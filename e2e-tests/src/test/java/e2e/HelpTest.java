@@ -26,8 +26,21 @@ public class HelpTest {
         File projectDir = copyTestProjectToTemporaryLocation("test-project-single-module");
         List<String> output = MvnRunner.runMaven(projectDir, "multi-module-release:help");
         assertThat(output, allOf(
-            hasItem(containsString("This plugin has 2 goals:"))
+            hasItem(containsString("This plugin has 2 goals:")),
+            hasItem(containsString("multi-module-release:release")),
+            hasItem(containsString("multi-module-release:help"))
         ));
+    }
 
+    @Test
+    public void canShowInformationAboutTheReleaseGoal() throws Exception {
+        File projectDir = copyTestProjectToTemporaryLocation("test-project-single-module");
+        List<String> output = MvnRunner.runMaven(projectDir,
+            "multi-module-release:help", "-Dgoal=release", "-Ddetail=true"
+        );
+        assertThat(output, allOf(
+            hasItem(containsString("The goals to run against the project during a release")),
+            hasItem(containsString("The release part of the version number to release"))
+        ));
     }
 }

@@ -10,17 +10,27 @@ import org.apache.maven.shared.invoker.*;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Releases the project.
+ */
 @Mojo(name = "release")
 public class ReleaseMojo extends AbstractMojo {
 
+    /**
+     * The release part of the version number to release. Given a snapshot version of "1.0-SNAPSHOT"
+     * and a releaseVersion value of "2", the actual released version will be "1.0.2". This can be
+     * specified using a command line parameter ("-DreleaseVersion=2") or in this plugin's configuration.
+     */
     @Parameter(alias = "releaseVersion", property = "releaseVersion")
     private String releaseVersion;
 
+    /**
+     * The goals to run against the project during a release. By default this is "deploy" which
+     * means the release version of your artifact will be tested and deployed.
+     */
     @Parameter(alias = "releaseGoals")
     private List<String> goals;
 
-    public ReleaseMojo() {
-    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
