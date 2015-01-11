@@ -10,6 +10,7 @@ import org.apache.maven.shared.invoker.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -21,11 +22,21 @@ public class MvnRunner {
     public static void installReleasePluginToLocalRepo() throws MavenInvocationException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(Collections.singletonList("install"));
+
         Properties props = new Properties();
         props.setProperty("skipTests", "true");
         request.setProperties(props);
         Invoker invoker = new DefaultInvoker();
+        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+        invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
         InvocationResult result = invoker.execute(request);
+
+        if (result.getExitCode() != 0) {
+            for (String line : logOutput.getLines()) {
+                System.out.println(line);
+            }
+        }
+
         assertThat("Exit code from running mvn install on this project", result.getExitCode(), is(0));
     }
 
@@ -47,7 +58,7 @@ public class MvnRunner {
         DefaultExecutor executor = new DefaultExecutor();
         executor.setWorkingDirectory(projectDir);
 
-        CollectingLogOutputStream logCollector = new CollectingLogOutputStream();
+        CollectingLogOutputStream logCollector = new CollectingLogOutputStream(true);
         PumpStreamHandler streamHandler = new PumpStreamHandler(logCollector);
         executor.setStreamHandler(streamHandler);
 
