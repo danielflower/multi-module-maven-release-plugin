@@ -52,8 +52,10 @@ public class MvnRunner {
         }
 
         CommandLine command = new CommandLine(m2.getCanonicalPath());
-        command.addArgument("com.github.danielflower.mavenplugins:multi-module-release-plugin:1.0-SNAPSHOT:release");
-        command.addArgument("-DreleaseVersion=" + releaseVersion);
+//        command.addArgument("-DreleaseGoal=install", false); // install rather than deploy during tests so we don't have dependency on Nexus
+        command.addArgument("-DreleaseVersion=" + releaseVersion, false);
+//        command.addArgument("com.github.danielflower.mavenplugins:multi-module-release-plugin:1.0-SNAPSHOT:release");
+        command.addArgument("multi-module-release:release");
 
         DefaultExecutor executor = new DefaultExecutor();
         executor.setWorkingDirectory(projectDir);
