@@ -42,6 +42,12 @@ public class MvnRunner {
     }
 
     public static List<String> runReleaseOn(File projectDir, String releaseVersion) throws IOException, InterruptedException {
+        return runMaven(projectDir,
+            "-DreleaseVersion=" + releaseVersion,
+            "multi-module-release:release");
+    }
+
+    public static List<String> runMaven(File projectDir, String... arguments) throws IOException {
         String mvnPath = System.getenv("M2_HOME");
         if (StringUtils.isBlank(mvnPath)) {
             throw new RuntimeException("M2_HOME is not set");
@@ -53,8 +59,9 @@ public class MvnRunner {
         }
 
         CommandLine command = new CommandLine(m2.getCanonicalPath());
-        command.addArgument("-DreleaseVersion=" + releaseVersion, false);
-        command.addArgument("multi-module-release:release");
+        for (String argument : arguments) {
+            command.addArgument(argument, false);
+        }
 
         DefaultExecutor executor = new DefaultExecutor();
         executor.setWorkingDirectory(projectDir);
