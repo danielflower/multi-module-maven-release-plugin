@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,9 +53,7 @@ public class MvnRunner {
         }
 
         CommandLine command = new CommandLine(m2.getCanonicalPath());
-//        command.addArgument("-DreleaseGoal=install", false); // install rather than deploy during tests so we don't have dependency on Nexus
         command.addArgument("-DreleaseVersion=" + releaseVersion, false);
-//        command.addArgument("com.github.danielflower.mavenplugins:multi-module-release-plugin:1.0-SNAPSHOT:release");
         command.addArgument("multi-module-release:release");
 
         DefaultExecutor executor = new DefaultExecutor();
@@ -72,6 +71,31 @@ public class MvnRunner {
         }
 
         return logCollector.getLines();
+    }
 
+    public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException, MavenInvocationException {
+        String artifact = groupId + ":" + artifactId + ":" + version;
+        File temp = new File("target/downloads/" + UUID.randomUUID());
+
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.8:copy"));
+
+        Properties props = new Properties();
+        props.setProperty("artifact", artifact);
+        props.setProperty("outputDirectory", temp.getCanonicalPath());
+
+        request.setProperties(props);
+        Invoker invoker = new DefaultInvoker();
+        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+        invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
+        InvocationResult result = invoker.execute(request);
+
+        if (result.getExitCode() != 0) {
+            for (String line : logOutput.getLines()) {
+                System.out.println(line);
+            }
+        }
+
+        assertThat("Could not find artifact in repository", result.getExitCode(), is(0));
     }
 }
