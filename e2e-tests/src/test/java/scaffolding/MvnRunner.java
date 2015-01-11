@@ -3,6 +3,7 @@ package scaffolding;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.maven.shared.invoker.*;
@@ -10,6 +11,7 @@ import org.apache.maven.shared.invoker.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -23,10 +25,11 @@ public class MvnRunner {
         props.setProperty("skipTests", "true");
         request.setProperties(props);
         Invoker invoker = new DefaultInvoker();
-        invoker.execute(request);
+        InvocationResult result = invoker.execute(request);
+        assertThat("Exit code from running mvn install on this project", result.getExitCode(), is(0));
     }
 
-    public static void runReleaseOn(File projectDir) throws IOException, InterruptedException {
+    public static List<String> runReleaseOn(File projectDir, String releaseVersion) throws IOException, InterruptedException {
         String mvnPath = System.getenv("M2_HOME");
         if (StringUtils.isBlank(mvnPath)) {
             throw new RuntimeException("M2_HOME is not set");
@@ -39,13 +42,23 @@ public class MvnRunner {
 
         CommandLine command = new CommandLine(m2.getCanonicalPath());
         command.addArgument("com.github.danielflower.mavenplugins:multi-module-release-plugin:1.0-SNAPSHOT:release");
+        command.addArgument("-DreleaseVersion=" + releaseVersion);
 
         DefaultExecutor executor = new DefaultExecutor();
         executor.setWorkingDirectory(projectDir);
+
+        CollectingLogOutputStream logCollector = new CollectingLogOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(logCollector);
+        executor.setStreamHandler(streamHandler);
+
         ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
         executor.setWatchdog(watchdog);
         int exitCode = executor.execute(command);
+        if (exitCode != 0) {
+            throw new RuntimeException("Exit code is " + 0);
+        }
 
-        assertThat(exitCode, is(0));
+        return logCollector.getLines();
+
     }
 }

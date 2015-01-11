@@ -1,42 +1,32 @@
 package e2e;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class SingleModuleTest {
 
-    @Before
-    public void installPluginToLocalRepo() throws MavenInvocationException {
+    @BeforeClass
+    public static void installPluginToLocalRepo() throws MavenInvocationException {
         MvnRunner.installReleasePluginToLocalRepo();
     }
 
     @Test
     public void canDoIt() throws IOException, InterruptedException {
         File projectDir = copyTestProjectToTemporaryLocation("test-project-single-module");
-        MvnRunner.runReleaseOn(projectDir);
+        String releaseVersion = String.valueOf(System.currentTimeMillis());
+        List<String> output = MvnRunner.runReleaseOn(projectDir, releaseVersion);
+        assertThat(output, hasItem(containsString("1.0-SNAPSHOT")));
     }
-
-    private File copyTestProjectToTemporaryLocation(String moduleName) throws IOException {
-        File source = new File(moduleName);
-        if (!source.isDirectory()) {
-            source = new File(FilenameUtils.separatorsToSystem("../" + moduleName));
-        }
-        if (!source.isDirectory()) {
-            throw new RuntimeException("Could not find module " + moduleName);
-        }
-
-        File target = new File(FilenameUtils.separatorsToSystem("target/samples/" + moduleName + "/" + UUID.randomUUID()));
-        FileUtils.copyDirectory(source, target);
-        return target;
-    }
-
 
 }
