@@ -20,16 +20,13 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void canDoIt() throws Exception {
+    public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
         File projectDir = copyTestProjectToTemporaryLocation("test-project-single-module");
         String releaseVersion = String.valueOf(System.currentTimeMillis());
         List<String> output = MvnRunner.runReleaseOn(projectDir, releaseVersion);
-        assertThat(output, allOf(
-//            hasItem(containsString("1.0-SNAPSHOT")),
-            hasItem(containsString("Release plugin running with release version " + releaseVersion))
-        ));
+        assertThat(output, hasItem(containsString("Release plugin running with release version " + releaseVersion)));
 
-        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "test-project-single-module", "1.0-SNAPSHOT");
+        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "test-project-single-module", "1.0." + releaseVersion);
     }
 
 }

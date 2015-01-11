@@ -20,7 +20,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MvnRunner {
+    public static boolean haveInstalledPlugin = false;
+
     public static void installReleasePluginToLocalRepo() throws MavenInvocationException {
+        if (haveInstalledPlugin) {
+            return;
+        }
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(Collections.singletonList("install"));
 
@@ -39,6 +44,7 @@ public class MvnRunner {
         }
 
         assertThat("Exit code from running mvn install on this project", result.getExitCode(), is(0));
+        haveInstalledPlugin = true;
     }
 
     public static List<String> runReleaseOn(File projectDir, String releaseVersion) throws IOException, InterruptedException {
@@ -103,6 +109,6 @@ public class MvnRunner {
             }
         }
 
-        assertThat("Could not find artifact in repository", result.getExitCode(), is(0));
+        assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
     }
 }
