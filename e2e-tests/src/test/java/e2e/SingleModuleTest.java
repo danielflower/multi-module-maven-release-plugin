@@ -24,7 +24,7 @@ public class SingleModuleTest {
         File projectDir = copyTestProjectToTemporaryLocation("test-project-single-module");
         String releaseVersion = String.valueOf(System.currentTimeMillis());
         List<String> output = MvnRunner.runReleaseOn(projectDir, releaseVersion);
-        assertThat(output, hasItem(containsString("Release plugin running with release version " + releaseVersion)));
+        assertThat(output, hasItem(containsString("Going to release test-project-single-module 1.0." + releaseVersion)));
 
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "test-project-single-module", "1.0." + releaseVersion);
     }

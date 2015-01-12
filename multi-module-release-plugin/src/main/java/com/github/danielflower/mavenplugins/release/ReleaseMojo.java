@@ -1,12 +1,18 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,6 +21,12 @@ import java.util.List;
  */
 @Mojo(name = "release")
 public class ReleaseMojo extends AbstractMojo {
+
+    /**
+     * The Maven Project.
+     */
+    @Parameter(property = "project", required = true, readonly = true, defaultValue = "${project}")
+    private MavenProject project;
 
     /**
      * The release part of the version number to release. Given a snapshot version of "1.0-SNAPSHOT"
@@ -34,8 +46,28 @@ public class ReleaseMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        getLog().info("Release plugin running with release version " + releaseVersion);
+        try {
+            updateVersion(project.getFile(), project.getVersion(), releaseVersion);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not update the version", e);
+        }
         deployReleasedProject();
+    }
+
+    private void updateVersion(File pom, String currentSnapshotVersion, String releaseVersion) throws IOException {
+        String newVersion = currentSnapshotVersion.replace("-SNAPSHOT", "").concat(".").concat(releaseVersion);
+        getLog().info("Going to release " + project.getArtifactId() + " " + newVersion);
+
+        project.getOriginalModel().setVersion(newVersion);
+        Writer fileWriter = new FileWriter(pom);
+
+        try {
+            MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+            pomWriter.write( fileWriter, project.getOriginalModel() );
+        } finally {
+            fileWriter.close();
+        }
+
     }
 
     private void deployReleasedProject() throws MojoExecutionException {
@@ -47,6 +79,7 @@ public class ReleaseMojo extends AbstractMojo {
         }
         request.setGoals(goals);
         getLog().info("About to run mvn " + goals);
+        System.out.println("project = " + project);
 
         Invoker invoker = new DefaultInvoker();
         try {
