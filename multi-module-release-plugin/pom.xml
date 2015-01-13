@@ -37,6 +37,12 @@
             <artifactId>maven-project</artifactId>
             <version>${mavenVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>3.6.1.201501031845-r</version>
+        </dependency>
+
     </dependencies>
 
     <build>

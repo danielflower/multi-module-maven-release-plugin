@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.MvnRunner.mvn;
@@ -47,8 +46,8 @@ public class HelpTest {
     private static Matcher<Iterable<? super String>> containsStrings(String... strings) {
         List<Matcher<Iterable<? super String>>> matchers = new ArrayList<Matcher<Iterable<? super String>>>();
         for (String s : strings)
-            matchers.add(CoreMatchers.hasItem(containsString(s)));
+            matchers.add(CoreMatchers.<String>hasItem(containsString(s)));
 
-        return allOf((Iterable) matchers);
+        return CoreMatchers.allOf((Iterable) matchers);
     }
 }
