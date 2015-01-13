@@ -6,7 +6,13 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.apache.maven.shared.invoker.*;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.apache.maven.shared.invoker.PrintStreamHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +24,11 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class MvnRunner {
+    public static final String test_project_single_module = "test-project-single-module";
+
     public static boolean haveInstalledPlugin = false;
 
     public static void installReleasePluginToLocalRepo() throws MavenInvocationException {
@@ -32,6 +41,7 @@ public class MvnRunner {
         Properties props = new Properties();
         props.setProperty("skipTests", "true");
         request.setProperties(props);
+
         Invoker invoker = new DefaultInvoker();
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
@@ -110,5 +120,10 @@ public class MvnRunner {
         }
 
         assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
+    }
+
+    public static List<String> mvn(String... arguments) throws IOException {
+        File projectDir = copyTestProjectToTemporaryLocation(test_project_single_module);
+        return runMaven(projectDir, arguments);
     }
 }

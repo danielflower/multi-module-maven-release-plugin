@@ -5,12 +5,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 
-import java.io.File;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
+import static scaffolding.MvnRunner.mvn;
 
 public class SingleModuleTest {
 
@@ -21,12 +19,13 @@ public class SingleModuleTest {
 
     @Test
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
-        File projectDir = copyTestProjectToTemporaryLocation("test-project-single-module");
         String releaseVersion = String.valueOf(System.currentTimeMillis());
-        List<String> output = MvnRunner.runReleaseOn(projectDir, releaseVersion);
-        assertThat(output, hasItem(containsString("Going to release test-project-single-module 1.0." + releaseVersion)));
+        String expected = "1.0." + releaseVersion;
 
-        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "test-project-single-module", "1.0." + releaseVersion);
+        assertThat(
+                mvn("-DreleaseVersion=" + releaseVersion, "multi-module-release:release"),
+                hasItem(containsString("Going to release test-project-single-module " + expected)));
+
+        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", MvnRunner.test_project_single_module, expected);
     }
-
 }
