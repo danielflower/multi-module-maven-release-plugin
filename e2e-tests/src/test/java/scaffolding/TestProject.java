@@ -2,7 +2,6 @@ package scaffolding;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,28 +38,32 @@ public class TestProject {
             "multi-module-release:release");
     }
 
-    private static TestProject project(String name) throws IOException, GitAPIException {
-        File originDir = copyTestProjectToTemporaryLocation(name);
+    private static TestProject project(String name) {
+        try {
+            File originDir = copyTestProjectToTemporaryLocation(name);
 
-        InitCommand initCommand = Git.init();
-        initCommand.setDirectory(originDir);
-        Git origin = initCommand.call();
+            InitCommand initCommand = Git.init();
+            initCommand.setDirectory(originDir);
+            Git origin = initCommand.call();
 
-        origin.add().addFilepattern(".").call();
-        origin.commit().setMessage("Initial commit").call();
+            origin.add().addFilepattern(".").call();
+            origin.commit().setMessage("Initial commit").call();
 
 
-        File localDir = Photocopier.folderForSampleProject(name);
-        Git local = Git.cloneRepository()
-            .setBare(false)
-            .setDirectory(localDir)
-            .setURI(originDir.toURI().toString())
-            .call();
+            File localDir = Photocopier.folderForSampleProject(name);
+            Git local = Git.cloneRepository()
+                .setBare(false)
+                .setDirectory(localDir)
+                .setURI(originDir.toURI().toString())
+                .call();
 
-        return new TestProject(originDir, origin, localDir, local);
+            return new TestProject(originDir, origin, localDir, local);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while creating copies of the test project");
+        }
     }
 
-    public static TestProject singleModuleProject() throws IOException, GitAPIException {
+    public static TestProject singleModuleProject() {
         return project("single-module");
     }
 

@@ -4,19 +4,17 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListTagCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 public class GitMatchers {
 
-    public static Matcher<Repository> hasTag(final String tag) {
-        return new TypeSafeMatcher<Repository>() {
+    public static Matcher<Git> hasTag(final String tag) {
+        return new TypeSafeMatcher<Git>() {
             @Override
-            protected boolean matchesSafely(Repository repo) {
-                Git git = new Git(repo);
-                ListTagCommand listTagCommand = git.tagList();
+            protected boolean matchesSafely(Git repo) {
+                ListTagCommand listTagCommand = repo.tagList();
                 try {
                     String targetRefName = "refs/tags/" + tag;
                     for (Ref ref : listTagCommand.call()) {

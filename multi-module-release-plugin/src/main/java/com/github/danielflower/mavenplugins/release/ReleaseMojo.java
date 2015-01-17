@@ -8,6 +8,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -46,16 +48,23 @@ public class ReleaseMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        String newVersion = project.getVersion().replace("-SNAPSHOT", "").concat(".").concat(releaseVersion);
         try {
-            updateVersion(project.getFile(), project.getVersion(), releaseVersion);
+            updateVersion(project.getFile(), newVersion);
         } catch (IOException e) {
             throw new MojoExecutionException("Could not update the version", e);
         }
         deployReleasedProject();
+        try {
+            tagRepo(project.getArtifactId() + "-" + newVersion);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not access the git repository. Please make sure you are releasing from a git repo.", e);
+        } catch (GitAPIException e) {
+            throw new MojoExecutionException("Could not tag the git repository", e);
+        }
     }
 
-    private void updateVersion(File pom, String currentSnapshotVersion, String releaseVersion) throws IOException {
-        String newVersion = currentSnapshotVersion.replace("-SNAPSHOT", "").concat(".").concat(releaseVersion);
+    private void updateVersion(File pom, String newVersion) throws IOException {
         getLog().info("Going to release " + project.getArtifactId() + " " + newVersion);
 
         project.getOriginalModel().setVersion(newVersion);
@@ -90,5 +99,12 @@ public class ReleaseMojo extends AbstractMojo {
         } catch (MavenInvocationException e) {
             throw new MojoExecutionException("Failed to build artifact", e);
         }
+    }
+
+    private void tagRepo(String tag) throws IOException, GitAPIException {
+        getLog().info("About to tag the repository with " + tag);
+        Git git = Git.open(new File("."));
+        git.tag().setAnnotated(true).setName(tag).setMessage("Release " + tag).call();
+        git.push().setPushTags().call();
     }
 }

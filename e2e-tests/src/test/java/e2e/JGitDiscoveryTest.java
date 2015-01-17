@@ -48,8 +48,8 @@ public class JGitDiscoveryTest {
         for (Ref ref : listTagCommand.call()) {
             System.out.println("ref = " + ref.getName());
         }
-        assertThat(repo, hasTag("tag-for-jgit-discovery-test"));
-        assertThat(repo, not(hasTag("some-non-existent-tag")));
+        assertThat(git, hasTag("tag-for-jgit-discovery-test"));
+        assertThat(git, not(hasTag("some-non-existent-tag")));
     }
 
     @Test public void name() throws IOException, GitAPIException {
