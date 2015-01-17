@@ -10,6 +10,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -104,7 +105,7 @@ public class ReleaseMojo extends AbstractMojo {
     private void tagRepo(String tag) throws IOException, GitAPIException {
         getLog().info("About to tag the repository with " + tag);
         Git git = Git.open(new File("."));
-        git.tag().setAnnotated(true).setName(tag).setMessage("Release " + tag).call();
-        git.push().setPushTags().call();
+        Ref tagRef = git.tag().setAnnotated(true).setName(tag).setMessage("Release " + tag).call();
+        git.push().add(tagRef).call();
     }
 }
