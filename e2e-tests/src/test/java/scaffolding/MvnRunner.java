@@ -6,13 +6,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.apache.maven.shared.invoker.DefaultInvocationRequest;
-import org.apache.maven.shared.invoker.DefaultInvoker;
-import org.apache.maven.shared.invoker.InvocationRequest;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.Invoker;
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.apache.maven.shared.invoker.PrintStreamHandler;
+import org.apache.maven.shared.invoker.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +18,6 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class MvnRunner {
     public static final String test_project_single_module = "test-project-single-module";
@@ -55,12 +48,6 @@ public class MvnRunner {
 
         assertThat("Exit code from running mvn install on this project", result.getExitCode(), is(0));
         haveInstalledPlugin = true;
-    }
-
-    public static List<String> runReleaseOn(File projectDir, String releaseVersion) throws IOException, InterruptedException {
-        return runMaven(projectDir,
-            "-DreleaseVersion=" + releaseVersion,
-            "multi-module-release:release");
     }
 
     public static List<String> runMaven(File projectDir, String... arguments) throws IOException {
@@ -114,6 +101,9 @@ public class MvnRunner {
         InvocationResult result = invoker.execute(request);
 
         if (result.getExitCode() != 0) {
+            System.out.println();
+            System.out.println("There was a problem checking for the existence of the artifact. Here is the output of the mvn command:");
+            System.out.println();
             for (String line : logOutput.getLines()) {
                 System.out.println(line);
             }
@@ -122,8 +112,5 @@ public class MvnRunner {
         assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
     }
 
-    public static List<String> mvn(String... arguments) throws IOException {
-        File projectDir = copyTestProjectToTemporaryLocation(test_project_single_module);
-        return runMaven(projectDir, arguments);
-    }
+
 }

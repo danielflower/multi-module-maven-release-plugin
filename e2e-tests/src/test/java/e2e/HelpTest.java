@@ -1,11 +1,13 @@
 package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MvnRunner;
+import scaffolding.TestProject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,25 +15,30 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.MvnRunner.mvn;
 
 public class HelpTest {
 
     public static final String multi_module_release_help = "multi-module-release:help";
+    private static TestProject someProject;
 
     @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
+    public static void installPluginToLocalRepo() throws MavenInvocationException, IOException, GitAPIException {
         MvnRunner.installReleasePluginToLocalRepo();
+        someProject = TestProject.singleModuleProject();
     }
 
     @Test
-    public void runningTheHelpMojoTellsYouAboutThePluging() throws IOException {
+    public void runningTheHelpMojoTellsYouAboutThePlugin() throws IOException {
         assertThat(
                 mvn(multi_module_release_help),
                 containsStrings(
                         "This plugin has 2 goals:",
                         "multi-module-release:release",
                         multi_module_release_help));
+    }
+
+    private List<String> mvn(String... commands) throws IOException {
+        return MvnRunner.runMaven(someProject.localDir, commands);
     }
 
     @Test

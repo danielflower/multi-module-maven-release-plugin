@@ -5,10 +5,10 @@ import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MvnRunner;
+import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.MvnRunner.mvn;
 
 public class SingleModuleTest {
 
@@ -21,11 +21,13 @@ public class SingleModuleTest {
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
         String releaseVersion = String.valueOf(System.currentTimeMillis());
         String expected = "1.0." + releaseVersion;
+        TestProject testProject = TestProject.singleModuleProject();
+
 
         assertThat(
-                mvn("-DreleaseVersion=" + releaseVersion, "multi-module-release:release"),
-                CoreMatchers.<String>hasItem(containsString("Going to release test-project-single-module " + expected)));
+            testProject.mvnRelease(releaseVersion),
+            CoreMatchers.hasItem(containsString("Going to release single-module " + expected)));
 
-        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", MvnRunner.test_project_single_module, expected);
+        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
     }
 }
