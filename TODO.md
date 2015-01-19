@@ -4,7 +4,6 @@ Release Plugin TODOs
 Features
 --------
 
-* Revert changes to pom.xml before tagging so that repo before release == repo after (excepting the tag)
 * Change the list of goals to just a goal string that allows arbitrary stuff to be passed to maven
 * Multi-module projects, with dependencies amongst them. Add one tag per module
 * Shared/inherited version numbers, or independent version numbers

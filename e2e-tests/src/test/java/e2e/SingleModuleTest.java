@@ -1,6 +1,8 @@
 package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
 import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,6 +13,8 @@ import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 
 public class SingleModuleTest {
@@ -39,5 +43,20 @@ public class SingleModuleTest {
         String expectedTag = "single-module-" + expected;
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, hasTag(expectedTag));
+    }
+
+    @Test
+    public void thePomChangesAreRevertedAfterTheRelease() throws IOException, InterruptedException {
+        ObjectId originHeadAtStart = head(testProject.origin);
+        ObjectId localHeadAtStart = head(testProject.local);
+        assertThat(originHeadAtStart, equalTo(localHeadAtStart));
+        testProject.mvnRelease(releaseVersion);
+        assertThat(head(testProject.origin), equalTo(originHeadAtStart));
+        assertThat(head(testProject.local), equalTo(localHeadAtStart));
+        assertThat(testProject.local, hasCleanWorkingDirectory());
+    }
+
+    private ObjectId head(Git git) throws IOException {
+        return git.getRepository().getRef("HEAD").getObjectId();
     }
 }

@@ -50,14 +50,22 @@ public class ReleaseMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         String newVersion = project.getVersion().replace("-SNAPSHOT", "").concat(".").concat(releaseVersion);
+
+        Git git = loadGitDir();
+
+        List<String> changedFiles;
         try {
-            updateVersion(project.getFile(), newVersion);
+            changedFiles = updateVersion(project.getFile(), newVersion);
         } catch (IOException e) {
             throw new MojoExecutionException("Could not update the version", e);
         }
-        deployReleasedProject();
         try {
-            tagRepo(project.getArtifactId() + "-" + newVersion);
+            deployReleasedProject();
+        } finally {
+            revertChanges(git, changedFiles);
+        }
+        try {
+            tagRepo(project.getArtifactId() + "-" + newVersion, git);
         } catch (IOException e) {
             throw new MojoExecutionException("Could not access the git repository. Please make sure you are releasing from a git repo.", e);
         } catch (GitAPIException e) {
@@ -65,7 +73,43 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private void updateVersion(File pom, String newVersion) throws IOException {
+    private static Git loadGitDir() throws MojoExecutionException {
+        Git git;
+        File gitDir = new File(".");
+        try {
+            git = Git.open(gitDir);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?");
+        }
+        return git;
+    }
+
+    private static String pathOf(File file) {
+        String gitPath;
+        try {
+            gitPath = file.getCanonicalPath();
+        } catch (IOException e1) {
+            gitPath = file.getAbsolutePath();
+        }
+        return gitPath;
+    }
+
+    private void revertChanges(Git git, List<String> changedFiles) throws MojoExecutionException {
+        boolean hasErrors = false;
+        for (String changedFile : changedFiles) {
+            try {
+                git.checkout().addPath(changedFile).call();
+            } catch (GitAPIException e) {
+                hasErrors = true;
+                getLog().error("Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
+            }
+        }
+        if (hasErrors) {
+            throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
+        }
+    }
+
+    private List<String> updateVersion(File pom, String newVersion) throws IOException {
         getLog().info("Going to release " + project.getArtifactId() + " " + newVersion);
 
         project.getOriginalModel().setVersion(newVersion);
@@ -78,6 +122,7 @@ public class ReleaseMojo extends AbstractMojo {
             fileWriter.close();
         }
 
+        return Collections.singletonList("pom.xml");
     }
 
     private void deployReleasedProject() throws MojoExecutionException {
@@ -102,9 +147,8 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private void tagRepo(String tag) throws IOException, GitAPIException {
+    private void tagRepo(String tag, Git git) throws IOException, GitAPIException {
         getLog().info("About to tag the repository with " + tag);
-        Git git = Git.open(new File("."));
         Ref tagRef = git.tag().setAnnotated(true).setName(tag).setMessage("Release " + tag).call();
         git.push().add(tagRef).call();
     }

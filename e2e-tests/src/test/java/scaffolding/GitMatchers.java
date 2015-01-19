@@ -36,4 +36,21 @@ public class GitMatchers {
         };
     }
 
+    public static Matcher<Git> hasCleanWorkingDirectory() {
+        return new TypeSafeMatcher<Git>() {
+            @Override
+            protected boolean matchesSafely(Git git) {
+                try {
+                    return git.status().call().isClean();
+                } catch (GitAPIException e) {
+                    throw new RuntimeException("Error checking git status", e);
+                }
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("A git directory with no staged or unstaged changes");
+            }
+        };
+    }
 }
