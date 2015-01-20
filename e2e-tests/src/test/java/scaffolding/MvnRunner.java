@@ -76,11 +76,14 @@ public class MvnRunner {
         ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
         executor.setWatchdog(watchdog);
         int exitCode = executor.execute(command);
+        List<String> output = logCollector.getLines();
+
+
         if (exitCode != 0) {
-            throw new RuntimeException("Exit code is " + 0);
+            throw new MavenExecutionException(exitCode, output);
         }
 
-        return logCollector.getLines();
+        return output;
     }
 
     public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException, MavenInvocationException {

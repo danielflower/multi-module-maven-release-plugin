@@ -4,7 +4,6 @@ Release Plugin TODOs
 Features
 --------
 
-* Change the list of goals to just a goal string that allows arbitrary stuff to be passed to maven
 * Multi-module projects, with dependencies amongst them. Add one tag per module
 * Shared/inherited version numbers, or independent version numbers
 * Allow easy way to bump minor or major versions of a module (during release?)
@@ -12,7 +11,6 @@ Features
 * Guess a good value for the release version if it's not specified
 * Allow releaseVersions to be numbers, strings, or number-string format
 * Allow optional appending of branch name to release version if not "master" (or supplied regex)
-* Allow skipTests option
 
 Validationy stuff
 -----------------
@@ -28,3 +26,4 @@ Stability stuff
 
 * Make sure it can be run from any folder
 * Use the value in the scm tag for the remote URL when pushing, if it's available
+* Figure out if things like MVN_OPTIONS and other JVM options need to be passed during release

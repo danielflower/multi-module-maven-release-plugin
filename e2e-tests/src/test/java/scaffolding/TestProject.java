@@ -67,4 +67,8 @@ public class TestProject {
         return project("single-module");
     }
 
+    public static TestProject moduleWithTestFailure() {
+        return project("module-with-test-failure");
+    }
+
 }

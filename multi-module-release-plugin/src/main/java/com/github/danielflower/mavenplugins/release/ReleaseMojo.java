@@ -19,6 +19,8 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 /**
  * Releases the project.
  */
@@ -45,6 +47,13 @@ public class ReleaseMojo extends AbstractMojo {
      */
     @Parameter(alias = "releaseGoals")
     private List<String> goals;
+
+    /**
+     * If true then tests will not be run during a release.
+     * This is the same as adding -DskipTests=true to the release goals.
+     */
+    @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
+    private boolean skipTests;
 
 
     @Override
@@ -127,14 +136,17 @@ public class ReleaseMojo extends AbstractMojo {
 
     private void deployReleasedProject() throws MojoExecutionException {
         InvocationRequest request = new DefaultInvocationRequest();
+        request.setInteractive(false);
 //        request.setPomFile( new File( "/path/to/pom.xml" ) );
 
         if (goals == null) {
-            goals = Collections.singletonList("deploy");
+            goals = asList("deploy");
+        }
+        if (skipTests) {
+            goals.add("-DskipTests=true");
         }
         request.setGoals(goals);
         getLog().info("About to run mvn " + goals);
-        System.out.println("project = " + project);
 
         Invoker invoker = new DefaultInvoker();
         try {
