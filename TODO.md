@@ -1,6 +1,8 @@
 Release Plugin TODOs
 ====================
 
+[![Build Status](https://travis-ci.org/danielflower/maven-multi-module-releaser.svg?branch=master)](https://travis-ci.org/danielflower/maven-multi-module-releaser)
+
 Features
 --------
 

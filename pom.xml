@@ -55,7 +55,6 @@
                 <executions>
                     <execution>
                         <id>copy</id>
-                        <phase>validate</phase>
                         <goals>
                             <goal>analyze</goal>
                         </goals>
