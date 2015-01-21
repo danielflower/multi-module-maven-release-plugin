@@ -15,7 +15,6 @@ Features
 Validationy stuff
 -----------------
 
-* Throw clear error early if supplied version is not valid
 * Throw clear error early if release is not in git repo
 * Throw clear error early if there are any snapshot versions for parents, dependencies or plugins
 * Throw clear error if working set is not clean

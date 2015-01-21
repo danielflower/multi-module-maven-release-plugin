@@ -58,7 +58,7 @@ public class ReleaseMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        String newVersion = project.getVersion().replace("-SNAPSHOT", "").concat(".").concat(releaseVersion);
+        String newVersion = new VersionNamer().name(project.getVersion(), releaseVersion);
 
         Git git = loadGitDir();
 
@@ -94,13 +94,13 @@ public class ReleaseMojo extends AbstractMojo {
     }
 
     private static String pathOf(File file) {
-        String gitPath;
+        String path;
         try {
-            gitPath = file.getCanonicalPath();
+            path = file.getCanonicalPath();
         } catch (IOException e1) {
-            gitPath = file.getAbsolutePath();
+            path = file.getAbsolutePath();
         }
-        return gitPath;
+        return path;
     }
 
     private void revertChanges(Git git, List<String> changedFiles) throws MojoExecutionException {
