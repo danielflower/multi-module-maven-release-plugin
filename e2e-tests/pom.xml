@@ -5,7 +5,7 @@
     <parent>
         <artifactId>maven-multi-module-releaser</artifactId>
         <groupId>com.github.danielflower.mavenplugins</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,12 @@
         <dependency>
             <groupId>com.github.danielflower.mavenplugins</groupId>
             <artifactId>multi-module-release-maven-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

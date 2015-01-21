@@ -16,7 +16,7 @@ public class CollectingLogOutputStream extends LogOutputStream {
     @Override
     protected void processLine(String line, int level) {
         if (logToStandardOut) {
-            System.out.println(line);
+            System.out.println("        " + line);
         }
         lines.add(line);
     }

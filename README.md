@@ -1,3 +1,6 @@
+THIS PROJECT IS IN DEVELOPMENT AND IS NOT READY FOR PRODUCTION USE
+==================================================================
+
 The Multi Module Maven Release Plugin for Git
 =============================================
 

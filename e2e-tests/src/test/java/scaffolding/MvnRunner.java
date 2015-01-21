@@ -20,7 +20,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MvnRunner {
-    public static final String test_project_single_module = "test-project-single-module";
 
     public static boolean haveInstalledPlugin = false;
 
@@ -42,7 +41,7 @@ public class MvnRunner {
 
         if (result.getExitCode() != 0) {
             for (String line : logOutput.getLines()) {
-                System.out.println(line);
+                System.out.println("        " + line);
             }
         }
 
@@ -77,7 +76,6 @@ public class MvnRunner {
         executor.setWatchdog(watchdog);
         int exitCode = executor.execute(command);
         List<String> output = logCollector.getLines();
-
 
         if (exitCode != 0) {
             throw new MavenExecutionException(exitCode, output);
@@ -114,6 +112,5 @@ public class MvnRunner {
 
         assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
     }
-
 
 }
