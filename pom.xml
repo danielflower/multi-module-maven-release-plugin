@@ -17,6 +17,31 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <ciManagement>
+        <system>travis-ci</system>
+        <url>https://travis-ci.org/danielflower/maven-multi-module-releaser</url>
+    </ciManagement>
+
+    <scm>
+        <url>https://github.com/danielflower/maven-multi-module-releaser</url>
+        <connection>https://github.com/danielflower/maven-multi-module-releaser.git</connection>
+    </scm>
+
+    <inceptionYear>2015</inceptionYear>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/danielflower/maven-multi-module-releaser/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
