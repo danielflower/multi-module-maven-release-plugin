@@ -2,10 +2,12 @@ package scaffolding;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListTagCommand;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
 
 public class GitMatchers {
@@ -37,11 +39,17 @@ public class GitMatchers {
     }
 
     public static Matcher<Git> hasCleanWorkingDirectory() {
-        return new TypeSafeMatcher<Git>() {
+        return new TypeSafeDiagnosingMatcher<Git>() {
             @Override
-            protected boolean matchesSafely(Git git) {
+            protected boolean matchesSafely(Git git, Description mismatchDescription) {
                 try {
-                    return git.status().call().isClean();
+                    Status status = git.status().call();
+                    if (!status.isClean()) {
+                        String start = "Uncommitted changes in ";
+                        String end = " at " + git.getRepository().getWorkTree().getAbsolutePath();
+                        mismatchDescription.appendValueList(start, ", ", end, status.getUncommittedChanges());
+                    }
+                    return status.isClean();
                 } catch (GitAPIException e) {
                     throw new RuntimeException("Error checking git status", e);
                 }

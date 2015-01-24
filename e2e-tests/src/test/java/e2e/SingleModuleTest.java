@@ -3,7 +3,6 @@ package e2e;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
-import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MvnRunner;
@@ -16,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
+import static scaffolding.ExactCountMatcher.oneOf;
 
 public class SingleModuleTest {
 
@@ -32,7 +32,7 @@ public class SingleModuleTest {
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
         assertThat(
             testProject.mvnRelease(releaseVersion),
-            CoreMatchers.hasItem(containsString("Going to release single-module " + expected)));
+            oneOf(containsString("Going to release single-module " + expected)));
 
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
     }
@@ -59,4 +59,5 @@ public class SingleModuleTest {
     private ObjectId head(Git git) throws IOException {
         return git.getRepository().getRef("HEAD").getObjectId();
     }
+
 }

@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -11,12 +10,10 @@ import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -24,7 +21,13 @@ import static java.util.Arrays.asList;
 /**
  * Releases the project.
  */
-@Mojo(name = "release")
+@Mojo(
+    name = "release",
+    requiresDirectInvocation = true, // this should not be bound to a phase as this plugin starts a phase itself
+    inheritByDefault = true, // so you can configure this in a shared parent pom
+    requiresProject = true, // this can only run against a maven project
+    aggregator = true // the plugin should only run once against the aggregator pom
+)
 public class ReleaseMojo extends AbstractMojo {
 
     /**
@@ -32,6 +35,9 @@ public class ReleaseMojo extends AbstractMojo {
      */
     @Parameter(property = "project", required = true, readonly = true, defaultValue = "${project}")
     private MavenProject project;
+
+    @Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
+    private List<MavenProject> projects;
 
     /**
      * The release part of the version number to release. Given a snapshot version of "1.0-SNAPSHOT"
@@ -62,9 +68,10 @@ public class ReleaseMojo extends AbstractMojo {
 
         Git git = loadGitDir();
 
-        List<String> changedFiles;
+        List<File> changedFiles;
         try {
-            changedFiles = updateVersion(project.getFile(), newVersion);
+            PomUpdater pomUpdater = new PomUpdater(getLog(), projects, newVersion);
+            changedFiles = pomUpdater.updateVersion();
         } catch (IOException e) {
             throw new MojoExecutionException("Could not update the version", e);
         }
@@ -74,7 +81,9 @@ public class ReleaseMojo extends AbstractMojo {
             revertChanges(git, changedFiles);
         }
         try {
-            tagRepo(project.getArtifactId() + "-" + newVersion, git);
+            for (MavenProject mavenProject : projects) {
+                tagRepo(mavenProject.getArtifactId() + "-" + newVersion, git);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Could not access the git repository. Please make sure you are releasing from a git repo.", e);
         } catch (GitAPIException e) {
@@ -103,11 +112,13 @@ public class ReleaseMojo extends AbstractMojo {
         return path;
     }
 
-    private void revertChanges(Git git, List<String> changedFiles) throws MojoExecutionException {
+    private void revertChanges(Git git, List<File> changedFiles) throws MojoExecutionException {
         boolean hasErrors = false;
-        for (String changedFile : changedFiles) {
+        File workTree = git.getRepository().getWorkTree();
+        for (File changedFile : changedFiles) {
             try {
-                git.checkout().addPath(changedFile).call();
+                String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
+                git.checkout().addPath(pathRelativeToWorkingTree).call();
             } catch (GitAPIException e) {
                 hasErrors = true;
                 getLog().error("Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
@@ -116,22 +127,6 @@ public class ReleaseMojo extends AbstractMojo {
         if (hasErrors) {
             throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
         }
-    }
-
-    private List<String> updateVersion(File pom, String newVersion) throws IOException {
-        getLog().info("Going to release " + project.getArtifactId() + " " + newVersion);
-
-        project.getOriginalModel().setVersion(newVersion);
-        Writer fileWriter = new FileWriter(pom);
-
-        try {
-            MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-            pomWriter.write( fileWriter, project.getOriginalModel() );
-        } finally {
-            fileWriter.close();
-        }
-
-        return Collections.singletonList("pom.xml");
     }
 
     private void deployReleasedProject() throws MojoExecutionException {

@@ -85,7 +85,7 @@ public class MvnRunner {
     }
 
     public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException, MavenInvocationException {
-        String artifact = groupId + ":" + artifactId + ":" + version;
+        String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
         File temp = new File("target/downloads/" + UUID.randomUUID());
 
         InvocationRequest request = new DefaultInvocationRequest();
