@@ -17,6 +17,7 @@ Features
 Validationy stuff
 -----------------
 
+* Make the user-error messages big and clear
 * Throw clear error early if release is not in git repo
 * Throw clear error early if there are any snapshot versions for parents, dependencies or plugins
 * Throw clear error if working set is not clean
