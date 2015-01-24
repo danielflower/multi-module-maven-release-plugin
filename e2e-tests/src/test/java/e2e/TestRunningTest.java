@@ -10,7 +10,6 @@ import scaffolding.TestProject;
 import java.io.IOException;
 
 public class TestRunningTest {
-    final TestProject projectWithTestsThatPass = TestProject.singleModuleProject();
     final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
 
     @BeforeClass
@@ -27,7 +26,7 @@ public class TestRunningTest {
     public void ifTestsAreSkippedYouCanReleaseWithoutRunningThem() throws IOException {
         projectWithTestsThatFail.mvn(
             "-DreleaseVersion=1", "-DskipTests",
-            "multi-module-release:release");
+            "releaser:release");
     }
 
 }

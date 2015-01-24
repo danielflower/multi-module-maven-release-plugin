@@ -1,5 +1,8 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -29,19 +32,37 @@ public class PomUpdater {
 
             log.info("Going to release " + project.getArtifactId() + " " + newVersion);
 
-            project.getOriginalModel().setVersion(newVersion);
+            Model originalModel = project.getOriginalModel();
+            alterModel(originalModel);
             File pom = project.getFile();
             changedPoms.add(pom);
             Writer fileWriter = new FileWriter(pom);
 
             try {
                 MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-                pomWriter.write(fileWriter, project.getOriginalModel());
+                pomWriter.write(fileWriter, originalModel);
             } finally {
                 fileWriter.close();
             }
         }
         return changedPoms;
+    }
+
+    private void alterModel(Model originalModel) {
+        originalModel.setVersion(newVersion);
+        Parent parent = originalModel.getParent();
+        if (parent != null && isSnapshot(parent.getVersion())) {
+            parent.setVersion(newVersion);
+        }
+        for (Dependency dependency : originalModel.getDependencies()) {
+            if (isSnapshot(dependency.getVersion())) {
+                dependency.setVersion(newVersion);
+            }
+        }
+    }
+
+    private boolean isSnapshot(String version) {
+        return (version != null && version.endsWith("-SNAPSHOT"));
     }
 
 }
