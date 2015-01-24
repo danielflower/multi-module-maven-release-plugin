@@ -11,6 +11,7 @@
         <module>multi-module-release-plugin</module>
         <module>e2e-tests</module>
     </modules>
+    <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
     </description>
     <url>https://github.com/danielflower/maven-multi-module-releaser</url>
