@@ -35,7 +35,7 @@ public class TestProject {
     public List<String> mvnRelease(String releaseVersion) throws IOException, InterruptedException {
         return runMaven(localDir,
             "-DreleaseVersion=" + releaseVersion,
-            "multi-module-release:release");
+            "releaser:release");
     }
 
     private static TestProject project(String name) {

@@ -18,7 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HelpTest {
 
-    public static final String multi_module_release_help = "multi-module-release:help";
+    public static final String multi_module_release_help = "releaser:help";
     private static TestProject someProject;
 
     @BeforeClass
@@ -33,7 +33,7 @@ public class HelpTest {
                 mvn(multi_module_release_help),
                 containsStrings(
                         "This plugin has 2 goals:",
-                        "multi-module-release:release",
+                        "releaser:release",
                         multi_module_release_help));
     }
 

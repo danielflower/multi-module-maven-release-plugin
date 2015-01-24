@@ -42,7 +42,7 @@ Add the plugin to your pom:
 
 And then call the plugin with a release number:
 
-	mvn multi-module-release:release -DreleaseVersion=1234
+	mvn releaser:release -DreleaseVersion=1234
 
 Differences with the maven-release-plugin
 -----------------------------------------
