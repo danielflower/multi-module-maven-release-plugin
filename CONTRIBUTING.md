@@ -31,9 +31,17 @@ Given everything is set up correctly, the following deploys a snapshot version:
 Performing a release
 --------------------
 
-The plugin can use itself to release itself.
+The plugin uses itself to release itself.
 
-    mvn com.github.danielflower.mavenplugins:multi-module-maven-release-plugin:0.1.12:release -DreleaseVersion=3 -P release,gpg
+    mvn releaser:release -DreleaseVersion=[put version here] -P release,gpg
+
+Note that for site generation you will need access to write to the Git repo and the following in your `settings.xml`:
+
+    <server>
+        <id>github</id>
+        <username>GitHubLogin</username>
+        <password>GitHubPassw0rd</password>
+    </server>
 
 Once released, go to the Nexus instance at https://oss.sonatype.org and log in, and then click on the "Staging Repositories"
 link where you should find a repository in the list that looks something like `comgithubdanielflower-1010`. Select that

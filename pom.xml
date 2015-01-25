@@ -16,6 +16,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <github.global.server>github</github.global.server>
+        <plugin.goal.prefix>releaser</plugin.goal.prefix>
     </properties>
 
     <ciManagement>
@@ -119,15 +121,12 @@
 
     <build>
         <plugins>
-
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
-                    <goalPrefix>releaser</goalPrefix>
+                    <goalPrefix>${plugin.goal.prefix}</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
@@ -237,6 +236,34 @@
                         </executions>
                     </plugin>
 
+                    <plugin>
+                        <groupId>com.github.danielflower.mavenplugins</groupId>
+                        <artifactId>multi-module-maven-release-plugin</artifactId>
+                        <version>0.1.12</version>
+                        <configuration>
+                            <releaseGoals>
+                                <releaseGoal>clean</releaseGoal>
+                                <releaseGoal>site</releaseGoal>
+                                <releaseGoal>deploy</releaseGoal>
+                            </releaseGoals>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <version>0.11</version>
+                        <configuration>
+                            <message>Creating site for ${project.version}</message>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                                <phase>site</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -260,7 +287,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
-                    <goalPrefix>releaser</goalPrefix>
+                    <goalPrefix>${plugin.goal.prefix}</goalPrefix>
                 </configuration>
             </plugin>
             <plugin>
