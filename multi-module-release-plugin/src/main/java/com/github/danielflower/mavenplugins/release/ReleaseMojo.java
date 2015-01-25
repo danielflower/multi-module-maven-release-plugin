@@ -14,6 +14,7 @@ import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -141,7 +142,14 @@ public class ReleaseMojo extends AbstractMojo {
             goals.add("-DskipTests=true");
         }
         request.setGoals(goals);
-        getLog().info("About to run mvn " + goals);
+        List<String> profiles = new ArrayList<String>();
+        for (Object activatedProfile : project.getActiveProfiles()) {
+            profiles.add(((org.apache.maven.model.Profile)activatedProfile).getId());
+        }
+        request.setProfiles(profiles);
+        String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;
+
+        getLog().info("About to run mvn " + goals + " with " + profilesInfo);
 
         Invoker invoker = new DefaultInvoker();
         try {

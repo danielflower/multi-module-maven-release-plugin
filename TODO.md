@@ -6,8 +6,8 @@ Release Plugin TODOs
 Features
 --------
 
-* Multi-module projects, with dependencies amongst them. Add one tag per module
-* Shared/inherited version numbers, or independent version numbers
+* Multi-module projects, with dependencies amongst them.
+* Independent version numbers
 * Allow easy way to bump minor or major versions of a module (during release?)
 * Do not re-release a module if it hasn't changed since the last one
 * Guess a good value for the release version if it's not specified

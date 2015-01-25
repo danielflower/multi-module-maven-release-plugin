@@ -34,6 +34,11 @@ public class ExactCountMatcher extends TypeSafeDiagnosingMatcher<List<String>> {
     }
 
     @Factory
+    public static Matcher<? super List<String>> noneOf(Matcher<String> stringMatcher) {
+        return new ExactCountMatcher(stringMatcher, 0);
+    }
+
+    @Factory
     public static Matcher<? super List<String>> oneOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 1);
     }

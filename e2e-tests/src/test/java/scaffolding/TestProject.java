@@ -67,6 +67,10 @@ public class TestProject {
         return project("single-module");
     }
 
+    public static TestProject moduleWithProfilesProject() {
+        return project("module-with-profiles");
+    }
+
     public static TestProject inheritedVersionsFromParent() {
         return project("inherited-versions-from-parent");
     }
