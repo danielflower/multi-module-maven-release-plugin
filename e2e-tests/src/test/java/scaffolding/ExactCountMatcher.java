@@ -23,7 +23,10 @@ public class ExactCountMatcher extends TypeSafeDiagnosingMatcher<List<String>> {
         }
         boolean okay = count == expectedCount;
         if (!okay) {
-            mismatchDescriptor.appendText("was matched " + count + " times");
+            mismatchDescriptor.appendText("was matched " + count + " times in the following list:");
+            String separator = String.format("%n") + "          ";
+            mismatchDescriptor.appendValueList(separator, separator, "", items);
+
         }
         return okay;
     }
