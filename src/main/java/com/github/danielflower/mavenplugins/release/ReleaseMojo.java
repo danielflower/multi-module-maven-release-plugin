@@ -68,14 +68,14 @@ public class ReleaseMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
         try {
-            String newVersion = new VersionNamer().name(project.getVersion(), releaseVersion);
+            Reactor reactor = Reactor.fromProjects(projects, releaseVersion);
 
             Git git = loadGitDir();
-            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(projects, newVersion, git);
+            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), git);
 
             List<File> changedFiles;
             try {
-                PomUpdater pomUpdater = new PomUpdater(log, projects, newVersion);
+                PomUpdater pomUpdater = new PomUpdater(log, reactor);
                 changedFiles = pomUpdater.updateVersion();
             } catch (IOException e) {
                 throw new MojoExecutionException("Could not update the version", e);
@@ -102,10 +102,10 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<MavenProject> projects, String newVersion, Git git) throws GitAPIException, ValidationException {
+    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, Git git) throws GitAPIException, ValidationException {
         List<String> names = new ArrayList<String>();
-        for (MavenProject mavenProject : projects) {
-            String tag = mavenProject.getArtifactId() + "-" + newVersion;
+        for (ReleasableModule module : modules) {
+            String tag = module.getTagName();
             if (GitHelper.hasLocalTag(git, tag)) {
                 String summary = "There is already a tag named " + tag + " in this repository.";
                 throw new ValidationException(summary, asList(

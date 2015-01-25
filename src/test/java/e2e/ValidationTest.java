@@ -11,6 +11,7 @@ import scaffolding.TestProject;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.ExactCountMatcher.twoOf;
 
 public class ValidationTest {
 
@@ -29,7 +30,7 @@ public class ValidationTest {
             Assert.fail("Should not have worked the second time");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output,
-                oneOf(containsString("There is already a tag named single-module-1.0.1 in this repository.")));
+                twoOf(containsString("There is already a tag named single-module-1.0.1 in this repository.")));
             assertThat(mee.output,
                 oneOf(containsString("It is likely that this version has been released before.")));
             assertThat(mee.output,

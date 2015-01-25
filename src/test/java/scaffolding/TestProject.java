@@ -75,6 +75,10 @@ public class TestProject {
         return project("inherited-versions-from-parent");
     }
 
+    public static TestProject independentVersionsProject() {
+        return project("independent-versions");
+    }
+
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }

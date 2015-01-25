@@ -6,13 +6,11 @@ Release Plugin TODOs
 Features
 --------
 
-* Multi-module projects, with dependencies amongst them.
-* Independent version numbers
-* Allow easy way to bump minor or major versions of a module (during release?)
 * Do not re-release a module if it hasn't changed since the last one
 * Guess a good value for the release version if it's not specified
 * Allow releaseVersions to be numbers, strings, or number-string format
 * Allow optional appending of branch name to release version if not "master" (or supplied regex)
+* Allow easy way to bump minor or major versions of a module (during release?)
 
 Validationy stuff
 -----------------
@@ -28,3 +26,5 @@ Stability stuff
 * Make sure it can be run from any folder
 * Use the value in the scm tag for the remote URL when pushing, if it's available
 * Figure out if things like MVN_OPTIONS and other JVM options need to be passed during release
+* Test more nested projects work
+* Test cases where things like group IDs in parents are omitted

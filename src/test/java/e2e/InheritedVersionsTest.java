@@ -21,7 +21,7 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-public class MultiModuleTest {
+public class InheritedVersionsTest {
 
     public static final String[] ARTIFACT_IDS = new String[]{"inherited-versions-from-parent", "core-utils", "console-app"};
     final String releaseVersion = String.valueOf(System.currentTimeMillis());
@@ -78,10 +78,10 @@ public class MultiModuleTest {
         assertThat(testProject.local, hasCleanWorkingDirectory());
     }
 
-    @Test
-    public void whenOneModuleDependsOnAnotherThenWhenReleasingThisDependencyHasTheRelaseVersion() {
-        // TODO: implement this
-    }
+//    @Test
+//    public void whenOneModuleDependsOnAnotherThenWhenReleasingThisDependencyHasTheRelaseVersion() {
+//        // TODO: implement this
+//    }
 
     private ObjectId head(Git git) throws IOException {
         return git.getRepository().getRef("HEAD").getObjectId();

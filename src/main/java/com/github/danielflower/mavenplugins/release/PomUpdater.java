@@ -2,7 +2,6 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -17,23 +16,22 @@ import java.util.List;
 public class PomUpdater {
 
     private final Log log;
-    private final List<MavenProject> projects;
-    private final String newVersion;
+    private final Reactor reactor;
 
-    public PomUpdater(Log log, List<MavenProject> projects, String newVersion) {
+    public PomUpdater(Log log, Reactor reactor) {
         this.log = log;
-        this.projects = projects;
-        this.newVersion = newVersion;
+        this.reactor = reactor;
     }
 
-    public List<File> updateVersion() throws IOException {
+    public List<File> updateVersion() throws IOException, ValidationException {
         List<File> changedPoms = new ArrayList<File>();
-        for (MavenProject project : projects) {
+        for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
+            MavenProject project = module.getProject();
 
-            log.info("Going to release " + project.getArtifactId() + " " + newVersion);
+            log.info("Going to release " + module.getArtifactId() + " " + module.getNewVersion());
 
             Model originalModel = project.getOriginalModel();
-            alterModel(originalModel);
+            alterModel(project, module.getNewVersion());
             File pom = project.getFile();
             changedPoms.add(pom);
             Writer fileWriter = new FileWriter(pom);
@@ -48,15 +46,22 @@ public class PomUpdater {
         return changedPoms;
     }
 
-    private void alterModel(Model originalModel) {
+    private void alterModel(MavenProject project, String newVersion) throws ValidationException {
+        Model originalModel = project.getOriginalModel();
         originalModel.setVersion(newVersion);
-        Parent parent = originalModel.getParent();
+
+
+        MavenProject parent = project.getParent();
         if (parent != null && isSnapshot(parent.getVersion())) {
-            parent.setVersion(newVersion);
+            String searchingFrom = "the parent reference in " + project.getFile().getAbsolutePath();
+            ReleasableModule parentBeingReleased = reactor.find(searchingFrom, parent.getGroupId(), parent.getArtifactId());
+            originalModel.getParent().setVersion(parentBeingReleased.getNewVersion());
         }
         for (Dependency dependency : originalModel.getDependencies()) {
             if (isSnapshot(dependency.getVersion())) {
-                dependency.setVersion(newVersion);
+                String searchingFrom = "a dependency in " + project.getFile().getAbsolutePath();
+                ReleasableModule dependencyBeingReleased = reactor.find(searchingFrom, dependency.getGroupId(), dependency.getArtifactId());
+                dependency.setVersion(dependencyBeingReleased.getNewVersion());
             }
         }
     }
