@@ -13,9 +13,9 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
-import static scaffolding.ExactCountMatcher.oneOf;
 
 public class SingleModuleTest {
 

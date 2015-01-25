@@ -9,6 +9,7 @@ import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -33,9 +34,15 @@ public class MultiModuleTest {
     }
 
     @Test
-    public void buildsEachProjectOnceAndOnlyOnce() throws Exception {
+    public void buildsAndInstallsAndTagsAllModules() throws Exception {
+        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease(releaseVersion));
+        installsAllModulesIntoTheRepoWithTheReleaseVersion();
+        theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
+    }
+
+    private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {
         assertThat(
-            testProject.mvnRelease(releaseVersion),
+            commandOutput,
             allOf(
                 oneOf(containsString("Going to release inherited-versions-from-parent " + expected)),
                 twoOf(containsString("Building inherited-versions-from-parent")), // once for initial build; once for release build
@@ -46,17 +53,13 @@ public class MultiModuleTest {
         );
     }
 
-    @Test
-    public void installsAllModulesIntoTheRepoWithTheReleaseVersion() throws Exception {
-        testProject.mvnRelease(releaseVersion);
+    private void installsAllModulesIntoTheRepoWithTheReleaseVersion() throws Exception {
         assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.versioninheritor", "inherited-versions-from-parent", expected);
         assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.versioninheritor", "core-utils", expected);
         assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.versioninheritor", "console-app", expected);
     }
 
-    @Test
-    public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
-        testProject.mvnRelease(releaseVersion);
+    private void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
         for (String artifactId : ARTIFACT_IDS) {
             String expectedTag = artifactId + "-" + expected;
             assertThat(testProject.local, hasTag(expectedTag));

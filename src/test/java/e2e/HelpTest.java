@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -55,6 +56,6 @@ public class HelpTest {
         for (String s : strings)
             matchers.add(CoreMatchers.<String>hasItem(containsString(s)));
 
-        return CoreMatchers.allOf((Iterable) matchers);
+        return allOf((Iterable) matchers);
     }
 }
