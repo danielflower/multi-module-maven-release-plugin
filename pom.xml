@@ -24,9 +24,8 @@
     </ciManagement>
 
     <scm>
-        <url>https://github.com/danielflower/multi-module-maven-release-plugin.git</url>
+        <url>https://github.com/danielflower/multi-module-maven-release-plugin</url>
         <connection>scm:git:git@github.com:danielflower/multi-module-maven-release-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:danielflower/multi-module-maven-release-plugin.git</developerConnection>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
@@ -116,8 +115,13 @@
 
     </dependencies>
 
+
+
     <build>
         <plugins>
+
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
@@ -160,6 +164,18 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>1.6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -236,5 +252,41 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.4</version>
+                <configuration>
+                    <goalPrefix>releaser</goalPrefix>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.18.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.8</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <!--<report>dependencies</report>-->
+                            <report>project-team</report>
+                            <!--<report>mailing-list</report>-->
+                            <!--<report>cim</report>-->
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

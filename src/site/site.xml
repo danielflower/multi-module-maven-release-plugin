@@ -1,0 +1,34 @@
+<project name="Multi Module Maven Release Plugin">
+    <bannerLeft>
+        <name>Multi Module Maven Release Plugin</name>
+    </bannerLeft>
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.3.0</version>
+    </skin>
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>true</topBarEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
+            <googleSearch>
+                <sitesearch>${project.url}</sitesearch>
+            </googleSearch>
+            <gitHub>
+                <projectId>danielflower/multi-module-maven-release-plugin</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>gray</ribbonColor>
+            </gitHub>
+        </fluidoSkin>
+    </custom>
+
+    <body>
+        <menu name="Overview">
+            <item name="Introduction" href="index.html"/>
+            <item name="Goals" href="plugin-info.html"/>
+            <item name="Usage" href="usage.html"/>
+            <item name="FAQ" href="FAQ.html"/>
+        </menu>
+        <menu ref="reports" inherit="top"/>
+    </body>
+</project>

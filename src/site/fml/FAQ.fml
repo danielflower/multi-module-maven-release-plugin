@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs xmlns="http://maven.apache.org/FML/1.0.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
+  title="Frequently Asked Questions"
+  toplink="false">
+
+  <part id="source-control">
+    <title>Source control</title>
+
+    <faq id="git-needed">
+      <question>
+        Does the Git executable need to be installed?
+      </question>
+      <answer>
+        <p>
+          No. The jgit java implementation of Git is used meaning you do not need to have Git installed.
+          This means you are free to use whichever version of Git you like without fear of compatibilty
+          which sometimes happens with the default maven release plugin due to the way it interprets
+          shell output of Git.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="which-remote">
+      <question>
+        Where do the tags get pushed?
+      </question>
+      <answer>
+        <p>The tags get pushed to whatever origin is pointing to. Note that the scm tag in the pom is
+        ignored by the plugin currently.</p>
+      </answer>
+    </faq>
+  </part>
+
+</faqs>

@@ -1,7 +1,7 @@
 Release Plugin TODOs
 ====================
 
-[![Build Status](https://travis-ci.org/danielflower/maven-multi-module-releaser.svg?branch=master)](https://travis-ci.org/danielflower/maven-multi-module-releaser)
+[![Build Status](https://travis-ci.org/danielflower/multi-module-maven-release-plugin.svg?branch=master)](https://travis-ci.org/danielflower/multi-module-maven-release-plugin)
 
 Features
 --------
@@ -28,3 +28,4 @@ Stability stuff
 * Figure out if things like MVN_OPTIONS and other JVM options need to be passed during release
 * Test more nested projects work
 * Test cases where things like group IDs in parents are omitted
+* Test that when failures happen, things are rolled back
