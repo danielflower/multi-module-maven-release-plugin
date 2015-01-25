@@ -33,7 +33,7 @@ Performing a release
 
 The plugin can use itself to release itself.
 
-    mvn com.github.danielflower.mavenplugins:multi-module-release-maven-plugin:release -DreleaseVersion=3 -P release,gpg
+    mvn com.github.danielflower.mavenplugins:multi-module-maven-release-plugin:release -DreleaseVersion=3 -P release,gpg
 
 Once released, go to the Nexus instance at https://oss.sonatype.org and close the release in the "Staging Repositories" link.
 

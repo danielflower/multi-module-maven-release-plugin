@@ -29,7 +29,7 @@ Add the plugin to your pom:
         <plugins>
             <plugin>
                 <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-release-maven-plugin</artifactId>
+                <artifactId>multi-module-maven-release-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
                     <releaseGoals>
