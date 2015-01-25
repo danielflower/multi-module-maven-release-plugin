@@ -8,12 +8,7 @@ The passwords for this should be in your Maven `settings.xml` with the following
 	<settings>
       <servers>
         <server>
-          <id>sonatype-nexus-staging</id>
-          <username>your sonatype nexus username</username>
-          <password>your password</password>
-        </server>
-        <server>
-          <id>sonatype-nexus-snapshots</id>
+          <id>ossrh</id>
           <username>your sonatype nexus username</username>
           <password>your password</password>
         </server>
