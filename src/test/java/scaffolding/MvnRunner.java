@@ -76,7 +76,12 @@ public class MvnRunner {
 
         ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
         executor.setWatchdog(watchdog);
-        int exitCode = executor.execute(command);
+        int exitCode;
+        try {
+            exitCode = executor.execute(command);
+        } catch (Exception e) {
+            throw new MavenExecutionException(1, logCollector.getLines());
+        }
         List<String> output = logCollector.getLines();
 
         if (exitCode != 0) {

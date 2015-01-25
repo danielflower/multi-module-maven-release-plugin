@@ -3,6 +3,7 @@ package com.github.danielflower.mavenplugins.release;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -65,31 +66,74 @@ public class ReleaseMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        String newVersion = new VersionNamer().name(project.getVersion(), releaseVersion);
+        Log log = getLog();
+        try {
+            String newVersion = new VersionNamer().name(project.getVersion(), releaseVersion);
 
-        Git git = loadGitDir();
+            Git git = loadGitDir();
+            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(projects, newVersion, git);
 
-        List<File> changedFiles;
-        try {
-            PomUpdater pomUpdater = new PomUpdater(getLog(), projects, newVersion);
-            changedFiles = pomUpdater.updateVersion();
-        } catch (IOException e) {
-            throw new MojoExecutionException("Could not update the version", e);
-        }
-        try {
-            deployReleasedProject();
-        } finally {
-            revertChanges(git, changedFiles);
-        }
-        try {
-            for (MavenProject mavenProject : projects) {
-                tagRepo(mavenProject.getArtifactId() + "-" + newVersion, git);
+            List<File> changedFiles;
+            try {
+                PomUpdater pomUpdater = new PomUpdater(log, projects, newVersion);
+                changedFiles = pomUpdater.updateVersion();
+            } catch (IOException e) {
+                throw new MojoExecutionException("Could not update the version", e);
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Could not access the git repository. Please make sure you are releasing from a git repo.", e);
-        } catch (GitAPIException e) {
-            throw new MojoExecutionException("Could not tag the git repository", e);
+            try {
+                deployReleasedProject();
+            } finally {
+                revertChanges(git, changedFiles);
+            }
+            try {
+                for (String tagName : tagNames) {
+                    tagRepo(tagName, git);
+                }
+            } catch (IOException e) {
+                throw new MojoExecutionException("Could not access the git repository. Please make sure you are releasing from a git repo.", e);
+            } catch (GitAPIException e) {
+                throw new MojoExecutionException("Could not tag the git repository", e);
+            }
+        } catch (GitAPIException gae) {
+            printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
+                asList("There was an error while accessing the Git repository. The error returned from git was:", gae.getMessage()));
+        } catch (ValidationException e) {
+            printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         }
+    }
+
+    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<MavenProject> projects, String newVersion, Git git) throws GitAPIException, ValidationException {
+        List<String> names = new ArrayList<String>();
+        for (MavenProject mavenProject : projects) {
+            String tag = mavenProject.getArtifactId() + "-" + newVersion;
+            if (GitHelper.hasLocalTag(git, tag)) {
+                String summary = "There is already a tag named " + tag + " in this repository.";
+                throw new ValidationException(summary, asList(
+                    summary,
+                    "It is likely that this version has been released before.",
+                    "Please try incrementing the release version and trying again."
+                ));
+            }
+            names.add(tag);
+        }
+        return names;
+    }
+
+    private void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
+        log.error("");
+        log.error("");
+        log.error("");
+        log.error("************************************");
+        log.error("Could not execute the release plugin");
+        log.error("************************************");
+        log.error("");
+        log.error("");
+        for (String line : linesToLog) {
+            log.error(line);
+        }
+        log.error("");
+        log.error("");
+        throw new MojoExecutionException(terseMessage);
     }
 
     private static Git loadGitDir() throws MojoExecutionException {
@@ -144,7 +188,7 @@ public class ReleaseMojo extends AbstractMojo {
         request.setGoals(goals);
         List<String> profiles = new ArrayList<String>();
         for (Object activatedProfile : project.getActiveProfiles()) {
-            profiles.add(((org.apache.maven.model.Profile)activatedProfile).getId());
+            profiles.add(((org.apache.maven.model.Profile) activatedProfile).getId());
         }
         request.setProfiles(profiles);
         String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;

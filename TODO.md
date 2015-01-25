@@ -17,11 +17,10 @@ Features
 Validationy stuff
 -----------------
 
-* Make the user-error messages big and clear
-* Throw clear error early if release is not in git repo
+* Throw clear error early if releasing from a folder that is not a git repo
 * Throw clear error early if there are any snapshot versions for parents, dependencies or plugins
 * Throw clear error if working set is not clean
-* Throw clear error early if tag already exists (what if it exists locally but not remotely? or other way round?)
+* Throw clear error early if tag already exists remotely (is this a good idea?)
 
 Stability stuff
 ---------------

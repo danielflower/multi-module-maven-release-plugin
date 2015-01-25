@@ -1,10 +1,10 @@
 package scaffolding;
 
+import com.github.danielflower.mavenplugins.release.GitHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListTagCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -16,19 +16,11 @@ public class GitMatchers {
         return new TypeSafeMatcher<Git>() {
             @Override
             protected boolean matchesSafely(Git repo) {
-                ListTagCommand listTagCommand = repo.tagList();
                 try {
-                    String targetRefName = "refs/tags/" + tag;
-                    for (Ref ref : listTagCommand.call()) {
-                        String tagName = ref.getName();
-                        if (tagName.equals(targetRefName)) {
-                            return true;
-                        }
-                    }
+                    return GitHelper.hasLocalTag(repo, tag);
                 } catch (GitAPIException e) {
                     throw new RuntimeException("Couldn't access repo", e);
                 }
-                return false;
             }
 
             @Override

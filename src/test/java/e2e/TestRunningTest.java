@@ -1,9 +1,9 @@
 package e2e;
 
-import org.apache.commons.exec.ExecuteException;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
@@ -17,7 +17,7 @@ public class TestRunningTest {
         MvnRunner.installReleasePluginToLocalRepo();
     }
 
-    @Test(expected = ExecuteException.class)
+    @Test(expected = MavenExecutionException.class)
     public void doesNotReleaseIfThereAreTestFailures() throws Exception {
         projectWithTestsThatFail.mvnRelease("1");
     }
