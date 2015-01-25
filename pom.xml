@@ -21,20 +21,20 @@
 
     <ciManagement>
         <system>travis-ci</system>
-        <url>https://travis-ci.org/danielflower/maven-multi-module-releaser</url>
+        <url>https://travis-ci.org/danielflower/multi-module-maven-release-plugin</url>
     </ciManagement>
 
     <scm>
-        <url>https://github.com/danielflower/maven-multi-module-releaser</url>
-        <connection>scm:git:git@github.com:danielflower/maven-multi-module-releaser.git</connection>
-        <developerConnection>scm:git:git@github.com:danielflower/maven-multi-module-releaser.git</developerConnection>
+        <url>https://github.com/danielflower/multi-module-maven-release-plugin.git</url>
+        <connection>scm:git:git@github.com:danielflower/multi-module-maven-release-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:danielflower/multi-module-maven-release-plugin.git</developerConnection>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/danielflower/maven-multi-module-releaser/issues</url>
+        <url>https://github.com/danielflower/multi-module-maven-release-plugin/issues</url>
     </issueManagement>
 
     <licenses>
