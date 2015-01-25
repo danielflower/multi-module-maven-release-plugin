@@ -239,7 +239,7 @@
                     <plugin>
                         <groupId>com.github.danielflower.mavenplugins</groupId>
                         <artifactId>multi-module-maven-release-plugin</artifactId>
-                        <version>0.1.12</version>
+                        <version>0.1.16.16</version>
                         <configuration>
                             <releaseGoals>
                                 <releaseGoal>clean</releaseGoal>
