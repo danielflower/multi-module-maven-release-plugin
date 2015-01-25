@@ -239,7 +239,7 @@
                     <plugin>
                         <groupId>com.github.danielflower.mavenplugins</groupId>
                         <artifactId>multi-module-maven-release-plugin</artifactId>
-                        <version>0.1.16.16</version>
+                        <version>0.1.17</version>
                         <configuration>
                             <releaseGoals>
                                 <releaseGoal>clean</releaseGoal>
@@ -302,10 +302,8 @@
                 <reportSets>
                     <reportSet>
                         <reports>
-                            <!--<report>dependencies</report>-->
                             <report>project-team</report>
-                            <!--<report>mailing-list</report>-->
-                            <!--<report>cim</report>-->
+                            <report>cim</report>
                             <report>issue-tracking</report>
                             <report>license</report>
                             <report>scm</report>
