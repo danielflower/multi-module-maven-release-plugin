@@ -38,6 +38,11 @@ public class SingleModuleTest {
     }
 
     @Test
+    public void theBuildNumberIsOptional() throws IOException {
+        testProject.mvn("releaser:release");
+    }
+
+    @Test
     public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
         testProject.mvnRelease(buildNumber);
         String expectedTag = "single-module-" + expected;
