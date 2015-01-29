@@ -33,7 +33,7 @@ Performing a release
 
 The plugin uses itself to release itself.
 
-    mvn releaser:release -DreleaseVersion=[put version here] -P release,gpg
+    mvn releaser:release -DbuildNumber=[put version here] -P release,gpg
 
 Note that for site generation you will need access to write to the Git repo and the following in your `settings.xml`:
 

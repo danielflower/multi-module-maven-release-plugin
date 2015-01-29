@@ -12,8 +12,8 @@ public class ReleasableModuleBuilder {
     MavenProject project = new MavenProject();
     private String buildNumber = "123";
 
-    public ReleasableModuleBuilder withBuildNumber(String releaseVersion) {
-        this.buildNumber = releaseVersion;
+    public ReleasableModuleBuilder withBuildNumber(String buildNumber) {
+        this.buildNumber = buildNumber;
         return this;
     }
 
