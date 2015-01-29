@@ -11,9 +11,6 @@
         <fluidoSkin>
             <topBarEnabled>true</topBarEnabled>
             <sideBarEnabled>true</sideBarEnabled>
-            <googleSearch>
-                <sitesearch>${project.url}</sitesearch>
-            </googleSearch>
             <gitHub>
                 <projectId>danielflower/multi-module-maven-release-plugin</projectId>
                 <ribbonOrientation>right</ribbonOrientation>

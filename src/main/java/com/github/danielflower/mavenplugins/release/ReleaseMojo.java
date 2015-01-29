@@ -48,17 +48,31 @@ public class ReleaseMojo extends AbstractMojo {
      * specified using a command line parameter ("-DbuildNumber=2") or in this plugin's configuration.
      * </p>
      * <p>
-     *     By default, in no value is specified then this is a value based on the current time
-     *     such as "20150129135926".
+     * By default, in no value is specified then this is a value based on the current time
+     * such as "20150129135926".
      * </p>
-     *
      */
     @Parameter(property = "buildNumber")
     private String buildNumber;
 
     /**
+     * <p>
      * The goals to run against the project during a release. By default this is "deploy" which
      * means the release version of your artifact will be tested and deployed.
+     * </p>
+     * <p>
+     * You can specify more goals and maven options. For example if you want to perform
+     * a clean, build a maven site, and then deploys it, use:
+     * </p>
+     * <pre>
+     * {@code
+     * <releaseGoals>
+     *     <releaseGoal>clean</releaseGoal>
+     *     <releaseGoal>site</releaseGoal>
+     *     <releaseGoal>deploy</releaseGoal>
+     * </releaseGoals>
+     * }
+     * </pre>
      */
     @Parameter(alias = "releaseGoals")
     private List<String> goals;
