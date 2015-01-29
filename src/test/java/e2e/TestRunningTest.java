@@ -25,7 +25,7 @@ public class TestRunningTest {
     @Test
     public void ifTestsAreSkippedYouCanReleaseWithoutRunningThem() throws IOException {
         projectWithTestsThatFail.mvn(
-            "-DreleaseVersion=1", "-DskipTests",
+            "-DbuildNumber=1", "-DskipTests",
             "releaser:release");
     }
 

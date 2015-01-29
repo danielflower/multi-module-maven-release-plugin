@@ -9,9 +9,9 @@ This plugin is an alternative to the `maven-release-plugin` which was created wi
 * Git should not need to be installed on the system.
 
 The plugin works with the idea that a software module has two types of versions: the "business version" and the
-"release number". The business version is used for semantic versioning, and may be something like "1.0", "1.1", etc.
+"build number". The business version is used for semantic versioning, and may be something like "1.0", "1.1.0", etc.
 During development, the version in the pom is the business version with `-SNAPSHOT` appended. During a release, module
-version becomes `business-version.release-number` and this is what the repo is tagged with, and this is what the
+version becomes `business-version.build-number` and this is what the repo is tagged with, and this is what the
 pom version becomes in the deployed artifact (however this version is not committed as a change to your pom).
 
 Using a number that increments on each release - like your CI server's build number for example - is highly recommended

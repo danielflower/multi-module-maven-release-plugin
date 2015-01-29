@@ -19,10 +19,11 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(List<MavenProject> projects, String releaseVersion) throws ValidationException {
+    public static Reactor fromProjects(List<MavenProject> projects, String buildNumber) throws ValidationException {
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
+        VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
         for (MavenProject project : projects) {
-            modules.add(new ReleasableModule(project, releaseVersion));
+            modules.add(new ReleasableModule(project, buildNumber, versionNamer));
         }
         return new Reactor(modules);
     }

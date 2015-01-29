@@ -23,10 +23,10 @@ import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
 public class IndependentVersionsTest {
 
-    final String releaseVersion = String.valueOf(System.currentTimeMillis());
-    final String expectedParentVersion = "1.0." + releaseVersion;
-    final String expectedCoreVersion = "2.0." + releaseVersion;
-    final String expectedAppVersion = "3.2." + releaseVersion;
+    final String buildNumber = String.valueOf(System.currentTimeMillis());
+    final String expectedParentVersion = "1.0." + buildNumber;
+    final String expectedCoreVersion = "2.0." + buildNumber;
+    final String expectedAppVersion = "3.2." + buildNumber;
     final TestProject testProject = TestProject.independentVersionsProject();
 
     @BeforeClass
@@ -36,8 +36,8 @@ public class IndependentVersionsTest {
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
-        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease(releaseVersion));
-        installsAllModulesIntoTheRepoWithTheReleaseVersion();
+        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease(buildNumber));
+        installsAllModulesIntoTheRepoWithTheBuildNumber();
         theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
     }
 
@@ -54,7 +54,7 @@ public class IndependentVersionsTest {
         );
     }
 
-    private void installsAllModulesIntoTheRepoWithTheReleaseVersion() throws Exception {
+    private void installsAllModulesIntoTheRepoWithTheBuildNumber() throws Exception {
         assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "independent-versions", expectedParentVersion);
         assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "core-utils", expectedCoreVersion);
         assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "console-app", expectedAppVersion);
@@ -76,7 +76,7 @@ public class IndependentVersionsTest {
         ObjectId originHeadAtStart = head(testProject.origin);
         ObjectId localHeadAtStart = head(testProject.local);
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
-        testProject.mvnRelease(releaseVersion);
+        testProject.mvnRelease(buildNumber);
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());

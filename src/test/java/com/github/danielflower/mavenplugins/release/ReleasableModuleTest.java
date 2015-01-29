@@ -12,7 +12,7 @@ public class ReleasableModuleTest {
         ReleasableModule module = aModule()
             .withArtifactId("my-artifact")
             .withSnapshotVersion("1.0-SNAPSHOT")
-            .withReleaseVersion("123")
+            .withBuildNumber("123")
             .build();
         assertThat(module.getTagName(), equalTo("my-artifact-1.0.123"));
     }

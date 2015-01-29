@@ -33,7 +33,7 @@ public class ExecutionTest {
 
     @Test
     public void profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment() throws Exception {
-        List<String> consoleOutput = testProject.mvn("-DreleaseVersion=1", "releaser:release", "-P runTestsProfile");
+        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", "releaser:release", "-P runTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("The module-with-profiles test has run")));
 
         // can only uncomment if you know there are no globally activated profiles on the current computer

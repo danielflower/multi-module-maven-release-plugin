@@ -42,12 +42,19 @@ public class ReleaseMojo extends AbstractMojo {
     private List<MavenProject> projects;
 
     /**
-     * The release part of the version number to release. Given a snapshot version of "1.0-SNAPSHOT"
-     * and a releaseVersion value of "2", the actual released version will be "1.0.2". This can be
-     * specified using a command line parameter ("-DreleaseVersion=2") or in this plugin's configuration.
+     * <p>
+     * The build number to use in the release version. Given a snapshot version of "1.0-SNAPSHOT"
+     * and a buildNumber value of "2", the actual released version will be "1.0.2". This can be
+     * specified using a command line parameter ("-DbuildNumber=2") or in this plugin's configuration.
+     * </p>
+     * <p>
+     *     By default, in no value is specified then this is a value based on the current time
+     *     such as "20150129135926".
+     * </p>
+     *
      */
-    @Parameter(alias = "releaseVersion", property = "releaseVersion")
-    private String releaseVersion;
+    @Parameter(property = "buildNumber")
+    private String buildNumber;
 
     /**
      * The goals to run against the project during a release. By default this is "deploy" which
@@ -68,7 +75,7 @@ public class ReleaseMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
         try {
-            Reactor reactor = Reactor.fromProjects(projects, releaseVersion);
+            Reactor reactor = Reactor.fromProjects(projects, buildNumber);
 
             Git git = loadGitDir();
             List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), git);
@@ -111,7 +118,7 @@ public class ReleaseMojo extends AbstractMojo {
                 throw new ValidationException(summary, asList(
                     summary,
                     "It is likely that this version has been released before.",
-                    "Please try incrementing the release version and trying again."
+                    "Please try incrementing the build number and trying again."
                 ));
             }
             names.add(tag);

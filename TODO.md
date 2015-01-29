@@ -7,8 +7,7 @@ Features
 --------
 
 * Do not re-release a module if it hasn't changed since the last one
-* Guess a good value for the release version if it's not specified
-* Allow releaseVersions to be numbers, strings, or number-string format
+* Allow build numbers to be numbers, strings, or number-string format
 * Allow optional appending of branch name to release version if not "master" (or supplied regex)
 * Allow easy way to bump minor or major versions of a module (during release?)
 

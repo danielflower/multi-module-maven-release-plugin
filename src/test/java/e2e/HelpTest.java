@@ -48,7 +48,7 @@ public class HelpTest {
                 mvn(multi_module_release_help, "-Dgoal=release", "-Ddetail=true"),
                 containsStrings(
                         "The goals to run against the project during a release",
-                        "The release part of the version number to release"));
+                        "The build number to use in the release version"));
     }
 
     private static Matcher<Iterable<? super String>> containsStrings(String... strings) {

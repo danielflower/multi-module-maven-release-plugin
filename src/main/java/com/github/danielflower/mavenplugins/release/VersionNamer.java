@@ -2,11 +2,26 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.eclipse.jgit.lib.Repository;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import static java.util.Arrays.asList;
 
 public class VersionNamer {
-    public String name(String pomVersion, String releaseVersion) throws ValidationException {
-        String newVersion = pomVersion.replace("-SNAPSHOT", "").concat(".").concat(releaseVersion);
+    private final Clock clock;
+
+    public VersionNamer(Clock clock) {
+        this.clock = clock;
+    }
+
+    public String name(String pomVersion, String buildNumber) throws ValidationException {
+        if (buildNumber == null || buildNumber.trim().length() == 0) {
+            buildNumber = currentDate();
+        }
+
+        String newVersion = pomVersion.replace("-SNAPSHOT", "").concat(".").concat(buildNumber);
         if (!Repository.isValidRefName("refs/tags/" + newVersion)) {
             String summary = "Sorry, '" + newVersion + "' is not a valid version.";
             throw new ValidationException(summary, asList(
@@ -16,5 +31,11 @@ public class VersionNamer {
             ));
         }
         return newVersion;
+    }
+
+    private String currentDate() {
+        DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return format.format(clock.now());
     }
 }

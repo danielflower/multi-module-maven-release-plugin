@@ -5,14 +5,14 @@ import org.apache.maven.project.MavenProject;
 public class ReleasableModule {
 
     private final MavenProject project;
-    private final String releaseVersion;
+    private final String buildNumber;
     private final String tagName;
     private final String newVersion;
 
-    public ReleasableModule(MavenProject project, String releaseVersion) throws ValidationException {
+    public ReleasableModule(MavenProject project, String buildNumber, VersionNamer versionNamer) throws ValidationException {
         this.project = project;
-        this.releaseVersion = releaseVersion;
-        this.newVersion = new VersionNamer().name(project.getVersion(), releaseVersion);
+        this.buildNumber = buildNumber;
+        this.newVersion = versionNamer.name(project.getVersion(), buildNumber);
         this.tagName = project.getArtifactId() + "-" + newVersion;
     }
 

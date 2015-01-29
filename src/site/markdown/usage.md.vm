@@ -20,4 +20,4 @@ Add the plugin to your pom:
 
 And then call the plugin with a release number:
 
-	mvn releaser:release -DreleaseVersion=1234
+	mvn releaser:release -DbuildNumber=1234

@@ -32,9 +32,9 @@ public class TestProject {
         return runMaven(localDir, arguments);
     }
 
-    public List<String> mvnRelease(String releaseVersion) throws IOException, InterruptedException {
+    public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
         return runMaven(localDir,
-            "-DreleaseVersion=" + releaseVersion,
+            "-DbuildNumber=" + buildNumber,
             "releaser:release");
     }
 

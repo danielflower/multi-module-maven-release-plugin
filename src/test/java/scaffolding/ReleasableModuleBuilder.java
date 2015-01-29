@@ -1,16 +1,19 @@
 package scaffolding;
 
+import com.github.danielflower.mavenplugins.release.Clock;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.VersionNamer;
 import org.apache.maven.project.MavenProject;
 
 public class ReleasableModuleBuilder {
 
+    private final VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
     MavenProject project = new MavenProject();
-    private String releaseVersion = "123";
+    private String buildNumber = "123";
 
-    public ReleasableModuleBuilder withReleaseVersion(String releaseVersion) {
-        this.releaseVersion = releaseVersion;
+    public ReleasableModuleBuilder withBuildNumber(String releaseVersion) {
+        this.buildNumber = releaseVersion;
         return this;
     }
 
@@ -30,7 +33,7 @@ public class ReleasableModuleBuilder {
     }
 
     public ReleasableModule build() throws ValidationException {
-        return new ReleasableModule(project, releaseVersion);
+        return new ReleasableModule(project, buildNumber, versionNamer);
     }
 
     public static ReleasableModuleBuilder aModule() {

@@ -34,7 +34,7 @@ public class ValidationTest {
             assertThat(mee.output,
                 oneOf(containsString("It is likely that this version has been released before.")));
             assertThat(mee.output,
-                oneOf(containsString("Please try incrementing the release version and trying again.")));
+                oneOf(containsString("Please try incrementing the build number and trying again.")));
         }
     }
 

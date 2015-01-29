@@ -19,8 +19,8 @@ import static scaffolding.GitMatchers.hasTag;
 
 public class SingleModuleTest {
 
-    final String releaseVersion = String.valueOf(System.currentTimeMillis());
-    final String expected = "1.0." + releaseVersion;
+    final String buildNumber = String.valueOf(System.currentTimeMillis());
+    final String expected = "1.0." + buildNumber;
     final TestProject testProject = TestProject.singleModuleProject();
 
     @BeforeClass
@@ -31,7 +31,7 @@ public class SingleModuleTest {
     @Test
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
         assertThat(
-            testProject.mvnRelease(releaseVersion),
+            testProject.mvnRelease(buildNumber),
             oneOf(containsString("Going to release single-module " + expected)));
 
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
@@ -39,7 +39,7 @@ public class SingleModuleTest {
 
     @Test
     public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
-        testProject.mvnRelease(releaseVersion);
+        testProject.mvnRelease(buildNumber);
         String expectedTag = "single-module-" + expected;
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, hasTag(expectedTag));
@@ -50,7 +50,7 @@ public class SingleModuleTest {
         ObjectId originHeadAtStart = head(testProject.origin);
         ObjectId localHeadAtStart = head(testProject.local);
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
-        testProject.mvnRelease(releaseVersion);
+        testProject.mvnRelease(buildNumber);
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());
