@@ -8,9 +8,12 @@ import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.oneOf;
@@ -30,11 +33,13 @@ public class SingleModuleTest {
 
     @Test
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
-        assertThat(
-            testProject.mvnRelease(buildNumber),
-            oneOf(containsString("Going to release single-module " + expected)));
+        List<String> outputLines = testProject.mvnRelease(buildNumber);
+        assertThat(outputLines, oneOf(containsString("Going to release single-module " + expected)));
+        assertThat(outputLines, oneOf(containsString("Hello from version " + expected + "!")));
 
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
+
+        assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(), is(true));
     }
 
     @Test
