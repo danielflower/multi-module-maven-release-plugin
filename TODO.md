@@ -28,3 +28,4 @@ Stability stuff
 * Test more nested projects work
 * Test cases where things like group IDs in parents are omitted
 * Test that when failures happen, things are rolled back
+* If it crashes during compilation, the pom isn't rolled back and the new buildNumber is appened to the old buildNumber
