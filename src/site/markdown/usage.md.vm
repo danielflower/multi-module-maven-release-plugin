@@ -11,13 +11,17 @@ Add the plugin to your pom:
                 <version>${project.version}</version>
                 <configuration>
                     <releaseGoals>
-                        <releaseGoal>install</releaseGoal>
+                        <releaseGoal>deploy</releaseGoal>
                     </releaseGoals>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
-And then call the plugin with a release number:
+And then call the plugin with a build number:
 
 	mvn releaser:release -DbuildNumber=1234
+
+You can omit the build number in order to use a number based on the current date:
+
+    mvn releaser:release
