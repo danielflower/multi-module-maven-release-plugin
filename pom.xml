@@ -54,6 +54,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.51</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>2.2.1</version>
@@ -239,7 +246,7 @@
                     <plugin>
                         <groupId>com.github.danielflower.mavenplugins</groupId>
                         <artifactId>multi-module-maven-release-plugin</artifactId>
-                        <version>0.1.17</version>
+                        <version>0.1.18</version>
                         <configuration>
                             <releaseGoals>
                                 <releaseGoal>clean</releaseGoal>
