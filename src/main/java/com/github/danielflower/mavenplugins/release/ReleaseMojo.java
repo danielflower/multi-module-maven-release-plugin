@@ -9,10 +9,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryState;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,9 +90,9 @@ public class ReleaseMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
         try {
-            Reactor reactor = Reactor.fromProjects(projects, buildNumber);
-
             Git git = loadGitDir();
+            Reactor reactor = Reactor.fromProjects(git, projects, buildNumber);
+
             errorIfNotClean(git);
             List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), git);
 
@@ -126,12 +126,20 @@ public class ReleaseMojo extends AbstractMojo {
     }
 
     private void errorIfNotClean(Git git) throws ValidationException, GitAPIException {
-        boolean isClean = git.status().call().isClean();
+        Status status = git.status().call();
+        boolean isClean = status.isClean();
         if (!isClean) {
-            String summary = "Cannot release with uncommitted changes";
-            throw new ValidationException(summary, asList(
-                summary, "Please commit or revert these changes before releasing."
-            ));
+            String summary = "Cannot release with uncommitted changes. Please check the following files:";
+            List<String> message = new ArrayList<String>();
+            message.add(summary);
+            for (String path : status.getUncommittedChanges()) {
+                message.add(" * " + path);
+            }
+            for (String path : status.getUntracked()) {
+                message.add(" * " + path);
+            }
+            message.add("Please commit or revert these changes before releasing.");
+            throw new ValidationException(summary, message);
         }
     }
 

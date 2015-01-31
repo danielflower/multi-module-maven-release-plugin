@@ -16,7 +16,6 @@ Validationy stuff
 
 * Throw clear error early if releasing from a folder that is not a git repo
 * Throw clear error early if there are any snapshot versions for parents, dependencies or plugins
-* Throw clear error if working set is not clean
 * Throw clear error early if tag already exists remotely (is this a good idea?)
 
 Stability stuff

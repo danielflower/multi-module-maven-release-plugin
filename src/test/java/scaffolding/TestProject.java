@@ -2,10 +2,12 @@ package scaffolding;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import static scaffolding.MvnRunner.runMaven;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
@@ -36,6 +38,22 @@ public class TestProject {
         return runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
             "releaser:release");
+    }
+
+    public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+        File moduleDir = new File(localDir, module);
+        if (!moduleDir.isDirectory()) {
+            throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
+        }
+        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
+        random.createNewFile();
+        local.add().addFilepattern(module + "/" + random.getName()).call();
+        local.commit().setMessage("Adding " + random.getName()).call();
+        return this;
+    }
+
+    public void pushIt() throws GitAPIException {
+        local.push().call();
     }
 
     private static TestProject project(String name) {

@@ -45,25 +45,29 @@ public class ValidationTest {
     @Test
     public void failsIfThereAreUntrackedFiles() throws IOException, InterruptedException {
         new File(testProject.localDir, "untracked.txt").createNewFile();
+        new File(testProject.localDir, "someFolder").mkdir();
+        new File(testProject.localDir, "someFolder/anotherUntracked.txt").createNewFile();
         try {
             testProject.mvnRelease("1");
             Assert.fail("Should not have worked the second time");
         } catch (MavenExecutionException mee) {
-            assertThat(mee.output,
-                twoOf(containsString("Cannot release with uncommitted changes")));
+            assertThat(mee.output, twoOf(containsString("Cannot release with uncommitted changes")));
+            assertThat(mee.output, oneOf(containsString(" * untracked.txt")));
+            assertThat(mee.output, oneOf(containsString(" * someFolder/anotherUntracked.txt")));
         }
     }
 
     @Test
     public void failsIfThereAreUncommittedFiles() throws IOException, InterruptedException, GitAPIException {
         new File(testProject.localDir, "uncommitted.txt").createNewFile();
+//        new File(testProject.localDir, "uncommitted.txt").createNewFile();
         testProject.local.add().addFilepattern("uncommitted.txt").call();
         try {
             testProject.mvnRelease("1");
             Assert.fail("Should not have worked the second time");
         } catch (MavenExecutionException mee) {
-            assertThat(mee.output,
-                twoOf(containsString("Cannot release with uncommitted changes")));
+            assertThat(mee.output, twoOf(containsString("Cannot release with uncommitted changes")));
+            assertThat(mee.output, oneOf(containsString(" * uncommitted.txt")));
         }
     }
 

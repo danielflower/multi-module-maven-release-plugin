@@ -2,21 +2,20 @@ package scaffolding;
 
 import com.github.danielflower.mavenplugins.release.GitHelper;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListTagCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.hamcrest.TypeSafeMatcher;
 
 public class GitMatchers {
 
     public static Matcher<Git> hasTag(final String tag) {
-        return new TypeSafeMatcher<Git>() {
+        return new TypeSafeDiagnosingMatcher<Git>() {
             @Override
-            protected boolean matchesSafely(Git repo) {
+            protected boolean matchesSafely(Git repo, Description mismatchDescription) {
                 try {
+                    mismatchDescription.appendValueList("a git repo with tags: ", ", ", "", repo.getRepository().getTags().keySet());
                     return GitHelper.hasLocalTag(repo, tag);
                 } catch (GitAPIException e) {
                     throw new RuntimeException("Couldn't access repo", e);

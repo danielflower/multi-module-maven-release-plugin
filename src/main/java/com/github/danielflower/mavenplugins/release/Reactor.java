@@ -1,6 +1,9 @@
 package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +22,22 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(List<MavenProject> projects, String buildNumber) throws ValidationException {
+    public static Reactor fromProjects(Git git, List<MavenProject> projects, String buildNumber) throws ValidationException, GitAPIException {
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
         for (MavenProject project : projects) {
-            modules.add(new ReleasableModule(project, buildNumber, versionNamer));
+            ReleasableModule module = new ReleasableModule(project, buildNumber, versionNamer);
+            String tagToFind = module.getNewVersion().substring(0, module.getNewVersion().lastIndexOf(".") + 1);
+            Ref ref = GitHelper.refStartingWith(git, tagToFind);
+            if (shouldRelease(ref)) {
+                modules.add(module);
+            }
         }
         return new Reactor(modules);
+    }
+
+    private static boolean shouldRelease(Ref ref) {
+        return ref == null;
     }
 
 
