@@ -12,6 +12,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,6 +93,7 @@ public class ReleaseMojo extends AbstractMojo {
             Reactor reactor = Reactor.fromProjects(projects, buildNumber);
 
             Git git = loadGitDir();
+            errorIfNotClean(git);
             List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), git);
 
             List<File> changedFiles;
@@ -120,6 +122,16 @@ public class ReleaseMojo extends AbstractMojo {
                 asList("There was an error while accessing the Git repository. The error returned from git was:", gae.getMessage()));
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
+        }
+    }
+
+    private void errorIfNotClean(Git git) throws ValidationException, GitAPIException {
+        boolean isClean = git.status().call().isClean();
+        if (!isClean) {
+            String summary = "Cannot release with uncommitted changes";
+            throw new ValidationException(summary, asList(
+                summary, "Please commit or revert these changes before releasing."
+            ));
         }
     }
 
