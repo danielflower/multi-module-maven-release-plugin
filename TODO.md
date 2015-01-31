@@ -28,5 +28,5 @@ Stability stuff
 * Test more nested projects work
 * Test cases where things like group IDs in parents are omitted
 * Test that when failures happen, things are rolled back
-* If it crashes during compilation, the pom isn't rolled back and the new buildNumber is appended to the old buildNumber
-It should rollback during failure, but also not start if the pom has uncommitted changes.
+* If it crashes it should try to undo the pom changes
+* If it crashes it should report exactly what it has done and what it hasn't
