@@ -24,12 +24,11 @@ public class SkippingUnchangedModulesTest {
     @Ignore("This is a failing test written before implementation. Woo.")
     public void doesNotReReleaseAModuleThatHasNotChanged() throws Exception {
         testProject.mvnRelease("1");
-        testProject.commitRandomFile("console-app").pushIt();
-
         assertTagExists("independent-versions-1.0.1");
         assertTagExists("core-utils-2.0.1");
         assertTagExists("console-app-3.2.1");
 
+        testProject.commitRandomFile("console-app").pushIt();
         testProject.mvnRelease("2");
         assertTagExists("independent-versions-1.0.2");
         assertTagDoesNotExist("core-utils-2.0.2");

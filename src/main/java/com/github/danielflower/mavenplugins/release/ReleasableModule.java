@@ -9,11 +9,11 @@ public class ReleasableModule {
     private final String tagName;
     private final String newVersion;
 
-    public ReleasableModule(MavenProject project, String buildNumber, VersionNamer versionNamer) throws ValidationException {
+    public ReleasableModule(MavenProject project, String buildNumber, String newVersion) throws ValidationException {
         this.project = project;
         this.buildNumber = buildNumber;
-        this.newVersion = versionNamer.name(project.getVersion(), buildNumber);
-        this.tagName = project.getArtifactId() + "-" + newVersion;
+        this.newVersion = newVersion;
+        this.tagName = project.getArtifactId() + "-" + this.newVersion;
     }
 
     public String getTagName() {

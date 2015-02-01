@@ -26,7 +26,7 @@ public class Reactor {
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
         for (MavenProject project : projects) {
-            ReleasableModule module = new ReleasableModule(project, buildNumber, versionNamer);
+            ReleasableModule module = new ReleasableModule(project, buildNumber, versionNamer.name(project.getVersion(), buildNumber));
             String tagToFind = module.getNewVersion().substring(0, module.getNewVersion().lastIndexOf(".") + 1);
             Ref ref = GitHelper.refStartingWith(git, tagToFind);
             if (shouldRelease(ref)) {
