@@ -14,7 +14,7 @@ Features
 Validationy stuff
 -----------------
 
-* Throw clear error early if there are any snapshot versions for parents, dependencies or plugins
+* Throw clear error early if there are any snapshot versions for plugins
 * Throw clear error early if tag already exists remotely (is this a good idea?)
 
 Stability stuff

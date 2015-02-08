@@ -111,5 +111,8 @@ public class TestProject {
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }
+    public static TestProject moduleWithSnapshotDependencies() {
+        return project("snapshot-dependencies");
+    }
 
 }

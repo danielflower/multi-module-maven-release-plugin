@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
@@ -18,19 +19,19 @@ public class ReactorTest {
         Reactor reactor = new Reactor(asList(
             aModule().build(), arty, aModule().build()
         ));
-        assertThat(reactor.find("anything", "my.great.group", "some-arty"), is(arty));
+        assertThat(reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT"), is(arty));
     }
 
     @Test
-    public void ifNotFoundThenAValidationExceptionIsThrown() throws Exception {
+    public void ifNotFoundThenAUnresolvedSnapshotDependencyExceptionIsThrown() throws Exception {
         Reactor reactor = new Reactor(asList(
             aModule().build(), aModule().build()
         ));
         try {
-            reactor.find("the parent reference in my-thing/pom.xml", "my.great.group", "some-arty");
+            reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT");
             Assert.fail("Should have thrown");
-        } catch (ValidationException e) {
-            assertThat(e.getMessages(), oneOf(containsString("The artifact my.great.group:some-arty referenced from the parent reference in my-thing/pom.xml is a SNAPSHOT in your project however it was not found")));
+        } catch (UnresolvedSnapshotDependencyException e) {
+            assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty:1.0-SNAPSHOT"));
         }
     }
 }

@@ -53,21 +53,19 @@ public class LocalGitRepo {
         return status;
     }
 
-    public void revertChanges(Log log, List<File> changedFiles) throws MojoExecutionException {
+    public boolean revertChanges(Log log, List<File> changedFiles) throws MojoExecutionException {
         boolean hasErrors = false;
         File workTree = git.getRepository().getWorkTree();
         for (File changedFile : changedFiles) {
             try {
                 String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
                 git.checkout().addPath(pathRelativeToWorkingTree).call();
-            } catch (GitAPIException e) {
+            } catch (Exception e) {
                 hasErrors = true;
                 log.error("Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
             }
         }
-        if (hasErrors) {
-            throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
-        }
+        return !hasErrors;
     }
 
     public boolean hasLocalTag(String tagName) throws GitAPIException {

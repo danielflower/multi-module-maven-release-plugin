@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 
+import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Reactor {
         return new Reactor(modules);
     }
 
-    public ReleasableModule find(String searchingFrom, String groupId, String artifactId) throws ValidationException {
+    public ReleasableModule find(String groupId, String artifactId, String version) throws UnresolvedSnapshotDependencyException {
 
         for (ReleasableModule module : modulesInBuildOrder) {
             if (module.getGroupId().equals(groupId) && module.getArtifactId().equals(artifactId)) {
@@ -41,8 +42,7 @@ public class Reactor {
             }
         }
 
-        String summary = "The artifact " + groupId + ":" + artifactId + " referenced from " + searchingFrom +
-            " is a SNAPSHOT in your project however it was not found";
-        throw new ValidationException(summary, asList(summary));
+        throw new UnresolvedSnapshotDependencyException(groupId, artifactId, version);
     }
+
 }

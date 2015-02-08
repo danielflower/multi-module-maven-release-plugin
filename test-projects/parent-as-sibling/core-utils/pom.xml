@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent-module</artifactId>
-        <groupId>com.github.danielflower.mavenplugins.testprojects.independentversions</groupId>
+        <groupId>com.github.danielflower.mavenplugins.testprojects.parentassibling</groupId>
         <version>1.2.3-SNAPSHOT</version>
         <relativePath>../parent-module/pom.xml</relativePath>
     </parent>

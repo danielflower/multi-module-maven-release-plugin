@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins.testprojects.independentversions</groupId>
+    <groupId>com.github.danielflower.mavenplugins.testprojects.parentassibling</groupId>
     <artifactId>parent-module</artifactId>
     <version>1.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>

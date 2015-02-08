@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -8,9 +9,9 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PomUpdater {
@@ -23,47 +24,78 @@ public class PomUpdater {
         this.reactor = reactor;
     }
 
-    public List<File> updateVersion() throws IOException, ValidationException {
+    public UpdateResult updateVersion() {
         List<File> changedPoms = new ArrayList<File>();
+        List<String> errors = new ArrayList<String>();
         for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
-            MavenProject project = module.getProject();
-
-            log.info("Going to release " + module.getArtifactId() + " " + module.getNewVersion());
-
-            Model originalModel = project.getOriginalModel();
-            alterModel(project, module.getNewVersion());
-            File pom = project.getFile();
-            changedPoms.add(pom);
-            Writer fileWriter = new FileWriter(pom);
-
             try {
-                MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-                pomWriter.write(fileWriter, originalModel);
-            } finally {
-                fileWriter.close();
+                MavenProject project = module.getProject();
+                log.info("Going to release " + module.getArtifactId() + " " + module.getNewVersion());
+
+                List<String> errorsForCurrentPom = alterModel(project, module.getNewVersion());
+                errors.addAll(errorsForCurrentPom);
+
+                File pom = project.getFile();
+                changedPoms.add(pom);
+                Writer fileWriter = new FileWriter(pom);
+
+                Model originalModel = project.getOriginalModel();
+                try {
+                    MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+                    pomWriter.write(fileWriter, originalModel);
+                } finally {
+                    fileWriter.close();
+                }
+            } catch (Exception e) {
+                return new UpdateResult(changedPoms, errors, e);
             }
         }
-        return changedPoms;
+        return new UpdateResult(changedPoms, errors, null);
     }
 
-    private void alterModel(MavenProject project, String newVersion) throws ValidationException {
+    public static class UpdateResult {
+        public final List<File> alteredPoms;
+        public final List<String> dependencyErrors;
+        public final Exception unexpectedException;
+
+        public UpdateResult(List<File> alteredPoms, List<String> dependencyErrors, Exception unexpectedException) {
+            this.alteredPoms = alteredPoms;
+            this.dependencyErrors = dependencyErrors;
+            this.unexpectedException = unexpectedException;
+        }
+        public boolean success() {
+            return (dependencyErrors.size() == 0) && (unexpectedException == null);
+        }
+    }
+
+    private List<String> alterModel(MavenProject project, String newVersion) {
         Model originalModel = project.getOriginalModel();
         originalModel.setVersion(newVersion);
 
+        List<String> errors = new ArrayList<String>();
 
+        String searchingFrom = project.getArtifactId();
         MavenProject parent = project.getParent();
         if (parent != null && isSnapshot(parent.getVersion())) {
-            String searchingFrom = "the parent reference in " + project.getFile().getAbsolutePath();
-            ReleasableModule parentBeingReleased = reactor.find(searchingFrom, parent.getGroupId(), parent.getArtifactId());
-            originalModel.getParent().setVersion(parentBeingReleased.getNewVersion());
-        }
-        for (Dependency dependency : originalModel.getDependencies()) {
-            if (isSnapshot(dependency.getVersion())) {
-                String searchingFrom = "a dependency in " + project.getFile().getAbsolutePath();
-                ReleasableModule dependencyBeingReleased = reactor.find(searchingFrom, dependency.getGroupId(), dependency.getArtifactId());
-                dependency.setVersion(dependencyBeingReleased.getNewVersion());
+            try {
+                ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+                originalModel.getParent().setVersion(parentBeingReleased.getNewVersion());
+            } catch (UnresolvedSnapshotDependencyException e) {
+                errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
             }
         }
+        for (Dependency dependency : originalModel.getDependencies()) {
+            String version = dependency.getVersion();
+            if (isSnapshot(version)) {
+                try {
+                    ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
+                    dependency.setVersion(dependencyBeingReleased.getNewVersion());
+                } catch (UnresolvedSnapshotDependencyException e) {
+                    errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
+                }
+            }
+        }
+        return errors;
     }
 
     private boolean isSnapshot(String version) {

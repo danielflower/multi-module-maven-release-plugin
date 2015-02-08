@@ -8,13 +8,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -94,17 +93,14 @@ public class ReleaseMojo extends AbstractMojo {
             repo.errorIfNotClean();
             List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo);
 
-            List<File> changedFiles;
-            try {
-                PomUpdater pomUpdater = new PomUpdater(log, reactor);
-                changedFiles = pomUpdater.updateVersion();
-            } catch (IOException e) {
-                throw new MojoExecutionException("Could not update the version", e);
-            }
+
+            List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
             try {
                 deployReleasedProject();
             } finally {
-                repo.revertChanges(log, changedFiles);
+                if (!repo.revertChanges(log, changedFiles)) {
+                    throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
+                }
             }
 
             for (String tagName : tagNames) {
@@ -118,6 +114,28 @@ public class ReleaseMojo extends AbstractMojo {
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         }
+    }
+
+    private List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor) throws MojoExecutionException, ValidationException {
+        PomUpdater pomUpdater = new PomUpdater(log, reactor);
+        PomUpdater.UpdateResult result = pomUpdater.updateVersion();
+        if (!result.success()) {
+            log.info("Going to revert changes because there was an error.");
+            repo.revertChanges(log, result.alteredPoms);
+            if (result.unexpectedException != null) {
+                throw new ValidationException("Unexpected exception while setting the release versions in the pom", result.unexpectedException);
+            } else {
+                String summary = "Cannot release with references to snapshot dependencies";
+                List<String> messages = new ArrayList<String>();
+                messages.add(summary);
+                messages.add("The following dependency errors were found:");
+                for (String dependencyError : result.dependencyErrors) {
+                    messages.add(" * " + dependencyError);
+                }
+                throw new ValidationException(summary, messages);
+            }
+        }
+        return result.alteredPoms;
     }
 
     private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git) throws GitAPIException, ValidationException {
