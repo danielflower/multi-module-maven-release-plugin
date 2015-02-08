@@ -97,6 +97,10 @@ public class TestProject {
         return project("independent-versions");
     }
 
+    public static TestProject parentAsSibilngProject() {
+        return project("parent-as-sibling");
+    }
+
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }

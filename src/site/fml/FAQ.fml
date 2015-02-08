@@ -1,36 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faqs xmlns="http://maven.apache.org/FML/1.0.1"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
-  title="Frequently Asked Questions"
-  toplink="false">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
+      title="Frequently Asked Questions"
+      toplink="false">
 
-  <part id="source-control">
-    <title>Source control</title>
+    <part id="for-why">
+        <title>Why this plugin</title>
 
-    <faq id="git-needed">
-      <question>
-        Does the Git executable need to be installed?
-      </question>
-      <answer>
-        <p>
-          No. The jgit java implementation of Git is used meaning you do not need to have Git installed.
-          This means you are free to use whichever version of Git you like without fear of compatibilty
-          which sometimes happens with the default maven release plugin due to the way it interprets
-          shell output of Git.
-        </p>
-      </answer>
-    </faq>
+        <faq id="why-not-maven-release-plugin">
+            <question>Why not just use the default maven-release-plugin?</question>
+            <answer>
+                <p>We found the built-in maven release plugin was falling short in the types of projects we were working on. Some specific issues:</p>
+                <ul>
+                    <li>Performing commits during a release leads to a messy commit history and constant merges. Being able to make
+                    multiple releases without having to pull from the remote branch is rather liberating.</li>
+                    <li>It is too difficult to convince the built-in plugin to run tests only once.</li>
+                    <li>The maven-release-plugin relies on Git being available on the path, so this adds an unnecessary prerequisite on machines
+                    like build agents where you may not be able to install Git. Furthermore, the built-in plugin parses shell output from Git
+                    which makes it brittle: upgrading Git could sometimes break your builds. Because the multi-module-maven-release-plugin
+                    uses a Java implementation of Git, there is no dependency on Git being installed.</li>
+                </ul>
+            </answer>
+        </faq>
 
-    <faq id="which-remote">
-      <question>
-        Where do the tags get pushed?
-      </question>
-      <answer>
-        <p>The tags get pushed to whatever origin is pointing to. Note that the scm tag in the pom is
-        ignored by the plugin currently.</p>
-      </answer>
-    </faq>
-  </part>
+    </part>
+
+    <part id="building">
+        <title>Building</title>
+        <faq id="aggregator-pom">
+            <question>I have an aggregator pom which is separate from the parent pom. Do I declare the release plugin
+            in the parent or the aggregator?</question>
+            <answer>You need to declare it in both poms unfortunately. The configuration in the parent pom will be ignored
+            so should be left blank. All configuration should go into the aggregator.</answer>
+        </faq>
+    </part>
+
+    <part id="source-control">
+        <title>Source control</title>
+
+        <faq id="git-needed">
+            <question>
+                Does the Git executable need to be installed?
+            </question>
+            <answer>
+                <p>
+                    No. The jgit java implementation of Git is used meaning you do not need to have Git installed.
+                    This means you are free to use whichever version of Git you like without fear of compatibilty
+                    which sometimes happens with the default maven release plugin due to the way it interprets
+                    shell output of Git.
+                </p>
+            </answer>
+        </faq>
+
+        <faq id="which-remote">
+            <question>
+                Where do the tags get pushed?
+            </question>
+            <answer>
+                <p>The tags get pushed to whatever origin is pointing to. Note that the scm tag in the pom is
+                    ignored by the plugin currently.
+                </p>
+            </answer>
+        </faq>
+    </part>
 
 </faqs>
