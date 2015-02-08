@@ -11,6 +11,7 @@ import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
@@ -177,13 +178,19 @@ public class ReleaseMojo extends AbstractMojo {
         throw new MojoExecutionException(terseMessage);
     }
 
-    private static Git loadGitDir() throws MojoExecutionException {
+    private static Git loadGitDir() throws MojoExecutionException, ValidationException {
         Git git;
         File gitDir = new File(".");
         try {
             git = Git.open(gitDir);
-        } catch (IOException e) {
-            throw new MojoExecutionException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?");
+        } catch (RepositoryNotFoundException rnfe) {
+            String summary = "Releases can only be performed from Git repositories.";
+            List<String> messages = new ArrayList<String>();
+            messages.add(summary);
+            messages.add(pathOf(gitDir) + " is not a Git repository.");
+            throw new ValidationException(summary, messages);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?" + e);
         }
         return git;
     }
