@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
+import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
 public class ValidationTest {
 
@@ -76,6 +77,21 @@ public class ValidationTest {
     }
 
     @Test
+    public void ifIOErrorOccursWhileUpdatingPomsThenThisIsReported() throws IOException, InterruptedException {
+        TestProject testProject = TestProject.independentVersionsProject();
+        File pom = new File(testProject.localDir, "console-app/pom.xml");
+        pom.setWritable(false); // this should cause an IO exception when writing the pom
+        try {
+            testProject.mvnRelease("1");
+            Assert.fail("It was expected that this would fail due to a pom being readonly.");
+        } catch (MavenExecutionException e) {
+            assertThat(e.output, twoOf(containsString("Unexpected exception while setting the release versions in the pom")));
+            assertThat(e.output, oneOf(containsString("Going to revert changes because there was an error")));
+        }
+        assertThat(testProject.local, hasCleanWorkingDirectory());
+    }
+
+        @Test
     public void failsIfThereAreDependenciesOnSnapshotVersionsThatAreNotPartOfTheReactor() throws Exception {
         // Install the snapshot dependency so that it can be built
         TestProject dependency = TestProject.independentVersionsProject();
@@ -95,7 +111,7 @@ public class ValidationTest {
             assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils 2.0-SNAPSHOT")));
         }
 
-        assertThat(badOne.local, GitMatchers.hasCleanWorkingDirectory());
+        assertThat(badOne.local, hasCleanWorkingDirectory());
     }
 
 }

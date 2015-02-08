@@ -25,6 +25,5 @@ Stability stuff
 * Figure out if things like MVN_OPTIONS and other JVM options need to be passed during release
 * Test more nested projects work
 * Test cases where things like group IDs in parents are omitted
-* Test that when failures happen, things are rolled back
 * If it crashes it should try to undo the pom changes
 * If it crashes it should report exactly what it has done and what it hasn't

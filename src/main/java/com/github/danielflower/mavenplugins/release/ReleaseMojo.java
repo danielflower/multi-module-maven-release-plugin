@@ -93,7 +93,6 @@ public class ReleaseMojo extends AbstractMojo {
             repo.errorIfNotClean();
             List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo);
 
-
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
             try {
                 deployReleasedProject();
