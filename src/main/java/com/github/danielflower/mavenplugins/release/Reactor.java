@@ -22,24 +22,16 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Git git, List<MavenProject> projects, String buildNumber) throws ValidationException, GitAPIException {
+    public static Reactor fromProjects(List<MavenProject> projects, String buildNumber) throws ValidationException {
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
         for (MavenProject project : projects) {
             ReleasableModule module = new ReleasableModule(project, buildNumber, versionNamer.name(project.getVersion(), buildNumber));
             String tagToFind = module.getNewVersion().substring(0, module.getNewVersion().lastIndexOf(".") + 1);
-            Ref ref = GitHelper.refStartingWith(git, tagToFind);
-            if (shouldRelease(ref)) {
-                modules.add(module);
-            }
+            modules.add(module);
         }
         return new Reactor(modules);
     }
-
-    private static boolean shouldRelease(Ref ref) {
-        return ref == null;
-    }
-
 
     public ReleasableModule find(String searchingFrom, String groupId, String artifactId) throws ValidationException {
 

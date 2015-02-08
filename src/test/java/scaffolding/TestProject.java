@@ -40,6 +40,13 @@ public class TestProject {
             "releaser:release");
     }
 
+    public List<String> mvnRelease(String buildNumber, String moduleToRelease) throws IOException, InterruptedException {
+        return runMaven(localDir,
+            "-DbuildNumber=" + buildNumber,
+            "-DmoduleToRelease" + moduleToRelease,
+            "releaser:release");
+    }
+
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
         File moduleDir = new File(localDir, module);
         if (!moduleDir.isDirectory()) {

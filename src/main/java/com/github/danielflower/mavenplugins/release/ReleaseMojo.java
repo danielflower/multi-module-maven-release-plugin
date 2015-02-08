@@ -9,11 +9,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,11 +88,11 @@ public class ReleaseMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
         try {
-            Git git = loadGitDir();
-            Reactor reactor = Reactor.fromProjects(git, projects, buildNumber);
+            LocalGitRepo repo = LocalGitRepo.fromCurrentDir();
+            Reactor reactor = Reactor.fromProjects(projects, buildNumber);
 
-            errorIfNotClean(git);
-            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), git);
+            repo.errorIfNotClean();
+            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo);
 
             List<File> changedFiles;
             try {
@@ -107,17 +104,14 @@ public class ReleaseMojo extends AbstractMojo {
             try {
                 deployReleasedProject();
             } finally {
-                revertChanges(git, changedFiles);
+                repo.revertChanges(log, changedFiles);
             }
-            try {
-                for (String tagName : tagNames) {
-                    tagRepo(tagName, git);
-                }
-            } catch (IOException e) {
-                throw new MojoExecutionException("Could not access the git repository. Please make sure you are releasing from a git repo.", e);
-            } catch (GitAPIException e) {
-                throw new MojoExecutionException("Could not tag the git repository", e);
+
+            for (String tagName : tagNames) {
+                log.info("About to tag the repository with " + tagName);
+                repo.tagRepoAndPush(tagName);
             }
+
         } catch (GitAPIException gae) {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:", gae.getMessage()));
@@ -126,29 +120,11 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private void errorIfNotClean(Git git) throws ValidationException, GitAPIException {
-        Status status = git.status().call();
-        boolean isClean = status.isClean();
-        if (!isClean) {
-            String summary = "Cannot release with uncommitted changes. Please check the following files:";
-            List<String> message = new ArrayList<String>();
-            message.add(summary);
-            for (String path : status.getUncommittedChanges()) {
-                message.add(" * " + path);
-            }
-            for (String path : status.getUntracked()) {
-                message.add(" * " + path);
-            }
-            message.add("Please commit or revert these changes before releasing.");
-            throw new ValidationException(summary, message);
-        }
-    }
-
-    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, Git git) throws GitAPIException, ValidationException {
+    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git) throws GitAPIException, ValidationException {
         List<String> names = new ArrayList<String>();
         for (ReleasableModule module : modules) {
             String tag = module.getTagName();
-            if (GitHelper.hasLocalTag(git, tag)) {
+            if (git.hasLocalTag(tag)) {
                 String summary = "There is already a tag named " + tag + " in this repository.";
                 throw new ValidationException(summary, asList(
                     summary,
@@ -176,50 +152,6 @@ public class ReleaseMojo extends AbstractMojo {
         log.error("");
         log.error("");
         throw new MojoExecutionException(terseMessage);
-    }
-
-    private static Git loadGitDir() throws MojoExecutionException, ValidationException {
-        Git git;
-        File gitDir = new File(".");
-        try {
-            git = Git.open(gitDir);
-        } catch (RepositoryNotFoundException rnfe) {
-            String summary = "Releases can only be performed from Git repositories.";
-            List<String> messages = new ArrayList<String>();
-            messages.add(summary);
-            messages.add(pathOf(gitDir) + " is not a Git repository.");
-            throw new ValidationException(summary, messages);
-        } catch (Exception e) {
-            throw new MojoExecutionException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?" + e);
-        }
-        return git;
-    }
-
-    private static String pathOf(File file) {
-        String path;
-        try {
-            path = file.getCanonicalPath();
-        } catch (IOException e1) {
-            path = file.getAbsolutePath();
-        }
-        return path;
-    }
-
-    private void revertChanges(Git git, List<File> changedFiles) throws MojoExecutionException {
-        boolean hasErrors = false;
-        File workTree = git.getRepository().getWorkTree();
-        for (File changedFile : changedFiles) {
-            try {
-                String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
-                git.checkout().addPath(pathRelativeToWorkingTree).call();
-            } catch (GitAPIException e) {
-                hasErrors = true;
-                getLog().error("Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
-            }
-        }
-        if (hasErrors) {
-            throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
-        }
     }
 
     private void deployReleasedProject() throws MojoExecutionException {
@@ -254,9 +186,4 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private void tagRepo(String tag, Git git) throws IOException, GitAPIException {
-        getLog().info("About to tag the repository with " + tag);
-        Ref tagRef = git.tag().setAnnotated(true).setName(tag).setMessage("Release " + tag).call();
-        git.push().add(tagRef).call();
-    }
 }
