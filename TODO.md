@@ -11,11 +11,6 @@ Features
 * Allow optional appending of branch name to release version if not "master" (or supplied regex)
 * Allow easy way to bump minor or major versions of a module (during release?)
 
-Validationy stuff
------------------
-
-* Throw clear error early if there are any snapshot versions for plugins
-
 Stability stuff
 ---------------
 

@@ -3,6 +3,7 @@ package com.github.danielflower.mavenplugins.release;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -95,7 +96,19 @@ public class PomUpdater {
                 }
             }
         }
+        for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
+            String version = plugin.getVersion();
+            if (isSnapshot(version)) {
+                if (!isMultiModuleReleasePlugin(plugin)) {
+                    errors.add(searchingFrom + " references plugin " + plugin.getArtifactId() + " " + version);
+                }
+            }
+        }
         return errors;
+    }
+
+    private static boolean isMultiModuleReleasePlugin(Plugin plugin) {
+        return plugin.getGroupId().equals("com.github.danielflower.mavenplugins") && plugin.getArtifactId().equals("multi-module-maven-release-plugin");
     }
 
     private boolean isSnapshot(String version) {

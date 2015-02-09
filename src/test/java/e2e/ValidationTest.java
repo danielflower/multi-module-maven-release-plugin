@@ -123,6 +123,9 @@ public class ValidationTest {
             assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
             assertThat(mee.output, oneOf(containsString(" * The parent of snapshot-dependencies is independent-versions 1.0-SNAPSHOT")));
             assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils 2.0-SNAPSHOT")));
+
+            // commented out because this plugin is allowed to be a snapshot for testing purposes only
+//            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references plugin multi-module-maven-release-plugin 0.1-SNAPSHOT")));
         }
 
         assertThat(badOne.local, hasCleanWorkingDirectory());
