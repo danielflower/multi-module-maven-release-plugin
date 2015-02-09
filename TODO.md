@@ -15,7 +15,6 @@ Validationy stuff
 -----------------
 
 * Throw clear error early if there are any snapshot versions for plugins
-* Throw clear error early if tag already exists remotely (is this a good idea?)
 
 Stability stuff
 ---------------
@@ -25,5 +24,4 @@ Stability stuff
 * Figure out if things like MVN_OPTIONS and other JVM options need to be passed during release
 * Test more nested projects work
 * Test cases where things like group IDs in parents are omitted
-* If it crashes it should try to undo the pom changes
 * If it crashes it should report exactly what it has done and what it hasn't

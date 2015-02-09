@@ -11,9 +11,7 @@ import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -150,6 +148,17 @@ public class ReleaseMojo extends AbstractMojo {
                 ));
             }
             names.add(tag);
+        }
+        List<String> matchingRemoteTags = git.remoteTagsFrom(names);
+        if (matchingRemoteTags.size() > 0) {
+            String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
+            List<String> messages = new ArrayList<String>();
+            messages.add(summary);
+            for (String matchingRemoteTag : matchingRemoteTags) {
+                messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
+            }
+            messages.add("Please try releasing again with a new build number.");
+            throw new ValidationException(summary, messages);
         }
         return names;
     }

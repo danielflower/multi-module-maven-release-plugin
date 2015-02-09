@@ -10,9 +10,9 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
@@ -21,7 +21,7 @@ public class LocalGitRepo {
 
     private final Git git;
 
-    private LocalGitRepo(Git git) {
+    LocalGitRepo(Git git) {
         this.git = git;
     }
 
@@ -77,7 +77,7 @@ public class LocalGitRepo {
         git.push().add(tagRef).call();
     }
 
-    public static final LocalGitRepo fromCurrentDir() throws ValidationException {
+    public static LocalGitRepo fromCurrentDir() throws ValidationException {
         Git git;
         File gitDir = new File(".");
         try {
@@ -92,5 +92,18 @@ public class LocalGitRepo {
             throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
         }
         return new LocalGitRepo(git);
+    }
+
+    public List<String> remoteTagsFrom(List<String> tagNames) throws GitAPIException {
+        List<String> results = new ArrayList<String>();
+        Collection<Ref> remoteTags = git.lsRemote().setTags(true).setHeads(false).call();
+        for (Ref remoteTag : remoteTags) {
+            for (String proposedTagName : tagNames) {
+                if (remoteTag.getName().equals("refs/tags/" + proposedTagName)) {
+                    results.add(proposedTagName);
+                }
+            }
+        }
+        return results;
     }
 }
