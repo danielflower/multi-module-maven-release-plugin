@@ -34,6 +34,20 @@ public class LocalGitRepoTest {
         assertThat(repo.remoteTagsFrom(asList("blah", "some-taggart")), equalTo(emptyList()));
     }
 
+    @Test
+    public void canHaveHundredsOfTags() throws GitAPIException {
+        for (int i = 0; i < 500; i++) {
+            tag(project.local, "this-is-a-tag-" + i);
+        }
+        project.local.push().setPushTags().call();
+        LocalGitRepo repo = new LocalGitRepo(project.local);
+        for (int i = 0; i < 500; i++) {
+            String tagName = "this-is-a-tag-" + i;
+            assertThat(repo.hasLocalTag(tagName), is(true));
+            assertThat(repo.remoteTagsFrom(asList(tagName)).size(), is(1));
+        }
+    }
+
     private static List<String> emptyList() {
         return new ArrayList<String>();
     }
