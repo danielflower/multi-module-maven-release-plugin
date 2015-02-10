@@ -24,7 +24,6 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-@Ignore("Not implemented yet")
 public class PartialReleaseTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
@@ -51,7 +50,7 @@ public class PartialReleaseTest {
         assertThat(
             commandOutput,
             allOf(
-                oneOf(containsString("Going to release core-utils " + expectedAggregatorVersion)),
+                oneOf(containsString("Going to release core-utils " + expectedCoreVersion)),
                 oneOf(containsString("Building parent-as-sibling")), // once for initial build only
                 oneOf(containsString("Building parent-module")),
                 oneOf(containsString("Building core-utils")),
@@ -62,8 +61,8 @@ public class PartialReleaseTest {
     }
 
     private void installsAllModulesIntoTheRepoWithTheBuildNumber() throws Exception {
-        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "parent-module", expectedParentVersion);
-        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "core-utils", expectedCoreVersion);
+        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.parentassibling", "parent-module", expectedParentVersion);
+        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.parentassibling", "core-utils", expectedCoreVersion);
     }
 
     private void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {

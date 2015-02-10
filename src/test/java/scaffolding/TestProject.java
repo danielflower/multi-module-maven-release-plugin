@@ -43,7 +43,7 @@ public class TestProject {
     public List<String> mvnRelease(String buildNumber, String moduleToRelease) throws IOException, InterruptedException {
         return runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
-            "-DmoduleToRelease" + moduleToRelease,
+            "-DmodulesToRelease=" + moduleToRelease,
             "releaser:release");
     }
 

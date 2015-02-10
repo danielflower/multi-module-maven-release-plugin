@@ -9,6 +9,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,6 +81,13 @@ public class ReleaseMojo extends AbstractMojo {
     @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
     private boolean skipTests;
 
+    /**
+     * The modules to release, or no  value to to release the project from the root pom, which is the default.
+     * The selected module plus any other modules it needs will be built and released also.
+     * When run from the command line, this can be a comma-separated list of module names.
+     */
+    @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
+    private List<String> modulesToRelease;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -93,7 +101,7 @@ public class ReleaseMojo extends AbstractMojo {
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
             try {
-                deployReleasedProject();
+                runMavenBuild();
             } finally {
                 if (!repo.revertChanges(log, changedFiles)) {
                     throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
@@ -180,10 +188,9 @@ public class ReleaseMojo extends AbstractMojo {
         throw new MojoExecutionException(terseMessage);
     }
 
-    private void deployReleasedProject() throws MojoExecutionException {
+    private void runMavenBuild() throws MojoExecutionException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setInteractive(false);
-//        request.setPomFile( new File( "/path/to/pom.xml" ) );
 
         if (goals == null) {
             goals = asList("deploy");
@@ -197,6 +204,13 @@ public class ReleaseMojo extends AbstractMojo {
             profiles.add(((org.apache.maven.model.Profile) activatedProfile).getId());
         }
         request.setProfiles(profiles);
+
+        if (modulesToRelease != null && modulesToRelease.size() > 0) {
+            request.setAlsoMake(true);
+            request.setProjects(modulesToRelease);
+        }
+
+
         String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;
 
         getLog().info("About to run mvn " + goals + " with " + profilesInfo);
