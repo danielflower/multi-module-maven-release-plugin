@@ -41,17 +41,6 @@ public class JGitDiscoveryTest {
             System.out.println(revCommit.getFullMessage().trim());
     }
 
-    @Test
-    public void hasTagOrHasNot() throws GitAPIException {
-        Git git = new Git(repo);
-        ListTagCommand listTagCommand = git.tagList();
-        for (Ref ref : listTagCommand.call()) {
-            System.out.println("ref = " + ref.getName());
-        }
-        assertThat(git, hasTag("tag-for-jgit-discovery-test"));
-        assertThat(git, not(hasTag("some-non-existent-tag")));
-    }
-
     @Test public void name() throws IOException, GitAPIException {
         ObjectId head = repo.resolve("HEAD^{tree}");
         ObjectId oldHead = repo.resolve("HEAD^^{tree}");
