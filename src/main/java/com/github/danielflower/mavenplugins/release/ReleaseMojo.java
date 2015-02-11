@@ -1,19 +1,20 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -89,23 +90,35 @@ public class ReleaseMojo extends AbstractMojo {
     @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
     private List<String> modulesToRelease;
 
+    @Parameter(property = "session", readonly = true, required = true, defaultValue = "${session}")
+    private MavenSession session;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
+
+        log.warn("CURRENT PROJECT " + session.getTopLevelProject().getArtifactId());
+        for (Object mavenProject : session.getRequest().getSelectedProjects()) {
+            log.warn("HEHE " + mavenProject);
+        }
+
         try {
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir();
             Reactor reactor = Reactor.fromProjects(projects, buildNumber);
 
             repo.errorIfNotClean();
-            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo);
+            Collection<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
+            boolean revertedOk;
             try {
                 runMavenBuild();
             } finally {
-                if (!repo.revertChanges(log, changedFiles)) {
-                    throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
-                }
+                revertedOk = repo.revertChanges(log, changedFiles);
+                log.warn("Could not revert changes - working directory is no longer clean. Please revert changes manually");
+            }
+            if (!revertedOk) {
+                throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
             }
 
             for (String tagName : tagNames) {
@@ -143,21 +156,33 @@ public class ReleaseMojo extends AbstractMojo {
         return result.alteredPoms;
     }
 
-    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git) throws GitAPIException, ValidationException {
-        List<String> names = new ArrayList<String>();
-        for (ReleasableModule module : modules) {
-            String tag = module.getTagName();
-            if (git.hasLocalTag(tag)) {
-                String summary = "There is already a tag named " + tag + " in this repository.";
-                throw new ValidationException(summary, asList(
-                    summary,
-                    "It is likely that this version has been released before.",
-                    "Please try incrementing the build number and trying again."
-                ));
-            }
-            names.add(tag);
+    private Collection<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException, MojoExecutionException {
+        SuperProjectSorter projectSorter;
+        try {
+            projectSorter = new SuperProjectSorter(projects);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Could not sort projects", e);
         }
-        List<String> matchingRemoteTags = git.remoteTagsFrom(names);
+
+        Set<String> names = new HashSet<String>();
+        for (ReleasableModule module : modules) {
+            if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
+                String tag = module.getTagName();
+                throwIfTagExistsLocally(git, tag);
+                names.add(tag);
+                List dependents = projectSorter.getDAG().getChildLabels("com.github.danielflower.mavenplugins.testprojects.parentassibling:core-utils");
+                for (Object dependent : dependents) {
+                    Object project = projectSorter.getProjectMap().get(dependent);
+                    getLog().info("Dependent is " + project);
+                }
+            }
+        }
+        throwIfAnyTagExistsRemotely(git, names);
+        return names;
+    }
+
+    private void throwIfAnyTagExistsRemotely(LocalGitRepo git, Set<String> names) throws GitAPIException, ValidationException {
+        Collection<String> matchingRemoteTags = git.remoteTagsFrom(names);
         if (matchingRemoteTags.size() > 0) {
             String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
             List<String> messages = new ArrayList<String>();
@@ -168,7 +193,17 @@ public class ReleaseMojo extends AbstractMojo {
             messages.add("Please try releasing again with a new build number.");
             throw new ValidationException(summary, messages);
         }
-        return names;
+    }
+
+    private static void throwIfTagExistsLocally(LocalGitRepo git, String tag) throws GitAPIException, ValidationException {
+        if (git.hasLocalTag(tag)) {
+            String summary = "There is already a tag named " + tag + " in this repository.";
+            throw new ValidationException(summary, asList(
+                summary,
+                "It is likely that this version has been released before.",
+                "Please try incrementing the build number and trying again."
+            ));
+        }
     }
 
     private void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
@@ -198,6 +233,7 @@ public class ReleaseMojo extends AbstractMojo {
         if (skipTests) {
             goals.add("-DskipTests=true");
         }
+        request.setShowErrors(true);
         request.setGoals(goals);
         List<String> profiles = new ArrayList<String>();
         for (Object activatedProfile : project.getActiveProfiles()) {
@@ -207,9 +243,22 @@ public class ReleaseMojo extends AbstractMojo {
 
         if (modulesToRelease != null && modulesToRelease.size() > 0) {
             request.setAlsoMake(true);
+            try {
+                SuperProjectSorter projectSorter = new SuperProjectSorter(projects);
+                List dependents = projectSorter.getDAG().getChildLabels("com.github.danielflower.mavenplugins.testprojects.parentassibling:core-utils");
+                for (Object dependent : dependents) {
+                    Object project = projectSorter.getProjectMap().get(dependent);
+                    getLog().info("Dependent is " + project);
+                }
+            } catch (Throwable e) {
+                getLog().warn("Error while sorting: " + e);
+                for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                    getLog().warn(stackTraceElement.toString());
+                }
+                throw new RuntimeException("sort error", e);
+            }
             request.setProjects(modulesToRelease);
         }
-
 
         String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;
 

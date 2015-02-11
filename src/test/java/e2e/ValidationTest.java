@@ -105,7 +105,7 @@ public class ValidationTest {
         assertThat(testProject.local, hasCleanWorkingDirectory());
     }
 
-        @Test
+    @Test
     public void failsIfThereAreDependenciesOnSnapshotVersionsThatAreNotPartOfTheReactor() throws Exception {
         // Install the snapshot dependency so that it can be built
         TestProject dependency = TestProject.independentVersionsProject();

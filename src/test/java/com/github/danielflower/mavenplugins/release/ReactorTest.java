@@ -4,11 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ReleasableModuleBuilder.aModule;
 
 public class ReactorTest {
@@ -20,6 +17,15 @@ public class ReactorTest {
             aModule().build(), arty, aModule().build()
         ));
         assertThat(reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT"), is(arty));
+        assertThat(reactor.findByLabel("my.great.group:some-arty"), is(arty));
+    }
+
+    @Test
+    public void findOrReturnNullReturnsNullIfNotFound() throws Exception {
+        Reactor reactor = new Reactor(asList(
+            aModule().build(), aModule().build()
+        ));
+        assertThat(reactor.findByLabel("my.great.group:some-arty"), is(nullValue()));
     }
 
     @Test

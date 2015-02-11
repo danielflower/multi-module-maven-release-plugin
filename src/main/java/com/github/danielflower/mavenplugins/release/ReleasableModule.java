@@ -2,6 +2,8 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
 
+import java.util.List;
+
 public class ReleasableModule {
 
     private final MavenProject project;
@@ -34,5 +36,19 @@ public class ReleasableModule {
 
     public MavenProject getProject() {
         return project;
+    }
+
+    public String getLabel() {
+        return getGroupId() + ":" + getArtifactId();
+    }
+
+    public boolean isOneOf(List<String> moduleNames) {
+        String modulePath = project.getBasedir().getName();
+        for (String moduleName : moduleNames) {
+            if (modulePath.equals(moduleName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

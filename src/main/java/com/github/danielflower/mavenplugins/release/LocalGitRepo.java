@@ -94,7 +94,7 @@ public class LocalGitRepo {
         return new LocalGitRepo(git);
     }
 
-    public List<String> remoteTagsFrom(List<String> tagNames) throws GitAPIException {
+    public List<String> remoteTagsFrom(Collection<String> tagNames) throws GitAPIException {
         List<String> results = new ArrayList<String>();
         Collection<Ref> remoteTags = git.lsRemote().setTags(true).setHeads(false).call();
         for (Ref remoteTag : remoteTags) {

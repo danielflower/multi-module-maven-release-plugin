@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class PomUpdater {

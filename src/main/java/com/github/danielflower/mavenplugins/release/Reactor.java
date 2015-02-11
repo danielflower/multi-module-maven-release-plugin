@@ -1,15 +1,9 @@
 package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
 
-import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public class Reactor {
 
@@ -33,15 +27,21 @@ public class Reactor {
         return new Reactor(modules);
     }
 
-    public ReleasableModule find(String groupId, String artifactId, String version) throws UnresolvedSnapshotDependencyException {
-
+    public ReleasableModule findByLabel(String label) {
         for (ReleasableModule module : modulesInBuildOrder) {
-            if (module.getGroupId().equals(groupId) && module.getArtifactId().equals(artifactId)) {
+            String currentLabel = module.getGroupId() + ":" + module.getArtifactId();
+            if (currentLabel.equals(label)) {
                 return module;
             }
         }
-
-        throw new UnresolvedSnapshotDependencyException(groupId, artifactId, version);
+        return null;
     }
 
+    public ReleasableModule find(String groupId, String artifactId, String version) throws UnresolvedSnapshotDependencyException {
+        ReleasableModule value = findByLabel(groupId + ":" + artifactId);
+        if (value == null) {
+            throw new UnresolvedSnapshotDependencyException(groupId, artifactId, version);
+        }
+        return value;
+    }
 }

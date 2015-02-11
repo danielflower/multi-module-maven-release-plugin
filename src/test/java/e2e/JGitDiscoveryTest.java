@@ -1,13 +1,13 @@
 package e2e;
 
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectSorter;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListTagCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
@@ -17,11 +17,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.GitMatchers.hasTag;
 
 public class JGitDiscoveryTest {
     Repository repo;
@@ -39,6 +36,12 @@ public class JGitDiscoveryTest {
         Iterable<RevCommit> log = git.log().call();
         for (RevCommit revCommit : log)
             System.out.println(revCommit.getFullMessage().trim());
+    }
+
+    @Test public void blah() throws Exception {
+        ArrayList projects = new ArrayList();
+        projects.add(new MavenProject());
+        new ProjectSorter(projects);
     }
 
     @Test public void name() throws IOException, GitAPIException {
