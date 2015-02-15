@@ -1,6 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
+import org.eclipse.jgit.lib.Repository;
 
 import java.util.List;
 
@@ -36,10 +37,6 @@ public class ReleasableModule {
 
     public MavenProject getProject() {
         return project;
-    }
-
-    public String getLabel() {
-        return getGroupId() + ":" + getArtifactId();
     }
 
     public boolean isOneOf(List<String> moduleNames) {

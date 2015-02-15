@@ -47,9 +47,9 @@ import org.codehaus.plexus.util.dag.TopologicalSorter;
 public class SuperProjectSorter {
     private final DAG dag;
 
-    private final Map<String, MavenProject> projectMap;
+    private final Map projectMap;
 
-    private final List<MavenProject> sortedProjects;
+    private final List sortedProjects;
 
     private MavenProject topLevelProject;
 
@@ -66,13 +66,14 @@ public class SuperProjectSorter {
      *
      * @throws DuplicateProjectException if any projects are duplicated by id
      */
-    public SuperProjectSorter(List<MavenProject> projects)
+    public SuperProjectSorter(List projects)
         throws CycleDetectedException, DuplicateProjectException {
         dag = new DAG();
 
-        projectMap = new HashMap<String, MavenProject>();
+        projectMap = new HashMap();
 
-        for (MavenProject project : projects) {
+        for (Object project2 : projects) {
+            MavenProject project = (MavenProject) project2;
 
             String id = ArtifactUtils.versionlessKey(project.getGroupId(), project.getArtifactId());
 
@@ -97,7 +98,7 @@ public class SuperProjectSorter {
                     .versionlessKey(dependency.getGroupId(), dependency.getArtifactId());
 
                 if (dag.getVertex(dependencyId) != null) {
-                    project.addProjectReference(projectMap.get(dependencyId));
+                    project.addProjectReference((MavenProject) projectMap.get(dependencyId));
 
                     dag.addEdge(id, dependencyId);
                 }
@@ -148,8 +149,7 @@ public class SuperProjectSorter {
 
         List sortedProjects = new ArrayList();
 
-        for (Object theId : TopologicalSorter.sort(dag)) {
-            String id = (String)theId;
+        for (Object id : TopologicalSorter.sort(dag)) {
             sortedProjects.add(projectMap.get(id));
         }
 
