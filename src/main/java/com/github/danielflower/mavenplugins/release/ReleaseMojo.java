@@ -211,21 +211,6 @@ public class ReleaseMojo extends AbstractMojo {
 
         if (modulesToRelease != null && modulesToRelease.size() > 0) {
             request.setAlsoMake(true);
-            try {
-                SuperProjectSorter projectSorter = new SuperProjectSorter(projects);
-
-                List dependents = projectSorter.getDAG().getChildLabels("com.github.danielflower.mavenplugins.testprojects.parentassibling:core-utils");
-                for (Object dependent : dependents) {
-                    Object project = projectSorter.getProjectMap().get(dependent);
-                    getLog().info("Dependent is " + project);
-                }
-            } catch (Throwable e) {
-                getLog().warn("Error while sorting: " + e);
-                for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                    getLog().warn(stackTraceElement.toString());
-                }
-                throw new RuntimeException("sort error", e);
-            }
             request.setProjects(modulesToRelease);
         }
 

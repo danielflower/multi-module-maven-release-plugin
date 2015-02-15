@@ -68,6 +68,17 @@ public class PartialReleaseTest {
     private void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
         assertThat(testProject.local, not(hasTag("parent-as-sibling-" + expectedAggregatorVersion)));
         assertThat(testProject.origin, not(hasTag("parent-as-sibling-" + expectedAggregatorVersion)));
+        // The parent module should have a tag but this is non-trivial to implement in a maintainable manner.
+        // The problem is that the plugin executes Maven but does not know which builds Maven will actually
+        // run. I have considered 3 strategies:
+        // 1. Parse the console output from Maven. I worry this will result in future breakages if Maven output changes.
+        // 2. Figure out which modules Maven will build. There are Maven libraries that make this possible however it again
+        //    feels like something that could break depending on the maven version.
+        // 3. Get the plugin to work with --projects flag. This is probably the best way and almost works, however the Pom
+        //    updater only updates the modules that are being built, which sounds okay but it turns out that it results
+        //    in modules referencing a snapshot parent that doesn't exist, and maven checks this even though the project
+        //    with the bad reference isn't being checked.
+        // Although there are solutions to the problem, they all felt too brittle.
 //        assertThat(testProject.local, hasTag("parent-module-" + expectedParentVersion));
 //        assertThat(testProject.origin, hasTag("parent-module-" + expectedParentVersion));
         assertThat(testProject.local, hasTag("core-utils-" + expectedCoreVersion));

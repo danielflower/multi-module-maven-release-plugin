@@ -39,13 +39,10 @@ public class LocalGitRepoTest {
         int numberOfTags = 50; // setting this to 1000 works but takes too long
         for (int i = 0; i < numberOfTags; i++) {
             tag(project.local, "this-is-a-tag-" + i);
-            System.out.println("Making " + i);
         }
         project.local.push().setPushTags().call();
         LocalGitRepo repo = new LocalGitRepo(project.local);
         for (int i = 0; i < numberOfTags; i++) {
-            System.out.println("Testing " + i);
-
             String tagName = "this-is-a-tag-" + i;
             assertThat(repo.hasLocalTag(tagName), is(true));
             assertThat(repo.remoteTagsFrom(asList(tagName)).size(), is(1));

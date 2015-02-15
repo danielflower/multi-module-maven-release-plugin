@@ -20,3 +20,4 @@ Stability stuff
 * Test more nested projects work
 * Test cases where things like group IDs in parents are omitted
 * If it crashes it should report exactly what it has done and what it hasn't
+* Run E2E tests against multiple Maven versions
