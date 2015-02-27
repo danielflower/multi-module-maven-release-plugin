@@ -27,17 +27,11 @@ public class LocalGitRepoTest {
     }
 
     @Test
-    public void canSaveJsonInTagMessage() {
-        LocalGitRepo repo = new LocalGitRepo(project.local);
-
-    }
-
-    @Test
     public void canDetectRemoteTags() throws Exception {
         LocalGitRepo repo = new LocalGitRepo(project.local);
         tag(project.origin, "some-tag");
-        assertThat(repo.remoteTagsFrom(asList("blah", "some-tag")), equalTo(asList("some-tag")));
-        assertThat(repo.remoteTagsFrom(asList("blah", "some-taggart")), equalTo(emptyList()));
+        assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
+        assertThat(repo.remoteTagsFrom(tags("blah", "some-taggart")), equalTo(emptyList()));
     }
 
     @Test
@@ -51,10 +45,17 @@ public class LocalGitRepoTest {
         for (int i = 0; i < numberOfTags; i++) {
             String tagName = "this-is-a-tag-" + i;
             assertThat(repo.hasLocalTag(tagName), is(true));
-            assertThat(repo.remoteTagsFrom(asList(tagName)).size(), is(1));
+            assertThat(repo.remoteTagsFrom(tags(tagName)).size(), is(1));
         }
     }
 
+    private static List<AnnotatedTag> tags(String... tagNames) {
+        List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
+        for (String tagName : tagNames) {
+            tags.add(AnnotatedTag.create(tagName, "1", "0"));
+        }
+        return tags;
+    }
     private static List<String> emptyList() {
         return new ArrayList<String>();
     }

@@ -33,7 +33,7 @@ public class ReleasableModuleBuilder {
     }
 
     public ReleasableModule build() throws ValidationException {
-        return new ReleasableModule(project, buildNumber, versionNamer.name(project.getVersion(), buildNumber));
+        return new ReleasableModule(project, project.getVersion(), buildNumber, versionNamer.name(project.getVersion(), buildNumber));
     }
 
     public static ReleasableModuleBuilder aModule() {

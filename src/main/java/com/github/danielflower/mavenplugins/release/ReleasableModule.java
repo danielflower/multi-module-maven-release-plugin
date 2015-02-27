@@ -8,12 +8,14 @@ import java.util.List;
 public class ReleasableModule {
 
     private final MavenProject project;
+    private final String version;
     private final String buildNumber;
     private final String tagName;
     private final String newVersion;
 
-    public ReleasableModule(MavenProject project, String buildNumber, String newVersion) throws ValidationException {
+    public ReleasableModule(MavenProject project, String version, String buildNumber, String newVersion) throws ValidationException {
         this.project = project;
+        this.version = version;
         this.buildNumber = buildNumber;
         this.newVersion = newVersion;
         this.tagName = project.getArtifactId() + "-" + this.newVersion;
@@ -37,6 +39,14 @@ public class ReleasableModule {
 
     public MavenProject getProject() {
         return project;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getBuildNumber() {
+        return buildNumber;
     }
 
     public boolean isOneOf(List<String> moduleNames) {

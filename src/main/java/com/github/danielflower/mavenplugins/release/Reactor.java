@@ -21,7 +21,7 @@ public class Reactor {
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
         for (MavenProject project : projects) {
-            ReleasableModule module = new ReleasableModule(project, buildNumber, versionNamer.name(project.getVersion(), buildNumber));
+            ReleasableModule module = new ReleasableModule(project, project.getVersion(), buildNumber, versionNamer.name(project.getVersion(), buildNumber));
             modules.add(module);
         }
         return new Reactor(modules);

@@ -97,7 +97,7 @@ public class ReleaseMojo extends AbstractMojo {
             Reactor reactor = Reactor.fromProjects(projects, buildNumber);
 
             repo.errorIfNotClean();
-            List<String> tagNames = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
+            List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
             try {
@@ -108,9 +108,9 @@ public class ReleaseMojo extends AbstractMojo {
                 }
             }
 
-            for (String tagName : tagNames) {
-                log.info("About to tag the repository with " + tagName);
-                repo.tagRepoAndPush(tagName);
+            for (AnnotatedTag proposedTag : proposedTags) {
+                log.info("About to tag the repository with " + proposedTag.name());
+                repo.tagRepoAndPush(proposedTag);
             }
 
         } catch (GitAPIException gae) {
@@ -143,8 +143,8 @@ public class ReleaseMojo extends AbstractMojo {
         return result.alteredPoms;
     }
 
-    private List<String> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<String> names = new ArrayList<String>();
+    private List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
+        List<AnnotatedTag> names = new ArrayList<AnnotatedTag>();
         for (ReleasableModule module : modules) {
             if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
                 String tag = module.getTagName();
@@ -157,7 +157,8 @@ public class ReleaseMojo extends AbstractMojo {
                     ));
                 }
 
-                names.add(tag);
+                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.getBuildNumber());
+                names.add(annotatedTag);
             }
         }
         List<String> matchingRemoteTags = git.remoteTagsFrom(names);

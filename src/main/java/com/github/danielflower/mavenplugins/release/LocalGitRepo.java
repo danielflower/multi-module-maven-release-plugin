@@ -72,8 +72,8 @@ public class LocalGitRepo {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
-    public void tagRepoAndPush(String tag) throws GitAPIException {
-        Ref tagRef = git.tag().setAnnotated(true).setName(tag).setMessage("Release " + tag).call();
+    public void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException {
+        Ref tagRef = tag.saveAtHEAD(git);
         git.push().add(tagRef).call();
     }
 
@@ -94,13 +94,13 @@ public class LocalGitRepo {
         return new LocalGitRepo(git);
     }
 
-    public List<String> remoteTagsFrom(List<String> tagNames) throws GitAPIException {
+    public List<String> remoteTagsFrom(List<AnnotatedTag> tagNames) throws GitAPIException {
         List<String> results = new ArrayList<String>();
         Collection<Ref> remoteTags = git.lsRemote().setTags(true).setHeads(false).call();
         for (Ref remoteTag : remoteTags) {
-            for (String proposedTagName : tagNames) {
-                if (remoteTag.getName().equals("refs/tags/" + proposedTagName)) {
-                    results.add(proposedTagName);
+            for (AnnotatedTag proposedTag : tagNames) {
+                if (remoteTag.getName().equals("refs/tags/" + proposedTag.name())) {
+                    results.add(proposedTag.name());
                 }
             }
         }

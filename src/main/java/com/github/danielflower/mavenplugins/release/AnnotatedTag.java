@@ -52,9 +52,9 @@ public class AnnotatedTag {
         return String.valueOf(message.get(BUILD_NUMBER));
     }
 
-    public void saveAtHEAD(Git git) throws GitAPIException {
+    public Ref saveAtHEAD(Git git) throws GitAPIException {
         String json = message.toJSONString();
-        git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
+        return git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
     }
 
     @Override
