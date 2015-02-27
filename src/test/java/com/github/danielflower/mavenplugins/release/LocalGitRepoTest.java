@@ -27,6 +27,12 @@ public class LocalGitRepoTest {
     }
 
     @Test
+    public void canSaveJsonInTagMessage() {
+        LocalGitRepo repo = new LocalGitRepo(project.local);
+
+    }
+
+    @Test
     public void canDetectRemoteTags() throws Exception {
         LocalGitRepo repo = new LocalGitRepo(project.local);
         tag(project.origin, "some-tag");
