@@ -102,10 +102,9 @@ public class ReleaseMojo extends AbstractMojo {
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
             try {
                 runMavenBuild();
+                revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
             } finally {
-                if (!repo.revertChanges(log, changedFiles)) {
-                    throw new MojoExecutionException("Could not revert changes - working directory is no longer clean. Please revert changes manually");
-                }
+                revertChanges(log, repo, changedFiles, false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
             }
 
             for (AnnotatedTag proposedTag : proposedTags) {
@@ -118,6 +117,17 @@ public class ReleaseMojo extends AbstractMojo {
                 asList("There was an error while accessing the Git repository. The error returned from git was:", gae.getMessage()));
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
+        }
+    }
+
+    private static void revertChanges(Log log, LocalGitRepo repo, List<File> changedFiles, boolean throwIfError) throws MojoExecutionException {
+        if (!repo.revertChanges(log, changedFiles)) {
+            String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
+            if (throwIfError) {
+                throw new MojoExecutionException(message);
+            } else {
+                log.warn(message);
+            }
         }
     }
 
@@ -144,7 +154,7 @@ public class ReleaseMojo extends AbstractMojo {
     }
 
     private List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<AnnotatedTag> names = new ArrayList<AnnotatedTag>();
+        List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (ReleasableModule module : modules) {
             if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
                 String tag = module.getTagName();
@@ -158,10 +168,10 @@ public class ReleaseMojo extends AbstractMojo {
                 }
 
                 AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.getBuildNumber());
-                names.add(annotatedTag);
+                tags.add(annotatedTag);
             }
         }
-        List<String> matchingRemoteTags = git.remoteTagsFrom(names);
+        List<String> matchingRemoteTags = git.remoteTagsFrom(tags);
         if (matchingRemoteTags.size() > 0) {
             String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
             List<String> messages = new ArrayList<String>();
@@ -172,7 +182,7 @@ public class ReleaseMojo extends AbstractMojo {
             messages.add("Please try releasing again with a new build number.");
             throw new ValidationException(summary, messages);
         }
-        return names;
+        return tags;
     }
 
     private void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {

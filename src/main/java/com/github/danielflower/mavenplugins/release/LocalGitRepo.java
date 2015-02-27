@@ -20,6 +20,7 @@ import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 public class LocalGitRepo {
 
     private final Git git;
+    private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
 
     LocalGitRepo(Git git) {
         this.git = git;
@@ -54,6 +55,9 @@ public class LocalGitRepo {
     }
 
     public boolean revertChanges(Log log, List<File> changedFiles) throws MojoExecutionException {
+        if (hasReverted) {
+            return true;
+        }
         boolean hasErrors = false;
         File workTree = git.getRepository().getWorkTree();
         for (File changedFile : changedFiles) {
@@ -65,6 +69,7 @@ public class LocalGitRepo {
                 log.error("Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
             }
         }
+        hasReverted = true;
         return !hasErrors;
     }
 
