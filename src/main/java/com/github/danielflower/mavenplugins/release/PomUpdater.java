@@ -31,7 +31,9 @@ public class PomUpdater {
         for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
             try {
                 MavenProject project = module.getProject();
-                log.info("Going to release " + module.getArtifactId() + " " + module.getNewVersion());
+                if (module.willBeReleased()) {
+                    log.info("Going to release " + module.getArtifactId() + " " + module.getNewVersion());
+                }
 
                 List<String> errorsForCurrentPom = alterModel(project, module.getNewVersion());
                 errors.addAll(errorsForCurrentPom);
