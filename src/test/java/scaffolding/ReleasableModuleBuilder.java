@@ -11,9 +11,15 @@ public class ReleasableModuleBuilder {
     private final VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
     MavenProject project = new MavenProject();
     private String buildNumber = "123";
+    private String equivalentVersion = null;
 
     public ReleasableModuleBuilder withBuildNumber(String buildNumber) {
         this.buildNumber = buildNumber;
+        return this;
+    }
+
+    public ReleasableModuleBuilder withEquivalentVersion(String equivalentVersion) {
+        this.equivalentVersion = equivalentVersion;
         return this;
     }
 
@@ -33,7 +39,7 @@ public class ReleasableModuleBuilder {
     }
 
     public ReleasableModule build() throws ValidationException {
-        return new ReleasableModule(project, project.getVersion(), buildNumber, versionNamer.name(project.getVersion(), buildNumber));
+        return new ReleasableModule(project, project.getVersion(), buildNumber, versionNamer.name(project.getVersion(), buildNumber), equivalentVersion);
     }
 
     public static ReleasableModuleBuilder aModule() {

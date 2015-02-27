@@ -9,8 +9,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,14 +97,14 @@ public class ReleaseMojo extends AbstractMojo {
 
         try {
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir();
-            Reactor reactor = Reactor.fromProjects(projects, buildNumber);
+            Reactor reactor = Reactor.fromProjects(log, repo.git, project, projects, buildNumber);
 
             repo.errorIfNotClean();
             List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
             try {
-                runMavenBuild();
+                runMavenBuild(reactor);
                 revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
             } finally {
                 revertChanges(log, repo, changedFiles, false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
@@ -112,11 +115,11 @@ public class ReleaseMojo extends AbstractMojo {
                 repo.tagRepoAndPush(proposedTag);
             }
 
+        } catch (ValidationException e) {
+            printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         } catch (GitAPIException gae) {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:", gae.getMessage()));
-        } catch (ValidationException e) {
-            printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         }
     }
 
@@ -156,6 +159,9 @@ public class ReleaseMojo extends AbstractMojo {
     private static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
         List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (ReleasableModule module : modules) {
+            if (!module.willBeReleased()) {
+                continue;
+            }
             if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
                 String tag = module.getTagName();
                 if (git.hasLocalTag(tag)) {
@@ -167,7 +173,7 @@ public class ReleaseMojo extends AbstractMojo {
                     ));
                 }
 
-                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.getBuildNumber());
+                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion().replace("-SNAPSHOT", ""), module.getBuildNumber());
                 tags.add(annotatedTag);
             }
         }
@@ -202,7 +208,7 @@ public class ReleaseMojo extends AbstractMojo {
         throw new MojoExecutionException(terseMessage);
     }
 
-    private void runMavenBuild() throws MojoExecutionException {
+    private void runMavenBuild(Reactor reactor) throws MojoExecutionException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setInteractive(false);
 
@@ -220,10 +226,16 @@ public class ReleaseMojo extends AbstractMojo {
         }
         request.setProfiles(profiles);
 
-        if (modulesToRelease != null && modulesToRelease.size() > 0) {
-            request.setAlsoMake(true);
-            request.setProjects(modulesToRelease);
+        request.setAlsoMake(true);
+        List<String> changedModules = new ArrayList<String>();
+        for (ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
+            String module = Repository.stripWorkDir(project.getBasedir(), releasableModule.getProject().getBasedir());
+            boolean userImplicitlyOrExplictlyWantsThisToBeReleased = modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(module);
+            if (userImplicitlyOrExplictlyWantsThisToBeReleased && releasableModule.willBeReleased()) {
+                changedModules.add(module);
+            }
         }
+        request.setProjects(changedModules);
 
         String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;
 

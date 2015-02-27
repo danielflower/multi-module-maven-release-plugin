@@ -80,7 +80,7 @@ public class PomUpdater {
         if (parent != null && isSnapshot(parent.getVersion())) {
             try {
                 ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-                originalModel.getParent().setVersion(parentBeingReleased.getNewVersion());
+                originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
             } catch (UnresolvedSnapshotDependencyException e) {
                 errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
             }
@@ -90,7 +90,7 @@ public class PomUpdater {
             if (isSnapshot(version)) {
                 try {
                     ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
-                    dependency.setVersion(dependencyBeingReleased.getNewVersion());
+                    dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
                 } catch (UnresolvedSnapshotDependencyException e) {
                     errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
                 }

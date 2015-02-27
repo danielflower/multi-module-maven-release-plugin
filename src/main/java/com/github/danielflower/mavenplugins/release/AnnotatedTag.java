@@ -2,6 +2,7 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevTag;
@@ -16,8 +17,10 @@ public class AnnotatedTag {
     public static final String BUILD_NUMBER = "buildNumber";
     private final String name;
     private final JSONObject message;
+    private Ref ref;
 
-    private AnnotatedTag(String name, JSONObject message) {
+    private AnnotatedTag(Ref ref, String name, JSONObject message) {
+        this.ref = ref;
         this.name = name;
         this.message = message;
     }
@@ -26,14 +29,15 @@ public class AnnotatedTag {
         JSONObject message = new JSONObject();
         message.put(VERSION, version);
         message.put(BUILD_NUMBER, buildNumber);
-        return new AnnotatedTag(name, message);
+        return new AnnotatedTag(null, name, message);
     }
 
     public static AnnotatedTag fromRef(Repository repository, Ref gitTag) throws IOException {
         RevWalk walk = new RevWalk(repository);
-        RevTag tag = walk.parseTag(gitTag.getObjectId());
+        ObjectId tagId = gitTag.getObjectId();
+        RevTag tag = walk.parseTag(tagId);
         JSONObject message = (JSONObject) JSONValue.parse(tag.getFullMessage());
-        return new AnnotatedTag(stripRefPrefix(gitTag.getName()), message);
+        return new AnnotatedTag(gitTag, stripRefPrefix(gitTag.getName()), message);
     }
 
     static String stripRefPrefix(String refName) {
@@ -54,7 +58,8 @@ public class AnnotatedTag {
 
     public Ref saveAtHEAD(Git git) throws GitAPIException {
         String json = message.toJSONString();
-        return git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
+        ref = git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
+        return ref;
     }
 
     @Override
@@ -75,5 +80,9 @@ public class AnnotatedTag {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public Ref ref() {
+        return ref;
     }
 }

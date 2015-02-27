@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static scaffolding.MvnRunner.runMaven;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
@@ -19,6 +20,8 @@ public class TestProject {
 
     public final File localDir;
     public final Git local;
+
+    private final AtomicInteger commitCounter = new AtomicInteger(1);
 
     private TestProject(File originDir, Git origin, File localDir, Git local) {
         this.originDir = originDir;
@@ -55,7 +58,7 @@ public class TestProject {
         File random = new File(moduleDir, UUID.randomUUID() + ".txt");
         random.createNewFile();
         local.add().addFilepattern(module + "/" + random.getName()).call();
-        local.commit().setMessage("Adding " + random.getName()).call();
+        local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + random.getName()).call();
         return this;
     }
 

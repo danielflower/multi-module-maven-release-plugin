@@ -12,12 +12,14 @@ public class ReleasableModule {
     private final String buildNumber;
     private final String tagName;
     private final String newVersion;
+    private final String equivalentVersion;
 
-    public ReleasableModule(MavenProject project, String version, String buildNumber, String newVersion) throws ValidationException {
+    public ReleasableModule(MavenProject project, String version, String buildNumber, String newVersion, String equivalentVersion) throws ValidationException {
         this.project = project;
         this.version = version;
         this.buildNumber = buildNumber;
         this.newVersion = newVersion;
+        this.equivalentVersion = equivalentVersion;
         this.tagName = project.getArtifactId() + "-" + this.newVersion;
     }
 
@@ -57,5 +59,13 @@ public class ReleasableModule {
             }
         }
         return false;
+    }
+
+    public boolean willBeReleased() {
+        return equivalentVersion == null;
+    }
+
+    public String getVersionToDependOn() {
+        return willBeReleased() ? newVersion : equivalentVersion;
     }
 }

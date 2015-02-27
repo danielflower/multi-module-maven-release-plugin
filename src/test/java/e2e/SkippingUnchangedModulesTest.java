@@ -13,7 +13,7 @@ import static scaffolding.GitMatchers.hasTag;
 
 public class SkippingUnchangedModulesTest {
 
-    final TestProject testProject = TestProject.independentVersionsProject();
+    final TestProject testProject = TestProject.parentAsSibilngProject();
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
@@ -21,16 +21,15 @@ public class SkippingUnchangedModulesTest {
     }
 
     @Test
-    @Ignore("This is a failing test written before implementation. Woo.")
     public void doesNotReReleaseAModuleThatHasNotChanged() throws Exception {
         testProject.mvnRelease("1");
-        assertTagExists("independent-versions-1.0.1");
+        assertTagExists("parent-module-1.2.3.1");
         assertTagExists("core-utils-2.0.1");
         assertTagExists("console-app-3.2.1");
 
         testProject.commitRandomFile("console-app").pushIt();
         testProject.mvnRelease("2");
-        assertTagExists("independent-versions-1.0.2");
+        assertTagDoesNotExist("parent-module-1.2.3.2");
         assertTagDoesNotExist("core-utils-2.0.2");
         assertTagExists("console-app-3.2.2");
     }

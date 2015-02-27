@@ -11,12 +11,13 @@ import java.util.List;
 
 public class AnnotatedTagFinder {
 
-    public static List<AnnotatedTag> mostRecent(Git git, String module, String versionWithoutBuildNumber) throws GitAPIException, IOException {
+    public static List<AnnotatedTag> mostRecent(Git git, String module, String versionWithoutBuildNumber) throws IOException, GitAPIException {
         ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
         List<Ref> tags = git.tagList().call();
         Collections.reverse(tags);
+        String tagWithoutBuildNumber = module + "-" + versionWithoutBuildNumber;
         for (Ref tag : tags) {
-            if (isPotentiallySameVersionIgnoringBuildNumber(module + "-" + versionWithoutBuildNumber, tag.getName())) {
+            if (isPotentiallySameVersionIgnoringBuildNumber(tagWithoutBuildNumber, tag.getName())) {
                 results.add(AnnotatedTag.fromRef(git.getRepository(), tag));
                 break;
             }
@@ -28,4 +29,5 @@ public class AnnotatedTagFinder {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
         return tagName.startsWith(versionWithoutBuildNumber + ".");
     }
+
 }

@@ -26,7 +26,7 @@ public class AnnotatedTagFinderTest {
         assertThat(AnnotatedTagFinder.mostRecent(project.local, "core-utils", "2"), contains(tag2));
     }
 
-    private static AnnotatedTag saveFileInModule(TestProject project, String moduleName, String version, String buildNumber) throws IOException, GitAPIException {
+    static AnnotatedTag saveFileInModule(TestProject project, String moduleName, String version, String buildNumber) throws IOException, GitAPIException {
         project.commitRandomFile(moduleName);
         AnnotatedTag tag = AnnotatedTag.create(moduleName + "-" + version + "." + buildNumber, version, buildNumber);
         tag.saveAtHEAD(project.local);
@@ -40,5 +40,6 @@ public class AnnotatedTagFinderTest {
         assertThat(isPotentiallySameVersionIgnoringBuildNumber("my-artifact-1.3", "refs/tags/my-artifact-1.2.2"), is(false));
         assertThat(isPotentiallySameVersionIgnoringBuildNumber("not-my-artifact-1.2", "refs/tags/my-artifact-1.2.2"), is(false));
     }
+
 
 }
