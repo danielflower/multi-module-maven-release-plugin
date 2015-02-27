@@ -32,6 +32,7 @@ public class ValidationTest {
     public void ifTheSameVersionIsReleasedTwiceItErrorsLoudly() throws Exception {
         TestProject testProject = TestProject.singleModuleProject();
         testProject.mvnRelease("1");
+        testProject.commitRandomFile(".").pushIt();
         try {
             testProject.mvnRelease("1");
             Assert.fail("Should not have completed running");

@@ -57,7 +57,8 @@ public class TestProject {
         }
         File random = new File(moduleDir, UUID.randomUUID() + ".txt");
         random.createNewFile();
-        local.add().addFilepattern(module + "/" + random.getName()).call();
+        String modulePath = module.equals(".") ? "" : module + "/";
+        local.add().addFilepattern(modulePath + random.getName()).call();
         local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + random.getName()).call();
         return this;
     }
