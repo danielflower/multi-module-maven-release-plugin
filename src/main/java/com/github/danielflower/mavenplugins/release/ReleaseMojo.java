@@ -131,7 +131,7 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor) throws MojoExecutionException, ValidationException {
+    private static List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor) throws MojoExecutionException, ValidationException {
         PomUpdater pomUpdater = new PomUpdater(log, reactor);
         PomUpdater.UpdateResult result = pomUpdater.updateVersion();
         if (!result.success()) {
@@ -153,7 +153,7 @@ public class ReleaseMojo extends AbstractMojo {
         return result.alteredPoms;
     }
 
-    private List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
+    private static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
         List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (ReleasableModule module : modules) {
             if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
@@ -185,7 +185,7 @@ public class ReleaseMojo extends AbstractMojo {
         return tags;
     }
 
-    private void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
+    private static void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
         log.error("");
         log.error("");
         log.error("");
