@@ -12,6 +12,7 @@ public class ReleasableModuleBuilder {
     MavenProject project = new MavenProject();
     private String buildNumber = "123";
     private String equivalentVersion = null;
+    private String relativePathToModule = ".";
 
     public ReleasableModuleBuilder withBuildNumber(String buildNumber) {
         this.buildNumber = buildNumber;
@@ -20,6 +21,11 @@ public class ReleasableModuleBuilder {
 
     public ReleasableModuleBuilder withEquivalentVersion(String equivalentVersion) {
         this.equivalentVersion = equivalentVersion;
+        return this;
+    }
+
+    public ReleasableModuleBuilder withRelativePathToModule(String relativePathToModule) {
+        this.relativePathToModule = relativePathToModule;
         return this;
     }
 
@@ -39,7 +45,7 @@ public class ReleasableModuleBuilder {
     }
 
     public ReleasableModule build() throws ValidationException {
-        return new ReleasableModule(project, project.getVersion(), buildNumber, versionNamer.name(project.getVersion(), buildNumber), equivalentVersion);
+        return new ReleasableModule(project, project.getVersion(), buildNumber, versionNamer.name(project.getVersion(), buildNumber), equivalentVersion, relativePathToModule);
     }
 
     public static ReleasableModuleBuilder aModule() {

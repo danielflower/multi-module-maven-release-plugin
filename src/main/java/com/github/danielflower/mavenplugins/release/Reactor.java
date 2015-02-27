@@ -5,6 +5,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,11 @@ public class Reactor {
                 log.debug("Will use version " + newVersion + " for " + project.getArtifactId() + " as it has changed since the last release.");
             }
 
-            ReleasableModule module = new ReleasableModule(project, project.getVersion(), buildNumber, newVersion, equivalentVersion);
+            String relativePathToModule = Repository.stripWorkDir(rootProject.getBasedir(), project.getBasedir());
+            if (relativePathToModule.length() == 0) {
+                relativePathToModule = ".";
+            }
+            ReleasableModule module = new ReleasableModule(project, project.getVersion(), buildNumber, newVersion, equivalentVersion, relativePathToModule);
             modules.add(module);
         }
         return new Reactor(modules);

@@ -9,11 +9,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
-import java.io.IOError;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -229,10 +226,10 @@ public class ReleaseMojo extends AbstractMojo {
         request.setAlsoMake(true);
         List<String> changedModules = new ArrayList<String>();
         for (ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
-            String module = Repository.stripWorkDir(project.getBasedir(), releasableModule.getProject().getBasedir());
-            boolean userImplicitlyOrExplictlyWantsThisToBeReleased = modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(module);
-            if (userImplicitlyOrExplictlyWantsThisToBeReleased && releasableModule.willBeReleased()) {
-                changedModules.add(module);
+            String modulePath = releasableModule.getRelativePathToModule();
+            boolean userImplicitlyOrExplicitlyWantsThisToBeReleased = modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(modulePath);
+            if (userImplicitlyOrExplicitlyWantsThisToBeReleased && releasableModule.willBeReleased()) {
+                changedModules.add(modulePath);
             }
         }
         request.setProjects(changedModules);
