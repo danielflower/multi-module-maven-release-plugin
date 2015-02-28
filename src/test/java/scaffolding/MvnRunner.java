@@ -51,7 +51,7 @@ public class MvnRunner {
         haveInstalledPlugin = true;
     }
 
-    public static List<String> runMaven(File projectDir, String... arguments) throws IOException {
+    public static List<String> runMaven(File workingDir, String... arguments) throws IOException {
         String mvnPath = System.getenv("M2_HOME");
         if (StringUtils.isBlank(mvnPath)) {
             throw new RuntimeException("M2_HOME is not set");
@@ -68,7 +68,7 @@ public class MvnRunner {
         }
 
         DefaultExecutor executor = new DefaultExecutor();
-        executor.setWorkingDirectory(projectDir);
+        executor.setWorkingDirectory(workingDir);
 
         CollectingLogOutputStream logCollector = new CollectingLogOutputStream(true);
         PumpStreamHandler streamHandler = new PumpStreamHandler(logCollector);

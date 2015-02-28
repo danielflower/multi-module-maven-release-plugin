@@ -90,15 +90,35 @@ public class LocalGitRepo {
         try {
             git = Git.open(gitDir);
         } catch (RepositoryNotFoundException rnfe) {
-            String summary = "Releases can only be performed from Git repositories.";
+            File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(pathOf(gitDir)));
+            String summary;
             List<String> messages = new ArrayList<String>();
-            messages.add(summary);
-            messages.add(pathOf(gitDir) + " is not a Git repository.");
+            if (gitRoot == null) {
+                summary = "Releases can only be performed from Git repositories.";
+                messages.add(summary);
+                messages.add(pathOf(gitDir) + " is not a Git repository.");
+            } else {
+                summary = "The release plugin can only be run from the root folder of your Git repository";
+                messages.add(summary);
+                messages.add("Try running the release plugin from " + pathOf(gitRoot));
+            }
             throw new ValidationException(summary, messages);
         } catch (Exception e) {
             throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
         }
         return new LocalGitRepo(git);
+    }
+
+    private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
+        System.out.println("candidateDirStart = " + candidateDir);
+        while (candidateDir != null) {
+            System.out.println("candidateDir = " + candidateDir);
+            if (new File(candidateDir, ".git").isDirectory()) {
+                return candidateDir;
+            }
+            candidateDir = candidateDir.getParentFile();
+        }
+        return null;
     }
 
     public List<String> remoteTagsFrom(List<AnnotatedTag> tagNames) throws GitAPIException {

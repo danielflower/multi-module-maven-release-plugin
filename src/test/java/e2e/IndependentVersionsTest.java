@@ -3,11 +3,14 @@ package e2e;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -20,6 +23,7 @@ import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
+import static scaffolding.MvnRunner.runMaven;
 
 public class IndependentVersionsTest {
 
@@ -80,6 +84,19 @@ public class IndependentVersionsTest {
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());
+    }
+
+    @Test
+    public void whenRunFromASubFolderSomethingHappens() throws IOException, InterruptedException {
+        try {
+            runMaven(new File(testProject.localDir, "console-app"),
+                "-DbuildNumber=" + buildNumber,
+                "releaser:release");
+            Assert.fail("Should not have worked");
+        } catch (MavenExecutionException e) {
+            assertThat(e.output, twoOf(containsString("The release plugin can only be run from the root folder of your Git repository")));
+            assertThat(e.output, oneOf(containsString("Try running the release plugin from " + testProject.localDir.getCanonicalPath())));
+        }
     }
 
 //    @Test

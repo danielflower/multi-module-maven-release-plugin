@@ -5,6 +5,7 @@ import org.junit.Test;
 import scaffolding.TestProject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.saveFileInModule;
 import static java.util.Arrays.asList;
@@ -24,9 +25,9 @@ public class DiffDetectorTest {
 
         DiffDetector detector = new DiffDetector(project.local.getRepository());
 
-        assertThat(detector.hasChangedSince("core-utils", asList(tag2)), is(false));
-        assertThat(detector.hasChangedSince("console-app", asList(tag2)), is(true));
-        assertThat(detector.hasChangedSince("console-app", asList(tag3)), is(false));
+        assertThat(detector.hasChangedSince("core-utils", noChildModules(), asList(tag2)), is(false));
+        assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag2)), is(true));
+        assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(false));
     }
 
     @Test
@@ -39,6 +40,24 @@ public class DiffDetectorTest {
         project.commitRandomFile("console-app");
 
         DiffDetector detector = new DiffDetector(project.local.getRepository());
-        assertThat(detector.hasChangedSince("console-app", asList(tag3)), is(true));
+        assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(true));
+    }
+
+    @Test
+    public void canIgnoreModuleFolders() throws IOException, GitAPIException {
+        TestProject project = TestProject.independentVersionsProject();
+
+        saveFileInModule(project, "console-app", "1.2", "3");
+        saveFileInModule(project, "core-utils", "2", "0");
+        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", "4");
+        project.commitRandomFile("console-app");
+
+        DiffDetector detector = new DiffDetector(project.local.getRepository());
+        assertThat(detector.hasChangedSince("console-app", asList("console-app"), asList(tag3)), is(false));
+    }
+
+
+    private static java.util.List<String> noChildModules() {
+        return new ArrayList<String>();
     }
 }

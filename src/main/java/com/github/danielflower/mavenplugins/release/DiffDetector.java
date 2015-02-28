@@ -20,11 +20,18 @@ public class DiffDetector {
         this.repo = repo;
     }
 
-    public boolean hasChangedSince(String modulePath, Collection<AnnotatedTag> tags) throws IOException {
+    public boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Collection<AnnotatedTag> tags) throws IOException {
         RevWalk walk = new RevWalk(repo);
         walk.markStart(walk.parseCommit(repo.getRef("HEAD").getObjectId()));
 
-        walk.setTreeFilter(AndTreeFilter.create(PathFilter.create(modulePath + "/"), TreeFilter.ANY_DIFF));
+        Collection<TreeFilter> treeFilters = new ArrayList<TreeFilter>();
+        treeFilters.add(PathFilter.create(modulePath + "/"));
+        treeFilters.add(TreeFilter.ANY_DIFF);
+        for (String childModule : childModules) {
+            treeFilters.add(PathFilter.create(modulePath + "/" + childModule).negate());
+        }
+
+        walk.setTreeFilter(AndTreeFilter.create(treeFilters));
 
         for (AnnotatedTag tag : tags) {
             ObjectId commitId = tag.ref().getTarget().getObjectId();
