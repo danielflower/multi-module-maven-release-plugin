@@ -22,7 +22,7 @@ Stability stuff
 * If it crashes it should report exactly what it has done and what it hasn't
 * Run E2E tests against multiple Maven versions
 * Tests on partial-releases:
-    * If there are no changes to release, should that be an error or okay or rebuild everything?
+    * If there are no changes to release, the whole project should be re-released
     * If A->B->C, and B hasn't changed, but C has, then B should still be rebuilt and A should therefore get the new C
     * Nested modules
     * Cases where module path != artifact ID

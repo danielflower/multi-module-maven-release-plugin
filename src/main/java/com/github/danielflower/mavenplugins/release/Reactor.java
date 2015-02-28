@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -29,16 +30,36 @@ public class Reactor {
         for (MavenProject project : projects) {
             String newVersion = versionNamer.name(project.getVersion(), buildNumber);
 
-            String relativePathToModule = calculateModulePath(rootProject, project);
-            AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastCommit(git, detector, project, relativePathToModule);
-            String equivalentVersion = null;
-            if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-                equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
-                log.info("Will use version " + equivalentVersion + " for " + project.getArtifactId() + " as it has not been changed since that release.");
-            } else {
-                log.debug("Will use version " + newVersion + " for " + project.getArtifactId() + " as it has changed since the last release.");
+            boolean oneOfTheDependenciesHasChanged = false;
+            String changedDependency = null;
+            for (ReleasableModule module : modules) {
+                if (module.willBeReleased()) {
+                    for (Dependency dependency : project.getModel().getDependencies()) {
+                        if (dependency.getGroupId().equals(module.getGroupId()) && dependency.getArtifactId().equals(module.getArtifactId())) {
+                            oneOfTheDependenciesHasChanged = true;
+                            changedDependency = dependency.getArtifactId();
+                            break;
+                        }
+                    }
+                }
+                if (oneOfTheDependenciesHasChanged) {
+                    break;
+                }
             }
 
+            String equivalentVersion = null;
+            String relativePathToModule = calculateModulePath(rootProject, project);
+            if (oneOfTheDependenciesHasChanged) {
+                log.info("Releasing " + project.getArtifactId() + " " + newVersion + " as " + changedDependency + " has changed.");
+            } else {
+                AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastCommit(git, detector, project, relativePathToModule);
+                if (previousTagThatIsTheSameAsHEADForThisModule != null) {
+                    equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+                    log.info("Will use version " + equivalentVersion + " for " + project.getArtifactId() + " as it has not been changed since that release.");
+                } else {
+                    log.debug("Will use version " + newVersion + " for " + project.getArtifactId() + " as it has changed since the last release.");
+                }
+            }
             ReleasableModule module = new ReleasableModule(project, project.getVersion(), buildNumber, newVersion, equivalentVersion, relativePathToModule);
             modules.add(module);
         }

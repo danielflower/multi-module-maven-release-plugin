@@ -94,9 +94,10 @@ public class ReleaseMojo extends AbstractMojo {
 
         try {
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir();
+            repo.errorIfNotClean();
+
             Reactor reactor = Reactor.fromProjects(log, repo.git, project, projects, buildNumber);
 
-            repo.errorIfNotClean();
             List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);

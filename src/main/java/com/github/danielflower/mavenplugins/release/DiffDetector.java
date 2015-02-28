@@ -33,6 +33,7 @@ public class DiffDetector {
         }
 
         boolean hasCommit = walk.iterator().hasNext();
+        walk.dispose();
         return hasCommit;
     }
 }
