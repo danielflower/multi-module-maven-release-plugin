@@ -44,9 +44,6 @@ public class ValidationTest {
                 oneOf(containsString("It is likely that this version has been released before.")));
             assertThat(mee.output,
                 oneOf(containsString("Please try incrementing the build number and trying again.")));
-            assertThat(mee.output,
-                noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
-
         }
     }
 
