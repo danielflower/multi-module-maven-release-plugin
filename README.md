@@ -2,7 +2,7 @@ Documentation, download, and usage instructions
 ===============================================
 
 Full usage details, FAQs, background and more are available on the
-[project documention website](http://danielflower.github.io/multi-module-maven-release-plugin/index.html).
+**[project documention website](http://danielflower.github.io/multi-module-maven-release-plugin/index.html)**.
 
 Development
 ===========
@@ -18,7 +18,7 @@ Note that the tests run the plugin against a number of sample test projects, loc
 If adding new functionality, or fixing a bug, it is recommended that a sample project be set up so that the scenario
 can be tested end-to-end.
 
-See also [CONTRIBUTING.md](blob/master/CONTRIBUTING.md) for information on deploying to Nexus and releasing the plugin.
+See also [CONTRIBUTING.md](CONTRIBUTING.md) for information on deploying to Nexus and releasing the plugin.
 
 TODO
 ====
