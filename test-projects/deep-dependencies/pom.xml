@@ -9,10 +9,10 @@
     <artifactId>deep-dependencies-aggregator</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>core-utils</module>
+        <module>the-core-utilities</module>
         <module>console-app</module>
         <module>parent-module</module>
-        <module>more-utils</module>
+        <module>more-utilities</module>
     </modules>
     <packaging>pom</packaging>
 

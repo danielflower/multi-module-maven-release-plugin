@@ -63,7 +63,26 @@ public class Reactor {
             ReleasableModule module = new ReleasableModule(project, project.getVersion(), buildNumber, newVersion, equivalentVersion, relativePathToModule);
             modules.add(module);
         }
+
+        if (!atLeastOneBeingReleased(modules)) {
+            log.warn("No changes have been detected in any modules so will re-release them all");
+            List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
+            for (ReleasableModule module : modules) {
+                newList.add(module.createReleasableVersion());
+            }
+            modules = newList;
+        }
+
         return new Reactor(modules);
+    }
+
+    private static boolean atLeastOneBeingReleased(List<ReleasableModule> modules) {
+        for (ReleasableModule module : modules) {
+            if (module.willBeReleased()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String calculateModulePath(MavenProject rootProject, MavenProject project) {

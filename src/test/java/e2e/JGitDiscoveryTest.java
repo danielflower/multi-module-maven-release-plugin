@@ -48,7 +48,6 @@ public class JGitDiscoveryTest {
         ObjectId head = repo.resolve("HEAD^{tree}");
         ObjectId oldHead = repo.resolve("HEAD^^{tree}");
 
-        System.out.println("Diff between: " + oldHead + " and " + head);
 
         ObjectReader reader = repo.newObjectReader();
 

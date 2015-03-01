@@ -50,10 +50,12 @@ public class SkippingUnchangedModulesTest {
     }
 
     @Test
-    @Ignore("Slightly harder than expected to implemement, so will do it later")
     public void ifThereHaveBeenNoChangesThenReReleaseAllModules() throws Exception {
-        testProject.mvnRelease("1");
-        testProject.mvnRelease("2");
+        List<String> firstBuildOutput = testProject.mvnRelease("1");
+        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
+        List<String> secondBuildOutput = testProject.mvnRelease("2");
+        assertThat(secondBuildOutput, oneOf(containsString("No changes have been detected in any modules so will re-release them all")));
+
         assertTagExists("console-app-3.2.2");
         assertTagExists("parent-module-1.2.3.2");
         assertTagExists("core-utils-2.0.2");
@@ -61,23 +63,23 @@ public class SkippingUnchangedModulesTest {
         assertTagExists("deep-dependencies-aggregator-1.0.2");
     }
 
-        @Test
+    @Test
     public void ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased() throws Exception {
         testProject.mvnRelease("1");
-        testProject.commitRandomFile("more-utils").pushIt();
+        testProject.commitRandomFile("more-utilities").pushIt();
         List<String> output = testProject.mvnRelease("2");
 
         assertTagExists("console-app-3.2.2");
         assertTagDoesNotExist("parent-module-1.2.3.2");
         assertTagExists("core-utils-2.0.2");
         assertTagExists("more-utils-10.0.2");
-//        assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
+        assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
 
         assertThat(output, oneOf(containsString("Going to release console-app 3.2.2")));
         assertThat(output, noneOf(containsString("Going to release parent-module")));
         assertThat(output, oneOf(containsString("Going to release core-utils")));
         assertThat(output, oneOf(containsString("Going to release more-utils")));
-//        assertThat(output, noneOf(containsString("Going to release deep-dependencies-aggregator")));
+        assertThat(output, noneOf(containsString("Going to release deep-dependencies-aggregator")));
     }
 
     private void assertTagExists(String tagName) {
@@ -89,6 +91,5 @@ public class SkippingUnchangedModulesTest {
         assertThat(testProject.local, not(hasTag(tagName)));
         assertThat(testProject.origin, not(hasTag(tagName)));
     }
-
 
 }

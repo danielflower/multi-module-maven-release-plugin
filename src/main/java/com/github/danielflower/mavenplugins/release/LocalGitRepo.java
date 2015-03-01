@@ -90,16 +90,18 @@ public class LocalGitRepo {
         try {
             git = Git.open(gitDir);
         } catch (RepositoryNotFoundException rnfe) {
-            File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(pathOf(gitDir)));
+            String fullPathOfCurrentDir = pathOf(gitDir);
+            File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
             String summary;
             List<String> messages = new ArrayList<String>();
             if (gitRoot == null) {
                 summary = "Releases can only be performed from Git repositories.";
                 messages.add(summary);
-                messages.add(pathOf(gitDir) + " is not a Git repository.");
+                messages.add(fullPathOfCurrentDir + " is not a Git repository.");
             } else {
                 summary = "The release plugin can only be run from the root folder of your Git repository";
                 messages.add(summary);
+                messages.add(fullPathOfCurrentDir + " is not the root of a Gir repository");
                 messages.add("Try running the release plugin from " + pathOf(gitRoot));
             }
             throw new ValidationException(summary, messages);
@@ -110,9 +112,7 @@ public class LocalGitRepo {
     }
 
     private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
-        System.out.println("candidateDirStart = " + candidateDir);
-        while (candidateDir != null) {
-            System.out.println("candidateDir = " + candidateDir);
+        while (candidateDir != null && /* HACK ATTACK! Maybe.... */ !candidateDir.getName().equals("target") ) {
             if (new File(candidateDir, ".git").isDirectory()) {
                 return candidateDir;
             }

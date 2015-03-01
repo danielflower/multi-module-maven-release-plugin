@@ -17,6 +17,7 @@ import java.io.IOException;
 import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
@@ -43,6 +44,9 @@ public class ValidationTest {
                 oneOf(containsString("It is likely that this version has been released before.")));
             assertThat(mee.output,
                 oneOf(containsString("Please try incrementing the build number and trying again.")));
+            assertThat(mee.output,
+                noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
+
         }
     }
 

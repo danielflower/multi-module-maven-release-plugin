@@ -1,7 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.lib.Repository;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class ReleasableModule {
     private final String equivalentVersion;
     private final String relativePathToModule;
 
-    public ReleasableModule(MavenProject project, String version, String buildNumber, String newVersion, String equivalentVersion, String relativePathToModule) throws ValidationException {
+    public ReleasableModule(MavenProject project, String version, String buildNumber, String newVersion, String equivalentVersion, String relativePathToModule) {
         this.project = project;
         this.version = version;
         this.buildNumber = buildNumber;
@@ -73,5 +72,9 @@ public class ReleasableModule {
 
     public String getRelativePathToModule() {
         return relativePathToModule;
+    }
+
+    public ReleasableModule createReleasableVersion() {
+        return new ReleasableModule(project, version, buildNumber, newVersion, null, relativePathToModule);
     }
 }

@@ -27,6 +27,7 @@ public class MvnRunner {
         if (haveInstalledPlugin) {
             return;
         }
+        long start = System.currentTimeMillis();
         System.out.println("Installing the plugin into the local repo");
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(Collections.singletonList("install"));
@@ -47,7 +48,7 @@ public class MvnRunner {
         }
 
         assertThat("Exit code from running mvn install on this project", result.getExitCode(), is(0));
-        System.out.println("Finished installing the plugin into the local repo");
+        System.out.println("Finished installing the plugin into the local repo in " + (System.currentTimeMillis() - start) + "ms");
         haveInstalledPlugin = true;
     }
 
