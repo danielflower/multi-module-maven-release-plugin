@@ -4,6 +4,9 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GitHelper {
     public static boolean hasLocalTag(Git repo, String tagToCheck) throws GitAPIException {
         return tag(repo, new EqualsMatcher(tagToCheck)) != null;
@@ -26,6 +29,20 @@ public class GitHelper {
             }
         }
         return null;
+    }
+
+    public static String scmUrlToRemote(String scmUrl) throws ValidationException {
+        String GIT_PREFIX = "scm:git:";
+        if (!scmUrl.startsWith(GIT_PREFIX)) {
+            List<String> messages = new ArrayList<String>();
+            String summary = "Cannot run the release plugin with a non-Git version control system";
+            messages.add(summary);
+            messages.add("The value in your scm tag is " + scmUrl);
+            throw new ValidationException(summary, messages);
+        }
+        String remote = scmUrl.substring(GIT_PREFIX.length());
+        remote  = remote.replace("file://localhost/", "file:///");
+        return remote;
     }
 
     private interface Matcher {

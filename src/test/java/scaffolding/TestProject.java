@@ -1,5 +1,6 @@
 package scaffolding;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 import static scaffolding.MvnRunner.runMaven;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
@@ -70,6 +72,7 @@ public class TestProject {
     private static TestProject project(String name) {
         try {
             File originDir = copyTestProjectToTemporaryLocation(name);
+            performPomSubstitution(originDir);
 
             InitCommand initCommand = Git.init();
             initCommand.setDirectory(originDir);
@@ -77,7 +80,6 @@ public class TestProject {
 
             origin.add().addFilepattern(".").call();
             origin.commit().setMessage("Initial commit").call();
-
 
             File localDir = Photocopier.folderForSampleProject(name);
             Git local = Git.cloneRepository()
@@ -92,8 +94,25 @@ public class TestProject {
         }
     }
 
+    private static void performPomSubstitution(File sourceDir) throws IOException {
+        File pom = new File(sourceDir, "pom.xml");
+        String xml = FileUtils.readFileToString(pom, "UTF-8");
+        if (xml.contains("${scm.url}")) {
+            xml = xml.replace("${scm.url}", dirToGitScmReference(sourceDir));
+            FileUtils.writeStringToFile(pom, xml, "UTF-8");
+        }
+    }
+
+    public static String dirToGitScmReference(File sourceDir) {
+        return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/').toLowerCase();
+    }
+
     public static TestProject singleModuleProject() {
         return project("single-module");
+    }
+
+    public static TestProject moduleWithScmTag() {
+        return project("module-with-scm-tag");
     }
 
     public static TestProject moduleWithProfilesProject() {

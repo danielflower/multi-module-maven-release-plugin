@@ -3,11 +3,11 @@ package com.github.danielflower.mavenplugins.release;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LsRemoteCommand;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
@@ -22,10 +22,12 @@ import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 public class LocalGitRepo {
 
     public final Git git;
+    private final String remoteUrl;
     private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
 
-    LocalGitRepo(Git git) {
+    LocalGitRepo(Git git, String remoteUrl) {
         this.git = git;
+        this.remoteUrl = remoteUrl;
     }
 
     public void errorIfNotClean() throws ValidationException {
@@ -81,10 +83,19 @@ public class LocalGitRepo {
 
     public void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException {
         Ref tagRef = tag.saveAtHEAD(git);
-        git.push().add(tagRef).call();
+        PushCommand pushCommand = git.push().add(tagRef);
+        if (remoteUrl != null) {
+            pushCommand.setRemote(remoteUrl);
+        }
+        pushCommand.call();
     }
 
-    public static LocalGitRepo fromCurrentDir() throws ValidationException {
+    /**
+     * Uses the current working dir to open the Git repository.
+     * @param remoteUrl The value in pom.scm.connection or null if none specified, in which case the default remote is used.
+     * @throws ValidationException if anything goes wrong
+     */
+    public static LocalGitRepo fromCurrentDir(String remoteUrl) throws ValidationException {
         Git git;
         File gitDir = new File(".");
         try {
@@ -108,7 +119,7 @@ public class LocalGitRepo {
         } catch (Exception e) {
             throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
         }
-        return new LocalGitRepo(git);
+        return new LocalGitRepo(git, remoteUrl);
     }
 
     private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
@@ -123,7 +134,12 @@ public class LocalGitRepo {
 
     public List<String> remoteTagsFrom(List<AnnotatedTag> tagNames) throws GitAPIException {
         List<String> results = new ArrayList<String>();
-        Collection<Ref> remoteTags = git.lsRemote().setTags(true).setHeads(false).call();
+        LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
+        if (remoteUrl != null) {
+            lsRemoteCommand.setRemote(remoteUrl);
+        }
+
+        Collection<Ref> remoteTags = lsRemoteCommand.call();
         for (Ref remoteTag : remoteTags) {
             for (AnnotatedTag proposedTag : tagNames) {
                 if (remoteTag.getName().equals("refs/tags/" + proposedTag.name())) {

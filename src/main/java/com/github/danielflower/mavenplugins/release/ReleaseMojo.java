@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -11,6 +12,8 @@ import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,7 +96,7 @@ public class ReleaseMojo extends AbstractMojo {
         Log log = getLog();
 
         try {
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir();
+            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
             repo.errorIfNotClean();
 
             Reactor reactor = Reactor.fromProjects(log, repo.git, project, projects, buildNumber);
@@ -116,9 +119,29 @@ public class ReleaseMojo extends AbstractMojo {
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         } catch (GitAPIException gae) {
+
+            StringWriter sw = new StringWriter();
+            gae.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
-                asList("There was an error while accessing the Git repository. The error returned from git was:", gae.getMessage()));
+                asList("There was an error while accessing the Git repository. The error returned from git was:",
+                    gae.getMessage(), "Stack trace:", exceptionAsString));
         }
+    }
+
+    private static String getRemoteUrlOrNullIfNoneSet(Scm scm) throws ValidationException {
+        if (scm == null) {
+            return null;
+        }
+        String remote = scm.getDeveloperConnection();
+        if (remote == null) {
+            remote = scm.getConnection();
+        }
+        if (remote == null) {
+            return null;
+        }
+        return GitHelper.scmUrlToRemote(remote);
     }
 
     private static void revertChanges(Log log, LocalGitRepo repo, List<File> changedFiles, boolean throwIfError) throws MojoExecutionException {

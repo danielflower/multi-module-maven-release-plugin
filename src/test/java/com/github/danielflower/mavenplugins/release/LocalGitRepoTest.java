@@ -2,6 +2,7 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Test;
 import scaffolding.TestProject;
 
@@ -12,6 +13,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.TestProject.dirToGitScmReference;
+import static com.github.danielflower.mavenplugins.release.GitHelper.scmUrlToRemote;
 
 public class LocalGitRepoTest {
 
@@ -19,7 +22,7 @@ public class LocalGitRepoTest {
 
     @Test
     public void canDetectLocalTags() throws GitAPIException {
-        LocalGitRepo repo = new LocalGitRepo(project.local);
+        LocalGitRepo repo = new LocalGitRepo(project.local, null);
         tag(project.local, "some-tag");
         assertThat(repo.hasLocalTag("some-tag"), is(true));
         assertThat(repo.hasLocalTag("some-ta"), is(false));
@@ -28,10 +31,22 @@ public class LocalGitRepoTest {
 
     @Test
     public void canDetectRemoteTags() throws Exception {
-        LocalGitRepo repo = new LocalGitRepo(project.local);
+        LocalGitRepo repo = new LocalGitRepo(project.local, null);
         tag(project.origin, "some-tag");
         assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
         assertThat(repo.remoteTagsFrom(tags("blah", "some-taggart")), equalTo(emptyList()));
+    }
+
+    @Test
+    public void usesThePassedInScmUrlToFindRemote() throws Exception {
+        LocalGitRepo repo = new LocalGitRepo(project.local, scmUrlToRemote(dirToGitScmReference(project.originDir)));
+        tag(project.origin, "some-tag");
+
+        StoredConfig config = project.local.getRepository().getConfig();
+        config.unsetSection("remote", "origin");
+        config.save();
+
+        assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
     }
 
     @Test
@@ -41,7 +56,7 @@ public class LocalGitRepoTest {
             tag(project.local, "this-is-a-tag-" + i);
         }
         project.local.push().setPushTags().call();
-        LocalGitRepo repo = new LocalGitRepo(project.local);
+        LocalGitRepo repo = new LocalGitRepo(project.local, null);
         for (int i = 0; i < numberOfTags; i++) {
             String tagName = "this-is-a-tag-" + i;
             assertThat(repo.hasLocalTag(tagName), is(true));
