@@ -251,8 +251,9 @@ public class ReleaseMojo extends AbstractMojo {
         List<String> changedModules = new ArrayList<String>();
         for (ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
             String modulePath = releasableModule.getRelativePathToModule();
-            boolean userImplicitlyOrExplicitlyWantsThisToBeReleased = modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(modulePath);
-            if (userImplicitlyOrExplicitlyWantsThisToBeReleased && releasableModule.willBeReleased()) {
+            boolean userExplicitlyWantsThisToBeReleased = modulesToRelease.contains(modulePath);
+            boolean userImplicitlyWantsThisToBeReleased = modulesToRelease == null || modulesToRelease.size() == 0;
+            if (userExplicitlyWantsThisToBeReleased || (userImplicitlyWantsThisToBeReleased && releasableModule.willBeReleased())) {
                 changedModules.add(modulePath);
             }
         }

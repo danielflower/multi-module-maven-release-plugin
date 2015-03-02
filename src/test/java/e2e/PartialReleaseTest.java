@@ -3,9 +3,7 @@ package e2e;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
-import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
@@ -13,9 +11,7 @@ import scaffolding.TestProject;
 import java.io.IOException;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.noneOf;
@@ -44,6 +40,12 @@ public class PartialReleaseTest {
         buildsEachProjectOnceAndOnlyOnce(commandOutput);
         installsAllModulesIntoTheRepoWithTheBuildNumber();
         theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
+    }
+
+    @Test
+    public void whenNoChangesHaveBeenDetectedTheRequestedModuleIsBuiltAnyway() throws IOException, InterruptedException {
+        testProject.mvnRelease("1", "core-utils");
+        testProject.mvnRelease(buildNumber, "core-utils");
     }
 
     private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {
