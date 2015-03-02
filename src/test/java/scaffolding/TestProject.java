@@ -90,7 +90,7 @@ public class TestProject {
 
             return new TestProject(originDir, origin, localDir, local);
         } catch (Exception e) {
-            throw new RuntimeException("Error while creating copies of the test project");
+            throw new RuntimeException("Error while creating copies of the test project", e);
         }
     }
 
@@ -109,6 +109,10 @@ public class TestProject {
 
     public static TestProject singleModuleProject() {
         return project("single-module");
+    }
+
+    public static TestProject nestedProject() {
+        return project("nested-project");
     }
 
     public static TestProject moduleWithScmTag() {

@@ -34,9 +34,8 @@ Stability stuff
 ---------------
 
 * Figure out if things like MVN_OPTIONS and other JVM options need to be passed during release
-* Test more nested projects work
-* Test cases where things like group IDs in parents are omitted
 * Run E2E tests against multiple Maven versions
+* Have a retry on all remote-git operations to cover flaky servers (?)
+* Test the plugin on very large repositories
 * Tests on partial-releases:
     * Make sure the diffdetector works correctly with branches, specifically when one brance has a change another doesn't, and when two branches have changes
-    * Nested modules

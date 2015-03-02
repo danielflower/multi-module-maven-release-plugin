@@ -87,7 +87,7 @@ public class IndependentVersionsTest {
     }
 
     @Test
-    public void whenRunFromASubFolderSomethingHappens() throws IOException, InterruptedException {
+    public void whenRunFromASubFolderItShowsAnError() throws IOException, InterruptedException {
         try {
             runMaven(new File(testProject.localDir, "console-app"),
                 "-DbuildNumber=" + buildNumber,
