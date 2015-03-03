@@ -20,6 +20,8 @@ public class AnnotatedTag {
     private Ref ref;
 
     private AnnotatedTag(Ref ref, String name, JSONObject message) {
+        Guard.notBlank("tag name", name);
+        Guard.notNull("tag message", message);
         this.ref = ref;
         this.name = name;
         this.message = message;
@@ -33,10 +35,22 @@ public class AnnotatedTag {
     }
 
     public static AnnotatedTag fromRef(Repository repository, Ref gitTag) throws IOException {
+        Guard.notNull("gitTag", gitTag);
+
         RevWalk walk = new RevWalk(repository);
-        ObjectId tagId = gitTag.getObjectId();
-        RevTag tag = walk.parseTag(tagId);
-        JSONObject message = (JSONObject) JSONValue.parse(tag.getFullMessage());
+        JSONObject message;
+        try {
+            ObjectId tagId = gitTag.getObjectId();
+            RevTag tag = walk.parseTag(tagId);
+            message = (JSONObject) JSONValue.parse(tag.getFullMessage());
+        } finally {
+            walk.dispose();
+        }
+        if (message == null) {
+            message = new JSONObject();
+            message.put(VERSION, "0");
+            message.put(BUILD_NUMBER, "0");
+        }
         return new AnnotatedTag(gitTag, stripRefPrefix(gitTag.getName()), message);
     }
 

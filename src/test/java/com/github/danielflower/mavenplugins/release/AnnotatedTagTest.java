@@ -7,9 +7,7 @@ import scaffolding.TestProject;
 
 import java.io.IOException;
 
-import static com.github.danielflower.mavenplugins.release.AnnotatedTagFinder.isPotentiallySameVersionIgnoringBuildNumber;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AnnotatedTagTest {
@@ -33,6 +31,18 @@ public class AnnotatedTagTest {
         assertThat(inflatedTag.name(), equalTo("my-name"));
         assertThat(inflatedTag.version(), equalTo("the-version"));
         assertThat(inflatedTag.buildNumber(), equalTo("buildNumber"));
+    }
+
+    @Test
+    public void ifATagIsSavedWithoutJsonThenTheVersionIsSetTo0Dot0() throws GitAPIException, IOException {
+        TestProject project = TestProject.singleModuleProject();
+        project.local.tag().setName("my-name-1.0.2").setAnnotated(true).setMessage("This is not json").call();
+
+        Ref ref = project.local.tagList().call().get(0);
+        AnnotatedTag inflatedTag = AnnotatedTag.fromRef(project.local.getRepository(), ref);
+        assertThat(inflatedTag.name(), equalTo("my-name-1.0.2"));
+        assertThat(inflatedTag.version(), equalTo("0"));
+        assertThat(inflatedTag.buildNumber(), equalTo("0"));
     }
 
 }
