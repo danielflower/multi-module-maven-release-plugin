@@ -194,7 +194,7 @@ public class ReleaseMojo extends AbstractMojo {
                     ));
                 }
 
-                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion().replace("-SNAPSHOT", ""), module.getBuildNumber());
+                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.getBuildNumber());
                 tags.add(annotatedTag);
             }
         }

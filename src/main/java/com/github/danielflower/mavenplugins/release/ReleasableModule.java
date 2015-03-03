@@ -7,21 +7,17 @@ import java.util.List;
 public class ReleasableModule {
 
     private final MavenProject project;
-    private final String version;
-    private final String buildNumber;
+    private final VersionName version;
     private final String tagName;
-    private final String newVersion;
     private final String equivalentVersion;
     private final String relativePathToModule;
 
-    public ReleasableModule(MavenProject project, String version, String buildNumber, String newVersion, String equivalentVersion, String relativePathToModule) {
+    public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule) {
         this.project = project;
         this.version = version;
-        this.buildNumber = buildNumber;
-        this.newVersion = newVersion;
         this.equivalentVersion = equivalentVersion;
         this.relativePathToModule = relativePathToModule;
-        this.tagName = project.getArtifactId() + "-" + this.newVersion;
+        this.tagName = project.getArtifactId() + "-" + version.fullVersion();
     }
 
     public String getTagName() {
@@ -29,7 +25,7 @@ public class ReleasableModule {
     }
 
     public String getNewVersion() {
-        return newVersion;
+        return version.fullVersion();
     }
 
     public String getArtifactId() {
@@ -45,11 +41,11 @@ public class ReleasableModule {
     }
 
     public String getVersion() {
-        return version;
+        return version.version();
     }
 
     public String getBuildNumber() {
-        return buildNumber;
+        return version.buildNumber();
     }
 
     public boolean isOneOf(List<String> moduleNames) {
@@ -67,7 +63,7 @@ public class ReleasableModule {
     }
 
     public String getVersionToDependOn() {
-        return willBeReleased() ? newVersion : equivalentVersion;
+        return willBeReleased() ? version.fullVersion() : equivalentVersion;
     }
 
     public String getRelativePathToModule() {
@@ -75,6 +71,6 @@ public class ReleasableModule {
     }
 
     public ReleasableModule createReleasableVersion() {
-        return new ReleasableModule(project, version, buildNumber, newVersion, null, relativePathToModule);
+        return new ReleasableModule(project, version, null, relativePathToModule);
     }
 }

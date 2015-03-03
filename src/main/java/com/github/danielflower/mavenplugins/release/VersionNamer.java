@@ -16,21 +16,21 @@ public class VersionNamer {
         this.clock = clock;
     }
 
-    public String name(String pomVersion, String buildNumber) throws ValidationException {
+    public VersionName name(String pomVersion, String buildNumber) throws ValidationException {
         if (buildNumber == null || buildNumber.trim().length() == 0) {
             buildNumber = currentDate();
         }
+        VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), buildNumber);
 
-        String newVersion = pomVersion.replace("-SNAPSHOT", "").concat(".").concat(buildNumber);
-        if (!Repository.isValidRefName("refs/tags/" + newVersion)) {
-            String summary = "Sorry, '" + newVersion + "' is not a valid version.";
+        if (!Repository.isValidRefName("refs/tags/" + versionName.fullVersion())) {
+            String summary = "Sorry, '" + versionName.fullVersion() + "' is not a valid version.";
             throw new ValidationException(summary, asList(
                 summary,
                 "Version numbers are used in the Git tag, and so can only contain characters that are valid in git tags.",
                 "Please see https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html for tag naming rules."
             ));
         }
-        return newVersion;
+        return versionName;
     }
 
     private String currentDate() {

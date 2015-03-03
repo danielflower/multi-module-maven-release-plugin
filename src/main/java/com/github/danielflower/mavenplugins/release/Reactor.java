@@ -28,7 +28,7 @@ public class Reactor {
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
         for (MavenProject project : projects) {
-            String newVersion = versionNamer.name(project.getVersion(), buildNumber);
+            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber);
 
             boolean oneOfTheDependenciesHasChanged = false;
             String changedDependency = null;
@@ -60,7 +60,7 @@ public class Reactor {
                     log.debug("Will use version " + newVersion + " for " + project.getArtifactId() + " as it has changed since the last release.");
                 }
             }
-            ReleasableModule module = new ReleasableModule(project, project.getVersion(), buildNumber, newVersion, equivalentVersion, relativePathToModule);
+            ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);
             modules.add(module);
         }
 
