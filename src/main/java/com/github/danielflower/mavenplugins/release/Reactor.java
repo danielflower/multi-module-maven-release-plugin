@@ -52,7 +52,7 @@ public class Reactor {
             if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + project.getArtifactId() + " " + newVersion + " as " + changedDependency + " has changed.");
             } else {
-                AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastCommit(git, detector, project, relativePathToModule);
+                AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(git, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     log.info("Will use version " + equivalentVersion + " for " + project.getArtifactId() + " as it has not been changed since that release.");
@@ -93,7 +93,7 @@ public class Reactor {
         return relativePathToModule;
     }
 
-    private static AnnotatedTag hasChangedSinceLastCommit(Git git, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
+    private static AnnotatedTag hasChangedSinceLastRelease(Git git, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
         try {
             List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.mostRecent(git, project.getArtifactId(), project.getVersion().replace("-SNAPSHOT", ""));
             if (previousTagsForThisModule.size() == 0) {
