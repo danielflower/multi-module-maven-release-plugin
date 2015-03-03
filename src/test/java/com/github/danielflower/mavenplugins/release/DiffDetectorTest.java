@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import static com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.saveFileInModule;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasXPath;
 import static org.hamcrest.Matchers.is;
 
 public class DiffDetectorTest {
@@ -28,6 +27,18 @@ public class DiffDetectorTest {
         assertThat(detector.hasChangedSince("core-utils", noChildModules(), asList(tag2)), is(false));
         assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag2)), is(true));
         assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(false));
+    }
+
+    @Test
+    public void canDetectThingsInTheRoot() throws IOException, GitAPIException {
+        TestProject simple = TestProject.singleModuleProject();
+        AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0", "1");
+        simple.commitRandomFile(".");
+        DiffDetector detector = new DiffDetector(simple.local.getRepository());
+        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(true));
+
+        AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0", "2");
+        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag2)), is(false));
     }
 
     @Test

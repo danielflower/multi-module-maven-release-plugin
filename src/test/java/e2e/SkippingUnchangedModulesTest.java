@@ -2,7 +2,6 @@ package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
@@ -23,6 +22,16 @@ public class SkippingUnchangedModulesTest {
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
         MvnRunner.installReleasePluginToLocalRepo();
+    }
+
+    @Test
+    public void changesInTheRootAreDetected() throws Exception {
+        TestProject simple = TestProject.singleModuleProject();
+        simple.mvnRelease("1");
+        simple.commitRandomFile(".");
+        List<String> output = simple.mvnRelease("2");
+        assertThat(output, noneOf(containsString("No changes have been detected in any modules")));
+        assertThat(output, noneOf(containsString("Will use version 1.0.1")));
     }
 
     @Test

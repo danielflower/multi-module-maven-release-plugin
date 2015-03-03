@@ -22,19 +22,23 @@ public class DiffDetector {
 
     public boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Collection<AnnotatedTag> tags) throws IOException {
         RevWalk walk = new RevWalk(repo);
-        boolean hasCommit;
         try {
             walk.setRetainBody(false);
             walk.markStart(walk.parseCommit(repo.getRef("HEAD").getObjectId()));
 
-            Collection<TreeFilter> treeFilters = new ArrayList<TreeFilter>();
-            treeFilters.add(PathFilter.create(modulePath + "/"));
-            treeFilters.add(TreeFilter.ANY_DIFF);
-            for (String childModule : childModules) {
-                treeFilters.add(PathFilter.create(modulePath + "/" + childModule).negate());
+            TreeFilter treeFilter;
+            if (".".equals(modulePath) && childModules.size() == 0) {
+                treeFilter = TreeFilter.ANY_DIFF;
+            } else {
+                Collection<TreeFilter> treeFilters = new ArrayList<TreeFilter>();
+                treeFilters.add(PathFilter.create(modulePath + "/"));
+                treeFilters.add(TreeFilter.ANY_DIFF);
+                for (String childModule : childModules) {
+                    treeFilters.add(PathFilter.create(modulePath + "/" + childModule).negate());
+                }
+                treeFilter = AndTreeFilter.create(treeFilters);
             }
-
-            walk.setTreeFilter(AndTreeFilter.create(treeFilters));
+            walk.setTreeFilter(treeFilter);
 
             for (AnnotatedTag tag : tags) {
                 ObjectId commitId = tag.ref().getTarget().getObjectId();
@@ -42,10 +46,9 @@ public class DiffDetector {
                 walk.markUninteresting(revCommit);
             }
 
-            hasCommit = walk.iterator().hasNext();
+            return walk.iterator().hasNext();
         } finally {
             walk.dispose();
         }
-        return hasCommit;
     }
 }

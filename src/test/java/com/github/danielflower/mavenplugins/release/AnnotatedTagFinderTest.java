@@ -28,7 +28,8 @@ public class AnnotatedTagFinderTest {
 
     static AnnotatedTag saveFileInModule(TestProject project, String moduleName, String version, String buildNumber) throws IOException, GitAPIException {
         project.commitRandomFile(moduleName);
-        AnnotatedTag tag = AnnotatedTag.create(moduleName + "-" + version + "." + buildNumber, version, buildNumber);
+        String nameForTag = moduleName.equals(".") ? "root" : moduleName;
+        AnnotatedTag tag = AnnotatedTag.create(nameForTag + "-" + version + "." + buildNumber, version, buildNumber);
         tag.saveAtHEAD(project.local);
         return tag;
     }
