@@ -5,7 +5,7 @@ import org.apache.maven.project.MavenProject;
 
 public class ReleasableModuleBuilder {
 
-    private final VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
+    private final VersionNamer versionNamer = new VersionNamer();
     MavenProject project = new MavenProject();
     private String buildNumber = "123";
     private String equivalentVersion = null;
@@ -42,7 +42,7 @@ public class ReleasableModuleBuilder {
     }
 
     public ReleasableModule build() throws ValidationException {
-        return new ReleasableModule(project, versionNamer.name(project.getVersion(), buildNumber), equivalentVersion, relativePathToModule);
+        return new ReleasableModule(project, versionNamer.name(project.getVersion(), buildNumber, null), equivalentVersion, relativePathToModule);
     }
 
     public static ReleasableModuleBuilder aModule() {

@@ -43,8 +43,11 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void theBuildNumberIsOptional() throws IOException {
+    public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrement() throws IOException {
         testProject.mvn("releaser:release");
+        assertThat(testProject.local, hasTag("single-module-1.0.0"));
+        testProject.mvn("releaser:release");
+        assertThat(testProject.local, hasTag("single-module-1.0.1"));
     }
 
     @Test

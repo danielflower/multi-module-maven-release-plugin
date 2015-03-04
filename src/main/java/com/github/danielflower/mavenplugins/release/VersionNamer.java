@@ -2,23 +2,17 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.eclipse.jgit.lib.Repository;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import static java.util.Arrays.asList;
 
 public class VersionNamer {
-    private final Clock clock;
 
-    public VersionNamer(Clock clock) {
-        this.clock = clock;
-    }
-
-    public VersionName name(String pomVersion, String buildNumber) throws ValidationException {
+    public VersionName name(String pomVersion, String buildNumber, AnnotatedTag previousTag) throws ValidationException {
         if (buildNumber == null || buildNumber.trim().length() == 0) {
-            buildNumber = currentDate();
+            if (previousTag == null) {
+                buildNumber = "0";
+            } else {
+                buildNumber = String.valueOf((Long.parseLong(previousTag.buildNumber()) + 1));
+            }
         }
         VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), buildNumber);
 
@@ -33,9 +27,4 @@ public class VersionNamer {
         return versionName;
     }
 
-    private String currentDate() {
-        DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT);
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return format.format(clock.now());
-    }
 }

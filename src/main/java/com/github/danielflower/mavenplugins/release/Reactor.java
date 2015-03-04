@@ -26,9 +26,11 @@ public class Reactor {
     public static Reactor fromProjects(Log log, Git git, MavenProject rootProject, List<MavenProject> projects, String buildNumber) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new DiffDetector(git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
-        VersionNamer versionNamer = new VersionNamer(Clock.SystemClock);
+        VersionNamer versionNamer = new VersionNamer();
         for (MavenProject project : projects) {
-            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber);
+            String relativePathToModule = calculateModulePath(rootProject, project);
+            AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(git, detector, project, relativePathToModule);
+            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousTagThatIsTheSameAsHEADForThisModule);
 
             boolean oneOfTheDependenciesHasChanged = false;
             String changedDependency = null;
@@ -48,11 +50,11 @@ public class Reactor {
             }
 
             String equivalentVersion = null;
-            String relativePathToModule = calculateModulePath(rootProject, project);
+
             if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + project.getArtifactId() + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
-                AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(git, detector, project, relativePathToModule);
+
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     log.info("Will use version " + equivalentVersion + " for " + project.getArtifactId() + " as it has not been changed since that release.");

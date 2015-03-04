@@ -2,7 +2,6 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.junit.Test;
 
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -12,18 +11,21 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class VersionNamerTest {
 
-
-    private final Clock clock = new Clock() {
-        @Override
-        public Date now() {
-            return new Date(1422539966749L);
-        }
-    };
-    final VersionNamer namer = new VersionNamer(clock);
+    final VersionNamer namer = new VersionNamer();
 
     @Test
     public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
-        assertThat(namer.name("1.0-SNAPSHOT", "123").releaseVersion(), is(equalTo("1.0.123")));
+        assertThat(namer.name("1.0-SNAPSHOT", "123", null).releaseVersion(), is(equalTo("1.0.123")));
+    }
+
+    @Test
+    public void ifTheBuildNumberIsNullAndThePreviousTagIsNullThenZeroIsUsed() throws Exception {
+        assertThat(namer.name("1.0-SNAPSHOT", null, null).releaseVersion(), is(equalTo("1.0.0")));
+    }
+
+    @Test
+    public void ifTheBuildNumberIsNullButThereIsAPreviousTagThenThatValueIsIncremented() throws Exception {
+        assertThat(namer.name("1.0-SNAPSHOT", null, AnnotatedTag.create("something", "1.0", "10")).releaseVersion(), is(equalTo("1.0.11")));
     }
 
     @Test
@@ -36,17 +38,10 @@ public class VersionNamerTest {
         );
     }
 
-    @Test
-    public void usesTheCurrentDateAsABuildNumberIfNoneIsSpecified() throws ValidationException {
-        String expected = "1.0.20150129135926";
-        assertThat(namer.name("1.0-SNAPSHOT", null).releaseVersion(), is(equalTo(expected)));
-        assertThat(namer.name("1.0-SNAPSHOT", "").releaseVersion(), is(equalTo(expected)));
-        assertThat(namer.name("1.0-SNAPSHOT", " \t\r\n").releaseVersion(), is(equalTo(expected)));
-    }
 
     private List<String> errorMessageOf(String pomVersion, String buildNumber) {
         try {
-            namer.name(pomVersion, buildNumber);
+            namer.name(pomVersion, buildNumber, null);
             throw new AssertionError("Did not throw an error");
         } catch (ValidationException ex) {
             return ex.getMessages();
