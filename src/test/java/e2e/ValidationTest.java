@@ -127,7 +127,7 @@ public class ValidationTest {
             assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils 2.0-SNAPSHOT")));
 
             // commented out because this plugin is allowed to be a snapshot for testing purposes only
-//            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references plugin multi-module-maven-release-plugin 0.1-SNAPSHOT")));
+//            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references plugin multi-module-maven-release-plugin 0.2-SNAPSHOT")));
         }
 
         assertThat(badOne.local, hasCleanWorkingDirectory());

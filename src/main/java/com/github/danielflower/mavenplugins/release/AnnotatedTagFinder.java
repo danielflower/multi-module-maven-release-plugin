@@ -11,7 +11,7 @@ import java.util.List;
 
 public class AnnotatedTagFinder {
 
-    public static List<AnnotatedTag> mostRecent(Git git, String module, String versionWithoutBuildNumber) throws IOException, GitAPIException {
+    public static List<AnnotatedTag> mostRecent(Git git, String module, String versionWithoutBuildNumber) throws GitAPIException, IOException {
         ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
         List<Ref> tags = git.tagList().call();
         Collections.reverse(tags);

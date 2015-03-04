@@ -80,6 +80,8 @@ public class AnnotatedTag {
     public String toString() {
         return "AnnotatedTag{" +
             "name='" + name + '\'' +
+            ", version=" + version() +
+            ", buildNumber=" + buildNumber() +
             '}';
     }
 

@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,7 +26,11 @@ public class VersionNamerTest {
 
     @Test
     public void ifTheBuildNumberIsNullButThereIsAPreviousTagThenThatValueIsIncremented() throws Exception {
-        assertThat(namer.name("1.0-SNAPSHOT", null, AnnotatedTag.create("something", "1.0", "10")).releaseVersion(), is(equalTo("1.0.11")));
+        List<AnnotatedTag> previousTags = asList(
+            AnnotatedTag.create("something", "1.0", "9"),
+            AnnotatedTag.create("something", "1.0", "10")
+        );
+        assertThat(namer.name("1.0-SNAPSHOT", null, previousTags).releaseVersion(), is(equalTo("1.0.11")));
     }
 
     @Test

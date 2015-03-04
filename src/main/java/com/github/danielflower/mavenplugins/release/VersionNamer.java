@@ -2,16 +2,18 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.eclipse.jgit.lib.Repository;
 
+import java.util.List;
+
 import static java.util.Arrays.asList;
 
 public class VersionNamer {
 
-    public VersionName name(String pomVersion, String buildNumber, AnnotatedTag previousTag) throws ValidationException {
+    public VersionName name(String pomVersion, String buildNumber, List<AnnotatedTag> previousTags) throws ValidationException {
         if (buildNumber == null || buildNumber.trim().length() == 0) {
-            if (previousTag == null) {
+            if (previousTags == null || previousTags.size() == 0) {
                 buildNumber = "0";
             } else {
-                buildNumber = String.valueOf((Long.parseLong(previousTag.buildNumber()) + 1));
+                buildNumber = String.valueOf(nextBuildNumber(previousTags));
             }
         }
         VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), buildNumber);
@@ -25,6 +27,14 @@ public class VersionNamer {
             ));
         }
         return versionName;
+    }
+
+    private static long nextBuildNumber(List<AnnotatedTag> previousTags) {
+        long max = 0;
+        for (AnnotatedTag tag : previousTags) {
+            max = Math.max(max, Long.parseLong(tag.buildNumber()));
+        }
+        return max + 1;
     }
 
 }

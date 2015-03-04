@@ -55,7 +55,7 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, "1");
 
         testProject.commitRandomFile("server-modules/server-module-b");
-        testProject.mvnRelease("2");
+        testProject.mvn("releaser:release");
 
         assertBothReposNotTagged("nested-project", expectedAggregatorVersion, "2");
         assertBothReposNotTagged("core-utils", expectedCoreVersion, "2");

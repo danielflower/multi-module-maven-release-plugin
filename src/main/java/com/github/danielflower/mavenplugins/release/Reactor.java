@@ -29,8 +29,9 @@ public class Reactor {
         VersionNamer versionNamer = new VersionNamer();
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
-            AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(git, detector, project, relativePathToModule);
-            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousTagThatIsTheSameAsHEADForThisModule);
+            List<AnnotatedTag> previousTagsForThisModule = previousTagsForModule(git, project);
+
+            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousTagsForThisModule);
 
             boolean oneOfTheDependenciesHasChanged = false;
             String changedDependency = null;
@@ -54,7 +55,7 @@ public class Reactor {
             if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + project.getArtifactId() + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
-
+                AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     log.info("Will use version " + equivalentVersion + " for " + project.getArtifactId() + " as it has not been changed since that release.");
@@ -95,16 +96,21 @@ public class Reactor {
         return relativePathToModule;
     }
 
-    private static AnnotatedTag hasChangedSinceLastRelease(Git git, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
+    private static AnnotatedTag hasChangedSinceLastRelease(List<AnnotatedTag> previousTagsForThisModule, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
         try {
-            List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.mostRecent(git, project.getArtifactId(), project.getVersion().replace("-SNAPSHOT", ""));
-            if (previousTagsForThisModule.size() == 0) {
-                return null;
-            }
+            if (previousTagsForThisModule.size() == 0) return null;
             boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(), previousTagsForThisModule);
             return hasChanged ? null : previousTagsForThisModule.get(0);
         } catch (Exception e) {
             throw new MojoExecutionException("Error while detecting whether or not " + project.getArtifactId() + " has changed since the last release", e);
+        }
+    }
+
+    public static List<AnnotatedTag> previousTagsForModule(Git git, MavenProject project) throws MojoExecutionException {
+        try {
+            return AnnotatedTagFinder.mostRecent(git, project.getArtifactId(), project.getVersion().replace("-SNAPSHOT", ""));
+        } catch (Exception e) {
+            throw new MojoExecutionException("Error while looking up tags for " + project.getArtifactId(), e);
         }
     }
 
