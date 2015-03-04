@@ -17,7 +17,7 @@ public class ReleasableModule {
         this.version = version;
         this.equivalentVersion = equivalentVersion;
         this.relativePathToModule = relativePathToModule;
-        this.tagName = project.getArtifactId() + "-" + version.fullVersion();
+        this.tagName = project.getArtifactId() + "-" + version.releaseVersion();
     }
 
     public String getTagName() {
@@ -25,7 +25,7 @@ public class ReleasableModule {
     }
 
     public String getNewVersion() {
-        return version.fullVersion();
+        return version.releaseVersion();
     }
 
     public String getArtifactId() {
@@ -41,7 +41,7 @@ public class ReleasableModule {
     }
 
     public String getVersion() {
-        return version.version();
+        return version.businessVersion();
     }
 
     public String getBuildNumber() {
@@ -63,7 +63,7 @@ public class ReleasableModule {
     }
 
     public String getVersionToDependOn() {
-        return willBeReleased() ? version.fullVersion() : equivalentVersion;
+        return willBeReleased() ? version.releaseVersion() : equivalentVersion;
     }
 
     public String getRelativePathToModule() {

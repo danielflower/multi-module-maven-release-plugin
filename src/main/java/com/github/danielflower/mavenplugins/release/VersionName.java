@@ -14,7 +14,10 @@ public class VersionName {
         this.developmentVersion = developmentVersion;
     }
 
-    public String version() {
+    /**
+     * For example, "1.0" if the development version is "1.0-SNAPSHOT"
+     */
+    public String businessVersion() {
         return version;
     }
 
@@ -22,11 +25,17 @@ public class VersionName {
         return buildNumber;
     }
 
+    /**
+     * The snapshot version, e.g. "1.0-SNAPSHOT"
+     */
     public String developmentVersion() {
         return developmentVersion;
     }
 
-    public String fullVersion() {
+    /**
+     * The business version with the build number appended, e.g. "1.0.1"
+     */
+    public String releaseVersion() {
         return version + "." + buildNumber;
     }
 }

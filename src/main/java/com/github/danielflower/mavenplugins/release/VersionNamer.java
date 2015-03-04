@@ -22,8 +22,8 @@ public class VersionNamer {
         }
         VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), buildNumber);
 
-        if (!Repository.isValidRefName("refs/tags/" + versionName.fullVersion())) {
-            String summary = "Sorry, '" + versionName.fullVersion() + "' is not a valid version.";
+        if (!Repository.isValidRefName("refs/tags/" + versionName.releaseVersion())) {
+            String summary = "Sorry, '" + versionName.releaseVersion() + "' is not a valid version.";
             throw new ValidationException(summary, asList(
                 summary,
                 "Version numbers are used in the Git tag, and so can only contain characters that are valid in git tags.",

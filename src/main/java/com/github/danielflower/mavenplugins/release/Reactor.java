@@ -50,14 +50,14 @@ public class Reactor {
             String equivalentVersion = null;
             String relativePathToModule = calculateModulePath(rootProject, project);
             if (oneOfTheDependenciesHasChanged) {
-                log.info("Releasing " + project.getArtifactId() + " " + newVersion + " as " + changedDependency + " has changed.");
+                log.info("Releasing " + project.getArtifactId() + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
                 AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(git, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     log.info("Will use version " + equivalentVersion + " for " + project.getArtifactId() + " as it has not been changed since that release.");
                 } else {
-                    log.debug("Will use version " + newVersion + " for " + project.getArtifactId() + " as it has changed since the last release.");
+                    log.debug("Will use version " + newVersion.releaseVersion() + " for " + project.getArtifactId() + " as it has changed since the last release.");
                 }
             }
             ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);

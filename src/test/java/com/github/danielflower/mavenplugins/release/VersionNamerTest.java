@@ -23,7 +23,7 @@ public class VersionNamerTest {
 
     @Test
     public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
-        assertThat(namer.name("1.0-SNAPSHOT", "123").fullVersion(), is(equalTo("1.0.123")));
+        assertThat(namer.name("1.0-SNAPSHOT", "123").releaseVersion(), is(equalTo("1.0.123")));
     }
 
     @Test
@@ -39,9 +39,9 @@ public class VersionNamerTest {
     @Test
     public void usesTheCurrentDateAsABuildNumberIfNoneIsSpecified() throws ValidationException {
         String expected = "1.0.20150129135926";
-        assertThat(namer.name("1.0-SNAPSHOT", null).fullVersion(), is(equalTo(expected)));
-        assertThat(namer.name("1.0-SNAPSHOT", "").fullVersion(), is(equalTo(expected)));
-        assertThat(namer.name("1.0-SNAPSHOT", " \t\r\n").fullVersion(), is(equalTo(expected)));
+        assertThat(namer.name("1.0-SNAPSHOT", null).releaseVersion(), is(equalTo(expected)));
+        assertThat(namer.name("1.0-SNAPSHOT", "").releaseVersion(), is(equalTo(expected)));
+        assertThat(namer.name("1.0-SNAPSHOT", " \t\r\n").releaseVersion(), is(equalTo(expected)));
     }
 
     private List<String> errorMessageOf(String pomVersion, String buildNumber) {
