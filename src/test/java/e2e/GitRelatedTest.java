@@ -32,6 +32,7 @@ public class GitRelatedTest {
     @Test
     public void ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed() throws IOException {
         File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module");
+        TestProject.performPomSubstitution(projectRoot);
         try {
             runMaven(projectRoot, "releaser:release");
             Assert.fail("Should have failed");

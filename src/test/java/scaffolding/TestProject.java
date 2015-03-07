@@ -1,11 +1,13 @@
 package scaffolding;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -95,14 +97,19 @@ public class TestProject {
         }
     }
 
-    private static void performPomSubstitution(File sourceDir) throws IOException {
+    public static void performPomSubstitution(File sourceDir) throws IOException {
         File pom = new File(sourceDir, "pom.xml");
-        String xml = FileUtils.readFileToString(pom, "UTF-8");
-        if (xml.contains("${scm.url}")) {
-            xml = xml.replace("${scm.url}", dirToGitScmReference(sourceDir));
+        if (pom.exists()) {
+            String xml = FileUtils.readFileToString(pom, "UTF-8");
+            if (xml.contains("${scm.url}")) {
+                xml = xml.replace("${scm.url}", dirToGitScmReference(sourceDir));
+            }
+            xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
+            FileUtils.writeStringToFile(pom, xml, "UTF-8");
         }
-        xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
-        FileUtils.writeStringToFile(pom, xml, "UTF-8");
+        for (File child : sourceDir.listFiles((FileFilter)FileFilterUtils.directoryFileFilter())) {
+            performPomSubstitution(child);
+        }
     }
 
     public static String dirToGitScmReference(File sourceDir) {
