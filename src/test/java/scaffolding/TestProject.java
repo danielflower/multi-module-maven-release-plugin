@@ -17,6 +17,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class TestProject {
 
+    public static final String PLUGIN_VERSION_FOR_TESTS = "1.0-SNAPSHOT";
     public final File originDir;
     public final Git origin;
 
@@ -99,8 +100,9 @@ public class TestProject {
         String xml = FileUtils.readFileToString(pom, "UTF-8");
         if (xml.contains("${scm.url}")) {
             xml = xml.replace("${scm.url}", dirToGitScmReference(sourceDir));
-            FileUtils.writeStringToFile(pom, xml, "UTF-8");
         }
+        xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
+        FileUtils.writeStringToFile(pom, xml, "UTF-8");
     }
 
     public static String dirToGitScmReference(File sourceDir) {

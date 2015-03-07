@@ -25,7 +25,7 @@
             <plugin>
                 <groupId>com.github.danielflower.mavenplugins</groupId>
                 <artifactId>multi-module-maven-release-plugin</artifactId>
-                <version>0.2-SNAPSHOT</version>
+                <version>${current.plugin.version}</version>
                 <configuration>
                     <releaseGoals>
                         <releaseGoal>install</releaseGoal>
