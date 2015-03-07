@@ -26,9 +26,8 @@ TODO
 Features
 --------
 
-* Default build number to an incremented value based on a previous tag
 * Allow easy way to bump minor or major versions of a module (during release?)
-* Change build-number to a long to enforce correctly ordered dependencies and allow an optional label that is appended to the version
+* Allow an optional label that is appended to the version
 * Allow optional appending of branch name to release version if not "master" (or supplied regex)
 
 Stability stuff
