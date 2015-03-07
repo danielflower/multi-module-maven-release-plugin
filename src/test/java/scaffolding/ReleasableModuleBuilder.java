@@ -7,11 +7,11 @@ public class ReleasableModuleBuilder {
 
     private final VersionNamer versionNamer = new VersionNamer();
     MavenProject project = new MavenProject();
-    private String buildNumber = "123";
+    private long buildNumber = 123;
     private String equivalentVersion = null;
     private String relativePathToModule = ".";
 
-    public ReleasableModuleBuilder withBuildNumber(String buildNumber) {
+    public ReleasableModuleBuilder withBuildNumber(long buildNumber) {
         this.buildNumber = buildNumber;
         return this;
     }

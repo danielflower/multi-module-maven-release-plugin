@@ -23,7 +23,7 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, Git git, MavenProject rootProject, List<MavenProject> projects, String buildNumber) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, Git git, MavenProject rootProject, List<MavenProject> projects, Long buildNumber) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new DiffDetector(git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer();

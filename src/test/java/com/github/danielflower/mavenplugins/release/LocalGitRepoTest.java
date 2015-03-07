@@ -67,7 +67,7 @@ public class LocalGitRepoTest {
     private static List<AnnotatedTag> tags(String... tagNames) {
         List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (String tagName : tagNames) {
-            tags.add(AnnotatedTag.create(tagName, "1", "0"));
+            tags.add(AnnotatedTag.create(tagName, "1", 0));
         }
         return tags;
     }

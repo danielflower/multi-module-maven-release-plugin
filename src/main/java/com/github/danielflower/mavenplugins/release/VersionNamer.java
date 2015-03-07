@@ -8,12 +8,12 @@ import static java.util.Arrays.asList;
 
 public class VersionNamer {
 
-    public VersionName name(String pomVersion, String buildNumber, List<AnnotatedTag> previousTags) throws ValidationException {
-        if (buildNumber == null || buildNumber.trim().length() == 0) {
+    public VersionName name(String pomVersion, Long buildNumber, List<AnnotatedTag> previousTags) throws ValidationException {
+        if (buildNumber == null) {
             if (previousTags == null || previousTags.size() == 0) {
-                buildNumber = "0";
+                buildNumber = Long.valueOf(0);
             } else {
-                buildNumber = String.valueOf(nextBuildNumber(previousTags));
+                buildNumber = nextBuildNumber(previousTags);
             }
         }
         VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), buildNumber);
@@ -32,7 +32,7 @@ public class VersionNamer {
     private static long nextBuildNumber(List<AnnotatedTag> previousTags) {
         long max = 0;
         for (AnnotatedTag tag : previousTags) {
-            max = Math.max(max, Long.parseLong(tag.buildNumber()));
+            max = Math.max(max, tag.buildNumber());
         }
         return max + 1;
     }

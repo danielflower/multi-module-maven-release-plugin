@@ -43,16 +43,18 @@ public class ReleaseMojo extends AbstractMojo {
     /**
      * <p>
      * The build number to use in the release version. Given a snapshot version of "1.0-SNAPSHOT"
-     * and a buildNumber value of "2", the actual released version will be "1.0.2". This can be
-     * specified using a command line parameter ("-DbuildNumber=2") or in this plugin's configuration.
+     * and a buildNumber value of "2", the actual released version will be "1.0.2".
      * </p>
      * <p>
-     * By default, in no value is specified then this is a value based on the current time
-     * such as "20150129135926".
+     * By default, the plugin will automatically find a suitable build number. It will start at version
+     * 0 and increment this with each release.
+     * </p>
+     * <p>
+     * This can be specified using a command line parameter ("-DbuildNumber=2") or in this plugin's configuration.
      * </p>
      */
     @Parameter(property = "buildNumber")
-    private String buildNumber;
+    private Long buildNumber;
 
     /**
      * <p>

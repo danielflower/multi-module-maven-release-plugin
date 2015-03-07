@@ -44,7 +44,7 @@ public class ReleasableModule {
         return version.businessVersion();
     }
 
-    public String getBuildNumber() {
+    public long getBuildNumber() {
         return version.buildNumber();
     }
 

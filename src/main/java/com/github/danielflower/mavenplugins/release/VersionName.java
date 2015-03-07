@@ -2,13 +2,13 @@ package com.github.danielflower.mavenplugins.release;
 
 public class VersionName {
     private final String version;
-    private final String buildNumber;
+    private final long buildNumber;
     private final String developmentVersion;
 
-    public VersionName(String developmentVersion, String version, String buildNumber) {
+    public VersionName(String developmentVersion, String version, long buildNumber) {
         Guard.notBlank("developmentVersion", developmentVersion);
         Guard.notBlank("version", version);
-        Guard.notBlank("buildNumber", buildNumber);
+        Guard.notNull("buildNumber", buildNumber);
         this.version = version;
         this.buildNumber = buildNumber;
         this.developmentVersion = developmentVersion;
@@ -21,7 +21,7 @@ public class VersionName {
         return version;
     }
 
-    public String buildNumber() {
+    public long buildNumber() {
         return buildNumber;
     }
 

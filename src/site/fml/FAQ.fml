@@ -58,8 +58,8 @@
                 Where do the tags get pushed?
             </question>
             <answer>
-                <p>The tags get pushed to whatever origin is pointing to. Note that the scm tag in the pom is
-                    ignored by the plugin currently.
+                <p>The tags get pushed to the repo in the &lt;scm&gt; section of your pom, or if that is not specified
+                    then they will get pushed to origin.
                 </p>
             </answer>
         </faq>
