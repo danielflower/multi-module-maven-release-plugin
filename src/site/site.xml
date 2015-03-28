@@ -25,6 +25,7 @@
             <item name="Goals" href="plugin-info.html"/>
             <item name="Usage" href="usage.html"/>
             <item name="FAQ" href="FAQ.html"/>
+            <item name="Changelog" href="changelog.html"/>
         </menu>
         <menu ref="reports" inherit="top"/>
     </body>

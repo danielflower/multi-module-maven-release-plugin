@@ -33,6 +33,9 @@
                     <releaseGoals>
                         <releaseGoal>install</releaseGoal>
                     </releaseGoals>
+                    <releaseProfiles>
+                        <releaseProfile>profileActivatedByReleasePlugin</releaseProfile>
+                    </releaseProfiles>
                 </configuration>
             </plugin>
             <plugin>
@@ -56,6 +59,29 @@
                         <configuration>
                             <skipTests>false</skipTests>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>profileActivatedByReleasePlugin</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <version>1.0.0</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <message>echo-maven-plugin running because profileActivatedByReleasePlugin is activated</message>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

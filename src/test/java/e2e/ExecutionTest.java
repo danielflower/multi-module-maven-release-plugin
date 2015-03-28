@@ -16,6 +16,7 @@ import static scaffolding.ExactCountMatcher.oneOf;
 public class ExecutionTest {
 
     final TestProject testProject = TestProject.moduleWithProfilesProject();
+    final String echoPluginOutput = "echo-maven-plugin running because profileActivatedByReleasePlugin is activated";
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
@@ -23,21 +24,18 @@ public class ExecutionTest {
     }
 
     @Test
-    public void profilesNotPassedToTheReleaseExecutionAreNotPassedOnToTheDeployment() throws Exception {
+    public void profilesNotPassedToTheReleaseExecutionAreNotPassedOnToTheDeploymentButConfiguredProfilesAre() throws Exception {
         List<String> consoleOutput = testProject.mvnRelease("1");
         assertThat(consoleOutput, noneOf(containsString("The module-with-profiles test has run")));
-
-        // can only uncomment if you know there are no globally activated profiles on the current computer
-//        assertThat(consoleOutput, oneOf(containsString("[INFO] About to run mvn [install] with no profiles activated")));
+        assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
     }
 
     @Test
     public void profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment() throws Exception {
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", "releaser:release", "-P runTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("The module-with-profiles test has run")));
-
-        // can only uncomment if you know there are no globally activated profiles on the current computer
-//        assertThat(consoleOutput, oneOf(containsString("[INFO] About to run mvn [install] with profiles [runTestsProfile]")));
+        assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
     }
+
 
 }

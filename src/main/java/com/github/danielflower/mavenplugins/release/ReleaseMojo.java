@@ -79,6 +79,19 @@ public class ReleaseMojo extends AbstractMojo {
     private List<String> goals;
 
     /**
+     * <p>
+     *     Profiles to activate during the release.
+     * </p>
+     * <p>
+     *     Note that if any profiles are activated during the build using the `-P` or `--activate-profiles` will also be activated during release.
+     *     This gives two options for running releases: either configure it in the plugin configuration, or activate profiles from the command line.
+     * </p>
+     * @since 1.0.1
+     */
+    @Parameter(alias = "releaseProfiles")
+    private List<String> releaseProfiles;
+
+    /**
      * If true then tests will not be run during a release.
      * This is the same as adding -DskipTests=true to the release goals.
      */
@@ -243,10 +256,7 @@ public class ReleaseMojo extends AbstractMojo {
         }
         request.setShowErrors(true);
         request.setGoals(goals);
-        List<String> profiles = new ArrayList<String>();
-        for (Object activatedProfile : project.getActiveProfiles()) {
-            profiles.add(((org.apache.maven.model.Profile) activatedProfile).getId());
-        }
+        List<String> profiles = profilesToActivate();
         request.setProfiles(profiles);
 
         request.setAlsoMake(true);
@@ -274,6 +284,19 @@ public class ReleaseMojo extends AbstractMojo {
         } catch (MavenInvocationException e) {
             throw new MojoExecutionException("Failed to build artifact", e);
         }
+    }
+
+    private List<String> profilesToActivate() {
+        List<String> profiles = new ArrayList<String>();
+        if (releaseProfiles != null) {
+            for (String releaseProfile : releaseProfiles) {
+                profiles.add(releaseProfile);
+            }
+        }
+        for (Object activatedProfile : project.getActiveProfiles()) {
+            profiles.add(((org.apache.maven.model.Profile) activatedProfile).getId());
+        }
+        return profiles;
     }
 
 }
