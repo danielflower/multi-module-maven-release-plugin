@@ -139,6 +139,23 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>com.github.danielflower.mavenplugins</groupId>
+                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <releaseGoals>
+                        <releaseGoal>clean</releaseGoal>
+                        <releaseGoal>site</releaseGoal>
+                        <releaseGoal>deploy</releaseGoal>
+                    </releaseGoals>
+                    <releaseProfiles>
+                        <releaseProfile>release</releaseProfile>
+                        <releaseProfile>gpg</releaseProfile>
+                    </releaseProfiles>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
@@ -261,22 +278,6 @@
                         </executions>
                     </plugin>
 
-                    <plugin>
-                        <groupId>com.github.danielflower.mavenplugins</groupId>
-                        <artifactId>multi-module-maven-release-plugin</artifactId>
-                        <version>${project.version}</version>
-                        <configuration>
-                            <releaseGoals>
-                                <releaseGoal>clean</releaseGoal>
-                                <releaseGoal>site</releaseGoal>
-                                <releaseGoal>deploy</releaseGoal>
-                            </releaseGoals>
-                            <releaseProfiles>
-                                <releaseProfile>release</releaseProfile>
-                                <releaseProfile>gpg</releaseProfile>
-                            </releaseProfiles>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>
