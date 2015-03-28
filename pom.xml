@@ -148,6 +148,13 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>default-descriptor</id>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                    </execution>
+                    <execution>
                         <id>generated-helpmojo</id>
                         <goals>
                             <goal>helpmojo</goal>

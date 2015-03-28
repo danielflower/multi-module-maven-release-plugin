@@ -8,6 +8,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class Reactor {
         VersionNamer versionNamer = new VersionNamer();
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
-            List<AnnotatedTag> previousTagsForThisModule = previousTagsForModule(git, project);
+            List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(git, project.getArtifactId(), project.getVersion().replace("-SNAPSHOT", ""));
 
             VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousTagsForThisModule);
 
@@ -88,8 +90,17 @@ public class Reactor {
         return false;
     }
 
-    private static String calculateModulePath(MavenProject rootProject, MavenProject project) {
-        String relativePathToModule = Repository.stripWorkDir(rootProject.getBasedir(), project.getBasedir());
+    private static String calculateModulePath(MavenProject rootProject, MavenProject project) throws MojoExecutionException {
+        // Getting canonical files because on Windows, it's possible one returns "C:\..." and the other "c:\..." which is rather amazing
+        File projectRoot;
+        File moduleRoot;
+        try {
+            projectRoot = rootProject.getBasedir().getCanonicalFile();
+            moduleRoot = project.getBasedir().getCanonicalFile();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not find directory paths for maven project", e);
+        }
+        String relativePathToModule = Repository.stripWorkDir(projectRoot, moduleRoot);
         if (relativePathToModule.length() == 0) {
             relativePathToModule = ".";
         }
@@ -103,14 +114,6 @@ public class Reactor {
             return hasChanged ? null : previousTagsForThisModule.get(0);
         } catch (Exception e) {
             throw new MojoExecutionException("Error while detecting whether or not " + project.getArtifactId() + " has changed since the last release", e);
-        }
-    }
-
-    public static List<AnnotatedTag> previousTagsForModule(Git git, MavenProject project) throws MojoExecutionException {
-        try {
-            return AnnotatedTagFinder.mostRecent(git, project.getArtifactId(), project.getVersion().replace("-SNAPSHOT", ""));
-        } catch (Exception e) {
-            throw new MojoExecutionException("Error while looking up tags for " + project.getArtifactId(), e);
         }
     }
 

@@ -12,6 +12,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,7 +64,7 @@ public class LocalGitRepo {
             return true;
         }
         boolean hasErrors = false;
-        File workTree = git.getRepository().getWorkTree();
+        File workTree = workingDir();
         for (File changedFile : changedFiles) {
             try {
                 String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
@@ -75,6 +76,14 @@ public class LocalGitRepo {
         }
         hasReverted = true;
         return !hasErrors;
+    }
+
+    private File workingDir() throws MojoExecutionException {
+        try {
+            return git.getRepository().getWorkTree().getCanonicalFile();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not locate the working directory of the Git repo", e);
+        }
     }
 
     public boolean hasLocalTag(String tagName) throws GitAPIException {

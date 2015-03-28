@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class PomUpdater {
@@ -38,7 +36,7 @@ public class PomUpdater {
                 List<String> errorsForCurrentPom = alterModel(project, module.getNewVersion());
                 errors.addAll(errorsForCurrentPom);
 
-                File pom = project.getFile();
+                File pom = project.getFile().getCanonicalFile();
                 changedPoms.add(pom);
                 Writer fileWriter = new FileWriter(pom);
 
