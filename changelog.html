@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Date-Revision-yyyymmdd" content="20150328" />
     <meta http-equiv="Content-Language" content="en" />
-    <title>Multi Module Maven Release Plugin &#x2013; The Multi Module Maven Release Plugin for Git</title>
+    <title>Multi Module Maven Release Plugin &#x2013; Changelog</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-1.3.0.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -141,10 +141,12 @@
                 <ul class="nav nav-list">
                     <li class="nav-header">Overview</li>
                                 
-      <li class="active">
+      <li>
     
-            <a href="#"><i class="none"></i>Introduction</a>
-          </li>
+                          <a href="index.html" title="Introduction">
+          <i class="none"></i>
+        Introduction</a>
+            </li>
                   
       <li>
     
@@ -167,12 +169,10 @@
         FAQ</a>
             </li>
                   
-      <li>
+      <li class="active">
     
-                          <a href="changelog.html" title="Changelog">
-          <i class="none"></i>
-        Changelog</a>
-            </li>
+            <a href="#"><i class="none"></i>Changelog</a>
+          </li>
                               <li class="nav-header">Project Documentation</li>
                                                                                                                                                           
       <li>
@@ -209,37 +209,21 @@
         <div id="bodyColumn"  class="span9" >
                                   
             <div class="section">
-<h2><a name="The_Multi_Module_Maven_Release_Plugin_for_Git"></a>The Multi Module Maven Release Plugin for Git</h2>
-<p>This plugin is an alternative to the <tt>maven-release-plugin</tt> which was created with the following principles:</p>
-
-<ul>
-  
-<li>It should be trivial to release modules from a multi-module plugin, and only those modules that have changes should be released</li>
-  
-<li>No commits should be made to a repo during a release</li>
-  
-<li>Maven conventions such as developing against SNAPSHOT versions should be retained</li>
-  
-<li>Git should not need to be installed on the system.</li>
-</ul>
-<p>See the <a class="externalLink" href="http://danielflower.github.io/2015/03/08/The-Multi-Module-Maven-Release-Plugin-for-Git.html">introductory blog post</a> for more background.</p>
-<p>The plugin works with the idea that a software module has two types of versions: the &#x201c;business version&#x201d; and the &#x201c;build number&#x201d;. The business version is used for semantic versioning, and may be something like &#x201c;1.0&#x201d;, &#x201c;1.1.0&#x201d;, etc. During development, the version in the pom is the business version with <tt>-SNAPSHOT</tt> appended. During a release, module version becomes <tt>business-version.build-number</tt> and this is what the repo is tagged with, and this is what the pom version becomes in the deployed artifact (however this version is not committed as a change to your pom).</p>
-<p>This plugin automatically generates build numbers, starting from 0 and incrementing each time, by looking at previous releases in the Git history. Alternatively, you can use a number that increments on each release - like your CI server&#x2019;s build number for example.</p></div>
+<h2><a name="Changelog"></a>Changelog</h2>
 <div class="section">
-<h2><a name="Differences_with_the_maven-release-plugin"></a>Differences with the maven-release-plugin</h2>
+<h3><a name="a1.0.1"></a>1.0.1</h3>
 
 <ul>
   
-<li>Only Git is supported</li>
+<li>Feature: A list of <tt>releaseProfiles</tt> can now be set in the plugin config.</li>
   
-<li>Each module released will have a separate tag with its artifact ID and version so that it is easy to see when a version of a module was released</li>
+<li>Bug fix: Support cases where Windows would return <tt>C:\</tt> and <tt>c:\</tt> for different calls in some situations, causing no sub-modules to build.</li>
   
-<li>A module is only released if there are changes to it</li>
-  
-<li>The release version of the pom is not committed back to the repository</li>
-  
-<li>Tests are run once by default (or optionally not at all)</li>
+<li>Bug fix: When one commit has multiple tags, the wrong one would sometimes be seen as the latest and cause the release to fail.</li>
 </ul></div>
+<div class="section">
+<h3><a name="a1.0.0"></a>1.0.0</h3>
+<p>First stable release.</p></div></div>
                   </div>
             </div>
           </div>
