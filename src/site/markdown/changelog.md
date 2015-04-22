@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+### 1.0.2
+
+* Bug fix: When a git repository is partially checked out and the report repo has tags that the local repo does not, it was possible that the
+generated version number would clash with an existing tag.
+
 ### 1.0.1
 
 * Feature: A list of `releaseProfiles` can now be set in the plugin config.

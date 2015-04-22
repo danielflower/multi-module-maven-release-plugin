@@ -17,7 +17,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.global.server>github</github.global.server>
-        <plugin.goal.prefix>releaser</plugin.goal.prefix>
     </properties>
 
     <ciManagement>
@@ -161,7 +160,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
-                    <goalPrefix>${plugin.goal.prefix}</goalPrefix>
+                    <goalPrefix>releaser</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
@@ -317,7 +316,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
-                    <goalPrefix>${plugin.goal.prefix}</goalPrefix>
+                    <goalPrefix>releaser</goalPrefix>
                 </configuration>
             </plugin>
             <plugin>

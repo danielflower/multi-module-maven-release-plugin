@@ -1,7 +1,9 @@
 package e2e;
 
+import com.github.danielflower.mavenplugins.release.AnnotatedTag;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,11 +45,21 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrement() throws IOException {
+    public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags() throws IOException, GitAPIException {
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.0"));
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.1"));
+
+        AnnotatedTag.create("single-module-1.0.2", "1.0", 2).saveAtHEAD(testProject.local);
+        testProject.mvn("releaser:release");
+        assertThat(testProject.local, hasTag("single-module-1.0.3"));
+
+        AnnotatedTag.create("single-module-1.0.4", "1.0", 4).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD(testProject.origin);
+        testProject.mvn("releaser:release");
+        assertThat(testProject.local, hasTag("single-module-1.0.5"));
+
     }
 
     @Test

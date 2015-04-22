@@ -34,9 +34,22 @@ public class AnnotatedTagFinder {
         return results;
     }
 
-    static boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
+    public static boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
+        return buildNumberOf(versionWithoutBuildNumber, refName) != null;
+    }
+
+    public static Long buildNumberOf(String versionWithoutBuildNumber, String refName) {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
-        return tagName.startsWith(versionWithoutBuildNumber + ".");
+        String prefix = versionWithoutBuildNumber + ".";
+        if (tagName.startsWith(prefix)) {
+            String end = tagName.substring(prefix.length());
+            try {
+                return Long.parseLong(end);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
 }

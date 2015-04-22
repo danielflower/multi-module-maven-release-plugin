@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.github.danielflower.mavenplugins.release.AnnotatedTagFinder.isPotentiallySameVersionIgnoringBuildNumber;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -52,12 +53,12 @@ public class AnnotatedTagFinderTest {
         TestProject project = TestProject.independentVersionsProject();
         saveFileInModule(project, "console-app", "1.2", 1);
         AnnotatedTag tag1 = tagLocalRepo(project, "console-app-1.1.1.1", "1.1.1", 1);
-        AnnotatedTag tag3 = tagLocalRepo(project, "console-app-1.1.1.3", "1.1.3", 3);
-        AnnotatedTag tag2 = tagLocalRepo(project, "console-app-1.1.1.2", "1.1.2", 2);
-        List<AnnotatedTag> annotatedTags = AnnotatedTagFinder.tagsForVersion(project.local, "console-app", "1.1");
+        AnnotatedTag tag3 = tagLocalRepo(project, "console-app-1.1.1.3", "1.1.1", 3);
+        AnnotatedTag tag2 = tagLocalRepo(project, "console-app-1.1.1.2", "1.1.1", 2);
+        List<AnnotatedTag> annotatedTags = AnnotatedTagFinder.tagsForVersion(project.local, "console-app", "1.1.1");
         assertThat(annotatedTags, containsInAnyOrder(tag1, tag2, tag3));
         VersionNamer versionNamer = new VersionNamer();
-        VersionName name = versionNamer.name("1.1.1", null, annotatedTags);
+        VersionName name = versionNamer.name("1.1.1", null, asList(1L, 3L, 2L));
         assertThat(name.releaseVersion(), equalTo("1.1.1.4"));
     }
 

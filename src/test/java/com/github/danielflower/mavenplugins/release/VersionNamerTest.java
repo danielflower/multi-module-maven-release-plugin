@@ -2,6 +2,7 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -20,17 +21,13 @@ public class VersionNamerTest {
     }
 
     @Test
-    public void ifTheBuildNumberIsNullAndThePreviousTagIsNullThenZeroIsUsed() throws Exception {
-        assertThat(namer.name("1.0-SNAPSHOT", null, null).releaseVersion(), is(equalTo("1.0.0")));
+    public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsed() throws Exception {
+        assertThat(namer.name("1.0-SNAPSHOT", null, new ArrayList<Long>()).releaseVersion(), is(equalTo("1.0.0")));
     }
 
     @Test
-    public void ifTheBuildNumberIsNullButThereIsAPreviousTagThenThatValueIsIncremented() throws Exception {
-        List<AnnotatedTag> previousTags = asList(
-            AnnotatedTag.create("something", "1.0", 9),
-            AnnotatedTag.create("something", "1.0", 10)
-        );
-        assertThat(namer.name("1.0-SNAPSHOT", null, previousTags).releaseVersion(), is(equalTo("1.0.11")));
+    public void ifTheBuildNumberIsNullButThereIsAPreviousBuildNumbersThenThatValueIsIncremented() throws Exception {
+        assertThat(namer.name("1.0-SNAPSHOT", null, asList(9L, 10L, 8L)).releaseVersion(), is(equalTo("1.0.11")));
     }
 
     @Test

@@ -25,6 +25,7 @@ public class LocalGitRepo {
     public final Git git;
     private final String remoteUrl;
     private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
+    private Collection<Ref> remoteTags;
 
     LocalGitRepo(Git git, String remoteUrl) {
         this.git = git;
@@ -141,21 +142,35 @@ public class LocalGitRepo {
         return null;
     }
 
-    public List<String> remoteTagsFrom(List<AnnotatedTag> tagNames) throws GitAPIException {
-        List<String> results = new ArrayList<String>();
-        LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
-        if (remoteUrl != null) {
-            lsRemoteCommand.setRemote(remoteUrl);
+    public List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws GitAPIException {
+        List<String> tagNames = new ArrayList<String>();
+        for (AnnotatedTag annotatedTag : annotatedTags) {
+            tagNames.add(annotatedTag.name());
         }
+        return getRemoteTags(tagNames);
+    }
 
-        Collection<Ref> remoteTags = lsRemoteCommand.call();
+    public List<String> getRemoteTags(List<String> tagNamesToSearchFor) throws GitAPIException {
+        List<String> results = new ArrayList<String>();
+        Collection<Ref> remoteTags = allRemoteTags();
         for (Ref remoteTag : remoteTags) {
-            for (AnnotatedTag proposedTag : tagNames) {
-                if (remoteTag.getName().equals("refs/tags/" + proposedTag.name())) {
-                    results.add(proposedTag.name());
+            for (String proposedTag : tagNamesToSearchFor) {
+                if (remoteTag.getName().equals("refs/tags/" + proposedTag)) {
+                    results.add(proposedTag);
                 }
             }
         }
         return results;
+    }
+
+    public Collection<Ref> allRemoteTags() throws GitAPIException {
+        if (remoteTags == null) {
+            LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
+            if (remoteUrl != null) {
+                lsRemoteCommand.setRemote(remoteUrl);
+            }
+            remoteTags = lsRemoteCommand.call();
+        }
+        return remoteTags;
     }
 }
