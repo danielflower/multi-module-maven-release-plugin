@@ -1,13 +1,9 @@
 package e2e;
 
-import com.github.danielflower.mavenplugins.release.GitHelper;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.GitMatchers;
 import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
@@ -15,10 +11,8 @@ import scaffolding.TestProject;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
-import static scaffolding.GitMatchers.hasTag;
 
 public class TestRunningTest {
     final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
@@ -29,7 +23,7 @@ public class TestRunningTest {
     }
 
     @Test
-    public void doesNotReleaseIfThereAreTestFailures() throws Exception {
+    public void doesNotReleaseIfThereAreTestFailuresButTagsAreStillWritten() throws Exception {
         try {
             projectWithTestsThatFail.mvnRelease("1");
             Assert.fail("Should have failed");
@@ -37,7 +31,8 @@ public class TestRunningTest {
 
         }
         assertThat(projectWithTestsThatFail.local, hasCleanWorkingDirectory());
-        assertThat(projectWithTestsThatFail.local.tagList().call().size(), is(0));
+        assertThat(projectWithTestsThatFail.local.tagList().call().get(0).getName(), is("refs/tags/module-with-test-failure-1.0.1"));
+        assertThat(projectWithTestsThatFail.origin.tagList().call().get(0).getName(), is("refs/tags/module-with-test-failure-1.0.1"));
     }
 
     @Test

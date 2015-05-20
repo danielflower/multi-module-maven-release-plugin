@@ -119,6 +119,12 @@ public class ReleaseMojo extends AbstractMojo {
             List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
+
+            // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
+            // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
+            // and so fail. The downside is that failed builds result in tags being pushed.
+            tagAndPushRepo(log, repo, proposedTags);
+
             try {
                 runMavenBuild(reactor);
                 revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
@@ -126,10 +132,6 @@ public class ReleaseMojo extends AbstractMojo {
                 revertChanges(log, repo, changedFiles, false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
             }
 
-            for (AnnotatedTag proposedTag : proposedTags) {
-                log.info("About to tag the repository with " + proposedTag.name());
-                repo.tagRepoAndPush(proposedTag);
-            }
 
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
@@ -142,6 +144,13 @@ public class ReleaseMojo extends AbstractMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
+        }
+    }
+
+    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<AnnotatedTag> proposedTags) throws GitAPIException {
+        for (AnnotatedTag proposedTag : proposedTags) {
+            log.info("About to tag the repository with " + proposedTag.name());
+            repo.tagRepoAndPush(proposedTag);
         }
     }
 
