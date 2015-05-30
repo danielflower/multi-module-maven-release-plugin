@@ -66,15 +66,27 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-b", expectedServerModuleBVersion, "2");
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, "2");
 
-        testProject.mvnRelease("3");
-        assertBothReposTagged("nested-project", expectedAggregatorVersion, "3");
-        assertBothReposTagged("core-utils", expectedCoreVersion, "3");
+        testProject.commitRandomFile("parent-module");
+        testProject.mvn("releaser:release");
+
+        assertBothReposNotTagged("nested-project", expectedAggregatorVersion, "2");
+        assertBothReposTagged("core-utils", expectedCoreVersion, "2");
         assertBothReposTagged("console-app", expectedAppVersion, "3");
-        assertBothReposTagged("parent-module", expectedParentVersion, "3");
-        assertBothReposTagged("server-modules", expectedServerModulesVersion, "3");
-        assertBothReposTagged("server-module-a", expectedServerModuleAVersion, "3");
+        assertBothReposTagged("parent-module", expectedParentVersion, "2");
+        assertBothReposNotTagged("server-modules", expectedServerModulesVersion, "3");
+        assertBothReposTagged("server-module-a", expectedServerModuleAVersion, "2");
         assertBothReposTagged("server-module-b", expectedServerModuleBVersion, "3");
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, "3");
+
+        testProject.mvnRelease("4");
+        assertBothReposTagged("nested-project", expectedAggregatorVersion, "4");
+        assertBothReposTagged("core-utils", expectedCoreVersion, "4");
+        assertBothReposTagged("console-app", expectedAppVersion, "4");
+        assertBothReposTagged("parent-module", expectedParentVersion, "4");
+        assertBothReposTagged("server-modules", expectedServerModulesVersion, "4");
+        assertBothReposTagged("server-module-a", expectedServerModuleAVersion, "4");
+        assertBothReposTagged("server-module-b", expectedServerModuleBVersion, "4");
+        assertBothReposTagged("server-module-c", expectedServerModuleCVersion, "4");
 
     }
 

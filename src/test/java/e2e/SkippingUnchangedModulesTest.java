@@ -43,8 +43,8 @@ public class SkippingUnchangedModulesTest {
         assertTagExists("console-app-3.2.1");
         assertTagExists("more-utils-10.0.1");
 
-        assertThat(initialBuildOutput, oneOf(containsString("Releasing core-utils 2.0.1 as more-utils has changed")));
-        assertThat(initialBuildOutput, oneOf(containsString("Releasing console-app 3.2.1 as core-utils has changed")));
+        assertThat(initialBuildOutput, oneOf(containsString("Releasing core-utils 2.0.1 as parent-module has changed")));
+        assertThat(initialBuildOutput, oneOf(containsString("Releasing console-app 3.2.1 as parent-module has changed")));
 
         testProject.commitRandomFile("console-app").pushIt();
         List<String> output = testProject.mvnRelease("2");

@@ -60,6 +60,12 @@ public class Reactor {
                             break;
                         }
                     }
+                    if (project.getParent() != null
+                            && (project.getParent().getGroupId().equals(module.getGroupId()) && project.getParent().getArtifactId().equals(module.getArtifactId()))) {
+                        oneOfTheDependenciesHasChanged = true;
+                        changedDependency = project.getParent().getArtifactId();
+                        break;
+                    }
                 }
                 if (oneOfTheDependenciesHasChanged) {
                     break;
