@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+## 1.2.0
+
+* If a parent module changes, then all child modules are updated. This covers cases where upgrading a dependency in a parent
+should force all children to be updated.
+
 ## 1.1.0
 
 * Bug fix: tags are now pushed before building so that in the event of failure, the next build will use an incremented build number. 
