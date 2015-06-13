@@ -29,6 +29,9 @@ public class MvnRunner {
         }
         long start = System.currentTimeMillis();
         System.out.println("Installing the plugin into the local repo");
+
+        assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
+
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(Collections.singletonList("install"));
 
