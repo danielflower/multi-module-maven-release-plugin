@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+## 1.2.2
+
+* Fixed bug where the plugin would complain about symlinks (by upgrading the jgit version).
+
 ## 1.2.0
 
 * If a parent module changes, then all child modules are updated. This covers cases where upgrading a dependency in a parent
