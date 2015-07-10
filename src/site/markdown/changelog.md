@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+## 1.3.0
+
+* Added ssh-agent support thanks to [pull request 7](https://github.com/danielflower/multi-module-maven-release-plugin/pull/7)
+
 ## 1.2.4
 
 * Temporarily reverted version 1.2.2 as it broke compatibility with JDK 6
