@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+## 1.2.4
+
+* Temporarily reverted version 1.2.2 as it broke compatibility with JDK 6
+
 ## 1.2.2
 
 * Fixed bug where the plugin would complain about symlinks (by upgrading the jgit version).
