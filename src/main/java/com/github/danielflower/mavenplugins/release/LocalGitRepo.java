@@ -39,9 +39,11 @@ public class LocalGitRepo {
             String summary = "Cannot release with uncommitted changes. Please check the following files:";
             List<String> message = new ArrayList<String>();
             message.add(summary);
+            message.add("Uncommited:");
             for (String path : status.getUncommittedChanges()) {
                 message.add(" * " + path);
             }
+            message.add("Untracked:");
             for (String path : status.getUntracked()) {
                 message.add(" * " + path);
             }
