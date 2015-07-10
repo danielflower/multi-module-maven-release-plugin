@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
 /**
  * Releases the project.
@@ -106,11 +107,16 @@ public class ReleaseMojo extends AbstractMojo {
     @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
     private List<String> modulesToRelease;
 
+    @Parameter(property = "disableSshAgent")
+    private boolean disableSshAgent;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
 
         try {
+            configureJsch(log);
+
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
             repo.errorIfNotClean();
 
@@ -144,6 +150,12 @@ public class ReleaseMojo extends AbstractMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
+        }
+    }
+
+    private void configureJsch(Log log) {
+        if(!disableSshAgent) {
+            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log));
         }
     }
 
