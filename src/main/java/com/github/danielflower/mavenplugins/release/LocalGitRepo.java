@@ -13,10 +13,7 @@ import org.eclipse.jgit.lib.Repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 
@@ -39,13 +36,19 @@ public class LocalGitRepo {
             String summary = "Cannot release with uncommitted changes. Please check the following files:";
             List<String> message = new ArrayList<String>();
             message.add(summary);
-            message.add("Uncommited:");
-            for (String path : status.getUncommittedChanges()) {
-                message.add(" * " + path);
+            Set<String> uncommittedChanges = status.getUncommittedChanges();
+            if (uncommittedChanges.size() > 0) {
+                message.add("Uncommitted:");
+                for (String path : uncommittedChanges) {
+                    message.add(" * " + path);
+                }
             }
-            message.add("Untracked:");
-            for (String path : status.getUntracked()) {
-                message.add(" * " + path);
+            Set<String> untracked = status.getUntracked();
+            if (untracked.size() > 0) {
+                message.add("Untracked:");
+                for (String path : untracked) {
+                    message.add(" * " + path);
+                }
             }
             message.add("Please commit or revert these changes before releasing.");
             throw new ValidationException(summary, message);

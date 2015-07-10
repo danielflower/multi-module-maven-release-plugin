@@ -25,7 +25,7 @@ import org.eclipse.jgit.util.FS;
  *
  * Note that this requires the 'nc' binary installed and available on PATH!
  *
- * @author Johan Ström <johan@pistonlabs.com>
+ * @author Johan Ström johan@pistonlabs.com
  */
 public class SshAgentSessionFactory extends JschConfigSessionFactory {
     private final Log log;
