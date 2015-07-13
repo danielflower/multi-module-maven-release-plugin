@@ -81,6 +81,7 @@ public class PomUpdater {
             try {
                 ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
                 originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
+                log.debug(" Parent " + parentBeingReleased.getArtifactId() + " rewritten to version " + parentBeingReleased.getVersionToDependOn());
             } catch (UnresolvedSnapshotDependencyException e) {
                 errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
             }
@@ -91,10 +92,12 @@ public class PomUpdater {
                 try {
                     ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
                     dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
+                    log.debug(" Dependency on " + dependencyBeingReleased.getArtifactId() + " rewritten to version " + dependencyBeingReleased.getVersionToDependOn());
                 } catch (UnresolvedSnapshotDependencyException e) {
                     errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
                 }
-            }
+            }else
+                log.debug(" Dependency on " + dependency.getArtifactId() + " kept at version " + dependency.getVersion());
         }
         for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
             String version = plugin.getVersion();
