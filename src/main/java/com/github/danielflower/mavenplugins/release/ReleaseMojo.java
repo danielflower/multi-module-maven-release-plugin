@@ -276,6 +276,7 @@ public class ReleaseMojo extends AbstractMojo {
             goals.add("-DskipTests=true");
         }
         request.setShowErrors(true);
+        request.setDebug(getLog().isDebugEnabled());
         request.setGoals(goals);
         List<String> profiles = profilesToActivate();
         request.setProfiles(profiles);
