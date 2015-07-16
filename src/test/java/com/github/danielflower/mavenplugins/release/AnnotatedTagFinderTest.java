@@ -57,6 +57,10 @@ public class AnnotatedTagFinderTest {
         AnnotatedTag tag2 = tagLocalRepo(project, "console-app-1.1.1.2", "1.1.1", 2);
         List<AnnotatedTag> annotatedTags = AnnotatedTagFinder.tagsForVersion(project.local, "console-app", "1.1.1");
         assertThat(annotatedTags, containsInAnyOrder(tag1, tag2, tag3));
+    }
+
+    @Test
+    public void versionNamerCaresNotForOrderOfTags() throws ValidationException {
         VersionNamer versionNamer = new VersionNamer();
         VersionName name = versionNamer.name("1.1.1", null, asList(1L, 3L, 2L));
         assertThat(name.releaseVersion(), equalTo("1.1.1.4"));

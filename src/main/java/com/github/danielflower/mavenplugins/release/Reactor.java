@@ -27,7 +27,7 @@ public class Reactor {
     }
 
     public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new DiffDetector(gitRepo.git.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer();
         for (MavenProject project : projects) {
@@ -141,14 +141,24 @@ public class Reactor {
         return relativePathToModule;
     }
 
-    private static AnnotatedTag hasChangedSinceLastRelease(List<AnnotatedTag> previousTagsForThisModule, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
+    static AnnotatedTag hasChangedSinceLastRelease(List<AnnotatedTag> previousTagsForThisModule, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
         try {
             if (previousTagsForThisModule.size() == 0) return null;
             boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(), previousTagsForThisModule);
-            return hasChanged ? null : previousTagsForThisModule.get(0);
+            return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
         } catch (Exception e) {
             throw new MojoExecutionException("Error while detecting whether or not " + project.getArtifactId() + " has changed since the last release", e);
         }
+    }
+
+    private static AnnotatedTag tagWithHighestBuildNumber(List<AnnotatedTag> tags) {
+        AnnotatedTag cur = null;
+        for (AnnotatedTag tag : tags) {
+            if (cur == null || tag.buildNumber() > cur.buildNumber()) {
+                cur = tag;
+            }
+        }
+        return cur;
     }
 
     public ReleasableModule findByLabel(String label) {

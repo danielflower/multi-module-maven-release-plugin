@@ -1,7 +1,13 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.*;
@@ -38,6 +44,21 @@ public class ReactorTest {
             Assert.fail("Should have thrown");
         } catch (UnresolvedSnapshotDependencyException e) {
             assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty:1.0-SNAPSHOT"));
+        }
+    }
+
+    @Test
+    public void returnsTheLatestTagIfThereAreChanges() throws MojoExecutionException {
+        AnnotatedTag onePointNine = AnnotatedTag.create("whatever-1.1.9", "1.1", 9);
+        AnnotatedTag onePointTen = AnnotatedTag.create("whatever-1.1.10", "1.1", 10);
+        assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointNine, onePointTen), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
+        assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointTen, onePointNine), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
+    }
+
+    private static class NeverChanged implements DiffDetector {
+        @Override
+        public boolean hasChangedSince(String modulePath, List<String> childModules, Collection<AnnotatedTag> tags) throws IOException {
+            return false;
         }
     }
 }

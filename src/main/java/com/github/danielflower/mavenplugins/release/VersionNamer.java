@@ -14,8 +14,6 @@ public class VersionNamer {
             if (previousBuildNumbers.size() == 0) {
                 buildNumber = 0L;
             } else {
-
-
                 buildNumber = nextBuildNumber(previousBuildNumbers);
             }
         }

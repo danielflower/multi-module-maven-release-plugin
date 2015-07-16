@@ -22,7 +22,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2", 0);
         AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
 
-        DiffDetector detector = new DiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
 
         assertThat(detector.hasChangedSince("core-utils", noChildModules(), asList(tag2)), is(false));
         assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag2)), is(true));
@@ -34,7 +34,7 @@ public class DiffDetectorTest {
         TestProject simple = TestProject.singleModuleProject();
         AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0", 1);
         simple.commitRandomFile(".");
-        DiffDetector detector = new DiffDetector(simple.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
         assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(true));
 
         AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0", 2);
@@ -50,7 +50,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
         project.commitRandomFile("console-app");
 
-        DiffDetector detector = new DiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
         assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(true));
     }
 
@@ -63,7 +63,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
         project.commitRandomFile("console-app");
 
-        DiffDetector detector = new DiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
         assertThat(detector.hasChangedSince("console-app", asList("console-app"), asList(tag3)), is(false));
     }
 
