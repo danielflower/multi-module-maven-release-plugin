@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-## 1.3.3
+## 1.3.4
 
 * Fixed bug where a partial build failure where a single commit has multiple tags could result in subsequent releases
 failing due to the plugin picking the older tag to use when it is detected that the module hadn't changed. 
