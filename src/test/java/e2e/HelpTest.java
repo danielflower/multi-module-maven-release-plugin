@@ -31,11 +31,12 @@ public class HelpTest {
     @Test
     public void runningTheHelpMojoTellsYouAboutThePlugin() throws IOException {
         assertThat(
-                mvn(multi_module_release_help),
-                containsStrings(
-                        "This plugin has 2 goals:",
-                        "releaser:release",
-                        multi_module_release_help));
+            mvn(multi_module_release_help),
+            containsStrings(
+                "This plugin has 3 goals:",
+                "releaser:release",
+                "releaser:help",
+                multi_module_release_help));
     }
 
     private List<String> mvn(String... commands) throws IOException {
@@ -45,10 +46,10 @@ public class HelpTest {
     @Test
     public void canShowInformationAboutTheReleaseGoal() throws IOException {
         assertThat(
-                mvn(multi_module_release_help, "-Dgoal=release", "-Ddetail=true"),
-                containsStrings(
-                        "The goals to run against the project during a release",
-                        "The build number to use in the release version"));
+            mvn(multi_module_release_help, "-Dgoal=release", "-Ddetail=true"),
+            containsStrings(
+                "The goals to run against the project during a release",
+                "The build number to use in the release version"));
     }
 
     private static Matcher<Iterable<? super String>> containsStrings(String... strings) {

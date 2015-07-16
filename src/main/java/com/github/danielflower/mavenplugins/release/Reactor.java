@@ -82,7 +82,7 @@ public class Reactor {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
                 } else {
-                    log.debug("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
+                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
                 }
             }
             ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);

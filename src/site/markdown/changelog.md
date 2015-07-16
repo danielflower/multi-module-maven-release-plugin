@@ -1,7 +1,11 @@
 Changelog
 ---------
 
-## 1.3.4
+## 1.4.0
+
+* New feature: run `releaser:next` to see which versions will be used in the next release.
+
+### 1.3.4
 
 * Fixed bug where a partial build failure where a single commit has multiple tags could result in subsequent releases
 failing due to the plugin picking the older tag to use when it is detected that the module hadn't changed. 
@@ -10,11 +14,11 @@ failing due to the plugin picking the older tag to use when it is detected that 
 
 * Added ssh-agent support thanks to [pull request 7](https://github.com/danielflower/multi-module-maven-release-plugin/pull/7)
 
-## 1.2.4
+### 1.2.4
 
 * Temporarily reverted version 1.2.2 as it broke compatibility with JDK 6
 
-## 1.2.2
+### 1.2.2
 
 * Fixed bug where the plugin would complain about symlinks (by upgrading the jgit version).
 
@@ -29,12 +33,12 @@ should force all children to be updated.
 This is needed for cases where part of the build succeeded and some module(s) were uploaded to Nexus - re-uploading would cause an 
 error if the build number is not incremented. 
 
-### 1.0.2
+#### 1.0.2
 
 * Bug fix: When a git repository is partially checked out and the report repo has tags that the local repo does not, it was possible that the
 generated version number would clash with an existing tag.
 
-### 1.0.1
+#### 1.0.1
 
 * Feature: A list of `releaseProfiles` can now be set in the plugin config.
 * Bug fix: Support cases where Windows would return `C:\` and `c:\` for different calls in some situations, causing no sub-modules to build.

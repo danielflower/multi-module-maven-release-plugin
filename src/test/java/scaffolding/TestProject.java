@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class TestProject {
 
-    public static final String PLUGIN_VERSION_FOR_TESTS = "1.3-SNAPSHOT";
+    public static final String PLUGIN_VERSION_FOR_TESTS = "1.4-SNAPSHOT";
     public final File originDir;
     public final Git origin;
 
@@ -46,6 +46,12 @@ public class TestProject {
         return runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
             "releaser:release");
+    }
+
+    public List<String> mvnReleaserNext(String buildNumber) throws IOException, InterruptedException {
+        return runMaven(localDir,
+            "-DbuildNumber=" + buildNumber,
+            "releaser:next");
     }
 
     public List<String> mvnRelease(String buildNumber, String moduleToRelease) throws IOException, InterruptedException {
