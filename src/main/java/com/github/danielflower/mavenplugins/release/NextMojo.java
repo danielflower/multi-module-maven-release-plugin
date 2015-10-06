@@ -55,6 +55,12 @@ public class NextMojo extends AbstractMojo {
     @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
     private List<String> modulesToRelease;
 
+    /**
+     * See the release goal for more information.
+     */
+    @Parameter(alias = "forceRelease", property = "forceRelease")
+    private List<String> modulesToForceRelease;
+
     @Parameter(property = "disableSshAgent")
     private boolean disableSshAgent;
 
@@ -66,7 +72,7 @@ public class NextMojo extends AbstractMojo {
             configureJsch(log);
 
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease);
             figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
         } catch (ValidationException e) {
