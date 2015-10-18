@@ -107,6 +107,12 @@ public class ReleaseMojo extends AbstractMojo {
     @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
     private List<String> modulesToRelease;
 
+    /**
+     * A module to force release on, even if no changes has been detected.
+     */
+    @Parameter(alias = "forceRelease", property = "forceRelease")
+    private List<String> modulesToForceRelease;
+
     @Parameter(property = "disableSshAgent")
     private boolean disableSshAgent;
 
@@ -120,7 +126,7 @@ public class ReleaseMojo extends AbstractMojo {
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
             repo.errorIfNotClean();
 
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease);
 
             List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 

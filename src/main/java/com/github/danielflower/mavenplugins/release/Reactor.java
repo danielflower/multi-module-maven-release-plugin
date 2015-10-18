@@ -26,7 +26,7 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer();
@@ -74,7 +74,9 @@ public class Reactor {
 
             String equivalentVersion = null;
 
-            if (oneOfTheDependenciesHasChanged) {
+            if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
+                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we was asked to forced release.");
+            }else if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
                 AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);

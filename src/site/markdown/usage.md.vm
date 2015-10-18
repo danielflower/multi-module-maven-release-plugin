@@ -38,3 +38,12 @@ In this case the `MyApp` module will be built, released and tagged. If MyApp dep
 also be built and released (but there will be no Git tag for this).
 
 Note that this is not generally required as the plugin will only deploy changed modules by default anyway.
+
+Forcing a release
+-----------------
+It is possible to force the release of one or more specified modules, for example if the changes have not been picked up due to some issue.
+To do this, use the `forceRelease` parameter. For example:
+
+	mvn releaser:release -DforceRelease=MyApp
+
+In this case the `MyApp` module will be built, even if there where no changes found.
