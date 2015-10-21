@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+### 1.4.2
+
+* Fixed some bugs around change detection in modules where sometimes changes were not being detected.
+
+### 1.4.1
+
+* Added `forceRelease` option to allow forcing modules to be released even if no changes are detected.
+
 ## 1.4.0
 
 * New feature: run `releaser:next` to see which versions will be used in the next release.
