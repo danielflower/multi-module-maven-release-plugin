@@ -17,10 +17,12 @@ public class PomUpdater {
 
     private final Log log;
     private final Reactor reactor;
+    private final SnapshotStrategy snapshotStrategy;
 
-    public PomUpdater(Log log, Reactor reactor) {
+    public PomUpdater(Log log, Reactor reactor, SnapshotStrategy snapshotStrategy) {
         this.log = log;
         this.reactor = reactor;
+        this.snapshotStrategy = snapshotStrategy;
     }
 
     public UpdateResult updateVersion() {
@@ -83,7 +85,9 @@ public class PomUpdater {
                 originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
                 log.debug(" Parent " + parentBeingReleased.getArtifactId() + " rewritten to version " + parentBeingReleased.getVersionToDependOn());
             } catch (UnresolvedSnapshotDependencyException e) {
-                errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
+                if (!snapshotStrategy.allowParent(parent)) {
+                    errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
+                }
             }
         }
         for (Dependency dependency : originalModel.getDependencies()) {
@@ -94,7 +98,9 @@ public class PomUpdater {
                     dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
                     log.debug(" Dependency on " + dependencyBeingReleased.getArtifactId() + " rewritten to version " + dependencyBeingReleased.getVersionToDependOn());
                 } catch (UnresolvedSnapshotDependencyException e) {
-                    errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
+                    if (!snapshotStrategy.allowDependency(dependency)) {
+                        errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
+                    }
                 }
             }else
                 log.debug(" Dependency on " + dependency.getArtifactId() + " kept at version " + dependency.getVersion());
@@ -102,7 +108,7 @@ public class PomUpdater {
         for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
             String version = plugin.getVersion();
             if (isSnapshot(version)) {
-                if (!isMultiModuleReleasePlugin(plugin)) {
+                if (!isMultiModuleReleasePlugin(plugin) && !snapshotStrategy.allowPlugin(plugin)) {
                     errors.add(searchingFrom + " references plugin " + plugin.getArtifactId() + " " + version);
                 }
             }

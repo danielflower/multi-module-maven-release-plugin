@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class TestProject {
 
-    public static final String PLUGIN_VERSION_FOR_TESTS = "1.4-SNAPSHOT";
+    public static final String PLUGIN_VERSION_FOR_TESTS = "1.5-SNAPSHOT";
     public final File originDir;
     public final Git origin;
 
@@ -158,6 +158,27 @@ public class TestProject {
     }
     public static TestProject moduleWithSnapshotDependencies() {
         return project("snapshot-dependencies");
+    }
+    public static TestProject moduleWithAllowSnapshotParents() {
+        return project("allow-snapshot-parents");
+    }
+    public static TestProject moduleWithAllowedSnapshotParents() {
+        return project("allowed-snapshot-parents");
+    }
+    public static TestProject moduleWithAllowSnapshotDependencies() {
+        return project("allow-snapshot-dependencies");
+    }
+    public static TestProject moduleWithAllowedSnapshotDependencies() {
+        return project("allowed-snapshot-dependencies");
+    }
+    public static TestProject moduleWithAllowSnapshotPlugins() {
+        return project("allow-snapshot-plugins");
+    }
+    public static TestProject moduleWithAllowedSnapshotPlugins() {
+        return project("allowed-snapshot-plugins");
+    }
+    public static TestProject testPlugin() {
+        return project("test-plugin");
     }
 
 }

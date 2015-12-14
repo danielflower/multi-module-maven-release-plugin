@@ -116,6 +116,51 @@ public class ReleaseMojo extends AbstractMojo {
     @Parameter(property = "disableSshAgent")
     private boolean disableSshAgent;
 
+    /**
+     * If true then the SNAPSHOT parent check is disabled, allowing any of the modules selected for release to have any SNAPSHOT parents.
+     * SNAPSHOT parents that are part of the reactor for this release build will still be transformed, but no other SNAPSHOT parents will be transformed.
+     */
+    @Parameter(alias = "allowSnapshotParents", defaultValue = "false", property = "allowSnapshotParents")
+    private boolean allowSnapshotParents;
+
+    /**
+     * A list of parents that are permitted to have SNAPSHOT versions.
+     * SNAPSHOT parents that are part of the reactor for this release build will still be transformed, but no other SNAPSHOT parents will be transformed.
+     * Placing an artifact in this list will have no effect if the artifact is also in the reactor.
+     * If allowSnapshotParents is true, this list is ignored.
+     */
+    @Parameter(alias = "allowedSnapshotParents")
+    private List<ExemptSnapshotArtifact> allowedSnapshotParents;
+
+    /**
+     * If true then the SNAPSHOT dependency check is disabled, allowing any of the modules selected for release to have any SNAPSHOT dependencies.
+     * SNAPSHOT dependencies that are part of the reactor for this release build will still be transformed, but no other SNAPSHOT dependencies will be transformed.
+     */
+    @Parameter(alias = "allowSnapshotDependencies", defaultValue = "false", property = "allowSnapshotDependencies")
+    private boolean allowSnapshotDependencies;
+
+    /**
+     * A list of dependencies that are permitted to have SNAPSHOT versions.
+     * SNAPSHOT dependencies that are part of the reactor for this release build will still be transformed, but no other SNAPSHOT dependencies will be transformed.
+     * Placing an artifact in this list will have no effect if the artifact is also in the reactor.
+     * If allowSnapshotDependencies is true, this list is ignored.
+     */
+    @Parameter(alias = "allowedSnapshotDependencies")
+    private List<ExemptSnapshotArtifact> allowedSnapshotDependencies;
+
+    /**
+     * If true then the SNAPSHOT plugin check is disabled, allowing any of the modules selected for release to have any SNAPSHOT plugins.
+     */
+    @Parameter(alias = "allowSnapshotPlugins", defaultValue = "false", property = "allowSnapshotPlugins")
+    private boolean allowSnapshotPlugins;
+
+    /**
+     * A list of plugins that are permitted to have SNAPSHOT versions.
+     * If allowSnapshotPlugins is true, this list is ignored.
+     */
+    @Parameter(alias = "allowedSnapshotPlugins")
+    private List<ExemptSnapshotArtifact> allowedSnapshotPlugins;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
@@ -130,7 +175,8 @@ public class ReleaseMojo extends AbstractMojo {
 
             List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
-            List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
+            SnapshotStrategy snapshotStrategy = new SnapshotStrategy(allowSnapshotParents, allowedSnapshotParents, allowSnapshotDependencies, allowedSnapshotDependencies, allowSnapshotPlugins, allowedSnapshotPlugins);
+            List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor, snapshotStrategy);
 
             // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
             // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
@@ -197,8 +243,8 @@ public class ReleaseMojo extends AbstractMojo {
         }
     }
 
-    private static List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor) throws MojoExecutionException, ValidationException {
-        PomUpdater pomUpdater = new PomUpdater(log, reactor);
+    private static List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor, SnapshotStrategy snapshotStrategy) throws MojoExecutionException, ValidationException {
+        PomUpdater pomUpdater = new PomUpdater(log, reactor, snapshotStrategy);
         PomUpdater.UpdateResult result = pomUpdater.updateVersion();
         if (!result.success()) {
             log.info("Going to revert changes because there was an error.");
