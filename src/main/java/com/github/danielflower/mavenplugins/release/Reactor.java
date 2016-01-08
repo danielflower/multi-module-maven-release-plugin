@@ -27,79 +27,81 @@ public class Reactor {
     }
 
     public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
-        VersionNamer versionNamer = new VersionNamer();
-        for (MavenProject project : projects) {
-            String relativePathToModule = calculateModulePath(rootProject, project);
-            String artifactId = project.getArtifactId();
-            String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-            List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
+        if(gitRepo != null) {
+            DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+            VersionNamer versionNamer = new VersionNamer();
+            for (MavenProject project : projects) {
+                String relativePathToModule = calculateModulePath(rootProject, project);
+                String artifactId = project.getArtifactId();
+                String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
+                List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
 
 
-            Collection<Long> previousBuildNumbers = new ArrayList<Long>();
-            if (previousTagsForThisModule != null) {
-                for (AnnotatedTag previousTag : previousTagsForThisModule) {
-                    previousBuildNumbers.add(previousTag.buildNumber());
+                Collection<Long> previousBuildNumbers = new ArrayList<Long>();
+                if (previousTagsForThisModule != null) {
+                    for (AnnotatedTag previousTag : previousTagsForThisModule) {
+                        previousBuildNumbers.add(previousTag.buildNumber());
+                    }
                 }
-            }
 
-            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber);
-            previousBuildNumbers.addAll(remoteBuildNumbers);
+                Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber);
+                previousBuildNumbers.addAll(remoteBuildNumbers);
 
-            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
+                VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
 
-            boolean oneOfTheDependenciesHasChanged = false;
-            String changedDependency = null;
-            for (ReleasableModule module : modules) {
-                if (module.willBeReleased()) {
-                    for (Dependency dependency : project.getModel().getDependencies()) {
-                        if (dependency.getGroupId().equals(module.getGroupId()) && dependency.getArtifactId().equals(module.getArtifactId())) {
+                boolean oneOfTheDependenciesHasChanged = false;
+                String changedDependency = null;
+                for (ReleasableModule module : modules) {
+                    if (module.willBeReleased()) {
+                        for (Dependency dependency : project.getModel().getDependencies()) {
+                            if (dependency.getGroupId().equals(module.getGroupId()) && dependency.getArtifactId().equals(module.getArtifactId())) {
+                                oneOfTheDependenciesHasChanged = true;
+                                changedDependency = dependency.getArtifactId();
+                                break;
+                            }
+                        }
+                        if (project.getParent() != null
+                            && (project.getParent().getGroupId().equals(module.getGroupId()) && project.getParent().getArtifactId().equals(module.getArtifactId()))) {
                             oneOfTheDependenciesHasChanged = true;
-                            changedDependency = dependency.getArtifactId();
+                            changedDependency = project.getParent().getArtifactId();
                             break;
                         }
                     }
-                    if (project.getParent() != null
-                            && (project.getParent().getGroupId().equals(module.getGroupId()) && project.getParent().getArtifactId().equals(module.getArtifactId()))) {
-                        oneOfTheDependenciesHasChanged = true;
-                        changedDependency = project.getParent().getArtifactId();
+                    if (oneOfTheDependenciesHasChanged) {
                         break;
                     }
                 }
-                if (oneOfTheDependenciesHasChanged) {
-                    break;
-                }
-            }
 
-            String equivalentVersion = null;
+                String equivalentVersion = null;
 
-            if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
-                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we was asked to forced release.");
-            }else if (oneOfTheDependenciesHasChanged) {
-                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
-            } else {
-                AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
-                if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-                    equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
-                    log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
+                if (modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
+                    log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we was asked to forced release.");
+                } else if (oneOfTheDependenciesHasChanged) {
+                    log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
                 } else {
-                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
+                    AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
+                    if (previousTagThatIsTheSameAsHEADForThisModule != null) {
+                        equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+                        log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
+                    } else {
+                        log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
+                    }
                 }
+                ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);
+                modules.add(module);
             }
-            ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);
-            modules.add(module);
-        }
 
-        if (!atLeastOneBeingReleased(modules)) {
-            log.warn("No changes have been detected in any modules so will re-release them all");
-            List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
-            for (ReleasableModule module : modules) {
-                newList.add(module.createReleasableVersion());
-            }
-            modules = newList;
+            // TODO: Does this make sense in the scenario of an artificial reactor parent?
+            /*if (!atLeastOneBeingReleased(modules)) {
+                log.warn("No changes have been detected in any modules so will re-release them all");
+                List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
+                for (ReleasableModule module : modules) {
+                    newList.add(module.createReleasableVersion());
+                }
+                modules = newList;
+            }*/
         }
-
         return new Reactor(modules);
     }
 
