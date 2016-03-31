@@ -10,6 +10,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
 /**
  * Releases the project.

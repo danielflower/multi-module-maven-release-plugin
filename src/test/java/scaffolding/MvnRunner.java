@@ -1,11 +1,5 @@
 package scaffolding;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
 import org.apache.maven.shared.invoker.*;
 
 import java.io.File;
@@ -16,12 +10,13 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MvnRunner {
 
-    public static boolean haveInstalledPlugin = false;
+    private static boolean haveInstalledPlugin = false;
 
     public static void installReleasePluginToLocalRepo() throws MavenInvocationException {
         if (haveInstalledPlugin) {
@@ -56,37 +51,23 @@ public class MvnRunner {
     }
 
     public static List<String> runMaven(File workingDir, String... arguments) throws IOException {
-        String mvnPath = System.getenv("M2_HOME");
-        if (StringUtils.isBlank(mvnPath)) {
-            throw new RuntimeException("M2_HOME is not set");
-        }
-        File m2Bin = new File(mvnPath, "bin");
-        File m2 = new File(m2Bin, SystemUtils.IS_OS_WINDOWS ? "mvn.bat" : "mvn");
-        if (!m2.isFile()) {
-            throw new RuntimeException("Could not locate the mvn executable. Looked at " + m2.getCanonicalPath());
-        }
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setGoals(asList(arguments));
+        request.setBaseDirectory(workingDir);
 
-        CommandLine command = new CommandLine(m2.getCanonicalPath());
-        for (String argument : arguments) {
-            command.addArgument(argument, false);
-        }
+        Invoker invoker = new DefaultInvoker();
+        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+        invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
 
-        DefaultExecutor executor = new DefaultExecutor();
-        executor.setWorkingDirectory(workingDir);
 
-        CollectingLogOutputStream logCollector = new CollectingLogOutputStream(true);
-        PumpStreamHandler streamHandler = new PumpStreamHandler(logCollector);
-        executor.setStreamHandler(streamHandler);
-
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
-        executor.setWatchdog(watchdog);
         int exitCode;
         try {
-            exitCode = executor.execute(command);
+            InvocationResult result = invoker.execute(request);
+            exitCode = result.getExitCode();
         } catch (Exception e) {
-            throw new MavenExecutionException(1, logCollector.getLines());
+            throw new MavenExecutionException(1, logOutput.getLines());
         }
-        List<String> output = logCollector.getLines();
+        List<String> output = logOutput.getLines();
 
         if (exitCode != 0) {
             throw new MavenExecutionException(exitCode, output);
