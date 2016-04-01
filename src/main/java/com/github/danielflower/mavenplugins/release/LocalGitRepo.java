@@ -111,8 +111,11 @@ public class LocalGitRepo {
      * @throws ValidationException if anything goes wrong
      */
     public static LocalGitRepo fromCurrentDir(String remoteUrl) throws ValidationException {
+        return fromDir(new File("."), remoteUrl);
+    }
+
+    public static LocalGitRepo fromDir(File gitDir, String remoteUrl) throws ValidationException {
         Git git;
-        File gitDir = new File(".");
         try {
             git = Git.open(gitDir);
         } catch (RepositoryNotFoundException rnfe) {

@@ -11,6 +11,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class NextMojo extends AbstractMojo {
     @Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
     private List<MavenProject> projects;
 
+    private boolean allowNonGitParents = true;
+
     /**
      * <p>
      * An optional build number. See the release goal for more information.
@@ -67,16 +70,38 @@ public class NextMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
+        configureJsch(log);
+        processProject(project);
+    }
 
+    protected void processProject(MavenProject curProject) throws MojoExecutionException, MojoFailureException {
+        Log log = getLog();
+
+        List<MavenProject> curChildProjects = (List<MavenProject>) curProject.getCollectedProjects();
         try {
-            configureJsch(log);
-
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease);
+            File curDir = curProject.getBasedir();
+            String remoteUrl = getRemoteUrlOrNullIfNoneSet(curProject.getScm());
+            LocalGitRepo repo = LocalGitRepo.fromDir(curDir, remoteUrl);
+            Reactor reactor = Reactor.fromProjects(log, repo, curProject, curChildProjects, buildNumber, modulesToForceRelease);
             figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
         } catch (ValidationException e) {
-            printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
+            if(allowNonGitParents) {
+                log.info("Skipping non-git module: " + curProject.getGroupId() + ":" + curProject.getArtifactId());
+
+                for(String modulePath : (List<String>) curProject.getModules()) {
+                    File pomPath = new File(new File(curProject.getFile().getParentFile(), modulePath), "pom.xml");
+                    for(MavenProject curChildProject : curChildProjects) {
+                        // Only process the direct descendants of the current project.
+                        if(curChildProject.getFile().equals(pomPath)) {
+                            processProject(curChildProject);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
+            }
         } catch (GitAPIException gae) {
 
             StringWriter sw = new StringWriter();

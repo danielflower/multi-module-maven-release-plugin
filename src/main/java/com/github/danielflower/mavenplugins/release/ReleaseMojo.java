@@ -43,6 +43,21 @@ public class ReleaseMojo extends AbstractMojo {
 
     /**
      * <p>
+     * When set to 'true' execution of the plugin execution is skipped.
+     * </p>
+     * <p>
+     * By default, the plugin will be executed.
+     * </p>
+     * <p>
+     * This can be specified using a command line parameter ("-DskipRelease=true") or "skip"
+     * in this plugin's configuration.
+     * </p>
+     */
+    @Parameter(property = "skipRelease", defaultValue = "false")
+    private boolean skip;
+
+    /**
+     * <p>
      * The build number to use in the release version. Given a snapshot version of "1.0-SNAPSHOT"
      * and a buildNumber value of "2", the actual released version will be "1.0.2".
      * </p>
@@ -119,6 +134,11 @@ public class ReleaseMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
+
+        if(skip) {
+            log.info("Skipping plugin execution.");
+            return;
+        }
 
         try {
             configureJsch(log);
