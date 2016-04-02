@@ -1,18 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.shared.invoker.*;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -20,8 +8,19 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import org.apache.maven.model.Scm;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
  * Releases the project.
@@ -33,32 +32,7 @@ import static java.util.Arrays.asList;
     requiresProject = true, // this can only run against a maven project
     aggregator = true // the plugin should only run once against the aggregator pom
 )
-public class ReleaseMojo extends AbstractMojo {
-
-    /**
-     * The Maven Project.
-     */
-    @Parameter(property = "project", required = true, readonly = true, defaultValue = "${project}")
-    private MavenProject project;
-
-    @Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
-    private List<MavenProject> projects;
-
-    /**
-     * <p>
-     * The build number to use in the release version. Given a snapshot version of "1.0-SNAPSHOT"
-     * and a buildNumber value of "2", the actual released version will be "1.0.2".
-     * </p>
-     * <p>
-     * By default, the plugin will automatically find a suitable build number. It will start at version
-     * 0 and increment this with each release.
-     * </p>
-     * <p>
-     * This can be specified using a command line parameter ("-DbuildNumber=2") or in this plugin's configuration.
-     * </p>
-     */
-    @Parameter(property = "buildNumber")
-    private Long buildNumber;
+public class ReleaseMojo extends BaseMojo {
 
     /**
      * <p>
@@ -101,50 +75,6 @@ public class ReleaseMojo extends AbstractMojo {
      */
     @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
     private boolean skipTests;
-
-    /**
-     * The modules to release, or no  value to to release the project from the root pom, which is the default.
-     * The selected module plus any other modules it needs will be built and released also.
-     * When run from the command line, this can be a comma-separated list of module names.
-     */
-    @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
-    private List<String> modulesToRelease;
-
-    /**
-     * A module to force release on, even if no changes has been detected.
-     */
-    @Parameter(alias = "forceRelease", property = "forceRelease")
-    private List<String> modulesToForceRelease;
-
-    @Parameter(property = "disableSshAgent")
-    private boolean disableSshAgent;
-    
-    @Parameter(defaultValue = "${settings}", readonly = true, required = true)
-    private Settings settings;
-    
-    /**
-     * If set, the identityFile and passphrase will be read from the Maven settings file.
-     */
-    @Parameter(property = "serverId")
-    private String serverId;
-    
-    /**
-     * If set, this file will be used to specify the known_hosts. This will override any default value.
-     */
-    @Parameter(property = "knownHosts")
-    private String knownHosts;
-    
-    /**
-     * Specifies the identity file to be used.
-     */
-    @Parameter(property = "identityFile")
-    private String identityFile;
-    
-    /**
-     * Specifies the passphrase to be used with the identityFile specified.
-     */
-    @Parameter(property = "passphrase")
-    private String passphrase;
     
 
     @Override
@@ -187,22 +117,6 @@ public class ReleaseMojo extends AbstractMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
-        }
-    }
-
-    private void configureJsch(Log log) {
-        if(!disableSshAgent) {
-        	if (serverId != null) {
-        		Server server = settings.getServer(serverId);
-        		if (server != null) {
-        			identityFile = identityFile == null ? server.getPrivateKey() : identityFile;
-        			passphrase = passphrase == null ? server.getPassphrase() : passphrase;
-        		} else {
-        			log.warn(format("No server configuration in Maven settings found with id %s", serverId));
-        		}
-        	}
-        	
-            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, identityFile, passphrase));
         }
     }
 
