@@ -8,6 +8,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.shared.invoker.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
@@ -18,6 +20,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
@@ -115,6 +118,34 @@ public class ReleaseMojo extends AbstractMojo {
 
     @Parameter(property = "disableSshAgent")
     private boolean disableSshAgent;
+    
+    @Parameter(defaultValue = "${settings}", readonly = true, required = true)
+    private Settings settings;
+    
+    /**
+     * If set, the identityFile and passphrase will be read from the Maven settings file.
+     */
+    @Parameter(property = "serverId")
+    private String serverId;
+    
+    /**
+     * If set, this file will be used to specify the known_hosts. This will override any default value.
+     */
+    @Parameter(property = "knownHosts")
+    private String knownHosts;
+    
+    /**
+     * Specifies the identity file to be used.
+     */
+    @Parameter(property = "identityFile")
+    private String identityFile;
+    
+    /**
+     * Specifies the passphrase to be used with the identityFile specified.
+     */
+    @Parameter(property = "passphrase")
+    private String passphrase;
+    
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -161,7 +192,17 @@ public class ReleaseMojo extends AbstractMojo {
 
     private void configureJsch(Log log) {
         if(!disableSshAgent) {
-            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log));
+        	if (serverId != null) {
+        		Server server = settings.getServer(serverId);
+        		if (server != null) {
+        			identityFile = identityFile == null ? server.getPrivateKey() : identityFile;
+        			passphrase = passphrase == null ? server.getPassphrase() : passphrase;
+        		} else {
+        			log.warn(format("No server configuration in Maven settings found with id %s", serverId));
+        		}
+        	}
+        	
+            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, identityFile, passphrase));
         }
     }
 

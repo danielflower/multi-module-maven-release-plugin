@@ -63,6 +63,15 @@ public class NextMojo extends AbstractMojo {
 
     @Parameter(property = "disableSshAgent")
     private boolean disableSshAgent;
+    
+    @Parameter(property = "knownHosts")
+    private String knownHosts;
+    
+    @Parameter(property = "identityFile")
+    private String identityFile;
+    
+    @Parameter(property = "passphrase")
+    private String passphrase;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -91,7 +100,7 @@ public class NextMojo extends AbstractMojo {
 
     private void configureJsch(Log log) {
         if(!disableSshAgent) {
-            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log));
+            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, identityFile, passphrase));
         }
     }
 
