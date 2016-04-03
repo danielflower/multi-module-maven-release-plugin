@@ -32,22 +32,12 @@ public class SshAgentSessionFactoryTest {
 	private final Log log = mock(Log.class);
 	private final FS fs = mock(FS.class);
 	
-	/**
-	 * @param name
-	 * @return
-	 * @throws Exception
-	 */
 	private String getFile(String name) throws Exception {
 		final URL url = getClass().getResource("/"+ name);
 		assertNotNull(format("File {} not found", name), url);
 		return new File(url.toURI()).getAbsolutePath();
 	}
 	
-	/**
-	 * @param jsch
-	 * @param name
-	 * @return
-	 */
 	private Identity getId(JSch jsch, String name) {
 		final Iterator<?> it = jsch.getIdentityRepository().getIdentities().iterator();
 		
