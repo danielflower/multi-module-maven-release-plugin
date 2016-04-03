@@ -31,26 +31,26 @@ public class SshAgentSessionFactoryTest {
 	private static final String KNOWN_HOSTS = "known_hosts";
 	private final Log log = mock(Log.class);
 	private final FS fs = mock(FS.class);
-	
-	private String getFile(String name) throws Exception {
-		final URL url = getClass().getResource("/"+ name);
+
+	private String getFile(final String name) throws Exception {
+		final URL url = getClass().getResource("/" + name);
 		assertNotNull(format("File {} not found", name), url);
 		return new File(url.toURI()).getAbsolutePath();
 	}
-	
-	private Identity getId(JSch jsch, String name) {
+
+	private Identity getId(final JSch jsch, final String name) {
 		final Iterator<?> it = jsch.getIdentityRepository().getIdentities().iterator();
-		
+
 		while (it.hasNext()) {
-			final Identity id = (Identity)it.next();
+			final Identity id = (Identity) it.next();
 			if (id.getName().contains(name)) {
 				return id;
 			}
 		}
-		
+
 		throw new AssertionFailedError(format("No identity found with name %s", name));
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -62,7 +62,7 @@ public class SshAgentSessionFactoryTest {
 		final Identity id = getId(jsch, TESTID);
 		assertFalse(id.isEncrypted());
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -71,16 +71,16 @@ public class SshAgentSessionFactoryTest {
 		final SshAgentSessionFactory factory = new SshAgentSessionFactory(log, null, TESTID_WITH_PASSWORD, null);
 		factory.setIdentityFile(getFile(TESTID_WITH_PASSWORD));
 		JSch jsch = factory.createDefaultJSch(fs);
-		
-		Identity id = getId(jsch, TESTID_WITH_PASSWORD);		
+
+		Identity id = getId(jsch, TESTID_WITH_PASSWORD);
 		assertTrue(id.isEncrypted());
-		
+
 		factory.setPassphrase("password");
 		jsch = factory.createDefaultJSch(fs);
-		id = getId(jsch, TESTID);
+		id = getId(jsch, TESTID_WITH_PASSWORD);
 		assertFalse(id.isEncrypted());
 	}
-	
+
 	/**
 	 * 
 	 */
