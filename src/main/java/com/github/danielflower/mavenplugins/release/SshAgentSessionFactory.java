@@ -43,16 +43,28 @@ public class SshAgentSessionFactory extends JschConfigSessionFactory {
 		setPassphrase(passphraseOrNull);
 	}
 
-	public void setKnownHosts(String knownHosts) {
+	void setKnownHosts(String knownHosts) {
 		this.knownHostsOrNull = knownHosts;
 	}
 
-	public void setIdentityFile(String identityFile) {
+	void setIdentityFile(String identityFile) {
 		this.identityFile = identityFile;
 	}
 
-	public void setPassphrase(String passphrase) {
+	void setPassphrase(String passphrase) {
 		this.passphraseOrNull = passphrase;
+	}
+
+	String getKnownHostsOrNull() {
+		return knownHostsOrNull;
+	}
+
+	String getIdentityFile() {
+		return identityFile;
+	}
+
+	String getPassphraseOrNull() {
+		return passphraseOrNull;
 	}
 
 	@Override
