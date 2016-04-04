@@ -1,22 +1,18 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import static java.util.Arrays.asList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import org.apache.maven.model.Scm;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
  * Logs the versions of the modules that the releaser will release on the next release. Does not run the build nor
@@ -30,39 +26,7 @@ import static java.util.Arrays.asList;
     requiresProject = true, // this can only run against a maven project
     aggregator = true // the plugin should only run once against the aggregator pom
 )
-public class NextMojo extends AbstractMojo {
-
-    /**
-     * The Maven Project.
-     */
-    @Parameter(property = "project", required = true, readonly = true, defaultValue = "${project}")
-    private MavenProject project;
-
-    @Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
-    private List<MavenProject> projects;
-
-    /**
-     * <p>
-     * An optional build number. See the release goal for more information.
-     * </p>
-     */
-    @Parameter(property = "buildNumber")
-    private Long buildNumber;
-
-    /**
-     * See the release goal for more information.
-     */
-    @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
-    private List<String> modulesToRelease;
-
-    /**
-     * See the release goal for more information.
-     */
-    @Parameter(alias = "forceRelease", property = "forceRelease")
-    private List<String> modulesToForceRelease;
-
-    @Parameter(property = "disableSshAgent")
-    private boolean disableSshAgent;
+public class NextMojo extends BaseMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -86,12 +50,6 @@ public class NextMojo extends AbstractMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
-        }
-    }
-
-    private void configureJsch(Log log) {
-        if(!disableSshAgent) {
-            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log));
         }
     }
 
