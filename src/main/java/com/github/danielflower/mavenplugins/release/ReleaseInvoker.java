@@ -73,7 +73,7 @@ class ReleaseInvoker {
 		releaseProfiles = releaseProfilesOrNull;
 	}
 
-	final void skipTests(final boolean skipTests) {
+	final void setSkipTests(final boolean skipTests) {
 		this.skipTests = skipTests;
 	}
 

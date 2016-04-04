@@ -234,7 +234,7 @@ public class ReleaseInvokerTest {
 
 	@Test
 	public void skipTests() throws Exception {
-		releaseInvoker.skipTests(true);
+		releaseInvoker.setSkipTests(true);
 		releaseInvoker.runMavenBuild(reactor);
 		verify(request).setGoals(Mockito.argThat(new BaseMatcher<List<String>>() {
 
