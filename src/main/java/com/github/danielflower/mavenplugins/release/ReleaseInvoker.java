@@ -1,6 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
+import static java.lang.String.format;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,31 +18,37 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
 /**
- * @author rolandhauser
+ * @author Roland Hauser sourcepond@gmail.com
  *
  */
 class ReleaseInvoker {
+	static final String DEPLOY = "deploy";
+	static final String SKIP_TESTS = "-DskipTests=true";
 	private final Log log;
 	private final MavenProject project;
 	private final InvocationRequest request;
+	private final Invoker invoker;
+	private boolean skipTests;
 	private List<String> goals;
 	private List<String> modulesToRelease;
 	private List<String> releaseProfiles;
 
 	public ReleaseInvoker(final Log log, final MavenProject project) {
-		this(log, project, new DefaultInvocationRequest());
+		this(log, project, new DefaultInvocationRequest(), new DefaultInvoker());
 	}
 
-	
-	public ReleaseInvoker(final Log log, final MavenProject project, final InvocationRequest request) {
+	public ReleaseInvoker(final Log log, final MavenProject project, final InvocationRequest request,
+			final Invoker invoker) {
 		this.log = log;
 		this.project = project;
 		this.request = request;
+		this.invoker = invoker;
 	}
 
 	private List<String> getGoals() {
 		if (goals == null || goals.isEmpty()) {
-			goals = asList("deploy");
+			goals = new ArrayList<String>();
+			goals.add(DEPLOY);
 		}
 		return goals;
 	}
@@ -68,9 +74,7 @@ class ReleaseInvoker {
 	}
 
 	final void skipTests(final boolean skipTests) {
-		if (skipTests) {
-			getGoals().add("-DskipTests=true");
-		}
+		this.skipTests = skipTests;
 	}
 
 	final void setGlobalSettings(final File globalSettings) {
@@ -81,17 +85,17 @@ class ReleaseInvoker {
 		request.setUserSettingsFile(userSettings);
 	}
 
-	protected InvocationRequest createRequest() {
-		return new DefaultInvocationRequest();
-	}
-
 	public final void runMavenBuild(final Reactor reactor) throws MojoExecutionException {
-		final InvocationRequest request = createRequest();
 		request.setInteractive(false);
-
 		request.setShowErrors(true);
 		request.setDebug(log.isDebugEnabled());
+
+		final List<String> goals = getGoals();
+		if (skipTests) {
+			goals.add(SKIP_TESTS);
+		}
 		request.setGoals(getGoals());
+
 		final List<String> profiles = profilesToActivate();
 		request.setProfiles(profiles);
 
@@ -109,11 +113,10 @@ class ReleaseInvoker {
 		}
 		request.setProjects(changedModules);
 
-		final String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;
+		final String profilesInfo = profiles.isEmpty() ? "no profiles activated" : "profiles " + profiles;
 
-		log.info("About to run mvn " + goals + " with " + profilesInfo);
+		log.info(format("About to run mvn %s with %s", goals, profilesInfo));
 
-		final Invoker invoker = new DefaultInvoker();
 		try {
 			final InvocationResult result = invoker.execute(request);
 			if (result.getExitCode() != 0) {
