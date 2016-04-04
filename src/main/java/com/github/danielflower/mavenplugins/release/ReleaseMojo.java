@@ -14,12 +14,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.shared.invoker.DefaultInvocationRequest;
-import org.apache.maven.shared.invoker.DefaultInvoker;
-import org.apache.maven.shared.invoker.InvocationRequest;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.Invoker;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
@@ -76,6 +70,20 @@ public class ReleaseMojo extends BaseMojo {
     @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
     private boolean skipTests;
     
+	/**
+	 * Specifies a custom, user specific Maven settings file to be used during
+	 * the release build.
+	 */
+	@Parameter(alias = "userSettings")
+	private File userSettings;
+
+	/**
+	 * Specifies a custom, global Maven settings file to be used during the
+	 * release build.
+	 */
+	@Parameter(alias = "globalSettings")
+	private File globalSettings;
+    
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -99,7 +107,13 @@ public class ReleaseMojo extends BaseMojo {
             tagAndPushRepo(log, repo, proposedTags);
 
             try {
-                runMavenBuild(reactor);
+            	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
+            	invoker.setGlobalSettings(globalSettings);
+            	invoker.setUserSettings(userSettings);
+            	invoker.setGoals(goals);
+            	invoker.setModulesToRelease(modulesToRelease);
+            	invoker.setReleaseProfiles(releaseProfiles);
+                invoker.runMavenBuild(reactor);
                 revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
             } finally {
                 revertChanges(log, repo, changedFiles, false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
@@ -224,62 +238,6 @@ public class ReleaseMojo extends BaseMojo {
         log.error("");
         log.error("");
         throw new MojoExecutionException(terseMessage);
-    }
-
-    private void runMavenBuild(Reactor reactor) throws MojoExecutionException {
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setInteractive(false);
-
-        if (goals == null) {
-            goals = asList("deploy");
-        }
-        if (skipTests) {
-            goals.add("-DskipTests=true");
-        }
-        request.setShowErrors(true);
-        request.setDebug(getLog().isDebugEnabled());
-        request.setGoals(goals);
-        List<String> profiles = profilesToActivate();
-        request.setProfiles(profiles);
-
-        request.setAlsoMake(true);
-        List<String> changedModules = new ArrayList<String>();
-        for (ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
-            String modulePath = releasableModule.getRelativePathToModule();
-            boolean userExplicitlyWantsThisToBeReleased = modulesToRelease.contains(modulePath);
-            boolean userImplicitlyWantsThisToBeReleased = modulesToRelease == null || modulesToRelease.size() == 0;
-            if (userExplicitlyWantsThisToBeReleased || (userImplicitlyWantsThisToBeReleased && releasableModule.willBeReleased())) {
-                changedModules.add(modulePath);
-            }
-        }
-        request.setProjects(changedModules);
-
-        String profilesInfo = (profiles.size() == 0) ? "no profiles activated" : "profiles " + profiles;
-
-        getLog().info("About to run mvn " + goals + " with " + profilesInfo);
-
-        Invoker invoker = new DefaultInvoker();
-        try {
-            InvocationResult result = invoker.execute(request);
-            if (result.getExitCode() != 0) {
-                throw new MojoExecutionException("Maven execution returned code " + result.getExitCode());
-            }
-        } catch (MavenInvocationException e) {
-            throw new MojoExecutionException("Failed to build artifact", e);
-        }
-    }
-
-    private List<String> profilesToActivate() {
-        List<String> profiles = new ArrayList<String>();
-        if (releaseProfiles != null) {
-            for (String releaseProfile : releaseProfiles) {
-                profiles.add(releaseProfile);
-            }
-        }
-        for (Object activatedProfile : project.getActiveProfiles()) {
-            profiles.add(((org.apache.maven.model.Profile) activatedProfile).getId());
-        }
-        return profiles;
     }
 
 }
