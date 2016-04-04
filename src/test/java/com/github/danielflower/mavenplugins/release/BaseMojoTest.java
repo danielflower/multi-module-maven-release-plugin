@@ -61,7 +61,7 @@ public class BaseMojoTest {
 
 	@Test
 	public void configureJsch_PomIdentityFile() {
-		mojo.setIdentityFile(POM_IDENTITY_FILE);
+		mojo.setPrivateKey(POM_IDENTITY_FILE);
 		mojo.setPassphrase(POM_PASSPHRASE);
 		mojo.configureJsch(log);
 		assertIdentity(POM_IDENTITY_FILE, POM_PASSPHRASE);
@@ -77,7 +77,7 @@ public class BaseMojoTest {
 	@Test
 	public void configureJsch_CustomIdentityOverridesPom() {
 		mojo.setServerId(SERVER_ID);
-		mojo.setIdentityFile(POM_IDENTITY_FILE);
+		mojo.setPrivateKey(POM_IDENTITY_FILE);
 		mojo.configureJsch(log);
 		assertIdentity(POM_IDENTITY_FILE, SETTINGS_PASSPHRASE);
 	}

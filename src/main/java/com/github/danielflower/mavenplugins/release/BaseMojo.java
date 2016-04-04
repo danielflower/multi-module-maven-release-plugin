@@ -80,17 +80,17 @@ public abstract class BaseMojo extends AbstractMojo {
 	private String knownHosts;
 
 	/**
-	 * Specifies the identity file to be used.
+	 * Specifies the private key to be used.
 	 */
-	@Parameter(property = "identityFile")
-	private String identityFile;
+	@Parameter(property = "privateKey")
+	private String privateKey;
 
 	/**
 	 * Specifies the passphrase to be used with the identityFile specified.
 	 */
 	@Parameter(property = "passphrase")
 	private String passphrase;
-	
+
 	final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
@@ -98,36 +98,36 @@ public abstract class BaseMojo extends AbstractMojo {
 	final void setServerId(final String serverId) {
 		this.serverId = serverId;
 	}
-	
+
 	final void setKnownHosts(final String knownHosts) {
 		this.knownHosts = knownHosts;
 	}
 
-	final void setIdentityFile(final String identityFile) {
-		this.identityFile = identityFile;
+	final void setPrivateKey(final String privateKey) {
+		this.privateKey = privateKey;
 	}
 
 	final void setPassphrase(final String passphrase) {
 		this.passphrase = passphrase;
 	}
-	
+
 	final void disableSshAgent() {
 		disableSshAgent = true;
 	}
 
-	protected final void configureJsch(Log log) {
+	protected final void configureJsch(final Log log) {
 		if (!disableSshAgent) {
 			if (serverId != null) {
-				Server server = settings.getServer(serverId);
+				final Server server = settings.getServer(serverId);
 				if (server != null) {
-					identityFile = identityFile == null ? server.getPrivateKey() : identityFile;
+					privateKey = privateKey == null ? server.getPrivateKey() : privateKey;
 					passphrase = passphrase == null ? server.getPassphrase() : passphrase;
 				} else {
 					log.warn(format("No server configuration in Maven settings found with id %s", serverId));
 				}
 			}
 
-			JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, identityFile, passphrase));
+			JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, privateKey, passphrase));
 		}
 	}
 }
