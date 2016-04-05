@@ -1,3 +1,6 @@
+## Velocity treats double hashes as comments, which messes with markdown files. So $H can be used instead.
+#set( $H = '#' )
+
 Usage
 -----
 
@@ -88,7 +91,7 @@ SSH authentication
 Currently, only public key authentication is supported. By default, the plugin reads the private key from `~/.ssh/id_rsa`. 
 If it's required to use a private key file from another location, you have two opportunities to achieve this:
 
-### Add server section to your Maven settings
+$H$H$H Add server section to your Maven settings
 
 This is the preferred way. Firstly, add a server section to your Maven settings 
 like this (see <https://maven.apache.org/settings.html#Servers> for further information):
@@ -115,7 +118,7 @@ Secondly, specify the `serverId` in the plugin configuration
 	</plugin>	
 
 
-### Specify private key and optional passphrase in your POM
+$H$H$H Specify private key and optional passphrase in your POM
 
 This is the insecure way to specify your custom private key. Add following properties to your plugin configuration:
 
