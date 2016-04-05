@@ -48,6 +48,41 @@ To do this, use the `forceRelease` parameter. For example:
 
 In this case the `MyApp` module will be built, even if there where no changes found.
 
+Specify custom global/user Maven settings for release build
+-----------------------------------------------------------
+Sometimes it's necessary to specify custom Maven settings for the release build. This can be done with the optional plugin properties 
+**globalSettings** (defaults to `$M2_HOME/conf/settings.xml`) and **userSettings** (defaults to `${user.home}/.m2/settings.xml`). 
+These properties are used to specify the path to a custom Maven settings file:
+
+	<plugin>
+		...
+		<configuration>
+			<userSettings>/path/to/my/settings.xml</userSettings>
+		</configuration>
+	</plugin>	
+
+Or
+
+	<plugin>
+		...
+		<configuration>
+			<globalSettings>/path/to/global/settings.xml</globalSettings>
+		</configuration>
+	</plugin>
+	
+Or both
+
+	<plugin>
+		...
+		<configuration>
+			<globalSettings>/path/to/global/settings.xml</globalSettings>
+			<userSettings>/path/to/my/settings.xml</userSettings>
+		</configuration>
+	</plugin>
+	
+Note: properties from user settings always _override_ those derived from global settings, see <https://maven.apache.org/settings.html#Quick_Overview>
+for further information.
+
 SSH authentication
 ------------------
 Currently, only public key authentication is supported. By default, the plugin reads the private key from `~/.ssh/id_rsa`. 
