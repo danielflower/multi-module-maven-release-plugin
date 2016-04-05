@@ -1,12 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import java.io.File;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -22,6 +15,13 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.WriterFactory;
+
+import java.io.File;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
 
 public class PomUpdater {
 
@@ -173,7 +173,7 @@ public class PomUpdater {
                 log.error("Could not retrieve versions for artifact: " + artifact);
                 return null;
             }
-            versions.sort(new Comparator<ArtifactVersion>() {
+            Collections.sort(versions, new Comparator<ArtifactVersion>() {
                 @Override
                 public int compare(ArtifactVersion o1, ArtifactVersion o2) {
                     return o1.compareTo(o2);
