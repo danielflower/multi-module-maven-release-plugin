@@ -19,9 +19,12 @@ import org.codehaus.plexus.util.WriterFactory;
 import java.io.File;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PomUpdater {
 
@@ -92,6 +95,21 @@ public class PomUpdater {
         }
     }
 
+    /**
+     * Check whether the given dependencySnapshot is matched by the resolveSnapshotPattern (regular expression).
+     *
+     * @param dependencySnapshot a dependency string in a gradle like notation, i.e., groupId:artifactId:version
+     * @param resolveSnapshotPattern a regular expression pattern which is used in the plugin configuration, e.g.,
+     *                               ^org\.slf4j:slf4j-api:1\.7\..*
+     * @return if the dependency string matches the regex
+     */
+    protected static boolean snapshotResolves(String dependencySnapshot, String resolveSnapshotPattern) {
+        Pattern resolveSnapshotPatternAsPattern = Pattern.compile(resolveSnapshotPattern);
+        Matcher matcher = resolveSnapshotPatternAsPattern.matcher(dependencySnapshot);
+
+        return matcher.matches();
+    }
+
     private List<String> alterModel(MavenProject project, String newVersion) {
         Model originalModel = project.getOriginalModel();
         originalModel.setVersion(newVersion);
@@ -121,13 +139,13 @@ public class PomUpdater {
                 } catch (UnresolvedSnapshotDependencyException e) {
                     boolean resolveSnapshotFound = false;
                     if (null != resolveSnapshots) {
-                        String snapshot = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + version;
-                        log.debug(" Trying to resolve snapshot: '" + snapshot + "' with ...");
+                        String dependencySnapshot = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + version;
+                        log.debug(" Trying to resolve snapshot: '" + dependencySnapshot + "' with ...");
                         for (String resolveSnapshot : resolveSnapshots) {
                             log.debug(" ...: '" + resolveSnapshot + "'");
-                            if (snapshot.equals(resolveSnapshot)) {
+                            if (snapshotResolves(dependencySnapshot, resolveSnapshot)) {
                                 String resolvedVersion = resolveSnapshotDependency (dependency);
-                                log.debug(" Resolving snapshot dependency: '" + snapshot + "' to '" + resolvedVersion + "'");
+                                log.debug(" Resolving snapshot dependency: '" + dependencySnapshot + "' to '" + resolvedVersion + "'");
                                 if (null != resolvedVersion) {
                                     resolveSnapshotFound = true;
                                     dependency.setVersion(resolvedVersion);
