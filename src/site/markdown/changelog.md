@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+### 1.5.0
+
+* Added `allowSnapshotParents`, `allowSnapshotDependencies`, and `allowSnapshotPlugins` boolean options to allow modules to be released even if they have SNAPSHOT parents/dependencies/plugins (default false).
+* Added `allowedSnapshotParents`, `allowedSnapshotDependencies`, and `allowedSnapshotPlugins` list options to allow modules to specify which parents/dependencies/plugins are allowed to have SNAPSHOT versions (default empty). SNAPSHOT artifacts that are present in selected modules but not present in the appropriate list will cause the release to fail. These lists are overridden if their corresponding boolean options are true.
+
 ### 1.4.2
 
 * Fixed some bugs around change detection in modules where sometimes changes were not being detected.
