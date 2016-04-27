@@ -1,11 +1,8 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.IOException;
