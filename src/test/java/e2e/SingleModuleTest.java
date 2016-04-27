@@ -1,13 +1,10 @@
 package e2e;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.File;
@@ -22,16 +19,11 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 
-public class SingleModuleTest {
+public class SingleModuleTest extends E2ETest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
     final String expected = "1.0." + buildNumber;
     final TestProject testProject = TestProject.singleModuleProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
@@ -39,7 +31,7 @@ public class SingleModuleTest {
         assertThat(outputLines, oneOf(containsString("Going to release single-module " + expected)));
         assertThat(outputLines, oneOf(containsString("Hello from version " + expected + "!")));
 
-        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
+        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
 
         assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(), is(true));
     }

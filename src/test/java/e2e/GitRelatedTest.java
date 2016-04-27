@@ -1,14 +1,11 @@
 package e2e;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
 import scaffolding.Photocopier;
 import scaffolding.TestProject;
 
@@ -19,15 +16,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
-import static scaffolding.MvnRunner.runMaven;
 
-public class GitRelatedTest {
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException, IOException, GitAPIException {
-        MvnRunner.installReleasePluginToLocalRepo();
-
-    }
+public class GitRelatedTest extends E2ETest {
 
     @Test
     public void ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed() throws IOException {

@@ -20,9 +20,8 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
-import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-public class NestedModulesTest {
+public class NestedModulesTest extends E2ETest {
 
     final String expectedAggregatorVersion = "0.0.";
     final String expectedParentVersion = "1.2.3.";
@@ -34,11 +33,6 @@ public class NestedModulesTest {
     final String expectedServerModuleCVersion = "3.2.";
 
     final TestProject testProject = TestProject.nestedProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {

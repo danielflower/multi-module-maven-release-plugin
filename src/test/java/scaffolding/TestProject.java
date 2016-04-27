@@ -6,6 +6,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import e2e.E2ETest;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -14,7 +16,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
-import static scaffolding.MvnRunner.runMaven;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class TestProject {
@@ -39,23 +40,23 @@ public class TestProject {
      * Runs a mvn command against the local repo and returns the console output.
      */
     public List<String> mvn(String... arguments) throws IOException {
-        return runMaven(localDir, arguments);
+        return E2ETest.mvn.runMaven(localDir, arguments);
     }
 
     public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
-        return runMaven(localDir,
+        return E2ETest.mvn.runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
             "releaser:release");
     }
 
     public List<String> mvnReleaserNext(String buildNumber) throws IOException, InterruptedException {
-        return runMaven(localDir,
+        return E2ETest.mvn.runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
             "releaser:next");
     }
 
     public List<String> mvnRelease(String buildNumber, String moduleToRelease) throws IOException, InterruptedException {
-        return runMaven(localDir,
+        return E2ETest.mvn.runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
             "-DmodulesToRelease=" + moduleToRelease,
             "releaser:release");

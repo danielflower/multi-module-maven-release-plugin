@@ -22,21 +22,14 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
-import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
-import static scaffolding.MvnRunner.runMaven;
 
-public class IndependentVersionsTest {
+public class IndependentVersionsTest extends E2ETest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
     final String expectedParentVersion = "1.0." + buildNumber;
     final String expectedCoreVersion = "2.0." + buildNumber;
     final String expectedAppVersion = "3.2." + buildNumber;
     final TestProject testProject = TestProject.independentVersionsProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {

@@ -6,7 +6,6 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.IOException;
@@ -17,14 +16,13 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class HelpTest {
+public class HelpTest extends E2ETest {
 
     public static final String multi_module_release_help = "releaser:help";
     private static TestProject someProject;
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException, IOException, GitAPIException {
-        MvnRunner.installReleasePluginToLocalRepo();
         someProject = TestProject.singleModuleProject();
     }
 
@@ -40,7 +38,7 @@ public class HelpTest {
     }
 
     private List<String> mvn(String... commands) throws IOException {
-        return MvnRunner.runMaven(someProject.localDir, commands);
+        return runMaven(someProject.localDir, commands);
     }
 
     @Test
