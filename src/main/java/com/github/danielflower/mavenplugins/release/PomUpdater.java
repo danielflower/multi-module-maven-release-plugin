@@ -1,5 +1,11 @@
 package com.github.danielflower.mavenplugins.release;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -7,11 +13,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
+import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 
 public class PomUpdater {
 
@@ -26,7 +28,7 @@ public class PomUpdater {
     public UpdateResult updateVersion() {
         List<File> changedPoms = new ArrayList<File>();
         List<String> errors = new ArrayList<String>();
-        for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
+        for (ReleasableModule module : reactor) {
             try {
                 MavenProject project = module.getProject();
                 if (module.willBeReleased()) {

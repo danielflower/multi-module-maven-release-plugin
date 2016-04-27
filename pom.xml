@@ -6,7 +6,7 @@
 
     <groupId>com.github.danielflower.mavenplugins</groupId>
     <artifactId>multi-module-maven-release-plugin</artifactId>
-    <version>1.4-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
+    <version>1.5-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
 
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
@@ -18,6 +18,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.global.server>github</github.global.server>
         <jsch.agentproxy.version>0.0.9</jsch.agentproxy.version>
+        <maven.version>3.3.9</maven.version>
+        <maven-plugin-annotations.version>3.4</maven-plugin-annotations.version>
     </properties>
 
     <ciManagement>
@@ -78,31 +80,41 @@
             <artifactId>jsch.agentproxy.usocket-nc</artifactId>
             <version>${jsch.agentproxy.version}</version>
         </dependency>
-
+		<dependency>
+    		<groupId>javax.inject</groupId>
+    		<artifactId>javax.inject</artifactId>
+    		<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<version>${maven-plugin-annotations.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>2.2.1</version>
+            <version>${maven.version}</version>
         </dependency>
+        <dependency>
+        <scope>test</scope>
+    		<groupId>org.apache.maven</groupId>
+    		<artifactId>maven-artifact</artifactId>
+    		<version>${maven.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>2.2.1</version>
+            <version>${maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>2.2.1</version>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.maven</groupId>
           <artifactId>maven-settings</artifactId>
-          <version>2.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.3</version>
+          <version>${maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
@@ -211,10 +223,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>

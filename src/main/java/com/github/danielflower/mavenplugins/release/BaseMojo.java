@@ -1,16 +1,25 @@
 package com.github.danielflower.mavenplugins.release;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
+
+import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
+import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -91,6 +100,12 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "passphrase")
 	private String passphrase;
 
+	private final ReactorBuilderFactory builderFactory;
+
+	protected BaseMojo(final ReactorBuilderFactory builderFactory) {
+		this.builderFactory = builderFactory;
+	}
+
 	final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
@@ -113,6 +128,82 @@ public abstract class BaseMojo extends AbstractMojo {
 
 	final void disableSshAgent() {
 		disableSshAgent = true;
+	}
+
+	protected List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
+			throws GitAPIException, ValidationException {
+		final List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
+		for (final ReleasableModule module : reactor) {
+			if (!module.willBeReleased()) {
+				continue;
+			}
+			if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
+				final String tag = module.getTagName();
+				if (reactor.getLocalRepo().hasLocalTag(tag)) {
+					final String summary = "There is already a tag named " + tag + " in this repository.";
+					throw new ValidationException(summary,
+							asList(summary, "It is likely that this version has been released before.",
+									"Please try incrementing the build number and trying again."));
+				}
+
+				final AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(),
+						module.getBuildNumber());
+				tags.add(annotatedTag);
+			}
+		}
+		final List<String> matchingRemoteTags = reactor.getLocalRepo().remoteTagsFrom(tags);
+		if (matchingRemoteTags.size() > 0) {
+			final String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
+			final List<String> messages = new ArrayList<String>();
+			messages.add(summary);
+			for (final String matchingRemoteTag : matchingRemoteTags) {
+				messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
+			}
+			messages.add("Please try releasing again with a new build number.");
+			throw new ValidationException(summary, messages);
+		}
+		return tags;
+	}
+
+	private static String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws ValidationException {
+		if (scm == null) {
+			return null;
+		}
+		String remote = scm.getDeveloperConnection();
+		if (remote == null) {
+			remote = scm.getConnection();
+		}
+		if (remote == null) {
+			return null;
+		}
+		return GitHelper.scmUrlToRemote(remote);
+	}
+
+	protected void printBigErrorMessageAndThrow(final String terseMessage, final List<String> linesToLog)
+			throws MojoExecutionException {
+		final Log log = getLog();
+		log.error("");
+		log.error("");
+		log.error("");
+		log.error("************************************");
+		log.error("Could not execute the release plugin");
+		log.error("************************************");
+		log.error("");
+		log.error("");
+		for (final String line : linesToLog) {
+			log.error(line);
+		}
+		log.error("");
+		log.error("");
+		throw new MojoExecutionException(terseMessage);
+	}
+
+	protected final Reactor newReactor() throws ValidationException, MojoExecutionException, GitAPIException {
+		final ReactorBuilder builder = builderFactory.newBuilder();
+		return builder.setLog(getLog())
+				.setGitRepo(LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm())))
+				.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
+				.setModulesToForceRelease(modulesToForceRelease).build();
 	}
 
 	protected final void configureJsch(final Log log) {

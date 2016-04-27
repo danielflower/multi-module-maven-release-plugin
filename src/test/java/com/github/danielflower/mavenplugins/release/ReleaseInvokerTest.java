@@ -11,8 +11,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -27,6 +29,8 @@ import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -47,15 +51,19 @@ public class ReleaseInvokerTest {
 	private final List<String> goals = new LinkedList<String>();
 	private final List<String> modulesToRelease = new LinkedList<String>();
 	private final List<String> releaseProfiles = new LinkedList<String>();
-	private final List<ReleasableModule> modulesInBuildOrder = new LinkedList<ReleasableModule>();
+	@SuppressWarnings("unchecked")
+	private final Iterator<ReleasableModule> modulesInBuildOrder = mock(Iterator.class);
 	private final Reactor reactor = mock(Reactor.class);
 	private final ReleasableModule module = mock(ReleasableModule.class);
 	private final Profile activeProfile = mock(Profile.class);
 	private final ReleaseInvoker releaseInvoker = new ReleaseInvoker(log, project, request, invoker);
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
-		modulesInBuildOrder.add(module);
+		when(modulesInBuildOrder.next()).thenReturn(module).thenThrow(NoSuchElementException.class);
+		when(modulesInBuildOrder.hasNext()).thenReturn(true).thenReturn(false);
+		when(reactor.iterator()).thenReturn(modulesInBuildOrder);
 		when(log.isDebugEnabled()).thenReturn(true);
 		when(invoker.execute(request)).thenReturn(result);
 		when(activeProfile.getId()).thenReturn(ACTIVE_PROFILE_ID);
@@ -170,7 +178,6 @@ public class ReleaseInvokerTest {
 
 	@Test
 	public void runMavenBuild_UserExplicitlyWantsThisToBeReleased() throws Exception {
-		when(reactor.getModulesInBuildOrder()).thenReturn(modulesInBuildOrder);
 		modulesToRelease.add(MODULE_PATH);
 		releaseInvoker.setModulesToRelease(modulesToRelease);
 		releaseInvoker.runMavenBuild(reactor);
@@ -192,7 +199,6 @@ public class ReleaseInvokerTest {
 
 	@Test
 	public void runMavenBuild_UserImplicitlyWantsThisToBeReleased() throws Exception {
-		when(reactor.getModulesInBuildOrder()).thenReturn(modulesInBuildOrder);
 		when(module.willBeReleased()).thenReturn(true);
 		releaseInvoker.setModulesToRelease(modulesToRelease);
 		releaseInvoker.runMavenBuild(reactor);
@@ -214,7 +220,6 @@ public class ReleaseInvokerTest {
 
 	@Test
 	public void runMavenBuild_UserImplicitlyWantsThisToBeReleased_WillNotBeReleased() throws Exception {
-		when(reactor.getModulesInBuildOrder()).thenReturn(modulesInBuildOrder);
 		releaseInvoker.setModulesToRelease(modulesToRelease);
 		releaseInvoker.runMavenBuild(reactor);
 		verify(request).setProjects(Mockito.argThat(new BaseMatcher<List<String>>() {

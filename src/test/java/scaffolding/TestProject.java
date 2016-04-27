@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 public class TestProject {
 
-    public static final String PLUGIN_VERSION_FOR_TESTS = "1.4-SNAPSHOT";
+    public static final String PLUGIN_VERSION_FOR_TESTS = "1.5-SNAPSHOT";
     public final File originDir;
     public final Git origin;
 

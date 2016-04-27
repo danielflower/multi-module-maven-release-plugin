@@ -17,6 +17,10 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
+import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+
+
+
 /**
  * @author Roland Hauser sourcepond@gmail.com
  *
@@ -102,7 +106,7 @@ class ReleaseInvoker {
 		request.setAlsoMake(true);
 		final List<String> changedModules = new ArrayList<String>();
 		final List<String> modulesToRelease = getModulesToRelease();
-		for (final ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
+		for (final ReleasableModule releasableModule : reactor) {
 			final String modulePath = releasableModule.getRelativePathToModule();
 			final boolean userExplicitlyWantsThisToBeReleased = modulesToRelease.contains(modulePath);
 			final boolean userImplicitlyWantsThisToBeReleased = modulesToRelease.isEmpty();
