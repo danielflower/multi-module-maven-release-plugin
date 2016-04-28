@@ -4,8 +4,6 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
@@ -13,26 +11,27 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.AnnotatedTagFinder;
-import com.github.danielflower.mavenplugins.release.DiffDetector;
 import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.TreeWalkingDiffDetector;
 import com.github.danielflower.mavenplugins.release.ValidationException;
-import com.github.danielflower.mavenplugins.release.VersionName;
-import com.github.danielflower.mavenplugins.release.VersionNamer;
+import com.github.danielflower.mavenplugins.release.version.Version;
+import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 final class DefaultReactorBuilder implements ReactorBuilder {
+	private final VersionFactory versionFactory;
 	private Log log;
 	private LocalGitRepo gitRepo;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
 	private Long buildNumber;
 	private List<String> modulesToForceRelease;
+
+	public DefaultReactorBuilder(final VersionFactory versioningFactory) {
+		this.versionFactory = versioningFactory;
+	}
 
 	@Override
 	public ReactorBuilder setLog(final Log log) {
@@ -70,97 +69,80 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		return this;
 	}
 
-	@Override
-	public Reactor build() throws ValidationException, GitAPIException, MojoExecutionException {
-		final DefaultReactor reactor = new DefaultReactor(log, gitRepo);
-		final DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
-
-		final VersionNamer versionNamer = new VersionNamer();
-		for (final MavenProject project : projects) {
-			final String relativePathToModule = calculateModulePath(rootProject, project);
-			final String artifactId = project.getArtifactId();
-			final String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-			final List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(gitRepo.git,
-					artifactId, versionWithoutBuildNumber);
-
-			final Collection<Long> previousBuildNumbers = new ArrayList<Long>();
-			if (previousTagsForThisModule != null) {
-				for (final AnnotatedTag previousTag : previousTagsForThisModule) {
-					previousBuildNumbers.add(previousTag.buildNumber());
-				}
-			}
-
-			final Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(artifactId, versionWithoutBuildNumber);
-			previousBuildNumbers.addAll(remoteBuildNumbers);
-
-			final VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
-
-			boolean oneOfTheDependenciesHasChanged = false;
-			String changedDependency = null;
-			for (final ReleasableModule module : reactor) {
-				if (module.willBeReleased()) {
-					for (final Dependency dependency : project.getModel().getDependencies()) {
-						if (dependency.getGroupId().equals(module.getGroupId())
-								&& dependency.getArtifactId().equals(module.getArtifactId())) {
-							oneOfTheDependenciesHasChanged = true;
-							changedDependency = dependency.getArtifactId();
-							break;
-						}
-					}
-					if (project.getParent() != null && (project.getParent().getGroupId().equals(module.getGroupId())
-							&& project.getParent().getArtifactId().equals(module.getArtifactId()))) {
+	private String getChangedDependencyOrNull(final Reactor reactor, final MavenProject project) {
+		boolean oneOfTheDependenciesHasChanged = false;
+		String changedDependency = null;
+		for (final ReleasableModule module : reactor) {
+			if (module.willBeReleased()) {
+				for (final Dependency dependency : project.getModel().getDependencies()) {
+					if (dependency.getGroupId().equals(module.getGroupId())
+							&& dependency.getArtifactId().equals(module.getArtifactId())) {
 						oneOfTheDependenciesHasChanged = true;
-						changedDependency = project.getParent().getArtifactId();
+						changedDependency = dependency.getArtifactId();
 						break;
 					}
 				}
-				if (oneOfTheDependenciesHasChanged) {
+				if (project.getParent() != null && (project.getParent().getGroupId().equals(module.getGroupId())
+						&& project.getParent().getArtifactId().equals(module.getArtifactId()))) {
+					oneOfTheDependenciesHasChanged = true;
+					changedDependency = project.getParent().getArtifactId();
 					break;
 				}
 			}
-
-			String equivalentVersion = null;
-
-			if (modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
-				log.info(format("Releasing %s %s as we was asked to forced release.", artifactId,
-						newVersion.releaseVersion()));
-			} else if (oneOfTheDependenciesHasChanged) {
-				log.info(format("Releasing %s %s as %s has changed.", artifactId, newVersion.releaseVersion(),
-						changedDependency));
-			} else {
-				final AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(
-						previousTagsForThisModule, detector, project, relativePathToModule);
-				if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-					equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
-							+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
-					log.info(format("Will use version %s for %s as it has not been changed since that release.",
-							equivalentVersion, artifactId));
-				} else {
-					log.info(format("Will use version %s for %s as it has changed since the last release.",
-							newVersion.releaseVersion(), artifactId));
-				}
+			if (oneOfTheDependenciesHasChanged) {
+				break;
 			}
+		}
+		return changedDependency;
+	}
+
+	@Override
+	public Reactor build() throws ValidationException, GitAPIException, MojoExecutionException {
+		final DefaultReactor reactor = new DefaultReactor(log, gitRepo);
+
+		for (final MavenProject project : projects) {
+			final String artifactId = project.getArtifactId();
+
+			final Version version = versionFactory.newVersioning(gitRepo, project,
+					buildNumber);
+
+			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
+			final String relativePathToModule = calculateModulePath(rootProject, project);
+
+			final String equivalentVersion = logReleaseInfo(artifactId, version, changedDependencyOrNull,
+					relativePathToModule);
 
 			reactor.addReleasableModule(
-					new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule));
+					new ReleasableModule(project, version, equivalentVersion, relativePathToModule));
 		}
 
 		return reactor.finalizeReleaseVersions();
 	}
 
-	private Collection<Long> getRemoteBuildNumbers(final String artifactId, final String versionWithoutBuildNumber)
-			throws GitAPIException {
-		final Collection<Ref> remoteTagRefs = gitRepo.allRemoteTags();
-		final Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
-		final String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
-		for (final Ref remoteTagRef : remoteTagRefs) {
-			final String remoteTagName = remoteTagRef.getName();
-			final Long buildNumber = AnnotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
-			if (buildNumber != null) {
-				remoteBuildNumbers.add(buildNumber);
+	private String logReleaseInfo(final String artifactId, final Version versioning,
+			final String changedDependencyOrNull, final String relativePathToModule) throws MojoExecutionException {
+		String equivalentVersion = null;
+		if (modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
+			log.info(format("Releasing %s %s as we was asked to forced release.", artifactId,
+					versioning.releaseVersion()));
+		} else if (changedDependencyOrNull != null) {
+			log.info(format("Releasing %s %s as %s has changed.", artifactId, versioning.releaseVersion(),
+					changedDependencyOrNull));
+		} else {
+			final AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = versioning
+					.hasChangedSinceLastRelease(relativePathToModule);
+
+			if (previousTagThatIsTheSameAsHEADForThisModule != null) {
+				equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
+						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+				log.info(format("Will use version %s for %s as it has not been changed since that release.",
+						equivalentVersion, artifactId));
+			} else {
+				log.info(format("Will use version %s for %s as it has changed since the last release.",
+						versioning.releaseVersion(), artifactId));
 			}
 		}
-		return remoteBuildNumbers;
+		return equivalentVersion;
 	}
 
 	private static String calculateModulePath(final MavenProject rootProject, final MavenProject project)
@@ -180,32 +162,5 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			relativePathToModule = ".";
 		}
 		return relativePathToModule;
-	}
-
-	static AnnotatedTag hasChangedSinceLastRelease(final List<AnnotatedTag> previousTagsForThisModule,
-			final DiffDetector detector, final MavenProject project, final String relativePathToModule)
-					throws MojoExecutionException {
-		try {
-			if (previousTagsForThisModule.size() == 0)
-				return null;
-			final boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(),
-					previousTagsForThisModule);
-			return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
-		} catch (final Exception e) {
-			throw new MojoExecutionException(
-					format("Error while detecting whether or not %s has changed since the last release",
-							project.getArtifactId()),
-					e);
-		}
-	}
-
-	private static AnnotatedTag tagWithHighestBuildNumber(final List<AnnotatedTag> tags) {
-		AnnotatedTag cur = null;
-		for (final AnnotatedTag tag : tags) {
-			if (cur == null || tag.buildNumber() > cur.buildNumber()) {
-				cur = tag;
-			}
-		}
-		return cur;
 	}
 }

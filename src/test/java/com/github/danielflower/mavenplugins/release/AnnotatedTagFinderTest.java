@@ -59,12 +59,4 @@ public class AnnotatedTagFinderTest {
         assertThat(annotatedTags, containsInAnyOrder(tag1, tag2, tag3));
     }
 
-    @Test
-    public void versionNamerCaresNotForOrderOfTags() throws ValidationException {
-        VersionNamer versionNamer = new VersionNamer();
-        VersionName name = versionNamer.name("1.1.1", null, asList(1L, 3L, 2L));
-        assertThat(name.releaseVersion(), equalTo("1.1.1.4"));
-    }
-
-
 }

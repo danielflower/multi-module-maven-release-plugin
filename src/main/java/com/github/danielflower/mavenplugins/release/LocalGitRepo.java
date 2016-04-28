@@ -19,7 +19,7 @@ import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 
 public class LocalGitRepo {
 
-    public final Git git;
+    private final Git git;
     private final String remoteUrl;
     private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
     private Collection<Ref> remoteTags;
@@ -27,6 +27,10 @@ public class LocalGitRepo {
     LocalGitRepo(Git git, String remoteUrl) {
         this.git = git;
         this.remoteUrl = remoteUrl;
+    }
+    
+    public Git getGit() {
+    	return git;
     }
 
     public void errorIfNotClean() throws ValidationException {

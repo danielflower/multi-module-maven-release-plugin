@@ -4,8 +4,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static scaffolding.ReleasableModuleBuilder.aModule;
+
+import java.util.Iterator;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Assert;
@@ -15,7 +20,7 @@ import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
 
-public class ReactorTest {
+public class DefaultReactorTest {
 	private final LocalGitRepo localRepo = mock(LocalGitRepo.class);
 	private final Log log = mock(Log.class);
 	private final DefaultReactor reactor = new DefaultReactor(log, localRepo);
@@ -47,5 +52,31 @@ public class ReactorTest {
 		} catch (final UnresolvedSnapshotDependencyException e) {
 			assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty:1.0-SNAPSHOT"));
 		}
+	}
+
+	@Test
+	public void verifyGetLocalRepo() {
+		assertSame(localRepo, reactor.getLocalRepo());
+	}
+
+	@Test
+	public void finalizeReleaseVersionsWhenReleasableModuleIsAvailable() {
+		final ReleasableModule willBeReleased = mock(ReleasableModule.class);
+		when(willBeReleased.willBeReleased()).thenReturn(true);
+		reactor.addReleasableModule(willBeReleased);
+		final Iterator<ReleasableModule> modules = reactor.finalizeReleaseVersions().iterator();
+		assertSame(willBeReleased, modules.next());
+		assertFalse(modules.hasNext());
+	}
+
+	@Test
+	public void finalizeReleaseVersionsWhenNoReleasableModuleHasBeenAdded() {
+		final ReleasableModule willNotBeReleased = mock(ReleasableModule.class);
+		final ReleasableModule willBeReleased = mock(ReleasableModule.class);
+		when(willNotBeReleased.createReleasableVersion()).thenReturn(willBeReleased);
+		reactor.addReleasableModule(willNotBeReleased);
+		final Iterator<ReleasableModule> modules = reactor.finalizeReleaseVersions().iterator();
+		assertSame(willBeReleased, modules.next());
+		assertFalse(modules.hasNext());
 	}
 }
