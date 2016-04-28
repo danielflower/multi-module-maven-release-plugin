@@ -36,7 +36,6 @@ public class MvnRunner {
 			assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
 
 			final InvocationRequest request = createRequest();
-			request.setDebug(true);
 			request.setGoals(Collections.singletonList("install"));
 			request.getProperties().setProperty("skipTests", "true");
 
