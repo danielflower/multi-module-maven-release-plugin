@@ -71,6 +71,18 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "disableSshAgent")
 	private boolean disableSshAgent;
 
+	/**
+	 * Specifies whether the release build should run with the "-X" switch.
+	 */
+	@Parameter(property = "debugEnabled")
+	protected boolean debugEnabled;
+
+	/**
+	 * Specifies whether the release build should run with the "-e" switch.
+	 */
+	@Parameter(property = "stacktraceEnabled")
+	protected boolean stacktraceEnabled;
+
 	@Parameter(defaultValue = "${settings}", readonly = true, required = true)
 	private Settings settings;
 

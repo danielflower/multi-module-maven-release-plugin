@@ -30,27 +30,23 @@ public class MvnRunner {
 
 	static {
 		try {
-			long start = System.currentTimeMillis();
+			final long start = System.currentTimeMillis();
 			System.out.println("Installing the plugin into the local repo");
 
 			assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
 
-			InvocationRequest request = new DefaultInvocationRequest();
-			request.setLocalRepositoryDirectory(createDirectories(LOCAL_MAVEN_REPO).toFile());
+			final InvocationRequest request = createRequest();
 			request.setDebug(true);
 			request.setGoals(Collections.singletonList("install"));
+			request.getProperties().setProperty("skipTests", "true");
 
-			Properties props = new Properties();
-			props.setProperty("skipTests", "true");
-			request.setProperties(props);
-
-			Invoker invoker = new DefaultInvoker();
-			CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+			final Invoker invoker = new DefaultInvoker();
+			final CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
 			invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-			InvocationResult result = invoker.execute(request);
+			final InvocationResult result = invoker.execute(request);
 
 			if (result.getExitCode() != 0) {
-				for (String line : logOutput.getLines()) {
+				for (final String line : logOutput.getLines()) {
 					System.out.println("        " + line);
 				}
 			}
@@ -58,30 +54,40 @@ public class MvnRunner {
 			assertThat("Exit code from running mvn install on this project", result.getExitCode(), is(0));
 			System.out.println("Finished installing the plugin into the local repo in "
 					+ (System.currentTimeMillis() - start) + "ms");
-		} catch (Exception th) {
+		} catch (final Exception th) {
 			th.printStackTrace();
 			throw new InstantiationError(th.getMessage());
 		}
 	}
 
-	public List<String> runMaven(File workingDir, String... arguments) throws IOException {
-		InvocationRequest request = new DefaultInvocationRequest();
-		request.setLocalRepositoryDirectory(LOCAL_MAVEN_REPO.toFile());
+	private static InvocationRequest createRequest() throws IOException {
+		final InvocationRequest request = new DefaultInvocationRequest();
+		request.setLocalRepositoryDirectory(createDirectories(LOCAL_MAVEN_REPO).toFile());
+		final Properties props = new Properties();
+		props.setProperty("stacktraceEnabled", "true");
+		props.setProperty("localMavenRepo", LOCAL_MAVEN_REPO.toString());
+		request.setProperties(props);
+		return request;
+	}
+
+	public List<String> runMaven(final File workingDir, final String... arguments) throws IOException {
+		final InvocationRequest request = createRequest();
+
 		request.setGoals(asList(arguments));
 		request.setBaseDirectory(workingDir);
 
-		Invoker invoker = new DefaultInvoker();
-		CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+		final Invoker invoker = new DefaultInvoker();
+		final CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
 		invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
 
 		int exitCode;
 		try {
-			InvocationResult result = invoker.execute(request);
+			final InvocationResult result = invoker.execute(request);
 			exitCode = result.getExitCode();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MavenExecutionException(1, logOutput.getLines());
 		}
-		List<String> output = logOutput.getLines();
+		final List<String> output = logOutput.getLines();
 
 		if (exitCode != 0) {
 			throw new MavenExecutionException(exitCode, output);
@@ -90,29 +96,32 @@ public class MvnRunner {
 		return output;
 	}
 
-	public void assertArtifactInLocalRepo(String groupId, String artifactId, String version)
+	public void assertArtifactInLocalRepo(final String groupId, final String artifactId, final String version)
 			throws IOException, MavenInvocationException {
-		InvocationRequest request = new DefaultInvocationRequest();
-		request.setLocalRepositoryDirectory(LOCAL_MAVEN_REPO.toFile());
-		request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.8:resolve"));
+		final String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
+		final InvocationRequest request = createRequest();
+		request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.10:get"));
 
-		Invoker invoker = new DefaultInvoker();
-		CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+		final Properties props = new Properties();
+		props.setProperty("artifact", artifact);
+
+		request.setProperties(props);
+		final Invoker invoker = new DefaultInvoker();
+		final CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
 		invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-		InvocationResult result = invoker.execute(request);
+		final InvocationResult result = invoker.execute(request);
 
 		if (result.getExitCode() != 0) {
 			System.out.println();
 			System.out.println(
 					"There was a problem checking for the existence of the artifact. Here is the output of the mvn command:");
 			System.out.println();
-			for (String line : logOutput.getLines()) {
+			for (final String line : logOutput.getLines()) {
 				System.out.println(line);
 			}
 		}
 
-		assertThat(format("Could not find artifact %s:%s:%s:%s in repository", groupId, artifactId, version, "pom"),
-				result.getExitCode(), is(0));
+		assertThat(format("Could not find artifact %s:%s in repository", artifact, "pom"), result.getExitCode(), is(0));
 	}
 
 }
