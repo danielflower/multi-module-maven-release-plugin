@@ -1,10 +1,12 @@
 package e2e;
 
-import com.github.danielflower.mavenplugins.release.AnnotatedTag;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+
 import scaffolding.TestProject;
 
 import java.io.File;

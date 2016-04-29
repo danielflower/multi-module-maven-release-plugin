@@ -13,17 +13,15 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
-import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
 import com.github.danielflower.mavenplugins.release.version.Version;
 import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 final class DefaultReactorBuilder implements ReactorBuilder {
 	private final VersionFactory versionFactory;
 	private Log log;
-	private LocalGitRepo gitRepo;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
 	private Long buildNumber;
@@ -36,12 +34,6 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	@Override
 	public ReactorBuilder setLog(final Log log) {
 		this.log = log;
-		return this;
-	}
-
-	@Override
-	public ReactorBuilder setGitRepo(final LocalGitRepo gitRepo) {
-		this.gitRepo = gitRepo;
 		return this;
 	}
 
@@ -98,13 +90,12 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 
 	@Override
 	public Reactor build() throws ValidationException, GitAPIException, MojoExecutionException {
-		final DefaultReactor reactor = new DefaultReactor(log, gitRepo);
+		final DefaultReactor reactor = new DefaultReactor(log);
 
 		for (final MavenProject project : projects) {
 			final String artifactId = project.getArtifactId();
 
-			final Version version = versionFactory.newVersioning(gitRepo, project,
-					buildNumber);
+			final Version version = versionFactory.newVersioning(project, buildNumber);
 
 			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 			final String relativePathToModule = calculateModulePath(rootProject, project);

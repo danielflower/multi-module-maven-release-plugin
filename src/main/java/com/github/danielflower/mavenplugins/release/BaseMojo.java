@@ -6,7 +6,6 @@ import static java.util.Arrays.asList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -20,6 +19,8 @@ import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -114,8 +115,12 @@ public abstract class BaseMojo extends AbstractMojo {
 
 	private final ReactorBuilderFactory builderFactory;
 
-	protected BaseMojo(final ReactorBuilderFactory builderFactory) {
+	protected final SCMRepository repository;
+
+	protected BaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository)
+			throws ValidationException {
 		this.builderFactory = builderFactory;
+		this.repository = repository;
 	}
 
 	final void setSettings(final Settings settings) {
@@ -151,7 +156,7 @@ public abstract class BaseMojo extends AbstractMojo {
 			}
 			if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
 				final String tag = module.getTagName();
-				if (reactor.getLocalRepo().hasLocalTag(tag)) {
+				if (repository.hasLocalTag(tag)) {
 					final String summary = "There is already a tag named " + tag + " in this repository.";
 					throw new ValidationException(summary,
 							asList(summary, "It is likely that this version has been released before.",
@@ -163,7 +168,7 @@ public abstract class BaseMojo extends AbstractMojo {
 				tags.add(annotatedTag);
 			}
 		}
-		final List<String> matchingRemoteTags = reactor.getLocalRepo().remoteTagsFrom(tags);
+		final List<String> matchingRemoteTags = repository.remoteTagsFrom(tags);
 		if (matchingRemoteTags.size() > 0) {
 			final String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
 			final List<String> messages = new ArrayList<String>();
@@ -175,20 +180,6 @@ public abstract class BaseMojo extends AbstractMojo {
 			throw new ValidationException(summary, messages);
 		}
 		return tags;
-	}
-
-	private static String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws ValidationException {
-		if (scm == null) {
-			return null;
-		}
-		String remote = scm.getDeveloperConnection();
-		if (remote == null) {
-			remote = scm.getConnection();
-		}
-		if (remote == null) {
-			return null;
-		}
-		return GitHelper.scmUrlToRemote(remote);
 	}
 
 	protected void printBigErrorMessageAndThrow(final String terseMessage, final List<String> linesToLog)
@@ -212,9 +203,7 @@ public abstract class BaseMojo extends AbstractMojo {
 
 	protected final Reactor newReactor() throws ValidationException, MojoExecutionException, GitAPIException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
-		return builder.setLog(getLog())
-				.setGitRepo(LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm())))
-				.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
+		return builder.setLog(getLog()).setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
 				.setModulesToForceRelease(modulesToForceRelease).build();
 	}
 

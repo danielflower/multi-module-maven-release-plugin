@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import com.github.danielflower.mavenplugins.release.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
 
 public interface Version {
 

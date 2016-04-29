@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.scm;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -9,6 +9,8 @@ import org.eclipse.jgit.revwalk.RevTag;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.github.danielflower.mavenplugins.release.Guard;
 
 import java.io.IOException;
 

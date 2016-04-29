@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,51 +21,56 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
  * @author rolandhauser
  *
  */
 public class DefaultVersionTest {
-	private final LocalGitRepo gitRepo = mock(LocalGitRepo.class);
+	private static final String ARTIFACT_ID = "anyArtifactId";
+	private final SCMRepository gitRepo = mock(SCMRepository.class);
 	private final Git git = mock(Git.class);
 	private final ListTagCommand cmd = mock(ListTagCommand.class);
 	private final MavenProject project = mock(MavenProject.class);
 
 	@Before
 	public void setup() throws GitAPIException {
+		when(project.getArtifactId()).thenReturn(ARTIFACT_ID);
 		final List<Ref> ref = Collections.emptyList();
 		when(cmd.call()).thenReturn(ref);
 		when(git.tagList()).thenReturn(cmd);
-		when(gitRepo.getGit()).thenReturn(git);
 	}
 
 	@Test
 	public void versionNamerCaresNotForOrderOfTags() throws Exception {
-		final Version version = new DefaultVersion(gitRepo, project, "1.1.1", null, asList(1L, 3L, 2L));
+		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.1.1")).thenReturn(asList(1L, 3L, 2L));
+		final Version version = new DefaultVersion(gitRepo, project, "1.1.1", null);
 		assertThat(version.releaseVersion(), equalTo("1.1.1.4"));
 	}
 
 	@Test
 	public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
 		when(project.getVersion()).thenReturn("1.0-SNAPSHOT");
-		final Version version = new DefaultVersion(gitRepo, project, "1.0", 123L, null);
+		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.0")).thenReturn(Collections.<Long> emptyList());
+		final Version version = new DefaultVersion(gitRepo, project, "1.0", 123L);
 		assertEquals(version.releaseVersion(), "1.0.123");
 	}
 
 	@Test
 	public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsed() throws Exception {
 		when(project.getVersion()).thenReturn("1.0-SNAPSHOT");
-		final Version version = new DefaultVersion(gitRepo, project, "1.0", null, new ArrayList<Long>());
+		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.0")).thenReturn(Collections.<Long> emptyList());
+		final Version version = new DefaultVersion(gitRepo, project, "1.0", null);
 		assertEquals("1.0.0", version.releaseVersion());
 	}
 
 	@Test
 	public void ifTheBuildNumberIsNullButThereIsAPreviousBuildNumbersThenThatValueIsIncremented() throws Exception {
 		when(project.getVersion()).thenReturn("1.0-SNAPSHOT");
-		final Version version = new DefaultVersion(gitRepo, project, "1.0", null, asList(9L, 10L, 8L));
+		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.0")).thenReturn(asList(9L, 10L, 8L));
+		final Version version = new DefaultVersion(gitRepo, project, "1.0", null);
 		assertEquals("1.0.11", version.releaseVersion());
 	}
 
@@ -83,7 +87,7 @@ public class DefaultVersionTest {
 			throws MojoExecutionException, GitAPIException {
 		try {
 			when(project.getVersion()).thenReturn(pomVersion);
-			new DefaultVersion(gitRepo, project, "1.0", buildNumber, null);
+			new DefaultVersion(gitRepo, project, "1.0", buildNumber);
 			throw new AssertionError("Did not throw an error");
 		} catch (final ValidationException ex) {
 			return ex.getMessages();

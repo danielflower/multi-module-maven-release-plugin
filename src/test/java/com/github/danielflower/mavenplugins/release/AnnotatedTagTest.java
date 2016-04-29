@@ -3,6 +3,9 @@ package com.github.danielflower.mavenplugins.release;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+
 import scaffolding.TestProject;
 
 import java.io.IOException;

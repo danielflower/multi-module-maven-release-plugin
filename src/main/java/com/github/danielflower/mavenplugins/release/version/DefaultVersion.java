@@ -5,7 +5,6 @@ import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -13,31 +12,27 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
-import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.AnnotatedTagFinder;
-import com.github.danielflower.mavenplugins.release.DiffDetector;
-import com.github.danielflower.mavenplugins.release.LocalGitRepo;
-import com.github.danielflower.mavenplugins.release.TreeWalkingDiffDetector;
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 final class DefaultVersion implements Version {
-	private final LocalGitRepo gitRepo;
+	private final SCMRepository gitRepo;
 	private final MavenProject project;
 	private final String versionWithoutBuildNumber;
 	private final List<AnnotatedTag> previousTagsForThisModule;
 	private final Collection<Long> remoteBuildNumbers;
 	private Long buildNumber;
 
-	DefaultVersion(final LocalGitRepo gitRepo, final MavenProject project, final String versionWithoutBuildNumber,
-			final Long buildNumber, final Collection<Long> remoteBuildNumbers)
-					throws MojoExecutionException, ValidationException, GitAPIException {
+	DefaultVersion(final SCMRepository gitRepo, final MavenProject project, final String versionWithoutBuildNumber,
+			final Long buildNumber) throws MojoExecutionException, ValidationException, GitAPIException {
 		this.gitRepo = gitRepo;
 		this.project = project;
 		this.buildNumber = buildNumber;
 		this.versionWithoutBuildNumber = versionWithoutBuildNumber;
-		this.remoteBuildNumbers = remoteBuildNumbers == null ? Collections.<Long> emptyList() : remoteBuildNumbers;
-		previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(gitRepo.getGit(), project.getArtifactId(),
-				versionWithoutBuildNumber);
+		this.remoteBuildNumbers = gitRepo.getRemoteBuildNumbers(project.getArtifactId(), versionWithoutBuildNumber);
+		previousTagsForThisModule = gitRepo.tagsForVersion(project.getArtifactId(), versionWithoutBuildNumber);
 
 		init();
 	}
@@ -87,7 +82,7 @@ final class DefaultVersion implements Version {
 			if (previousTagsForThisModule.size() == 0) {
 				return null;
 			}
-			final DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.getGit().getRepository());
+			final DiffDetector detector = gitRepo.newDiffDetector();
 			final boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(),
 					previousTagsForThisModule);
 			return hasChanged ? null : tagWithHighestBuildNumber();

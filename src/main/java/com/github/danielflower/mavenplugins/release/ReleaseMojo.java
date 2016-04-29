@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -22,6 +21,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
  * Releases the project.
@@ -106,8 +107,9 @@ public class ReleaseMojo extends BaseMojo {
 	private File localMavenRepo;
 
 	@Inject
-	public ReleaseMojo(final ReactorBuilderFactory builderFactory) {
-		super(builderFactory);
+	public ReleaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository)
+			throws ValidationException {
+		super(builderFactory, repository);
 	}
 
 	@Override
@@ -116,9 +118,7 @@ public class ReleaseMojo extends BaseMojo {
 
 		try {
 			configureJsch(log);
-
-			final LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
-			repo.errorIfNotClean();
+			repository.errorIfNotClean();
 
 			final Reactor reactor = newReactor();
 
@@ -132,7 +132,7 @@ public class ReleaseMojo extends BaseMojo {
 			// re-use a version that is already in Nexus
 			// and so fail. The downside is that failed builds result in tags
 			// being pushed.
-			tagAndPushRepo(log, repo, proposedTags);
+			tagAndPushRepo(log, proposedTags);
 
 			try {
 				final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
@@ -146,21 +146,21 @@ public class ReleaseMojo extends BaseMojo {
 				invoker.setDebugEnabled(debugEnabled);
 				invoker.setStacktraceEnabled(stacktraceEnabled);
 				invoker.runMavenBuild(reactor);
-				revertChanges(log, repo, changedFiles, true); // throw if you
-																// can't revert
-																// as that is
-																// the root
-																// problem
+				revertChanges(changedFiles, true); // throw if you
+													// can't revert
+													// as that is
+													// the root
+													// problem
 			} finally {
-				revertChanges(log, repo, changedFiles, false); // warn if you
-																// can't revert
-																// but keep
-																// throwing the
-																// original
-																// exception so
-																// the root
-																// cause isn't
-																// lost
+				revertChanges(changedFiles, false); // warn if you
+													// can't revert
+													// but keep
+													// throwing the
+													// original
+													// exception so
+													// the root
+													// cause isn't
+													// lost
 			}
 
 		} catch (final IOException e) {
@@ -179,47 +179,32 @@ public class ReleaseMojo extends BaseMojo {
 		}
 	}
 
-	private void tagAndPushRepo(final Log log, final LocalGitRepo repo, final List<AnnotatedTag> proposedTags)
-			throws GitAPIException {
+	private void tagAndPushRepo(final Log log, final List<AnnotatedTag> proposedTags) throws GitAPIException {
 		for (final AnnotatedTag proposedTag : proposedTags) {
 			log.info("About to tag the repository with " + proposedTag.name());
-			repo.tagRepoAndPush(proposedTag);
+			repository.tagRepoAndPush(proposedTag);
 		}
 	}
 
-	private static String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws ValidationException {
-		if (scm == null) {
-			return null;
-		}
-		String remote = scm.getDeveloperConnection();
-		if (remote == null) {
-			remote = scm.getConnection();
-		}
-		if (remote == null) {
-			return null;
-		}
-		return GitHelper.scmUrlToRemote(remote);
-	}
-
-	private static void revertChanges(final Log log, final LocalGitRepo repo, final List<File> changedFiles,
-			final boolean throwIfError) throws MojoExecutionException {
-		if (!repo.revertChanges(log, changedFiles)) {
+	private void revertChanges(final List<File> changedFiles, final boolean throwIfError)
+			throws IOException, MojoExecutionException {
+		if (!repository.revertChanges(getLog(), changedFiles)) {
 			final String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
 			if (throwIfError) {
 				throw new MojoExecutionException(message);
 			} else {
-				log.warn(message);
+				getLog().warn(message);
 			}
 		}
 	}
 
 	private List<File> updatePomsAndReturnChangedFiles(final Reactor reactor)
-			throws MojoExecutionException, ValidationException {
+			throws MojoExecutionException, ValidationException, IOException {
 		final PomUpdater pomUpdater = new PomUpdater(getLog(), reactor);
 		final PomUpdater.UpdateResult result = pomUpdater.updateVersion();
 		if (!result.success()) {
 			getLog().info("Going to revert changes because there was an error.");
-			reactor.getLocalRepo().revertChanges(getLog(), result.alteredPoms);
+			repository.revertChanges(getLog(), result.alteredPoms);
 			if (result.unexpectedException != null) {
 				throw new ValidationException("Unexpected exception while setting the release versions in the pom",
 						result.unexpectedException);

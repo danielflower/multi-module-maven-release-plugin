@@ -16,14 +16,12 @@ import org.apache.maven.plugin.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
 
 public class DefaultReactorTest {
-	private final LocalGitRepo localRepo = mock(LocalGitRepo.class);
 	private final Log log = mock(Log.class);
-	private final DefaultReactor reactor = new DefaultReactor(log, localRepo);
+	private final DefaultReactor reactor = new DefaultReactor(log);
 
 	@Test
 	public void canFindModulesByGroupAndArtifactName() throws Exception {
@@ -52,11 +50,6 @@ public class DefaultReactorTest {
 		} catch (final UnresolvedSnapshotDependencyException e) {
 			assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty:1.0-SNAPSHOT"));
 		}
-	}
-
-	@Test
-	public void verifyGetLocalRepo() {
-		assertSame(localRepo, reactor.getLocalRepo());
 	}
 
 	@Test

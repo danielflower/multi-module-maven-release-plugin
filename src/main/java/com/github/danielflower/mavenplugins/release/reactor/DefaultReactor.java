@@ -7,18 +7,15 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
-import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
 
 final class DefaultReactor implements Reactor {
 	private final List<ReleasableModule> modulesInBuildOrder = new LinkedList<ReleasableModule>();
 	private final Log log;
-	private final LocalGitRepo localRepo;
 
-	DefaultReactor(final Log log, final LocalGitRepo localRepo) {
+	DefaultReactor(final Log log) {
 		this.log = log;
-		this.localRepo = localRepo;
 	}
 
 	void addReleasableModule(final ReleasableModule module) {
@@ -44,11 +41,6 @@ final class DefaultReactor implements Reactor {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public LocalGitRepo getLocalRepo() {
-		return localRepo;
 	}
 
 	@Override

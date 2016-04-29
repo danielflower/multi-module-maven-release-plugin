@@ -12,8 +12,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.DiffDetector;
+import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
 
 // FIXME: This test should be moved to DefaultVersion
 public class DefaultReactorBuilderTest {

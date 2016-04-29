@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.scm;
 
 import java.io.IOException;
 import java.util.Collection;

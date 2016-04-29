@@ -1,12 +1,13 @@
 package scaffolding;
 
-import com.github.danielflower.mavenplugins.release.GitHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
+
+import com.github.danielflower.mavenplugins.release.scm.GitHelper;
 
 public class GitMatchers {
 

@@ -7,14 +7,11 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.github.danielflower.mavenplugins.release.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface ReactorBuilder {
 
 	ReactorBuilder setLog(Log log);
-
-	ReactorBuilder setGitRepo(LocalGitRepo gitRepo);
 
 	ReactorBuilder setRootProject(MavenProject rootProject);
 
