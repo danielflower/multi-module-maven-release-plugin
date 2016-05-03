@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,6 +18,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
 import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
@@ -106,10 +106,13 @@ public class ReleaseMojo extends BaseMojo {
 	@Parameter(property = "localMavenRepo")
 	private File localMavenRepo;
 
+	private final Updater pomUpdater;
+
 	@Inject
-	public ReleaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository)
-			throws ValidationException {
+	public ReleaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
+			final Updater pomUpdater) throws ValidationException {
 		super(builderFactory, repository);
+		this.pomUpdater = pomUpdater;
 	}
 
 	@Override
@@ -124,7 +127,7 @@ public class ReleaseMojo extends BaseMojo {
 
 			final List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
 
-			final List<File> changedFiles = updatePomsAndReturnChangedFiles(reactor);
+			final List<File> changedFiles = pomUpdater.updatePoms(getLog(), reactor);
 
 			// Do this before running the maven build in case the build uploads
 			// some artifacts and then fails. If it is
@@ -196,29 +199,5 @@ public class ReleaseMojo extends BaseMojo {
 				getLog().warn(message);
 			}
 		}
-	}
-
-	private List<File> updatePomsAndReturnChangedFiles(final Reactor reactor)
-			throws MojoExecutionException, ValidationException, IOException {
-		final PomUpdater pomUpdater = new PomUpdater(getLog(), reactor);
-		final PomUpdater.UpdateResult result = pomUpdater.updateVersion();
-		if (!result.success()) {
-			getLog().info("Going to revert changes because there was an error.");
-			repository.revertChanges(getLog(), result.alteredPoms);
-			if (result.unexpectedException != null) {
-				throw new ValidationException("Unexpected exception while setting the release versions in the pom",
-						result.unexpectedException);
-			} else {
-				final String summary = "Cannot release with references to snapshot dependencies";
-				final List<String> messages = new ArrayList<String>();
-				messages.add(summary);
-				messages.add("The following dependency errors were found:");
-				for (final String dependencyError : result.dependencyErrors) {
-					messages.add(" * " + dependencyError);
-				}
-				throw new ValidationException(summary, messages);
-			}
-		}
-		return result.alteredPoms;
 	}
 }

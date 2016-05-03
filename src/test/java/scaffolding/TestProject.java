@@ -20,7 +20,7 @@ import e2e.E2ETest;
 
 public class TestProject {
 
-	public static final String PLUGIN_VERSION_FOR_TESTS = "1.5-SNAPSHOT";
+	public static final String PLUGIN_VERSION_FOR_TESTS = "2.0-SNAPSHOT";
 	public final File originDir;
 	public final Git origin;
 
