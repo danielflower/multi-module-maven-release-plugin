@@ -30,8 +30,8 @@ public class UpdatePlugins extends Command {
 	}
 
 	private static boolean isMultiModuleReleasePlugin(final Plugin plugin) {
-		return plugin.getGroupId().equals("com.github.danielflower.mavenplugins")
-				&& plugin.getArtifactId().equals("multi-module-maven-release-plugin");
+		return "com.github.danielflower.mavenplugins".equals(plugin.getGroupId())
+				&& "multi-module-maven-release-plugin".equals(plugin.getArtifactId());
 	}
 
 }
