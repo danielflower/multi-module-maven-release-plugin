@@ -24,7 +24,6 @@ final class UpdateParent extends Command {
 		final MavenProject parent = project.getParent();
 
 		if (parent != null && isSnapshot(parent.getVersion())) {
-			final String searchingFrom = project.getArtifactId();
 			try {
 				final ReleasableModule parentBeingReleased = updateContext.getReactor().find(parent.getGroupId(),
 						parent.getArtifactId(), parent.getVersion());
@@ -32,7 +31,7 @@ final class UpdateParent extends Command {
 				updateContext.debug(" Parent %s rewritten to version %s", parentBeingReleased.getArtifactId(),
 						parentBeingReleased.getVersionToDependOn());
 			} catch (final UnresolvedSnapshotDependencyException e) {
-				updateContext.addError("The parent of %s is %s %s", searchingFrom, e.artifactId, e.version);
+				updateContext.addError("The parent of %s is %s %s", project.getArtifactId(), e.artifactId, e.version);
 			}
 		}
 	}

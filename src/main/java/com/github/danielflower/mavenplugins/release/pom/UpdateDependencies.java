@@ -25,7 +25,6 @@ final class UpdateDependencies extends Command {
 		for (final Dependency dependency : originalModel.getDependencies()) {
 			final String version = dependency.getVersion();
 			if (isSnapshot(version)) {
-				final String searchingFrom = project.getArtifactId();
 				try {
 					final ReleasableModule dependencyBeingReleased = updateContext.getReactor()
 							.find(dependency.getGroupId(), dependency.getArtifactId(), version);
@@ -33,7 +32,8 @@ final class UpdateDependencies extends Command {
 					updateContext.debug(" Dependency on %s rewritten to version %s",
 							dependencyBeingReleased.getArtifactId(), dependencyBeingReleased.getVersionToDependOn());
 				} catch (final UnresolvedSnapshotDependencyException e) {
-					updateContext.addError("%s references dependency %s %s", searchingFrom, e.artifactId, e.version);
+					updateContext.addError("%s references dependency %s %s", project.getArtifactId(), e.artifactId,
+							e.version);
 				}
 			} else {
 				updateContext.debug(" Dependency on %s kept at version %s", dependency.getArtifactId(),

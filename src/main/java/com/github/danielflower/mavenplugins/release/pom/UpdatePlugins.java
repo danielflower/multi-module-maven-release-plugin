@@ -17,13 +17,12 @@ public class UpdatePlugins extends Command {
 	@Override
 	public void alterModel(final Context updateContext) {
 		final MavenProject project = updateContext.getProject();
-		final String searchingFrom = project.getArtifactId();
 		for (final Plugin plugin : project.getModel().getBuild().getPlugins()) {
 			final String version = plugin.getVersion();
 			if (isSnapshot(version)) {
 				if (!isMultiModuleReleasePlugin(plugin)) {
-					updateContext.addError("%s references plugin %s %s", searchingFrom, plugin.getArtifactId(),
-							version);
+					updateContext.addError("%s references plugin %s %s", project.getArtifactId(),
+							plugin.getArtifactId(), version);
 				}
 			}
 		}
