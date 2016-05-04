@@ -1,5 +1,7 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -16,13 +18,13 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
  */
 @Named
 @Singleton
-final class UpdateDependencies extends Command {
+class UpdateDependencies extends Command {
 
 	@Override
-	public void alterModel(final Context updateContext) {
+	public final void alterModel(final Context updateContext) {
 		final MavenProject project = updateContext.getProject();
 		final Model originalModel = project.getOriginalModel();
-		for (final Dependency dependency : originalModel.getDependencies()) {
+		for (final Dependency dependency : determineDependencies(originalModel)) {
 			final String version = dependency.getVersion();
 			if (isSnapshot(version)) {
 				try {
@@ -40,5 +42,9 @@ final class UpdateDependencies extends Command {
 						dependency.getVersion());
 			}
 		}
+	}
+
+	protected List<Dependency> determineDependencies(final Model originalModel) {
+		return originalModel.getDependencies();
 	}
 }

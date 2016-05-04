@@ -123,6 +123,10 @@ public class TestProject {
 		return project("nested-project");
 	}
 
+	public static TestProject nestedProjectManagedDependencies() {
+		return project("nested-project-managed-dependencies");
+	}
+
 	public static TestProject moduleWithScmTag() {
 		return project("module-with-scm-tag");
 	}
