@@ -20,9 +20,10 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
 @Named
 @Singleton
 final class UpdateParent extends Command {
+	static final String ERROR_FORMAT = "The parent of %s is %s %s";
 
 	@Inject
-	protected UpdateParent(final Log log) {
+	UpdateParent(final Log log) {
 		super(log);
 	}
 
@@ -37,10 +38,10 @@ final class UpdateParent extends Command {
 				final ReleasableModule parentBeingReleased = updateContext.getReactor().find(parent.getGroupId(),
 						parent.getArtifactId(), parent.getVersion());
 				originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
-				log.debug(format(" Parent %s rewritten to version %s", parentBeingReleased.getArtifactId(),
+				log.debug(format(" Parent %s rewritten to version %s", parent.getArtifactId(),
 						parentBeingReleased.getVersionToDependOn()));
 			} catch (final UnresolvedSnapshotDependencyException e) {
-				updateContext.addError("The parent of %s is %s %s", project.getArtifactId(), e.artifactId, e.version);
+				updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, e.version);
 			}
 		}
 	}
