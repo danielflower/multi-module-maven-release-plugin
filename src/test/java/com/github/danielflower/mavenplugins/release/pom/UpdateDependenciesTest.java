@@ -30,13 +30,17 @@ public class UpdateDependenciesTest {
 	private static final String ANY_SNAPSHOT_VERSION = ANY_VERSION + "-SNAPSHOT";
 	private final Reactor reactor = mock(Reactor.class);
 	private final ReleasableModule module = mock(ReleasableModule.class);
-	private final Log log = mock(Log.class);
+	protected final Log log = mock(Log.class);
 	private final Context context = mock(Context.class);
 	private final MavenProject project = mock(MavenProject.class);
-	private final Model model = mock(Model.class);
+	protected final Model model = mock(Model.class);
 	private final Dependency dependency = mock(Dependency.class);
 	protected final List<Dependency> dependencies = asList(dependency);
-	private final UpdateDependencies cmd = new UpdateDependencies(log);
+	private final Command cmd = newCommand();
+
+	protected Command newCommand() {
+		return new UpdateDependencies(log);
+	}
 
 	@Before
 	public void setup() throws Exception {
