@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
+import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 
 public interface Updater {
@@ -17,7 +18,8 @@ public interface Updater {
 	 *            Reactor instance, must not be {@code null}
 	 * @return List of updated POM files.
 	 * @throws IOException
+	 * @throws ValidationException
 	 */
-	List<File> updatePoms(Log log, Reactor reactor) throws IOException;
+	List<File> updatePoms(Log log, Reactor reactor) throws IOException, ValidationException;
 
 }

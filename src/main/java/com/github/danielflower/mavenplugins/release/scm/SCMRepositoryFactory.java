@@ -20,7 +20,7 @@ final class SCMRepositoryFactory implements Provider<SCMRepository> {
 		SCMRepository repository;
 		try {
 			repository = new GitRepository(project);
-		} catch (final RuntimeException e) {
+		} catch (final Exception e) {
 			repository = (SCMRepository) newProxyInstance(getClass().getClassLoader(),
 					new Class<?>[] { SCMRepository.class }, new InstantiationFailedHandler(e));
 		}

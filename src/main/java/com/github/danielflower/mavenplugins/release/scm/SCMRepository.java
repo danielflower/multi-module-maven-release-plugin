@@ -15,17 +15,19 @@ public interface SCMRepository {
 
 	void errorIfNotClean() throws ValidationException;
 
-	List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws GitAPIException;
+	List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws ValidationException, GitAPIException;
 
-	boolean hasLocalTag(String tag) throws GitAPIException;
+	boolean hasLocalTag(String tag) throws ValidationException, GitAPIException;
 
-	void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException;
+	void tagRepoAndPush(AnnotatedTag tag) throws ValidationException, GitAPIException;
 
-	boolean revertChanges(Log log, List<File> changedFiles) throws IOException;
+	boolean revertChanges(Log log, List<File> changedFiles) throws ValidationException, IOException;
 
-	Collection<Long> getRemoteBuildNumbers(String artifactId, String versionWithoutBuildNumber) throws GitAPIException;
+	Collection<Long> getRemoteBuildNumbers(String artifactId, String versionWithoutBuildNumber)
+			throws ValidationException, GitAPIException;
 
-	List<AnnotatedTag> tagsForVersion(String module, String versionWithoutBuildNumber) throws MojoExecutionException;
+	List<AnnotatedTag> tagsForVersion(String module, String versionWithoutBuildNumber)
+			throws ValidationException, MojoExecutionException;
 
-	DiffDetector newDiffDetector();
+	DiffDetector newDiffDetector() throws ValidationException;
 }

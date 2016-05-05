@@ -35,7 +35,7 @@ final class GitRepository implements SCMRepository {
 											// this bool prevents
 	private Collection<Ref> remoteTags;
 
-	GitRepository(final MavenProject project) {
+	GitRepository(final MavenProject project) throws ValidationException {
 		final File gitDir = new File(".");
 		try {
 			git = Git.open(gitDir);
@@ -201,6 +201,7 @@ final class GitRepository implements SCMRepository {
 		if (hasReverted) {
 			return true;
 		}
+		log.info("Going to revert changes because there was an error.");
 		boolean hasErrors = false;
 		final File workTree = workingDir();
 		for (final File changedFile : changedFiles) {

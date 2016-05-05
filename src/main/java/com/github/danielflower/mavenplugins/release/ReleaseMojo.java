@@ -182,7 +182,8 @@ public class ReleaseMojo extends BaseMojo {
 		}
 	}
 
-	private void tagAndPushRepo(final Log log, final List<AnnotatedTag> proposedTags) throws GitAPIException {
+	private void tagAndPushRepo(final Log log, final List<AnnotatedTag> proposedTags)
+			throws ValidationException, GitAPIException {
 		for (final AnnotatedTag proposedTag : proposedTags) {
 			log.info("About to tag the repository with " + proposedTag.name());
 			repository.tagRepoAndPush(proposedTag);
@@ -190,7 +191,7 @@ public class ReleaseMojo extends BaseMojo {
 	}
 
 	private void revertChanges(final List<File> changedFiles, final boolean throwIfError)
-			throws IOException, MojoExecutionException {
+			throws IOException, ValidationException, MojoExecutionException {
 		if (!repository.revertChanges(getLog(), changedFiles)) {
 			final String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
 			if (throwIfError) {

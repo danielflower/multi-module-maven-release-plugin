@@ -4,9 +4,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 final class InstantiationFailedHandler implements InvocationHandler {
-	private final RuntimeException exception;
+	private final Exception exception;
 
-	InstantiationFailedHandler(final RuntimeException exception) {
+	InstantiationFailedHandler(final Exception exception) {
 		this.exception = exception;
 	}
 
