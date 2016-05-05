@@ -16,7 +16,7 @@ public class ValidationException extends Exception {
 	}
 
 	public ValidationException(final String summary, final Throwable error) {
-		super(summary);
+		super(summary, error);
 		this.messages = Arrays.asList(summary, "" + error);
 	}
 

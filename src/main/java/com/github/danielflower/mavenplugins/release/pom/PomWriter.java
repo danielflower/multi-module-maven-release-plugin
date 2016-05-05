@@ -13,7 +13,6 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -28,12 +27,15 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 @Named
 @Singleton
 class PomWriter {
+	static final String EXCEPTION_MESSAGE = "Unexpected exception while setting the release versions in the pom";
 	private final Collection<MavenProject> changedProjects = new LinkedList<>();
 	private final SCMRepository repository;
+	private final MavenXpp3Writer writer;
 	private final Log log;
 
-	PomWriter(final SCMRepository repository, final Log log) {
+	PomWriter(final SCMRepository repository, final MavenXpp3Writer writer, final Log log) {
 		this.repository = repository;
+		this.writer = writer;
 		this.log = log;
 	}
 
@@ -45,16 +47,9 @@ class PomWriter {
 		final List<File> changedFiles = new LinkedList<>();
 		try {
 			for (final MavenProject project : changedProjects) {
-				final File pom = project.getFile().getCanonicalFile();
-				changedFiles.add(pom);
-				final Writer fileWriter = new FileWriter(pom);
-
-				final Model originalModel = project.getOriginalModel();
-				try {
-					final MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-					pomWriter.write(fileWriter, originalModel);
-				} finally {
-					fileWriter.close();
+				changedFiles.add(project.getFile());
+				try (final Writer fileWriter = new FileWriter(project.getFile())) {
+					writer.write(fileWriter, project.getOriginalModel());
 				}
 			}
 		} catch (final IOException e) {
@@ -63,7 +58,7 @@ class PomWriter {
 			} catch (final IOException revertException) {
 				log.error(format("Reverting changed POMs %s failed!", changedFiles), revertException);
 			}
-			throw new ValidationException("Unexpected exception while setting the release versions in the pom", e);
+			throw new ValidationException(EXCEPTION_MESSAGE, e);
 		}
 
 		return changedFiles;
