@@ -3,15 +3,12 @@ package com.github.danielflower.mavenplugins.release.reactor;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface ReactorBuilder {
-
-	ReactorBuilder setLog(Log log);
 
 	ReactorBuilder setRootProject(MavenProject rootProject);
 

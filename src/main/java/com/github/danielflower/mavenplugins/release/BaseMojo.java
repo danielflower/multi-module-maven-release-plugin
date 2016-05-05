@@ -16,6 +16,7 @@ import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
+import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
@@ -116,11 +117,13 @@ public abstract class BaseMojo extends AbstractMojo {
 	private final ReactorBuilderFactory builderFactory;
 
 	protected final SCMRepository repository;
+	private final LogHolder logHolder;
 
-	protected BaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository)
-			throws ValidationException {
+	protected BaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
+			final LogHolder logHolder) throws ValidationException {
 		this.builderFactory = builderFactory;
 		this.repository = repository;
+		this.logHolder = logHolder;
 	}
 
 	final void setSettings(final Settings settings) {
@@ -203,11 +206,11 @@ public abstract class BaseMojo extends AbstractMojo {
 
 	protected final Reactor newReactor() throws ValidationException, MojoExecutionException, GitAPIException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
-		return builder.setLog(getLog()).setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
+		return builder.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
 				.setModulesToForceRelease(modulesToForceRelease).build();
 	}
 
-	protected final void configureJsch(final Log log) {
+	protected final void configureJsch() {
 		if (!disableSshAgent) {
 			if (serverId != null) {
 				final Server server = settings.getServer(serverId);
@@ -215,11 +218,18 @@ public abstract class BaseMojo extends AbstractMojo {
 					privateKey = privateKey == null ? server.getPrivateKey() : privateKey;
 					passphrase = passphrase == null ? server.getPassphrase() : passphrase;
 				} else {
-					log.warn(format("No server configuration in Maven settings found with id %s", serverId));
+					getLog().warn(format("No server configuration in Maven settings found with id %s", serverId));
 				}
 			}
 
-			JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, privateKey, passphrase));
+			JschConfigSessionFactory
+					.setInstance(new SshAgentSessionFactory(getLog(), knownHosts, privateKey, passphrase));
 		}
+	}
+
+	@Override
+	public final void setLog(final Log log) {
+		super.setLog(log);
+		logHolder.setLog(log);
 	}
 }

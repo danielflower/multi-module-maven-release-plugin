@@ -27,6 +27,7 @@ import org.eclipse.jgit.lib.Repository;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
 final class GitRepository implements SCMRepository {
+	private final Log log;
 	private Git git;
 	private final String remoteUrl;
 	private boolean hasReverted = false; // A premature optimisation? In
@@ -35,7 +36,8 @@ final class GitRepository implements SCMRepository {
 											// this bool prevents
 	private Collection<Ref> remoteTags;
 
-	GitRepository(final MavenProject project) throws ValidationException {
+	GitRepository(final Log log, final MavenProject project) throws ValidationException {
+		this.log = log;
 		final File gitDir = new File(".");
 		try {
 			git = Git.open(gitDir);
@@ -62,7 +64,8 @@ final class GitRepository implements SCMRepository {
 		remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
 	}
 
-	GitRepository(final Git git, final String remoteUrl) {
+	GitRepository(final Log log, final Git git, final String remoteUrl) {
+		this.log = log;
 		this.git = git;
 		this.remoteUrl = remoteUrl;
 	}
@@ -197,7 +200,7 @@ final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public boolean revertChanges(final Log log, final List<File> changedFiles) throws IOException {
+	public boolean revertChanges(final List<File> changedFiles) throws IOException {
 		if (hasReverted) {
 			return true;
 		}

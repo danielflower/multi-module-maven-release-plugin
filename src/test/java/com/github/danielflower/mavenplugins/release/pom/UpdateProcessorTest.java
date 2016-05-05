@@ -49,19 +49,19 @@ public class UpdateProcessorTest {
 	private final List<Command> commands = asList(command);
 	private final MavenProject project = mock(MavenProject.class);
 	private final Model originalModel = mock(Model.class);
-	private final UpdateProcessor processor = new UpdateProcessor(contextFactory, writerFactory, commands);
+	private final UpdateProcessor processor = new UpdateProcessor(contextFactory, writerFactory, log, commands);
 
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws ValidationException {
 		// Setup context factory
-		when(contextFactory.newContext(log, reactor, project, ANY_VERSION)).thenReturn(context);
+		when(contextFactory.newContext(reactor, project, ANY_VERSION)).thenReturn(context);
 
 		// Setup context
 		when(context.getErrors()).thenReturn(Collections.<String> emptyList());
 
 		// Setup writer factory
-		when(writerFactory.newWriter(log)).thenReturn(writer);
+		when(writerFactory.newWriter()).thenReturn(writer);
 
 		// Setup writer
 		when(writer.writePoms()).thenReturn(Arrays.asList(ANY_POM));
@@ -84,7 +84,7 @@ public class UpdateProcessorTest {
 
 	@Test
 	public void updatePomsCompletedSuccessfully() throws Exception {
-		final List<File> updatedPoms = processor.updatePoms(log, reactor);
+		final List<File> updatedPoms = processor.updatePoms(reactor);
 		assertEquals(1, updatedPoms.size());
 		assertSame(ANY_POM, updatedPoms.get(0));
 
@@ -99,7 +99,7 @@ public class UpdateProcessorTest {
 	public void updatePomsDependencyErrorsOccurred() throws Exception {
 		when(context.getErrors()).thenReturn(asList(ANY_ERROR));
 		try {
-			processor.updatePoms(log, reactor);
+			processor.updatePoms(reactor);
 			fail("Exception expected");
 		} catch (final ValidationException e) {
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, e.getMessage());
@@ -118,7 +118,7 @@ public class UpdateProcessorTest {
 	@Test
 	public void updatePomsModuleWillNotBeReleased() throws Exception {
 		when(module.willBeReleased()).thenReturn(false);
-		final List<File> updatedPoms = processor.updatePoms(log, reactor);
+		final List<File> updatedPoms = processor.updatePoms(reactor);
 		assertEquals(1, updatedPoms.size());
 		assertSame(ANY_POM, updatedPoms.get(0));
 

@@ -84,7 +84,7 @@ public class PomWriterTest {
 		}
 		assertEquals(1, changedFiles.size());
 		assertEquals(TEST_FILE, changedFiles.get(0));
-		verify(repository, never()).revertChanges(Mockito.same(log), Mockito.anyList());
+		verify(repository, never()).revertChanges(Mockito.anyList());
 	}
 
 	@Test
@@ -98,14 +98,14 @@ public class PomWriterTest {
 			assertSame(expected, e.getCause());
 			assertEquals(EXCEPTION_MESSAGE, e.getMessage());
 		}
-		verify(repository).revertChanges(Mockito.same(log), Mockito.argThat(new HasOneChangedPomFile()));
+		verify(repository).revertChanges(Mockito.argThat(new HasOneChangedPomFile()));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void ioExceptionOccurredWhileReverting() throws Exception {
 		final IOException revertException = new IOException();
-		doThrow(revertException).when(repository).revertChanges(Mockito.same(log), Mockito.anyList());
+		doThrow(revertException).when(repository).revertChanges(Mockito.anyList());
 
 		final IOException expected = new IOException();
 		doThrow(expected).when(writer).write((Writer) Mockito.notNull(), Mockito.same(originalModel));
@@ -118,7 +118,7 @@ public class PomWriterTest {
 		}
 
 		final InOrder order = inOrder(log, repository);
-		order.verify(repository).revertChanges(Mockito.same(log), Mockito.argThat(new HasOneChangedPomFile()));
+		order.verify(repository).revertChanges(Mockito.argThat(new HasOneChangedPomFile()));
 		order.verify(log).error("Reverting changed POMs [target/pomWriterTest] failed!", revertException);
 	}
 }

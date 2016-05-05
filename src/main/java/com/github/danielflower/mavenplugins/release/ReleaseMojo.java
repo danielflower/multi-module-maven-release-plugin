@@ -13,11 +13,11 @@ import javax.inject.Inject;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
@@ -110,24 +110,22 @@ public class ReleaseMojo extends BaseMojo {
 
 	@Inject
 	public ReleaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
-			final Updater pomUpdater) throws ValidationException {
-		super(builderFactory, repository);
+			final Updater pomUpdater, final LogHolder logHolder) throws ValidationException {
+		super(builderFactory, repository, logHolder);
 		this.pomUpdater = pomUpdater;
 	}
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		final Log log = getLog();
-
 		try {
-			configureJsch(log);
+			configureJsch();
 			repository.errorIfNotClean();
 
 			final Reactor reactor = newReactor();
 
 			final List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
 
-			final List<File> changedFiles = pomUpdater.updatePoms(getLog(), reactor);
+			final List<File> changedFiles = pomUpdater.updatePoms(reactor);
 
 			// Do this before running the maven build in case the build uploads
 			// some artifacts and then fails. If it is
@@ -135,7 +133,7 @@ public class ReleaseMojo extends BaseMojo {
 			// re-use a version that is already in Nexus
 			// and so fail. The downside is that failed builds result in tags
 			// being pushed.
-			tagAndPushRepo(log, proposedTags);
+			tagAndPushRepo(proposedTags);
 
 			try {
 				final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
@@ -182,17 +180,16 @@ public class ReleaseMojo extends BaseMojo {
 		}
 	}
 
-	private void tagAndPushRepo(final Log log, final List<AnnotatedTag> proposedTags)
-			throws ValidationException, GitAPIException {
+	private void tagAndPushRepo(final List<AnnotatedTag> proposedTags) throws ValidationException, GitAPIException {
 		for (final AnnotatedTag proposedTag : proposedTags) {
-			log.info("About to tag the repository with " + proposedTag.name());
+			getLog().info("About to tag the repository with " + proposedTag.name());
 			repository.tagRepoAndPush(proposedTag);
 		}
 	}
 
 	private void revertChanges(final List<File> changedFiles, final boolean throwIfError)
 			throws IOException, ValidationException, MojoExecutionException {
-		if (!repository.revertChanges(getLog(), changedFiles)) {
+		if (!repository.revertChanges(changedFiles)) {
 			final String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
 			if (throwIfError) {
 				throw new MojoExecutionException(message);

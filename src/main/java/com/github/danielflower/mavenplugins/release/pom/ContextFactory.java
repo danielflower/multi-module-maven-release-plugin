@@ -3,7 +3,6 @@ package com.github.danielflower.mavenplugins.release.pom;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
@@ -12,7 +11,7 @@ import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 @Singleton
 class ContextFactory {
 
-	Context newContext(final Log log, final Reactor reactor, final MavenProject project, final String newVersion) {
-		return new Context(log, reactor, project, newVersion);
+	Context newContext(final Reactor reactor, final MavenProject project, final String newVersion) {
+		return new Context(reactor, project, newVersion);
 	}
 }

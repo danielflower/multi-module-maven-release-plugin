@@ -1,12 +1,16 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
+import static java.lang.String.format;
+
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
@@ -20,6 +24,11 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
 @Singleton
 class UpdateDependencies extends Command {
 
+	@Inject
+	UpdateDependencies(final Log log) {
+		super(log);
+	}
+
 	@Override
 	public final void alterModel(final Context updateContext) {
 		final MavenProject project = updateContext.getProject();
@@ -31,15 +40,15 @@ class UpdateDependencies extends Command {
 					final ReleasableModule dependencyBeingReleased = updateContext.getReactor()
 							.find(dependency.getGroupId(), dependency.getArtifactId(), version);
 					dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
-					updateContext.debug(" Dependency on %s rewritten to version %s",
-							dependencyBeingReleased.getArtifactId(), dependencyBeingReleased.getVersionToDependOn());
+					log.debug(format(" Dependency on %s rewritten to version %s",
+							dependencyBeingReleased.getArtifactId(), dependencyBeingReleased.getVersionToDependOn()));
 				} catch (final UnresolvedSnapshotDependencyException e) {
 					updateContext.addError("%s references dependency %s %s", project.getArtifactId(), e.artifactId,
 							e.version);
 				}
 			} else {
-				updateContext.debug(" Dependency on %s kept at version %s", dependency.getArtifactId(),
-						dependency.getVersion());
+				log.debug(format(" Dependency on %s kept at version %s", dependency.getArtifactId(),
+						dependency.getVersion()));
 			}
 		}
 	}

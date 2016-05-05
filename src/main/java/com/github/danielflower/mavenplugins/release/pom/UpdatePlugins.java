@@ -1,9 +1,11 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -13,6 +15,11 @@ import org.apache.maven.project.MavenProject;
 @Named
 @Singleton
 public class UpdatePlugins extends Command {
+
+	@Inject
+	UpdatePlugins(final Log log) {
+		super(log);
+	}
 
 	@Override
 	public void alterModel(final Context updateContext) {

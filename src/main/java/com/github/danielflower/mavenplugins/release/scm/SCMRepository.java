@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
@@ -21,7 +20,7 @@ public interface SCMRepository {
 
 	void tagRepoAndPush(AnnotatedTag tag) throws ValidationException, GitAPIException;
 
-	boolean revertChanges(Log log, List<File> changedFiles) throws ValidationException, IOException;
+	boolean revertChanges(List<File> changedFiles) throws ValidationException, IOException;
 
 	Collection<Long> getRemoteBuildNumbers(String artifactId, String versionWithoutBuildNumber)
 			throws ValidationException, GitAPIException;

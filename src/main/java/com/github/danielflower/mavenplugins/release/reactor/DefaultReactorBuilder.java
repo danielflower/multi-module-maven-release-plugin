@@ -21,20 +21,15 @@ import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 final class DefaultReactorBuilder implements ReactorBuilder {
 	private final VersionFactory versionFactory;
-	private Log log;
+	private final Log log;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
 	private Long buildNumber;
 	private List<String> modulesToForceRelease;
 
-	public DefaultReactorBuilder(final VersionFactory versioningFactory) {
-		this.versionFactory = versioningFactory;
-	}
-
-	@Override
-	public ReactorBuilder setLog(final Log log) {
+	public DefaultReactorBuilder(final Log log, final VersionFactory versioningFactory) {
 		this.log = log;
-		return this;
+		this.versionFactory = versioningFactory;
 	}
 
 	@Override

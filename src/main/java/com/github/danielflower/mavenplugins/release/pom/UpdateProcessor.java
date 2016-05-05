@@ -26,19 +26,21 @@ final class UpdateProcessor implements Updater {
 	static final String DEPENDENCY_ERROR_INTRO = "The following dependency errors were found:";
 	private final ContextFactory contextFactory;
 	private final PomWriterFactory writerFactory;
+	private final Log log;
 	private final List<Command> commands;
 
 	@Inject
-	public UpdateProcessor(final ContextFactory contextFactory, final PomWriterFactory writerFactory,
+	public UpdateProcessor(final ContextFactory contextFactory, final PomWriterFactory writerFactory, final Log log,
 			final List<Command> commands) {
 		this.contextFactory = contextFactory;
 		this.writerFactory = writerFactory;
+		this.log = log;
 		this.commands = commands;
 	}
 
 	private List<String> process(final Log log, final Reactor reactor, final MavenProject project,
 			final String newVersion) {
-		final Context context = contextFactory.newContext(log, reactor, project, newVersion);
+		final Context context = contextFactory.newContext(reactor, project, newVersion);
 		final Model originalModel = project.getOriginalModel();
 		originalModel.setVersion(newVersion);
 
@@ -50,8 +52,8 @@ final class UpdateProcessor implements Updater {
 	}
 
 	@Override
-	public List<File> updatePoms(final Log log, final Reactor reactor) throws IOException, ValidationException {
-		final PomWriter writer = writerFactory.newWriter(log);
+	public List<File> updatePoms(final Reactor reactor) throws IOException, ValidationException {
+		final PomWriter writer = writerFactory.newWriter();
 		final List<String> errors = new ArrayList<String>();
 
 		for (final ReleasableModule module : reactor) {

@@ -14,14 +14,16 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 class PomWriterFactory {
 	private final SCMRepository repository;
 	private final MavenXpp3Writer writer;
+	private final Log log;
 
 	@Inject
-	PomWriterFactory(final SCMRepository repository, final MavenXpp3Writer writer) {
+	PomWriterFactory(final SCMRepository repository, final MavenXpp3Writer writer, final Log log) {
 		this.repository = repository;
 		this.writer = writer;
+		this.log = log;
 	}
 
-	PomWriter newWriter(final Log log) {
+	PomWriter newWriter() {
 		return new PomWriter(repository, writer, log);
 	}
 }

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.plugin.logging.Log;
-
 import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 
@@ -20,6 +18,6 @@ public interface Updater {
 	 * @throws IOException
 	 * @throws ValidationException
 	 */
-	List<File> updatePoms(Log log, Reactor reactor) throws IOException, ValidationException;
+	List<File> updatePoms(Reactor reactor) throws IOException, ValidationException;
 
 }

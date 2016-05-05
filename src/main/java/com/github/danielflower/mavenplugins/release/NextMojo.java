@@ -9,10 +9,10 @@ import javax.inject.Inject;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
@@ -34,17 +34,15 @@ aggregator = true // the plugin should only run once against the aggregator pom
 public class NextMojo extends BaseMojo {
 
 	@Inject
-	public NextMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository)
-			throws ValidationException {
-		super(builderFactory, repository);
+	public NextMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
+			final LogHolder logHolder) throws ValidationException {
+		super(builderFactory, repository, logHolder);
 	}
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		final Log log = getLog();
-
 		try {
-			configureJsch(log);
+			configureJsch();
 			final Reactor reactor = newReactor();
 			figureOutTagNamesAndThrowIfAlreadyExists(reactor);
 

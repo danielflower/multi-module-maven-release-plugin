@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 import com.google.inject.Provider;
@@ -16,10 +17,10 @@ final class SCMRepositoryFactory implements Provider<SCMRepository> {
 	private final SCMRepository repository;
 
 	@Inject
-	SCMRepositoryFactory(final MavenProject project) {
+	SCMRepositoryFactory(final Log log, final MavenProject project) {
 		SCMRepository repository;
 		try {
-			repository = new GitRepository(project);
+			repository = new GitRepository(log, project);
 		} catch (final Exception e) {
 			repository = (SCMRepository) newProxyInstance(getClass().getClassLoader(),
 					new Class<?>[] { SCMRepository.class }, new InstantiationFailedHandler(e));

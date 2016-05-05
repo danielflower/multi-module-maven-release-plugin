@@ -54,7 +54,7 @@ class PomWriter {
 			}
 		} catch (final IOException e) {
 			try {
-				repository.revertChanges(log, changedFiles);
+				repository.revertChanges(changedFiles);
 			} catch (final IOException revertException) {
 				log.error(format("Reverting changed POMs %s failed!", changedFiles), revertException);
 			}
