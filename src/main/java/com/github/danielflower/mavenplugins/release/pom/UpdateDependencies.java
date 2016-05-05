@@ -23,6 +23,7 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
 @Named
 @Singleton
 class UpdateDependencies extends Command {
+	static final String ERROR_FORMAT = "%s references dependency %s %s";
 
 	@Inject
 	UpdateDependencies(final Log log) {
@@ -40,11 +41,10 @@ class UpdateDependencies extends Command {
 					final ReleasableModule dependencyBeingReleased = updateContext.getReactor()
 							.find(dependency.getGroupId(), dependency.getArtifactId(), version);
 					dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
-					log.debug(format(" Dependency on %s rewritten to version %s",
-							dependencyBeingReleased.getArtifactId(), dependencyBeingReleased.getVersionToDependOn()));
+					log.debug(format(" Dependency on %s rewritten to version %s", dependency.getArtifactId(),
+							dependencyBeingReleased.getVersionToDependOn()));
 				} catch (final UnresolvedSnapshotDependencyException e) {
-					updateContext.addError("%s references dependency %s %s", project.getArtifactId(), e.artifactId,
-							e.version);
+					updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, e.version);
 				}
 			} else {
 				log.debug(format(" Dependency on %s kept at version %s", dependency.getArtifactId(),
