@@ -19,9 +19,9 @@ public class DiffDetectorTest {
 	public void canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
 
-		final AnnotatedTag tag1 = saveFileInModule(project, "console-app", "1.2", 3);
-		final AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2", 0);
-		final AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
+		final ProposedTag tag1 = saveFileInModule(project, "console-app", "1.2", 3);
+		final ProposedTag tag2 = saveFileInModule(project, "core-utils", "2", 0);
+		final ProposedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
 
 		final DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
 
@@ -33,12 +33,12 @@ public class DiffDetectorTest {
 	@Test
 	public void canDetectThingsInTheRoot() throws IOException, GitAPIException {
 		final TestProject simple = TestProject.singleModuleProject();
-		final AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0", 1);
+		final ProposedTag tag1 = saveFileInModule(simple, ".", "1.0", 1);
 		simple.commitRandomFile(".");
 		final DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
 		assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(true));
 
-		final AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0", 2);
+		final ProposedTag tag2 = saveFileInModule(simple, ".", "1.0", 2);
 		assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag2)), is(false));
 	}
 
@@ -48,7 +48,7 @@ public class DiffDetectorTest {
 
 		saveFileInModule(project, "console-app", "1.2", 3);
 		saveFileInModule(project, "core-utils", "2", 0);
-		final AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
+		final ProposedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
 		project.commitRandomFile("console-app");
 
 		final DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
@@ -61,7 +61,7 @@ public class DiffDetectorTest {
 
 		saveFileInModule(project, "console-app", "1.2", 3);
 		saveFileInModule(project, "core-utils", "2", 0);
-		final AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
+		final ProposedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
 		project.commitRandomFile("console-app");
 
 		final DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());

@@ -7,7 +7,7 @@ import org.json.simple.JSONObject;
 
 import com.github.danielflower.mavenplugins.release.Guard;
 
-public class AnnotatedTag {
+class DefaultProposedTag implements ProposedTag {
 	public static final String VERSION = "version";
 	public static final String BUILD_NUMBER = "buildNumber";
 	private final String name;
@@ -15,7 +15,7 @@ public class AnnotatedTag {
 	private final Git git;
 	private Ref ref;
 
-	AnnotatedTag(final Git git, final Ref ref, final String name, final JSONObject message) {
+	DefaultProposedTag(final Git git, final Ref ref, final String name, final JSONObject message) {
 		Guard.notBlank("tag name", name);
 		Guard.notNull("tag message", message);
 		this.git = git;
@@ -24,18 +24,22 @@ public class AnnotatedTag {
 		this.message = message;
 	}
 
+	@Override
 	public String name() {
 		return name;
 	}
 
+	@Override
 	public String version() {
 		return String.valueOf(message.get(VERSION));
 	}
 
+	@Override
 	public long buildNumber() {
 		return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
 	}
 
+	@Override
 	public Ref saveAtHEAD() throws GitAPIException {
 		final String json = message.toJSONString();
 		ref = git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
@@ -54,7 +58,7 @@ public class AnnotatedTag {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		final AnnotatedTag that = (AnnotatedTag) o;
+		final DefaultProposedTag that = (DefaultProposedTag) o;
 		return name.equals(that.name);
 	}
 
@@ -63,6 +67,7 @@ public class AnnotatedTag {
 		return name.hashCode();
 	}
 
+	@Override
 	public Ref ref() {
 		return ref;
 	}

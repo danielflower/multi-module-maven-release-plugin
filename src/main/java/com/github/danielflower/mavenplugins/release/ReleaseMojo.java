@@ -21,7 +21,7 @@ import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
-import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -123,7 +123,7 @@ public class ReleaseMojo extends BaseMojo {
 
 			final Reactor reactor = newReactor();
 
-			final List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
+			final List<ProposedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
 
 			final List<File> changedFiles = pomUpdater.updatePoms(reactor);
 
@@ -180,8 +180,8 @@ public class ReleaseMojo extends BaseMojo {
 		}
 	}
 
-	private void tagAndPushRepo(final List<AnnotatedTag> proposedTags) throws ValidationException, GitAPIException {
-		for (final AnnotatedTag proposedTag : proposedTags) {
+	private void tagAndPushRepo(final List<ProposedTag> proposedTags) throws ValidationException, GitAPIException {
+		for (final ProposedTag proposedTag : proposedTags) {
 			getLog().info("About to tag the repository with " + proposedTag.name());
 			repository.tagRepoAndPush(proposedTag);
 		}

@@ -20,7 +20,7 @@ import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
-import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -150,9 +150,9 @@ public abstract class BaseMojo extends AbstractMojo {
 		disableSshAgent = true;
 	}
 
-	protected List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
+	protected List<ProposedTag> figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
 			throws GitAPIException, ValidationException {
-		final List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
+		final List<ProposedTag> tags = new ArrayList<ProposedTag>();
 		for (final ReleasableModule module : reactor) {
 			if (!module.willBeReleased()) {
 				continue;
@@ -166,7 +166,7 @@ public abstract class BaseMojo extends AbstractMojo {
 									"Please try incrementing the build number and trying again."));
 				}
 
-				final AnnotatedTag annotatedTag = repository.create(tag, module.getVersion(), module.getBuildNumber());
+				final ProposedTag annotatedTag = repository.create(tag, module.getVersion(), module.getBuildNumber());
 				tags.add(annotatedTag);
 			}
 		}

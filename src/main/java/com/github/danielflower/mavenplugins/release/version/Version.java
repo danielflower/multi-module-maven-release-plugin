@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 
 public interface Version {
 
-	List<AnnotatedTag> getPreviousTagsForThisModule() throws MojoExecutionException;
+	List<ProposedTag> getPreviousTagsForThisModule() throws MojoExecutionException;
 
 	String releaseVersion();
 
@@ -21,5 +21,5 @@ public interface Version {
 	 */
 	String developmentVersion();
 
-	AnnotatedTag hasChangedSinceLastRelease(String relativePathToModule) throws MojoExecutionException;
+	ProposedTag hasChangedSinceLastRelease(String relativePathToModule) throws MojoExecutionException;
 }

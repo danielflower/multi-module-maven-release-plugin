@@ -15,7 +15,7 @@ import org.eclipse.jgit.lib.Repository;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
-import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.version.Version;
 import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
@@ -115,7 +115,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			log.info(format("Releasing %s %s as %s has changed.", artifactId, versioning.releaseVersion(),
 					changedDependencyOrNull));
 		} else {
-			final AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = versioning
+			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = versioning
 					.hasChangedSinceLastRelease(relativePathToModule);
 
 			if (previousTagThatIsTheSameAsHEADForThisModule != null) {

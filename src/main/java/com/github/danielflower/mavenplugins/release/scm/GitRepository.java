@@ -1,7 +1,7 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
-import static com.github.danielflower.mavenplugins.release.scm.AnnotatedTag.BUILD_NUMBER;
-import static com.github.danielflower.mavenplugins.release.scm.AnnotatedTag.VERSION;
+import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.BUILD_NUMBER;
+import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.VERSION;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,9 +63,9 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public List<String> remoteTagsFrom(final List<AnnotatedTag> annotatedTags) throws GitAPIException {
+	public List<String> remoteTagsFrom(final List<ProposedTag> annotatedTags) throws GitAPIException {
 		final List<String> tagNames = new ArrayList<String>();
-		for (final AnnotatedTag annotatedTag : annotatedTags) {
+		for (final ProposedTag annotatedTag : annotatedTags) {
 			tagNames.add(annotatedTag.name());
 		}
 		return getRemoteTags(tagNames);
@@ -96,7 +96,7 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public void tagRepoAndPush(final AnnotatedTag tag) throws GitAPIException {
+	public void tagRepoAndPush(final ProposedTag tag) throws GitAPIException {
 		final Ref tagRef = tag.saveAtHEAD();
 		final PushCommand pushCommand = git.push().add(tagRef);
 		if (remoteUrl != null) {
@@ -174,9 +174,9 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public List<AnnotatedTag> tagsForVersion(final String module, final String versionWithoutBuildNumber)
+	public List<ProposedTag> tagsForVersion(final String module, final String versionWithoutBuildNumber)
 			throws MojoExecutionException {
-		final ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
+		final List<ProposedTag> results = new ArrayList<>();
 		List<Ref> tags;
 		try {
 			tags = git.tagList().call();
@@ -222,15 +222,15 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public AnnotatedTag create(final String name, final String version, final long buildNumber) {
+	public ProposedTag create(final String name, final String version, final long buildNumber) {
 		final JSONObject message = new JSONObject();
 		message.put(VERSION, version);
 		message.put(BUILD_NUMBER, String.valueOf(buildNumber));
-		return new AnnotatedTag(git, null, name, message);
+		return new DefaultProposedTag(git, null, name, message);
 	}
 
 	@Override
-	public AnnotatedTag fromRef(final Ref gitTag) throws IOException {
+	public DefaultProposedTag fromRef(final Ref gitTag) throws IOException {
 		Guard.notNull("gitTag", gitTag);
 
 		final RevWalk walk = new RevWalk(git.getRepository());
@@ -247,7 +247,7 @@ public final class GitRepository implements SCMRepository {
 			message.put(VERSION, "0");
 			message.put(BUILD_NUMBER, "0");
 		}
-		return new AnnotatedTag(git, gitTag, stripRefPrefix(gitTag.getName()), message);
+		return new DefaultProposedTag(git, gitTag, stripRefPrefix(gitTag.getName()), message);
 	}
 
 	static String stripRefPrefix(final String refName) {

@@ -13,24 +13,24 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface SCMRepository {
 
-	AnnotatedTag create(String name, final String version, long buildNumber);
+	ProposedTag create(String name, final String version, long buildNumber);
 
-	AnnotatedTag fromRef(Ref gitTag) throws IOException;
+	ProposedTag fromRef(Ref gitTag) throws IOException;
 
 	void errorIfNotClean() throws ValidationException;
 
-	List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws ValidationException, GitAPIException;
+	List<String> remoteTagsFrom(List<ProposedTag> annotatedTags) throws ValidationException, GitAPIException;
 
 	boolean hasLocalTag(String tag) throws ValidationException, GitAPIException;
 
-	void tagRepoAndPush(AnnotatedTag tag) throws ValidationException, GitAPIException;
+	void tagRepoAndPush(ProposedTag tag) throws ValidationException, GitAPIException;
 
 	boolean revertChanges(List<File> changedFiles) throws ValidationException, IOException;
 
 	Collection<Long> getRemoteBuildNumbers(String artifactId, String versionWithoutBuildNumber)
 			throws ValidationException, GitAPIException;
 
-	List<AnnotatedTag> tagsForVersion(String module, String versionWithoutBuildNumber)
+	List<ProposedTag> tagsForVersion(String module, String versionWithoutBuildNumber)
 			throws ValidationException, MojoExecutionException;
 
 	DiffDetector newDiffDetector() throws ValidationException;

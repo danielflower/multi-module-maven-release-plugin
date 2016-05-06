@@ -13,15 +13,15 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
-import com.github.danielflower.mavenplugins.release.scm.AnnotatedTag;
 import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 final class DefaultVersion implements Version {
 	private final SCMRepository gitRepo;
 	private final MavenProject project;
 	private final String versionWithoutBuildNumber;
-	private final List<AnnotatedTag> previousTagsForThisModule;
+	private final List<ProposedTag> previousTagsForThisModule;
 	private final Collection<Long> remoteBuildNumbers;
 	private Long buildNumber;
 
@@ -40,7 +40,7 @@ final class DefaultVersion implements Version {
 	private void init() throws ValidationException, GitAPIException {
 		final Collection<Long> previousBuildNumbers = new ArrayList<Long>();
 		if (previousTagsForThisModule != null) {
-			for (final AnnotatedTag previousTag : previousTagsForThisModule) {
+			for (final ProposedTag previousTag : previousTagsForThisModule) {
 				previousBuildNumbers.add(previousTag.buildNumber());
 			}
 		}
@@ -64,7 +64,7 @@ final class DefaultVersion implements Version {
 	}
 
 	@Override
-	public List<AnnotatedTag> getPreviousTagsForThisModule() throws MojoExecutionException {
+	public List<ProposedTag> getPreviousTagsForThisModule() throws MojoExecutionException {
 		return previousTagsForThisModule;
 	}
 
@@ -77,7 +77,7 @@ final class DefaultVersion implements Version {
 	}
 
 	@Override
-	public AnnotatedTag hasChangedSinceLastRelease(final String relativePathToModule) throws MojoExecutionException {
+	public ProposedTag hasChangedSinceLastRelease(final String relativePathToModule) throws MojoExecutionException {
 		try {
 			if (previousTagsForThisModule.size() == 0) {
 				return null;
@@ -94,9 +94,9 @@ final class DefaultVersion implements Version {
 		}
 	}
 
-	private AnnotatedTag tagWithHighestBuildNumber() {
-		AnnotatedTag cur = null;
-		for (final AnnotatedTag tag : previousTagsForThisModule) {
+	private ProposedTag tagWithHighestBuildNumber() {
+		ProposedTag cur = null;
+		for (final ProposedTag tag : previousTagsForThisModule) {
 			if (cur == null || tag.buildNumber() > cur.buildNumber()) {
 				cur = tag;
 			}
