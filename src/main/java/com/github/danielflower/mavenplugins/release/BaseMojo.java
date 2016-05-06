@@ -20,7 +20,7 @@ import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
-import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -150,9 +150,9 @@ public abstract class BaseMojo extends AbstractMojo {
 		disableSshAgent = true;
 	}
 
-	protected List<ProposedTag> figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
+	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
 			throws GitAPIException, ValidationException {
-		final List<ProposedTag> tags = new ArrayList<ProposedTag>();
+		final ProposedTags tags = repository.newProposedTags();
 		for (final ReleasableModule module : reactor) {
 			if (!module.willBeReleased()) {
 				continue;
@@ -166,11 +166,10 @@ public abstract class BaseMojo extends AbstractMojo {
 									"Please try incrementing the build number and trying again."));
 				}
 
-				final ProposedTag annotatedTag = repository.create(tag, module.getVersion(), module.getBuildNumber());
-				tags.add(annotatedTag);
+				tags.add(tag, module.getVersion(), module.getBuildNumber());
 			}
 		}
-		final List<String> matchingRemoteTags = repository.remoteTagsFrom(tags);
+		final List<String> matchingRemoteTags = tags.getMatchingRemoteTags();
 		if (matchingRemoteTags.size() > 0) {
 			final String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
 			final List<String> messages = new ArrayList<String>();

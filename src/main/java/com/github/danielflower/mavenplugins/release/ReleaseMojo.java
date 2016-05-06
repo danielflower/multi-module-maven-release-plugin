@@ -21,7 +21,7 @@ import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
-import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -123,7 +123,7 @@ public class ReleaseMojo extends BaseMojo {
 
 			final Reactor reactor = newReactor();
 
-			final List<ProposedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
+			final ProposedTags proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
 
 			final List<File> changedFiles = pomUpdater.updatePoms(reactor);
 
@@ -133,7 +133,7 @@ public class ReleaseMojo extends BaseMojo {
 			// re-use a version that is already in Nexus
 			// and so fail. The downside is that failed builds result in tags
 			// being pushed.
-			tagAndPushRepo(proposedTags);
+			proposedTags.tagAndPushRepo();
 
 			try {
 				final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
@@ -177,13 +177,6 @@ public class ReleaseMojo extends BaseMojo {
 			printBigErrorMessageAndThrow("Could not release due to a Git error",
 					asList("There was an error while accessing the Git repository. The error returned from git was:",
 							gae.getMessage(), "Stack trace:", exceptionAsString));
-		}
-	}
-
-	private void tagAndPushRepo(final List<ProposedTag> proposedTags) throws ValidationException, GitAPIException {
-		for (final ProposedTag proposedTag : proposedTags) {
-			getLog().info("About to tag the repository with " + proposedTag.name());
-			repository.tagRepoAndPush(proposedTag);
 		}
 	}
 

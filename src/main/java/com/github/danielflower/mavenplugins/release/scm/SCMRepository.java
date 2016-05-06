@@ -13,17 +13,11 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface SCMRepository {
 
-	ProposedTag create(String name, final String version, long buildNumber);
-
 	ProposedTag fromRef(Ref gitTag) throws IOException;
 
 	void errorIfNotClean() throws ValidationException;
 
-	List<String> remoteTagsFrom(List<ProposedTag> annotatedTags) throws ValidationException, GitAPIException;
-
 	boolean hasLocalTag(String tag) throws ValidationException, GitAPIException;
-
-	void tagRepoAndPush(ProposedTag tag) throws ValidationException, GitAPIException;
 
 	boolean revertChanges(List<File> changedFiles) throws ValidationException, IOException;
 
@@ -34,4 +28,6 @@ public interface SCMRepository {
 			throws ValidationException, MojoExecutionException;
 
 	DiffDetector newDiffDetector() throws ValidationException;
+
+	ProposedTags newProposedTags();
 }

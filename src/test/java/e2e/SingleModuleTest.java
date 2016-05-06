@@ -20,6 +20,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.scm.GitRepository;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
 
 import scaffolding.TestProject;
 
@@ -52,12 +53,13 @@ public class SingleModuleTest extends E2ETest {
 		assertThat(testProject.local, hasTag("single-module-1.0.1"));
 
 		final GitRepository repo = new GitRepository(mock(Log.class), testProject.local, null);
-		repo.create("single-module-1.0.2", "1.0", 2).saveAtHEAD();
+		final ProposedTags tags = repo.newProposedTags();
+		tags.add("single-module-1.0.2", "1.0", 2).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.3"));
 
-		repo.create("single-module-1.0.4", "1.0", 4).saveAtHEAD();
-		repo.create("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD();
+		tags.add("single-module-1.0.4", "1.0", 4).saveAtHEAD();
+		tags.add("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.5"));
 

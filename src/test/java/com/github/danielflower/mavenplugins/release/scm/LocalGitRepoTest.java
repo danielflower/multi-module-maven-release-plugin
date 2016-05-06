@@ -23,7 +23,7 @@ import scaffolding.TestProject;
 public class LocalGitRepoTest {
 	private final Log log = mock(Log.class);
 	TestProject project = TestProject.singleModuleProject();
-	private final GitRepository repo = new GitRepository(log, project.local, null);
+	private GitRepository repo = new GitRepository(log, project.local, null);
 
 	@Test
 	public void canDetectLocalTags() throws GitAPIException {
@@ -36,10 +36,9 @@ public class LocalGitRepoTest {
 
 	@Test
 	public void canDetectRemoteTags() throws Exception {
-		final GitRepository repo = new GitRepository(log, project.local, null);
 		tag(project.origin, "some-tag");
-		assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
-		assertThat(repo.remoteTagsFrom(tags("blah", "some-taggart")), equalTo(emptyList()));
+		assertThat(tags("blah", "some-tag").getMatchingRemoteTags(), equalTo(asList("some-tag")));
+		assertThat(tags("blah", "some-taggart").getMatchingRemoteTags(), equalTo(emptyList()));
 	}
 
 	@Test
@@ -47,15 +46,14 @@ public class LocalGitRepoTest {
 		final Scm scm = mock(Scm.class);
 		final String remote = dirToGitScmReference(project.originDir);
 		when(scm.getDeveloperConnection()).thenReturn(remote);
-		final GitRepository repo = new GitRepository(log, project.local,
-				SCMRepositoryProvider.getRemoteUrlOrNullIfNoneSet(scm));
+		repo = new GitRepository(log, project.local, SCMRepositoryProvider.getRemoteUrlOrNullIfNoneSet(scm));
 		tag(project.origin, "some-tag");
 
 		final StoredConfig config = project.local.getRepository().getConfig();
 		config.unsetSection("remote", "origin");
 		config.save();
 
-		assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
+		assertThat(tags("blah", "some-tag").getMatchingRemoteTags(), equalTo(asList("some-tag")));
 	}
 
 	@Test
@@ -70,14 +68,14 @@ public class LocalGitRepoTest {
 		for (int i = 0; i < numberOfTags; i++) {
 			final String tagName = "this-is-a-tag-" + i;
 			assertThat(repo.hasLocalTag(tagName), is(true));
-			assertThat(repo.remoteTagsFrom(tags(tagName)).size(), is(1));
+			assertThat(tags(tagName).getMatchingRemoteTags().size(), is(1));
 		}
 	}
 
-	private List<ProposedTag> tags(final String... tagNames) {
-		final List<ProposedTag> tags = new ArrayList<>();
+	private ProposedTags tags(final String... tagNames) {
+		final ProposedTags tags = repo.newProposedTags();
 		for (final String tagName : tagNames) {
-			tags.add(repo.create(tagName, "1", 0));
+			tags.add(tagName, "1", 0);
 		}
 		return tags;
 	}

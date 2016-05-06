@@ -46,7 +46,7 @@ public class AnnotatedTagFinderTest {
 	private static ProposedTag tagLocalRepo(final TestProject project, final String tagName, final String version,
 			final long buildNumber) throws GitAPIException {
 		final GitRepository repo = new GitRepository(log, project.local, null);
-		final ProposedTag tag = repo.create(tagName, version, buildNumber);
+		final ProposedTag tag = repo.newProposedTags().add(tagName, version, buildNumber);
 		tag.saveAtHEAD();
 		return tag;
 	}

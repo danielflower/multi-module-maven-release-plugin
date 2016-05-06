@@ -15,7 +15,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
-import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -62,28 +61,6 @@ public final class GitRepository implements SCMRepository {
 		return remoteBuildNumbers;
 	}
 
-	@Override
-	public List<String> remoteTagsFrom(final List<ProposedTag> annotatedTags) throws GitAPIException {
-		final List<String> tagNames = new ArrayList<String>();
-		for (final ProposedTag annotatedTag : annotatedTags) {
-			tagNames.add(annotatedTag.name());
-		}
-		return getRemoteTags(tagNames);
-	}
-
-	public List<String> getRemoteTags(final List<String> tagNamesToSearchFor) throws GitAPIException {
-		final List<String> results = new ArrayList<String>();
-		final Collection<Ref> remoteTags = allRemoteTags();
-		for (final Ref remoteTag : remoteTags) {
-			for (final String proposedTag : tagNamesToSearchFor) {
-				if (remoteTag.getName().equals("refs/tags/" + proposedTag)) {
-					results.add(proposedTag);
-				}
-			}
-		}
-		return results;
-	}
-
 	public Collection<Ref> allRemoteTags() throws GitAPIException {
 		if (remoteTags == null) {
 			final LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
@@ -93,16 +70,6 @@ public final class GitRepository implements SCMRepository {
 			remoteTags = lsRemoteCommand.call();
 		}
 		return remoteTags;
-	}
-
-	@Override
-	public void tagRepoAndPush(final ProposedTag tag) throws GitAPIException {
-		final Ref tagRef = tag.saveAtHEAD();
-		final PushCommand pushCommand = git.push().add(tagRef);
-		if (remoteUrl != null) {
-			pushCommand.setRemote(remoteUrl);
-		}
-		pushCommand.call();
 	}
 
 	@Override
@@ -222,15 +189,7 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public ProposedTag create(final String name, final String version, final long buildNumber) {
-		final JSONObject message = new JSONObject();
-		message.put(VERSION, version);
-		message.put(BUILD_NUMBER, String.valueOf(buildNumber));
-		return new DefaultProposedTag(git, null, name, message);
-	}
-
-	@Override
-	public DefaultProposedTag fromRef(final Ref gitTag) throws IOException {
+	public ProposedTag fromRef(final Ref gitTag) throws IOException {
 		Guard.notNull("gitTag", gitTag);
 
 		final RevWalk walk = new RevWalk(git.getRepository());
@@ -252,5 +211,10 @@ public final class GitRepository implements SCMRepository {
 
 	static String stripRefPrefix(final String refName) {
 		return refName.substring("refs/tags/".length());
+	}
+
+	@Override
+	public ProposedTags newProposedTags() {
+		return new DefaultProposedTags(log, git, this, remoteUrl);
 	}
 }
