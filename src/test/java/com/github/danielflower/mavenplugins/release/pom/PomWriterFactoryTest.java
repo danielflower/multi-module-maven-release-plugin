@@ -35,7 +35,7 @@ import org.mockito.stubbing.Answer;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
-public class PomWriterTest {
+public class PomWriterFactoryTest {
 	private final class HasOneChangedPomFile extends BaseMatcher<List<File>> {
 		@SuppressWarnings("unchecked")
 		@Override
@@ -57,7 +57,7 @@ public class PomWriterTest {
 	private final Log log = mock(Log.class);
 	private final MavenProject project = mock(MavenProject.class);
 	private final Model originalModel = mock(Model.class);
-	private final PomWriter pomWriter = new PomWriter(repository, writer, log);
+	private final PomWriter pomWriter = new PomWriterFactory(repository, writer, log).newWriter();
 
 	@Before
 	public void setup() throws IOException {
