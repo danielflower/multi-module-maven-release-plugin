@@ -1,16 +1,17 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
-import static com.github.danielflower.mavenplugins.release.scm.GitHelper.scmUrlToRemote;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static scaffolding.TestProject.dirToGitScmReference;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -42,8 +43,11 @@ public class LocalGitRepoTest {
 
 	@Test
 	public void usesThePassedInScmUrlToFindRemote() throws Exception {
+		final Scm scm = mock(Scm.class);
+		final String remote = dirToGitScmReference(project.originDir).replace("file://localhost/", "file:///");
+		when(scm.getDeveloperConnection()).thenReturn(remote);
 		final GitRepository repo = new GitRepository(log, project.local,
-				scmUrlToRemote(dirToGitScmReference(project.originDir)));
+				SCMRepositoryProvider.getRemoteUrlOrNullIfNoneSet(scm));
 		tag(project.origin, "some-tag");
 
 		final StoredConfig config = project.local.getRepository().getConfig();

@@ -3,10 +3,12 @@ package com.github.danielflower.mavenplugins.release.scm;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-final class InstantiationFailedHandler implements InvocationHandler {
-	private final Exception exception;
+import com.github.danielflower.mavenplugins.release.ValidationException;
 
-	InstantiationFailedHandler(final Exception exception) {
+final class InstantiationFailedHandler implements InvocationHandler {
+	private final ValidationException exception;
+
+	InstantiationFailedHandler(final ValidationException exception) {
 		this.exception = exception;
 	}
 

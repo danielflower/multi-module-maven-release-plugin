@@ -1,13 +1,8 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-
-import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public class GitHelper {
 	public static boolean hasLocalTag(final Git repo, final String tagToCheck) throws GitAPIException {
@@ -31,20 +26,6 @@ public class GitHelper {
 			}
 		}
 		return null;
-	}
-
-	public static String scmUrlToRemote(final String scmUrl) throws ValidationException {
-		final String GIT_PREFIX = "scm:git:";
-		if (!scmUrl.startsWith(GIT_PREFIX)) {
-			final List<String> messages = new ArrayList<String>();
-			final String summary = "Cannot run the release plugin with a non-Git version control system";
-			messages.add(summary);
-			messages.add("The value in your scm tag is " + scmUrl);
-			throw new ValidationException(summary + " " + scmUrl, messages);
-		}
-		String remote = scmUrl.substring(GIT_PREFIX.length());
-		remote = remote.replace("file://localhost/", "file:///");
-		return remote;
 	}
 
 	private interface Matcher {

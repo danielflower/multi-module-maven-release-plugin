@@ -1,26 +1,20 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
@@ -28,70 +22,18 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 
 final class GitRepository implements SCMRepository {
 	private final Log log;
-	private Git git;
+	private final Git git;
 	private final String remoteUrl;
-	private boolean hasReverted = false; // A premature optimisation? In
-											// the normal case, file
-											// reverting occurs twice, which
-											// this bool prevents
+	private boolean hasReverted; // A premature optimisation? In
+									// the normal case, file
+									// reverting occurs twice, which
+									// this bool prevents
 	private Collection<Ref> remoteTags;
-
-	GitRepository(final Log log, final MavenProject project) throws ValidationException {
-		this.log = log;
-		final File gitDir = new File(".");
-		try {
-			git = Git.open(gitDir);
-		} catch (final RepositoryNotFoundException rnfe) {
-			final String fullPathOfCurrentDir = pathOf(gitDir);
-			final File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
-			String summary;
-			final List<String> messages = new ArrayList<String>();
-			if (gitRoot == null) {
-				summary = "Releases can only be performed from Git repositories.";
-				messages.add(summary);
-				messages.add(fullPathOfCurrentDir + " is not a Git repository.");
-			} else {
-				summary = "The release plugin can only be run from the root folder of your Git repository";
-				messages.add(summary);
-				messages.add(fullPathOfCurrentDir + " is not the root of a Gir repository");
-				messages.add("Try running the release plugin from " + pathOf(gitRoot));
-			}
-			throw new ValidationException(summary, messages);
-		} catch (final Exception e) {
-			throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?",
-					Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
-		}
-		remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
-	}
 
 	GitRepository(final Log log, final Git git, final String remoteUrl) {
 		this.log = log;
 		this.git = git;
 		this.remoteUrl = remoteUrl;
-	}
-
-	private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
-		while (candidateDir != null && /* HACK ATTACK! Maybe.... */ !candidateDir.getName().equals("target")) {
-			if (new File(candidateDir, ".git").isDirectory()) {
-				return candidateDir;
-			}
-			candidateDir = candidateDir.getParentFile();
-		}
-		return null;
-	}
-
-	private String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws ValidationException {
-		if (scm == null) {
-			return null;
-		}
-		String remote = scm.getDeveloperConnection();
-		if (remote == null) {
-			remote = scm.getConnection();
-		}
-		if (remote == null) {
-			return null;
-		}
-		return GitHelper.scmUrlToRemote(remote);
 	}
 
 	@Override
