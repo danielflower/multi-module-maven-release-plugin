@@ -29,5 +29,5 @@ public interface SCMRepository {
 
 	DiffDetector newDiffDetector() throws ValidationException;
 
-	ProposedTags newProposedTags();
+	ProposedTagsBuilder newProposedTagsBuilder();
 }

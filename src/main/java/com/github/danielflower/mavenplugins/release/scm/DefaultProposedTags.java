@@ -1,48 +1,59 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
-import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.BUILD_NUMBER;
-import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.VERSION;
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import javax.xml.bind.ValidationException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.json.simple.JSONObject;
 
 final class DefaultProposedTags implements ProposedTags {
-	private final List<ProposedTag> proposedTags = new LinkedList<>();
+	static final String KEY_FORMAT = "%s/%s/%s";
+	private final Map<String, ProposedTag> proposedTags;
 	private final Log log;
 	private final Git git;
+
+	// TODO: Removed this when getMatchingRemoteTags is removed
 	private final GitRepository repo;
+
 	private final String remoteUrl;
 
-	DefaultProposedTags(final Log log, final Git git, final GitRepository repo, final String remoteUrl) {
+	DefaultProposedTags(final Log log, final Git git, final GitRepository repo, final String remoteUrl,
+			final Map<String, ProposedTag> proposedTags) {
 		this.log = log;
 		this.git = git;
 		this.repo = repo;
 		this.remoteUrl = remoteUrl;
+		this.proposedTags = proposedTags;
 	}
 
 	@Override
-	public ProposedTag add(final String tag, final String version, final long buildNumber) {
-		final JSONObject message = new JSONObject();
-		message.put(VERSION, version);
-		message.put(BUILD_NUMBER, String.valueOf(buildNumber));
-		final DefaultProposedTag proposedTag = new DefaultProposedTag(git, null, tag, message);
-		proposedTags.add(proposedTag);
-		return proposedTag;
+	public void tagAndPushRepo() throws GitAPIException {
+		for (final ProposedTag tag : proposedTags.values()) {
+			log.info("About to tag the repository with " + tag.name());
+			final Ref tagRef = tag.saveAtHEAD();
+			final PushCommand pushCommand = git.push().add(tagRef);
+			if (remoteUrl != null) {
+				pushCommand.setRemote(remoteUrl);
+			}
+			pushCommand.call();
+		}
 	}
 
 	@Override
 	public List<String> getMatchingRemoteTags() throws GitAPIException {
 		final List<String> tagNamesToSearchFor = new ArrayList<String>();
-		for (final ProposedTag annotatedTag : proposedTags) {
+		for (final ProposedTag annotatedTag : proposedTags.values()) {
 			tagNamesToSearchFor.add(annotatedTag.name());
 		}
 
@@ -59,16 +70,22 @@ final class DefaultProposedTags implements ProposedTags {
 	}
 
 	@Override
-	public void tagAndPushRepo() throws GitAPIException {
-		for (final ProposedTag tag : proposedTags) {
-			log.info("About to tag the repository with " + tag.name());
-			final Ref tagRef = tag.saveAtHEAD();
-			final PushCommand pushCommand = git.push().add(tagRef);
-			if (remoteUrl != null) {
-				pushCommand.setRemote(remoteUrl);
-			}
-			pushCommand.call();
+	public ProposedTag getTag(final String tag, final String version, final long buildNumber)
+			throws ValidationException {
+		final String key = toKey(tag, version, buildNumber);
+		final ProposedTag proposedTag = proposedTags.get(key);
+		if (proposedTag == null) {
+			throw new ValidationException(format("No proposed tag registered %s", key));
 		}
+		return proposedTag;
 	}
 
+	static String toKey(final String tag, final String version, final long buildNumber) {
+		return format(KEY_FORMAT, tag, version, buildNumber);
+	}
+
+	@Override
+	public Iterator<ProposedTag> iterator() {
+		return unmodifiableCollection(proposedTags.values()).iterator();
+	}
 }

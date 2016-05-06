@@ -5,10 +5,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Test;
 
 import scaffolding.TestProject;
@@ -31,7 +29,7 @@ public class DiffDetectorTest {
 	}
 
 	@Test
-	public void canDetectThingsInTheRoot() throws IOException, GitAPIException {
+	public void canDetectThingsInTheRoot() throws Exception {
 		final TestProject simple = TestProject.singleModuleProject();
 		final ProposedTag tag1 = saveFileInModule(simple, ".", "1.0", 1);
 		simple.commitRandomFile(".");
@@ -43,7 +41,7 @@ public class DiffDetectorTest {
 	}
 
 	@Test
-	public void canDetectChangesAfterTheLastTag() throws IOException, GitAPIException {
+	public void canDetectChangesAfterTheLastTag() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
 
 		saveFileInModule(project, "console-app", "1.2", 3);
@@ -56,7 +54,7 @@ public class DiffDetectorTest {
 	}
 
 	@Test
-	public void canIgnoreModuleFolders() throws IOException, GitAPIException {
+	public void canIgnoreModuleFolders() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
 
 		saveFileInModule(project, "console-app", "1.2", 3);

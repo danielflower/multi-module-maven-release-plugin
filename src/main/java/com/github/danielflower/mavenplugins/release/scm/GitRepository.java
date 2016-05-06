@@ -214,7 +214,8 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public ProposedTags newProposedTags() {
-		return new DefaultProposedTags(log, git, this, remoteUrl);
+	public ProposedTagsBuilder newProposedTagsBuilder() {
+		return new DefaultProposedTagsBuilder(log, git, this, remoteUrl);
 	}
+
 }

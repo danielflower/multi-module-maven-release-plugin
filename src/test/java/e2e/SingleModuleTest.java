@@ -15,12 +15,12 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.scm.GitRepository;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTagsBuilder;
 
 import scaffolding.TestProject;
 
@@ -46,20 +46,24 @@ public class SingleModuleTest extends E2ETest {
 	// private
 	@Test
 	public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags()
-			throws IOException, GitAPIException {
+			throws Exception {
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.0"));
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.1"));
 
 		final GitRepository repo = new GitRepository(mock(Log.class), testProject.local, null);
-		final ProposedTags tags = repo.newProposedTags();
-		tags.add("single-module-1.0.2", "1.0", 2).saveAtHEAD();
+		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder();
+		builder.add("single-module-1.0.2", "1.0", 2).build().getTag("single-module-1.0.2", "1.0", 2).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.3"));
 
-		tags.add("single-module-1.0.4", "1.0", 4).saveAtHEAD();
-		tags.add("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD();
+		builder.add("single-module-1.0.4", "1.0", 4);
+		builder.add("unrelated-module-1.0.5", "1.0", 5);
+		final ProposedTags tags = builder.build();
+		tags.getTag("single-module-1.0.4", "1.0", 4).saveAtHEAD();
+		tags.getTag("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD();
+
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.5"));
 

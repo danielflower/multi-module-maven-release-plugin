@@ -7,15 +7,10 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Test;
-
-import com.github.danielflower.mavenplugins.release.ValidationException;
 
 import scaffolding.TestProject;
 
@@ -37,16 +32,18 @@ public class AnnotatedTagFinderTest {
 	}
 
 	static ProposedTag saveFileInModule(final TestProject project, final String moduleName, final String version,
-			final long buildNumber) throws IOException, GitAPIException {
+			final long buildNumber) throws Exception {
 		project.commitRandomFile(moduleName);
 		final String nameForTag = moduleName.equals(".") ? "root" : moduleName;
 		return tagLocalRepo(project, nameForTag + "-" + version + "." + buildNumber, version, buildNumber);
 	}
 
 	private static ProposedTag tagLocalRepo(final TestProject project, final String tagName, final String version,
-			final long buildNumber) throws GitAPIException {
+			final long buildNumber) throws Exception {
 		final GitRepository repo = new GitRepository(log, project.local, null);
-		final ProposedTag tag = repo.newProposedTags().add(tagName, version, buildNumber);
+		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder();
+		builder.add(tagName, version, buildNumber);
+		final ProposedTag tag = builder.build().getTag(tagName, version, buildNumber);
 		tag.saveAtHEAD();
 		return tag;
 	}
@@ -64,8 +61,7 @@ public class AnnotatedTagFinderTest {
 	}
 
 	@Test
-	public void returnsMultipleTagsOnASingleCommit()
-			throws IOException, GitAPIException, MojoExecutionException, ValidationException {
+	public void returnsMultipleTagsOnASingleCommit() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
 		final GitRepository repo = new GitRepository(log, project.local, null);
 		saveFileInModule(project, "console-app", "1.2", 1);

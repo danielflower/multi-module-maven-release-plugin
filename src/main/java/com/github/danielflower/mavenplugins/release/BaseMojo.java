@@ -1,9 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -21,6 +19,7 @@ import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTagsBuilder;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -152,35 +151,16 @@ public abstract class BaseMojo extends AbstractMojo {
 
 	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
 			throws GitAPIException, ValidationException {
-		final ProposedTags tags = repository.newProposedTags();
+		final ProposedTagsBuilder builder = repository.newProposedTagsBuilder();
 		for (final ReleasableModule module : reactor) {
 			if (!module.willBeReleased()) {
 				continue;
 			}
 			if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
-				final String tag = module.getTagName();
-				if (repository.hasLocalTag(tag)) {
-					final String summary = "There is already a tag named " + tag + " in this repository.";
-					throw new ValidationException(summary,
-							asList(summary, "It is likely that this version has been released before.",
-									"Please try incrementing the build number and trying again."));
-				}
-
-				tags.add(tag, module.getVersion(), module.getBuildNumber());
+				builder.add(module.getTagName(), module.getVersion(), module.getBuildNumber());
 			}
 		}
-		final List<String> matchingRemoteTags = tags.getMatchingRemoteTags();
-		if (matchingRemoteTags.size() > 0) {
-			final String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
-			final List<String> messages = new ArrayList<String>();
-			messages.add(summary);
-			for (final String matchingRemoteTag : matchingRemoteTags) {
-				messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
-			}
-			messages.add("Please try releasing again with a new build number.");
-			throw new ValidationException(summary, messages);
-		}
-		return tags;
+		return builder.build();
 	}
 
 	protected void printBigErrorMessageAndThrow(final String terseMessage, final List<String> linesToLog)
