@@ -166,8 +166,7 @@ public abstract class BaseMojo extends AbstractMojo {
 									"Please try incrementing the build number and trying again."));
 				}
 
-				final AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(),
-						module.getBuildNumber());
+				final AnnotatedTag annotatedTag = repository.create(tag, module.getVersion(), module.getBuildNumber());
 				tags.add(annotatedTag);
 			}
 		}

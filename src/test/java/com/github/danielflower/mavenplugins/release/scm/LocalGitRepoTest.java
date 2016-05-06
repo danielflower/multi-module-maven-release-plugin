@@ -23,6 +23,7 @@ import scaffolding.TestProject;
 public class LocalGitRepoTest {
 	private final Log log = mock(Log.class);
 	TestProject project = TestProject.singleModuleProject();
+	private final GitRepository repo = new GitRepository(log, project.local, null);
 
 	@Test
 	public void canDetectLocalTags() throws GitAPIException {
@@ -73,10 +74,10 @@ public class LocalGitRepoTest {
 		}
 	}
 
-	private static List<AnnotatedTag> tags(final String... tagNames) {
+	private List<AnnotatedTag> tags(final String... tagNames) {
 		final List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
 		for (final String tagName : tagNames) {
-			tags.add(AnnotatedTag.create(tagName, "1", 0));
+			tags.add(repo.create(tagName, "1", 0));
 		}
 		return tags;
 	}

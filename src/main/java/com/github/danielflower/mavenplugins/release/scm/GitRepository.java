@@ -1,5 +1,8 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
+import static com.github.danielflower.mavenplugins.release.scm.AnnotatedTag.BUILD_NUMBER;
+import static com.github.danielflower.mavenplugins.release.scm.AnnotatedTag.VERSION;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,12 +18,19 @@ import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevTag;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
+import com.github.danielflower.mavenplugins.release.Guard;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
-final class GitRepository implements SCMRepository {
+// TODO: Make this class package private when SingleModuleTest is working with a Guice injector
+public final class GitRepository implements SCMRepository {
 	private final Log log;
 	private final Git git;
 	private final String remoteUrl;
@@ -30,7 +40,7 @@ final class GitRepository implements SCMRepository {
 									// this bool prevents
 	private Collection<Ref> remoteTags;
 
-	GitRepository(final Log log, final Git git, final String remoteUrl) {
+	public GitRepository(final Log log, final Git git, final String remoteUrl) {
 		this.log = log;
 		this.git = git;
 		this.remoteUrl = remoteUrl;
@@ -178,7 +188,7 @@ final class GitRepository implements SCMRepository {
 		for (final Ref tag : tags) {
 			if (isPotentiallySameVersionIgnoringBuildNumber(tagWithoutBuildNumber, tag.getName())) {
 				try {
-					results.add(AnnotatedTag.fromRef(git.getRepository(), tag));
+					results.add(fromRef(tag));
 				} catch (final IOException e) {
 					throw new MojoExecutionException("Error while looking up tag " + tag, e);
 				}
@@ -193,7 +203,7 @@ final class GitRepository implements SCMRepository {
 	}
 
 	public static Long buildNumberOf(final String versionWithoutBuildNumber, final String refName) {
-		final String tagName = AnnotatedTag.stripRefPrefix(refName);
+		final String tagName = stripRefPrefix(refName);
 		final String prefix = versionWithoutBuildNumber + ".";
 		if (tagName.startsWith(prefix)) {
 			final String end = tagName.substring(prefix.length());
@@ -209,5 +219,38 @@ final class GitRepository implements SCMRepository {
 	@Override
 	public DiffDetector newDiffDetector() {
 		return new TreeWalkingDiffDetector(git.getRepository());
+	}
+
+	@Override
+	public AnnotatedTag create(final String name, final String version, final long buildNumber) {
+		final JSONObject message = new JSONObject();
+		message.put(VERSION, version);
+		message.put(BUILD_NUMBER, String.valueOf(buildNumber));
+		return new AnnotatedTag(git, null, name, message);
+	}
+
+	@Override
+	public AnnotatedTag fromRef(final Ref gitTag) throws IOException {
+		Guard.notNull("gitTag", gitTag);
+
+		final RevWalk walk = new RevWalk(git.getRepository());
+		JSONObject message;
+		try {
+			final ObjectId tagId = gitTag.getObjectId();
+			final RevTag tag = walk.parseTag(tagId);
+			message = (JSONObject) JSONValue.parse(tag.getFullMessage());
+		} finally {
+			walk.dispose();
+		}
+		if (message == null) {
+			message = new JSONObject();
+			message.put(VERSION, "0");
+			message.put(BUILD_NUMBER, "0");
+		}
+		return new AnnotatedTag(git, gitTag, stripRefPrefix(gitTag.getName()), message);
+	}
+
+	static String stripRefPrefix(final String refName) {
+		return refName.substring("refs/tags/".length());
 	}
 }

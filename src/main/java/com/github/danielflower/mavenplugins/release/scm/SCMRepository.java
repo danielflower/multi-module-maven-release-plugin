@@ -7,10 +7,15 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface SCMRepository {
+
+	AnnotatedTag create(String name, final String version, long buildNumber);
+
+	AnnotatedTag fromRef(Ref gitTag) throws IOException;
 
 	void errorIfNotClean() throws ValidationException;
 

@@ -20,7 +20,7 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 import scaffolding.TestProject;
 
 public class AnnotatedTagFinderTest {
-	private final Log log = mock(Log.class);
+	private static final Log log = mock(Log.class);
 
 	@Test
 	public void findsTheLatestCommitWhereThereHaveBeenNoBranches() throws Exception {
@@ -45,7 +45,8 @@ public class AnnotatedTagFinderTest {
 
 	private static AnnotatedTag tagLocalRepo(final TestProject project, final String tagName, final String version,
 			final long buildNumber) throws GitAPIException {
-		final AnnotatedTag tag = AnnotatedTag.create(tagName, version, buildNumber);
+		final GitRepository repo = new GitRepository(log, project.local, null);
+		final AnnotatedTag tag = repo.create(tagName, version, buildNumber);
 		tag.saveAtHEAD(project.local);
 		return tag;
 	}
