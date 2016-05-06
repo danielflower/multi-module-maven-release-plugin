@@ -23,10 +23,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -36,7 +35,7 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 public class PomWriterFactoryTest {
-	private final class HasOneChangedPomFile extends BaseMatcher<List<File>> {
+	private final class HasOneChangedPomFile implements ArgumentMatcher<List<File>> {
 		@SuppressWarnings("unchecked")
 		@Override
 		public boolean matches(final Object item) {
@@ -45,8 +44,8 @@ public class PomWriterFactoryTest {
 		}
 
 		@Override
-		public void describeTo(final Description description) {
-			description.appendText("List with 1 changed file");
+		public String toString() {
+			return "List with 1 changed file";
 		}
 	}
 

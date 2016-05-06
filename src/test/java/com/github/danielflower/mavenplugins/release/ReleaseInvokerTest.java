@@ -24,10 +24,9 @@ import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
@@ -83,7 +82,7 @@ public class ReleaseInvokerTest {
 		verify(request).setDebug(true);
 		verify(log).isDebugEnabled();
 		verify(request).setAlsoMake(true);
-		verify(request).setGoals(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setGoals(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			public boolean matches(final Object item) {
@@ -93,11 +92,11 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("deploy");
+			public String toString() {
+				return "deploy";
 			}
 		}));
-		verify(request).setProjects(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setProjects(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -106,8 +105,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("projects");
+			public String toString() {
+				return "projects";
 			}
 		}));
 		verify(log).info("About to run mvn [deploy] with no profiles activated");
@@ -137,7 +136,7 @@ public class ReleaseInvokerTest {
 		goals.add(SITE);
 		releaseInvoker.setGoals(goals);
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setGoals(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setGoals(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -147,8 +146,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("goals");
+			public String toString() {
+				return "goals";
 			}
 		}));
 	}
@@ -159,7 +158,7 @@ public class ReleaseInvokerTest {
 		releaseInvoker.setReleaseProfiles(releaseProfiles);
 		when(project.getActiveProfiles()).thenReturn(asList(activeProfile));
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setProfiles(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setProfiles(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -170,8 +169,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("profiles");
+			public String toString() {
+				return "profiles";
 			}
 		}));
 	}
@@ -181,7 +180,7 @@ public class ReleaseInvokerTest {
 		modulesToRelease.add(MODULE_PATH);
 		releaseInvoker.setModulesToRelease(modulesToRelease);
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setProjects(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setProjects(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -191,8 +190,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("projects");
+			public String toString() {
+				return "projects";
 			}
 		}));
 	}
@@ -202,7 +201,7 @@ public class ReleaseInvokerTest {
 		when(module.willBeReleased()).thenReturn(true);
 		releaseInvoker.setModulesToRelease(modulesToRelease);
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setProjects(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setProjects(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -212,8 +211,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("projects");
+			public String toString() {
+				return "projects";
 			}
 		}));
 	}
@@ -222,7 +221,7 @@ public class ReleaseInvokerTest {
 	public void runMavenBuild_UserImplicitlyWantsThisToBeReleased_WillNotBeReleased() throws Exception {
 		releaseInvoker.setModulesToRelease(modulesToRelease);
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setProjects(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setProjects(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -231,8 +230,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("projects");
+			public String toString() {
+				return "projects";
 			}
 		}));
 	}
@@ -241,7 +240,7 @@ public class ReleaseInvokerTest {
 	public void skipTests() throws Exception {
 		releaseInvoker.setSkipTests(true);
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setGoals(Mockito.argThat(new BaseMatcher<List<String>>() {
+		verify(request).setGoals(Mockito.argThat(new ArgumentMatcher<List<String>>() {
 
 			@Override
 			@SuppressWarnings("unchecked")
@@ -251,8 +250,8 @@ public class ReleaseInvokerTest {
 			}
 
 			@Override
-			public void describeTo(final Description description) {
-				description.appendText("goals");
+			public String toString() {
+				return "goals";
 			}
 		}));
 	}
