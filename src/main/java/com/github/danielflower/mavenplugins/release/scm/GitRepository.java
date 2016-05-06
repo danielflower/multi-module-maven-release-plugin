@@ -97,7 +97,7 @@ public final class GitRepository implements SCMRepository {
 
 	@Override
 	public void tagRepoAndPush(final AnnotatedTag tag) throws GitAPIException {
-		final Ref tagRef = tag.saveAtHEAD(git);
+		final Ref tagRef = tag.saveAtHEAD();
 		final PushCommand pushCommand = git.push().add(tagRef);
 		if (remoteUrl != null) {
 			pushCommand.setRemote(remoteUrl);

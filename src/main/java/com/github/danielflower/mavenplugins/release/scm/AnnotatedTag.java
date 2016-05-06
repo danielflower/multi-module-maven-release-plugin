@@ -36,7 +36,7 @@ public class AnnotatedTag {
 		return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
 	}
 
-	public Ref saveAtHEAD(final Git git) throws GitAPIException {
+	public Ref saveAtHEAD() throws GitAPIException {
 		final String json = message.toJSONString();
 		ref = git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
 		return ref;

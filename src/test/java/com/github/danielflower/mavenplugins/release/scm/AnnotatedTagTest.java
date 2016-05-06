@@ -33,7 +33,7 @@ public class AnnotatedTagTest {
 		final TestProject project = TestProject.singleModuleProject();
 		final GitRepository repo = new GitRepository(log, project.local, null);
 		final AnnotatedTag tag = repo.create("my-name", "the-version", 2134);
-		tag.saveAtHEAD(project.local);
+		tag.saveAtHEAD();
 
 		final Ref ref = project.local.tagList().call().get(0);
 		final AnnotatedTag inflatedTag = repo.fromRef(ref);

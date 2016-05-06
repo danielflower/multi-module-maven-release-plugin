@@ -47,7 +47,7 @@ public class AnnotatedTagFinderTest {
 			final long buildNumber) throws GitAPIException {
 		final GitRepository repo = new GitRepository(log, project.local, null);
 		final AnnotatedTag tag = repo.create(tagName, version, buildNumber);
-		tag.saveAtHEAD(project.local);
+		tag.saveAtHEAD();
 		return tag;
 	}
 

@@ -52,12 +52,12 @@ public class SingleModuleTest extends E2ETest {
 		assertThat(testProject.local, hasTag("single-module-1.0.1"));
 
 		final GitRepository repo = new GitRepository(mock(Log.class), testProject.local, null);
-		repo.create("single-module-1.0.2", "1.0", 2).saveAtHEAD(testProject.local);
+		repo.create("single-module-1.0.2", "1.0", 2).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.3"));
 
-		repo.create("single-module-1.0.4", "1.0", 4).saveAtHEAD(testProject.origin);
-		repo.create("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD(testProject.origin);
+		repo.create("single-module-1.0.4", "1.0", 4).saveAtHEAD();
+		repo.create("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.5"));
 
