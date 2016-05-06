@@ -44,7 +44,7 @@ public class LocalGitRepoTest {
 	@Test
 	public void usesThePassedInScmUrlToFindRemote() throws Exception {
 		final Scm scm = mock(Scm.class);
-		final String remote = dirToGitScmReference(project.originDir).replace("file://localhost/", "file:///");
+		final String remote = dirToGitScmReference(project.originDir);
 		when(scm.getDeveloperConnection()).thenReturn(remote);
 		final GitRepository repo = new GitRepository(log, project.local,
 				SCMRepositoryProvider.getRemoteUrlOrNullIfNoneSet(scm));

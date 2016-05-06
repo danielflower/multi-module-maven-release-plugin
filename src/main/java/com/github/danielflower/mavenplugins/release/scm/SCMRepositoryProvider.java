@@ -50,7 +50,7 @@ final class SCMRepositoryProvider implements Provider<SCMRepository> {
 					messages.add(format("The value in your scm tag is %s", remote));
 					throw new ValidationException(format("%s %s", ERROR_SUMMARY, remote), messages);
 				}
-				remote = remote.substring(GIT_PREFIX.length());
+				remote = remote.substring(GIT_PREFIX.length()).replace("file://localhost/", "file:///");
 			}
 		}
 		return remote;

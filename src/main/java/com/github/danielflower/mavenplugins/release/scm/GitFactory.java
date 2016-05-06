@@ -6,11 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
+@Named
+@Singleton
 public class GitFactory {
 
 	public Git newGit() throws ValidationException {
