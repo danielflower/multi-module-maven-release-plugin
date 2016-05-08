@@ -23,7 +23,6 @@ import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
-import static scaffolding.MvnRunner.runMaven;
 
 public class IndependentVersionsTest {
 
@@ -89,7 +88,7 @@ public class IndependentVersionsTest {
     @Test
     public void whenRunFromASubFolderItShowsAnError() throws IOException, InterruptedException {
         try {
-            runMaven(new File(testProject.localDir, "console-app"),
+            new MvnRunner().runMaven(new File(testProject.localDir, "console-app"),
                 "-DbuildNumber=" + buildNumber,
                 "releaser:release");
             Assert.fail("Should not have worked");

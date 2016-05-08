@@ -30,3 +30,8 @@ version of a module was released
 * A module is only released if there are changes to it
 * The release version of the pom is not committed back to the repository
 * Tests are run once by default (or optionally not at all)
+
+Prerequisites
+-------------
+
+The plugin requires **Maven ${project.prerequisites.maven}** or later and **Java 7** or later. If you need Java 6 support, then use version `1.4.6`.

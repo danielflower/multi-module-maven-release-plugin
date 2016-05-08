@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HelpTest {
 
-    public static final String multi_module_release_help = "releaser:help";
+    private static final String multi_module_release_help = "releaser:help";
     private static TestProject someProject;
 
     @BeforeClass
@@ -40,7 +40,7 @@ public class HelpTest {
     }
 
     private List<String> mvn(String... commands) throws IOException {
-        return MvnRunner.runMaven(someProject.localDir, commands);
+        return new MvnRunner().runMaven(someProject.localDir, commands);
     }
 
     @Test
@@ -53,9 +53,9 @@ public class HelpTest {
     }
 
     private static Matcher<Iterable<? super String>> containsStrings(String... strings) {
-        List<Matcher<Iterable<? super String>>> matchers = new ArrayList<Matcher<Iterable<? super String>>>();
+        List<Matcher<Iterable<? super String>>> matchers = new ArrayList<>();
         for (String s : strings)
-            matchers.add(CoreMatchers.<String>hasItem(containsString(s)));
+            matchers.add(CoreMatchers.hasItem(containsString(s)));
 
         return allOf((Iterable) matchers);
     }

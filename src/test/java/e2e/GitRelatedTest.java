@@ -19,7 +19,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
-import static scaffolding.MvnRunner.runMaven;
 
 public class GitRelatedTest {
 
@@ -34,7 +33,7 @@ public class GitRelatedTest {
         File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module");
         TestProject.performPomSubstitution(projectRoot);
         try {
-            runMaven(projectRoot, "releaser:release");
+            new MvnRunner().runMaven(projectRoot, "releaser:release");
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
             assertThat(e.output, twoOf(containsString("Releases can only be performed from Git repositories.")));
