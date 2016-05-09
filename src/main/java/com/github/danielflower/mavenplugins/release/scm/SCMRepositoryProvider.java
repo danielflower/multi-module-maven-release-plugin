@@ -24,7 +24,8 @@ final class SCMRepositoryProvider implements Provider<SCMRepository> {
 	static final String GIT_PREFIX = "scm:git:";
 	private final SCMRepository repository;
 
-	@Inject
+	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
+	@Inject // Maven 3.3.0 and greater
 	SCMRepositoryProvider(final Log log, final GitFactory factory, final MavenProject project) {
 		SCMRepository repository;
 		try {

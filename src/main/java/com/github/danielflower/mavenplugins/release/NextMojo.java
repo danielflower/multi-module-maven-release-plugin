@@ -33,7 +33,8 @@ aggregator = true // the plugin should only run once against the aggregator pom
 )
 public class NextMojo extends BaseMojo {
 
-	@Inject
+	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
+	@Inject // Maven 3.3.0 and greater
 	public NextMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
 			final LogHolder logHolder) throws ValidationException {
 		super(builderFactory, repository, logHolder);

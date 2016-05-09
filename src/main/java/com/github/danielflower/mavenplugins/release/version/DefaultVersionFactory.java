@@ -16,7 +16,8 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 final class DefaultVersionFactory implements VersionFactory {
 	private final SCMRepository repository;
 
-	@Inject
+	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
+	@Inject // Maven 3.3.0 and greater
 	DefaultVersionFactory(final SCMRepository repository) {
 		this.repository = repository;
 	}

@@ -19,7 +19,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import e2e.E2ETest;
 
 public class TestProject {
-
 	public static final String PLUGIN_VERSION_FOR_TESTS = "2.0-SNAPSHOT";
 	public final File originDir;
 	public final Git origin;
@@ -28,6 +27,7 @@ public class TestProject {
 	public final Git local;
 
 	private final AtomicInteger commitCounter = new AtomicInteger(1);
+	private MvnRunner mvnRunner = E2ETest.mvn;
 
 	private TestProject(final File originDir, final Git origin, final File localDir, final Git local) {
 		this.originDir = originDir;
@@ -40,20 +40,20 @@ public class TestProject {
 	 * Runs a mvn command against the local repo and returns the console output.
 	 */
 	public List<String> mvn(final String... arguments) throws IOException {
-		return E2ETest.mvn.runMaven(localDir, arguments);
+		return mvnRunner.runMaven(localDir, arguments);
 	}
 
 	public List<String> mvnRelease(final String buildNumber) throws IOException, InterruptedException {
-		return E2ETest.mvn.runMaven(localDir, "-DbuildNumber=" + buildNumber, "releaser:release");
+		return mvnRunner.runMaven(localDir, "-DbuildNumber=" + buildNumber, "releaser:release");
 	}
 
 	public List<String> mvnReleaserNext(final String buildNumber) throws IOException, InterruptedException {
-		return E2ETest.mvn.runMaven(localDir, "-DbuildNumber=" + buildNumber, "releaser:next");
+		return mvnRunner.runMaven(localDir, "-DbuildNumber=" + buildNumber, "releaser:next");
 	}
 
 	public List<String> mvnRelease(final String buildNumber, final String moduleToRelease)
 			throws IOException, InterruptedException {
-		return E2ETest.mvn.runMaven(localDir, "-DbuildNumber=" + buildNumber, "-DmodulesToRelease=" + moduleToRelease,
+		return mvnRunner.runMaven(localDir, "-DbuildNumber=" + buildNumber, "-DmodulesToRelease=" + moduleToRelease,
 				"releaser:release");
 	}
 
@@ -159,4 +159,7 @@ public class TestProject {
 		return project("snapshot-dependencies");
 	}
 
+	public void setMvnRunner(final MvnRunner mvn) {
+		this.mvnRunner = mvn;
+	}
 }

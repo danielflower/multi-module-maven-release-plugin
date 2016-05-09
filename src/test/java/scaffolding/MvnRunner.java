@@ -9,6 +9,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -27,6 +29,8 @@ import org.apache.maven.shared.invoker.PrintStreamHandler;
 public class MvnRunner {
 	public static final Path WORK_DIRECTORY = getDefault().getPath(USER_DIR);
 	public static final Path LOCAL_MAVEN_REPO = WORK_DIRECTORY.resolve("maven-repo");
+	private boolean haveInstalledPlugin = false;
+	private final File mvnHome;
 
 	static {
 		try {
@@ -57,6 +61,39 @@ public class MvnRunner {
 			th.printStackTrace();
 			throw new InstantiationError(th.getMessage());
 		}
+	}
+
+	public MvnRunner() {
+		this(null);
+	}
+
+	public MvnRunner(final File mvnHome) {
+		this.mvnHome = mvnHome;
+	}
+
+	public void installReleasePluginToLocalRepo() throws MavenInvocationException, IOException {
+		if (haveInstalledPlugin) {
+			return;
+		}
+		final long start = System.currentTimeMillis();
+		System.out.println("Installing the plugin into the local repo");
+		assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
+		runMaven(new File("."), "-DskipTests=true", "install");
+		System.out.println(
+				"Finished installing the plugin into the local repo in " + (System.currentTimeMillis() - start) + "ms");
+		haveInstalledPlugin = true;
+	}
+
+	public MvnRunner mvn(final String version) throws IOException {
+		System.out.println("Ensuring maven " + version + " is available");
+		final MvnRunner mvnRunner = new MvnRunner();
+		final String dirWithMavens = "target/mavens/" + version;
+		mvnRunner.runMaven(new File("."), "-Dartifact=org.apache.maven:apache-maven:" + version + ":zip:bin",
+				"-DmarkersDirectory=" + dirWithMavens, "-DoutputDirectory=" + dirWithMavens,
+				"org.apache.maven.plugins:maven-dependency-plugin:2.10:unpack");
+		final File mvnHome = new File(dirWithMavens).listFiles((FileFilter) DirectoryFileFilter.INSTANCE)[0];
+		System.out.println("Maven " + version + " available at " + mvnHome.getAbsolutePath());
+		return new MvnRunner(mvnHome);
 	}
 
 	private static InvocationRequest createRequest() throws IOException {
