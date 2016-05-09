@@ -3,6 +3,7 @@ package com.github.danielflower.mavenplugins.release;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
+import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+
 /**
  * @author Roland Hauser sourcepond@gmail.com
  *
@@ -24,11 +27,15 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 class ReleaseInvoker {
 	static final String DEPLOY = "deploy";
 	static final String SKIP_TESTS = "-DskipTests=true";
+	static final String LOCAL_REPO = "-Dmaven.repo.local=%s";
 	private final Log log;
 	private final MavenProject project;
 	private final InvocationRequest request;
 	private final Invoker invoker;
 	private boolean skipTests;
+	private boolean debugEnabled;
+	private boolean stacktraceEnabled;
+	private File localMavenRepo;
 	private List<String> goals;
 	private List<String> modulesToRelease;
 	private List<String> releaseProfiles;
@@ -73,6 +80,14 @@ class ReleaseInvoker {
 		releaseProfiles = releaseProfilesOrNull;
 	}
 
+	final void setDebugEnabled(final boolean debugEnabled) {
+		this.debugEnabled = debugEnabled;
+	}
+
+	final void setStacktraceEnabled(final boolean stacktraceEnabled) {
+		this.stacktraceEnabled = stacktraceEnabled;
+	}
+
 	final void setSkipTests(final boolean skipTests) {
 		this.skipTests = skipTests;
 	}
@@ -85,7 +100,11 @@ class ReleaseInvoker {
 		request.setUserSettingsFile(userSettings);
 	}
 
-	public final void runMavenBuild(final Reactor reactor) throws MojoExecutionException {
+	final void setLocalMavenRepo(final File localMavenRepo) {
+		this.localMavenRepo = localMavenRepo;
+	}
+
+	public final void runMavenBuild(final Reactor reactor) throws MojoExecutionException, IOException {
 		request.setInteractive(false);
 		request.setShowErrors(true);
 		request.setDebug(log.isDebugEnabled());
@@ -93,6 +112,15 @@ class ReleaseInvoker {
 		final List<String> goals = getGoals();
 		if (skipTests) {
 			goals.add(SKIP_TESTS);
+		}
+		if (localMavenRepo != null) {
+			goals.add(format(LOCAL_REPO, localMavenRepo.getCanonicalFile()));
+		}
+		if (debugEnabled) {
+			goals.add("-X");
+		}
+		if (stacktraceEnabled) {
+			goals.add("-e");
 		}
 		request.setGoals(getGoals());
 
@@ -102,7 +130,7 @@ class ReleaseInvoker {
 		request.setAlsoMake(true);
 		final List<String> changedModules = new ArrayList<String>();
 		final List<String> modulesToRelease = getModulesToRelease();
-		for (final ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
+		for (final ReleasableModule releasableModule : reactor) {
 			final String modulePath = releasableModule.getRelativePathToModule();
 			final boolean userExplicitlyWantsThisToBeReleased = modulesToRelease.contains(modulePath);
 			final boolean userImplicitlyWantsThisToBeReleased = modulesToRelease.isEmpty();

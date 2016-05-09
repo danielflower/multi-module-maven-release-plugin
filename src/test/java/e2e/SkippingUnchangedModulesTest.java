@@ -1,9 +1,6 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.util.List;
@@ -15,14 +12,9 @@ import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasTag;
 
-public class SkippingUnchangedModulesTest {
+public class SkippingUnchangedModulesTest extends E2ETest {
 
     final TestProject testProject = TestProject.deepDependenciesProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void changesInTheRootAreDetected() throws Exception {

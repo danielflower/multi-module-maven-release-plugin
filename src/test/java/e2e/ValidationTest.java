@@ -1,33 +1,21 @@
 package e2e;
 
-import com.github.danielflower.mavenplugins.release.FileUtils;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.GitMatchers;
 import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
-public class ValidationTest {
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+public class ValidationTest extends E2ETest {
 
     @Test
     public void ifTheSameVersionIsReleasedTwiceItErrorsLoudly() throws Exception {

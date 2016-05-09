@@ -5,12 +5,22 @@ import static java.lang.String.format;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
+
+import com.github.danielflower.mavenplugins.release.log.LogHolder;
+import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
+import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTagsBuilder;
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -62,6 +72,18 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "disableSshAgent")
 	private boolean disableSshAgent;
 
+	/**
+	 * Specifies whether the release build should run with the "-X" switch.
+	 */
+	@Parameter(property = "debugEnabled")
+	protected boolean debugEnabled;
+
+	/**
+	 * Specifies whether the release build should run with the "-e" switch.
+	 */
+	@Parameter(property = "stacktraceEnabled")
+	protected boolean stacktraceEnabled;
+
 	@Parameter(defaultValue = "${settings}", readonly = true, required = true)
 	private Settings settings;
 
@@ -91,6 +113,18 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "passphrase")
 	private String passphrase;
 
+	private final ReactorBuilderFactory builderFactory;
+
+	protected final SCMRepository repository;
+	private final LogHolder logHolder;
+
+	protected BaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
+			final LogHolder logHolder) throws ValidationException {
+		this.builderFactory = builderFactory;
+		this.repository = repository;
+		this.logHolder = logHolder;
+	}
+
 	final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
@@ -115,7 +149,46 @@ public abstract class BaseMojo extends AbstractMojo {
 		disableSshAgent = true;
 	}
 
-	protected final void configureJsch(final Log log) {
+	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
+			throws GitAPIException, ValidationException {
+		final ProposedTagsBuilder builder = repository.newProposedTagsBuilder();
+		for (final ReleasableModule module : reactor) {
+			if (!module.willBeReleased()) {
+				continue;
+			}
+			if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
+				builder.add(module.getTagName(), module.getVersion(), module.getBuildNumber());
+			}
+		}
+		return builder.build();
+	}
+
+	protected void printBigErrorMessageAndThrow(final String terseMessage, final List<String> linesToLog)
+			throws MojoExecutionException {
+		final Log log = getLog();
+		log.error("");
+		log.error("");
+		log.error("");
+		log.error("************************************");
+		log.error("Could not execute the release plugin");
+		log.error("************************************");
+		log.error("");
+		log.error("");
+		for (final String line : linesToLog) {
+			log.error(line);
+		}
+		log.error("");
+		log.error("");
+		throw new MojoExecutionException(terseMessage);
+	}
+
+	protected final Reactor newReactor() throws ValidationException, MojoExecutionException, GitAPIException {
+		final ReactorBuilder builder = builderFactory.newBuilder();
+		return builder.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
+				.setModulesToForceRelease(modulesToForceRelease).build();
+	}
+
+	protected final void configureJsch() {
 		if (!disableSshAgent) {
 			if (serverId != null) {
 				final Server server = settings.getServer(serverId);
@@ -123,11 +196,18 @@ public abstract class BaseMojo extends AbstractMojo {
 					privateKey = privateKey == null ? server.getPrivateKey() : privateKey;
 					passphrase = passphrase == null ? server.getPassphrase() : passphrase;
 				} else {
-					log.warn(format("No server configuration in Maven settings found with id %s", serverId));
+					getLog().warn(format("No server configuration in Maven settings found with id %s", serverId));
 				}
 			}
 
-			JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, privateKey, passphrase));
+			JschConfigSessionFactory
+					.setInstance(new SshAgentSessionFactory(getLog(), knownHosts, privateKey, passphrase));
 		}
+	}
+
+	@Override
+	public final void setLog(final Log log) {
+		super.setLog(log);
+		logHolder.setLog(log);
 	}
 }

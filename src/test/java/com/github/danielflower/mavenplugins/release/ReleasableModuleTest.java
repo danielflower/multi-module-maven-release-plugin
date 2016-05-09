@@ -2,10 +2,15 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import com.github.danielflower.mavenplugins.release.version.Version;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static scaffolding.ReleasableModuleBuilder.aModule;
 
 public class ReleasableModuleTest {
@@ -24,11 +29,16 @@ public class ReleasableModuleTest {
         MavenProject project = new MavenProject();
         project.setArtifactId("some-arty");
         project.setGroupId("some-group");
+        Version version = mock(Version.class);
+        when(version.buildNumber()).thenReturn(12l);
+        when(version.businessVersion()).thenReturn("1.2.3");
+        when(version.developmentVersion()).thenReturn("1.2.3-SNAPSHOT");
         ReleasableModule first = new ReleasableModule(
-            project, new VersionName("1.2.3-SNAPSHOT", "1.2.3", 12), "1.2.3.11", "somewhere"
+            project, version, "1.2.3.11", "somewhere"
         );
         assertThat(first.willBeReleased(), is(false));
 
+        when(version.releaseVersion()).thenReturn("1.2.3.12");
         ReleasableModule changed = first.createReleasableVersion();
         assertThat(changed.getArtifactId(), equalTo("some-arty"));
         assertThat(changed.getBuildNumber(), equalTo(12L));

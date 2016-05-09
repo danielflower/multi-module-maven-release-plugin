@@ -1,11 +1,8 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.IOException;
@@ -14,13 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
-public class TestRunningTest {
+public class TestRunningTest extends E2ETest {
     final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void doesNotReleaseIfThereAreTestFailuresButTagsAreStillWritten() throws Exception {

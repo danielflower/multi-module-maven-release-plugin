@@ -2,17 +2,19 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
 
+import com.github.danielflower.mavenplugins.release.version.Version;
+
 import java.util.List;
 
 public class ReleasableModule {
 
     private final MavenProject project;
-    private final VersionName version;
+    private final Version version;
     private final String tagName;
     private final String equivalentVersion;
     private final String relativePathToModule;
 
-    public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule) {
+    public ReleasableModule(MavenProject project, Version version, String equivalentVersion, String relativePathToModule) {
         this.project = project;
         this.version = version;
         this.equivalentVersion = equivalentVersion;
