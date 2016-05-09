@@ -22,8 +22,7 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
 final class UpdateParent extends Command {
 	static final String ERROR_FORMAT = "The parent of %s is %s %s";
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	UpdateParent(final Log log) {
 		super(log);
 	}

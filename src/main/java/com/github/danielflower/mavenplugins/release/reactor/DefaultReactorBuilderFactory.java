@@ -18,8 +18,7 @@ final class DefaultReactorBuilderFactory implements ReactorBuilderFactory {
 	private final Log log;
 	private final VersionFactory versionFactory;
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	DefaultReactorBuilderFactory(final Log log, final VersionFactory versionFactory) {
 		this.log = log;
 		this.versionFactory = versionFactory;

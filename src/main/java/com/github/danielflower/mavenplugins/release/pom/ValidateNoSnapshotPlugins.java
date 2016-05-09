@@ -21,8 +21,7 @@ public class ValidateNoSnapshotPlugins extends Command {
 	static final String MULTI_MODULE_MAVEN_PLUGIN_GROUP_ID = "com.github.danielflower.mavenplugins";
 	static final String MULTI_MODULE_MAVEN_PLUGIN_ARTIFACT_ID = "multi-module-maven-release-plugin";
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	ValidateNoSnapshotPlugins(final Log log) {
 		super(log);
 	}

@@ -16,8 +16,7 @@ class PomWriterFactory {
 	private final MavenXpp3Writer writer;
 	private final Log log;
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	PomWriterFactory(final SCMRepository repository, final MavenXpp3Writer writer, final Log log) {
 		this.repository = repository;
 		this.writer = writer;

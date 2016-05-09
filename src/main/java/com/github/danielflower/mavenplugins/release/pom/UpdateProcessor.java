@@ -29,8 +29,7 @@ final class UpdateProcessor implements Updater {
 	private final Log log;
 	private final List<Command> commands;
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	public UpdateProcessor(final ContextFactory contextFactory, final PomWriterFactory writerFactory, final Log log,
 			final List<Command> commands) {
 		this.contextFactory = contextFactory;

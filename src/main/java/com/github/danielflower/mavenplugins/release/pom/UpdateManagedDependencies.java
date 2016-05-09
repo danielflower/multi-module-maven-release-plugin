@@ -20,8 +20,7 @@ import org.apache.maven.plugin.logging.Log;
 @Singleton
 final class UpdateManagedDependencies extends UpdateDependencies {
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	UpdateManagedDependencies(final Log log) {
 		super(log);
 	}

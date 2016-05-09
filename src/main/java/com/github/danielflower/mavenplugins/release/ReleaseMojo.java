@@ -108,8 +108,7 @@ public class ReleaseMojo extends BaseMojo {
 
 	private final Updater pomUpdater;
 
-	@com.google.inject.Inject // Compatibility: Maven 3.0.1 - 3.2.1
-	@Inject // Maven 3.3.0 and greater
+	@Inject
 	public ReleaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
 			final Updater pomUpdater, final LogHolder logHolder) throws ValidationException {
 		super(builderFactory, repository, logHolder);
