@@ -113,6 +113,7 @@ public class MvnRunner {
 		request.setBaseDirectory(workingDir);
 
 		final Invoker invoker = new DefaultInvoker();
+		invoker.setMavenHome(mvnHome);
 		final CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
 		invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
 
