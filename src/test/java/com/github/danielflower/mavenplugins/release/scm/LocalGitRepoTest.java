@@ -16,6 +16,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,11 +25,19 @@ import scaffolding.TestProject;
 public class LocalGitRepoTest {
 	private final Log log = mock(Log.class);
 	TestProject project = TestProject.singleModuleProject();
-	private GitRepository repo = new GitRepository(log, project.local, null);
+	private final GitFactory gitFactory = mock(GitFactory.class);
+	private GitRepository repo;
+
+	@Before
+	public void setup() throws Exception {
+		when(gitFactory.newGit()).thenReturn(project.local);
+		repo = new GitRepository(log, gitFactory);
+	}
 
 	@Test
-	public void canDetectLocalTags() throws GitAPIException {
-		final GitRepository repo = new GitRepository(log, project.local, null);
+	public void canDetectLocalTags() throws Exception {
+		when(gitFactory.newGit()).thenReturn(project.local);
+		final GitRepository repo = new GitRepository(log, gitFactory);
 		tag(project.local, "some-tag");
 		assertThat(repo.hasLocalTag("some-tag"), is(true));
 		assertThat(repo.hasLocalTag("some-ta"), is(false));
@@ -53,7 +62,8 @@ public class LocalGitRepoTest {
 		final Scm scm = mock(Scm.class);
 		final String remote = dirToGitScmReference(project.originDir);
 		when(scm.getDeveloperConnection()).thenReturn(remote);
-		repo = new GitRepository(log, project.local, SCMRepositoryProvider.getRemoteUrlOrNullIfNoneSet(scm));
+		when(gitFactory.newGit()).thenReturn(project.local);
+		final GitRepository repo = new GitRepository(log, gitFactory);
 		tag(project.origin, "some-tag");
 
 		final StoredConfig config = project.local.getRepository().getConfig();
@@ -74,7 +84,9 @@ public class LocalGitRepoTest {
 			tag(project.local, "this-is-a-tag-" + i);
 		}
 		project.local.push().setPushTags().call();
-		final GitRepository repo = new GitRepository(log, project.local, null);
+
+		when(gitFactory.newGit()).thenReturn(project.local);
+		final GitRepository repo = new GitRepository(log, gitFactory);
 		for (int i = 0; i < numberOfTags; i++) {
 			final String tagName = "this-is-a-tag-" + i;
 			assertThat(repo.hasLocalTag(tagName), is(true));
@@ -83,7 +95,7 @@ public class LocalGitRepoTest {
 	}
 
 	private ProposedTags tags(final String... tagNames) throws Exception {
-		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder();
+		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
 		for (final String tagName : tagNames) {
 			builder.add(tagName, "1", 0);
 		}

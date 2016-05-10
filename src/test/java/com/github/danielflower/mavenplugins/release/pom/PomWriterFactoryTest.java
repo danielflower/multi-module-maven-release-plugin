@@ -53,15 +53,18 @@ public class PomWriterFactoryTest {
 	private static final File TEST_FILE = new File("target/pomWriterTest");
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final MavenXpp3Writer writer = mock(MavenXpp3Writer.class);
+	private final MavenXpp3WriterFactory writerFactory = mock(MavenXpp3WriterFactory.class);
 	private final Log log = mock(Log.class);
 	private final MavenProject project = mock(MavenProject.class);
 	private final Model originalModel = mock(Model.class);
-	private final PomWriter pomWriter = new PomWriterFactory(repository, writer, log).newWriter();
+	private PomWriter pomWriter;
 
 	@Before
 	public void setup() throws IOException {
+		when(writerFactory.newWriter()).thenReturn(writer);
 		when(project.getOriginalModel()).thenReturn(originalModel);
 		when(project.getFile()).thenReturn(TEST_FILE);
+		pomWriter = new PomWriterFactory(repository, writerFactory, log).newWriter();
 		pomWriter.addProject(project);
 	}
 

@@ -11,12 +11,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -29,26 +34,45 @@ import com.github.danielflower.mavenplugins.release.Guard;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
 // TODO: Make this class package private when SingleModuleTest is working with a Guice injector
+@Named
+@Singleton
 public final class GitRepository implements SCMRepository {
 	private final Log log;
-	private final Git git;
-	private final String remoteUrl;
+	private final GitFactory gitFactory;
+	private Git git;
+	private ValidationException gitInstantiationException;
 	private boolean hasReverted; // A premature optimisation? In
 									// the normal case, file
 									// reverting occurs twice, which
 									// this bool prevents
 	private Collection<Ref> remoteTags;
 
-	public GitRepository(final Log log, final Git git, final String remoteUrl) {
+	@Inject
+	public GitRepository(final Log log, final GitFactory gitFactory) {
 		this.log = log;
-		this.git = git;
-		this.remoteUrl = remoteUrl;
+		this.gitFactory = gitFactory;
+	}
+
+	private Git getGit() throws ValidationException {
+		if (git == null && gitInstantiationException == null) {
+			try {
+				git = gitFactory.newGit();
+			} catch (final ValidationException e) {
+				gitInstantiationException = e;
+			}
+		}
+
+		if (git == null) {
+			throw gitInstantiationException;
+		}
+
+		return git;
 	}
 
 	@Override
-	public Collection<Long> getRemoteBuildNumbers(final String artifactId, final String versionWithoutBuildNumber)
-			throws GitAPIException {
-		final Collection<Ref> remoteTagRefs = allRemoteTags();
+	public Collection<Long> getRemoteBuildNumbers(final String remoteUrl, final String artifactId,
+			final String versionWithoutBuildNumber) throws GitAPIException, ValidationException {
+		final Collection<Ref> remoteTagRefs = allRemoteTags(remoteUrl);
 		final Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
 		final String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
 		for (final Ref remoteTagRef : remoteTagRefs) {
@@ -61,9 +85,9 @@ public final class GitRepository implements SCMRepository {
 		return remoteBuildNumbers;
 	}
 
-	public Collection<Ref> allRemoteTags() throws GitAPIException {
+	public Collection<Ref> allRemoteTags(final String remoteUrl) throws GitAPIException, ValidationException {
 		if (remoteTags == null) {
-			final LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
+			final LsRemoteCommand lsRemoteCommand = getGit().lsRemote().setTags(true).setHeads(false);
 			if (remoteUrl != null) {
 				lsRemoteCommand.setRemote(remoteUrl);
 			}
@@ -73,14 +97,14 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public boolean hasLocalTag(final String tagName) throws GitAPIException {
-		return GitHelper.hasLocalTag(git, tagName);
+	public boolean hasLocalTag(final String tagName) throws GitAPIException, ValidationException {
+		return GitHelper.hasLocalTag(getGit(), tagName);
 	}
 
 	private Status currentStatus() throws ValidationException {
 		Status status;
 		try {
-			status = git.status().call();
+			status = getGit().status().call();
 		} catch (final GitAPIException e) {
 			throw new ValidationException("Error while checking if the Git repo is clean", e);
 		}
@@ -114,12 +138,13 @@ public final class GitRepository implements SCMRepository {
 		}
 	}
 
-	private File workingDir() throws IOException {
-		return git.getRepository().getWorkTree().getCanonicalFile();
+	private File workingDir() throws IOException, NoWorkTreeException, ValidationException {
+		return getGit().getRepository().getWorkTree().getCanonicalFile();
 	}
 
 	@Override
-	public boolean revertChanges(final List<File> changedFiles) throws IOException {
+	public boolean revertChanges(final List<File> changedFiles)
+			throws IOException, NoWorkTreeException, ValidationException {
 		if (hasReverted) {
 			return true;
 		}
@@ -129,7 +154,7 @@ public final class GitRepository implements SCMRepository {
 		for (final File changedFile : changedFiles) {
 			try {
 				final String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
-				git.checkout().addPath(pathRelativeToWorkingTree).call();
+				getGit().checkout().addPath(pathRelativeToWorkingTree).call();
 			} catch (final Exception e) {
 				hasErrors = true;
 				log.error("Unable to revert changes to " + changedFile
@@ -142,11 +167,11 @@ public final class GitRepository implements SCMRepository {
 
 	@Override
 	public List<ProposedTag> tagsForVersion(final String module, final String versionWithoutBuildNumber)
-			throws MojoExecutionException {
+			throws MojoExecutionException, ValidationException {
 		final List<ProposedTag> results = new ArrayList<>();
 		List<Ref> tags;
 		try {
-			tags = git.tagList().call();
+			tags = getGit().tagList().call();
 		} catch (final GitAPIException e) {
 			throw new MojoExecutionException("Error while getting a list of tags in the local repo", e);
 		}
@@ -184,15 +209,15 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public DiffDetector newDiffDetector() {
-		return new TreeWalkingDiffDetector(git.getRepository());
+	public DiffDetector newDiffDetector() throws ValidationException {
+		return new TreeWalkingDiffDetector(getGit().getRepository());
 	}
 
 	@Override
-	public ProposedTag fromRef(final Ref gitTag) throws IOException {
+	public ProposedTag fromRef(final Ref gitTag) throws IOException, ValidationException {
 		Guard.notNull("gitTag", gitTag);
 
-		final RevWalk walk = new RevWalk(git.getRepository());
+		final RevWalk walk = new RevWalk(getGit().getRepository());
 		JSONObject message;
 		try {
 			final ObjectId tagId = gitTag.getObjectId();
@@ -206,7 +231,7 @@ public final class GitRepository implements SCMRepository {
 			message.put(VERSION, "0");
 			message.put(BUILD_NUMBER, "0");
 		}
-		return new DefaultProposedTag(git, gitTag, stripRefPrefix(gitTag.getName()), message);
+		return new DefaultProposedTag(getGit(), gitTag, stripRefPrefix(gitTag.getName()), message);
 	}
 
 	static String stripRefPrefix(final String refName) {
@@ -214,8 +239,8 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public ProposedTagsBuilder newProposedTagsBuilder() {
-		return new DefaultProposedTagsBuilder(log, git, this, remoteUrl);
+	public ProposedTagsBuilder newProposedTagsBuilder(final String remoteUrl) throws ValidationException {
+		return new DefaultProposedTagsBuilder(log, getGit(), this, remoteUrl);
 	}
 
 }

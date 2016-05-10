@@ -22,9 +22,9 @@ final class DefaultVersionFactory implements VersionFactory {
 	}
 
 	@Override
-	public Version newVersioning(final MavenProject project, final Long buildNumber)
+	public Version newVersioning(final MavenProject project, final Long buildNumber, final String remoteUrl)
 			throws MojoExecutionException, ValidationException, GitAPIException {
 		final String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-		return new DefaultVersion(repository, project, versionWithoutBuildNumber, buildNumber);
+		return new DefaultVersion(repository, project, versionWithoutBuildNumber, buildNumber, remoteUrl);
 	}
 }

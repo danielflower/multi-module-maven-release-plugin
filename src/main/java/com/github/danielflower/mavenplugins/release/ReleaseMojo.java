@@ -120,10 +120,10 @@ public class ReleaseMojo extends BaseMojo {
 		try {
 			configureJsch();
 			repository.errorIfNotClean();
+			final String remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
+			final Reactor reactor = newReactor(remoteUrl);
 
-			final Reactor reactor = newReactor();
-
-			final ProposedTags proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor);
+			final ProposedTags proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl);
 
 			final List<File> changedFiles = pomUpdater.updatePoms(reactor);
 

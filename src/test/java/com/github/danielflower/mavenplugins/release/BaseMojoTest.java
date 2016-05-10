@@ -1,13 +1,20 @@
 package com.github.danielflower.mavenplugins.release;
 
+import static com.github.danielflower.mavenplugins.release.BaseMojo.getRemoteUrlOrNullIfNoneSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
+import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
@@ -23,6 +30,8 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
  *
  */
 public class BaseMojoTest {
+	private static final String DEVELOPER_CONNECTION = "scm:git:ssh://some/developerPath";
+	private static final String CONNECTION = "scm:git:ssh://some/commonPath";
 	private static final String KNOWN_HOSTS = "anyKnownHosts";
 	private static final String SERVER_ID = "anyServerId";
 	private static final String SETTINGS_IDENTITY_FILE = "settingsIdentityFile";
@@ -35,6 +44,7 @@ public class BaseMojoTest {
 	private final ReactorBuilderFactory reactorBuilderFactory = mock(ReactorBuilderFactory.class);
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final LogHolder logHolder = mock(LogHolder.class);
+	private final Scm scm = mock(Scm.class);
 	private BaseMojo mojo;
 
 	@Before
@@ -46,6 +56,7 @@ public class BaseMojoTest {
 				// noop
 			}
 		};
+		mojo.project = mock(MavenProject.class);
 
 		when(server.getPrivateKey()).thenReturn(SETTINGS_IDENTITY_FILE);
 		when(server.getPassphrase()).thenReturn(SETTINGS_PASSPHRASE);
@@ -114,5 +125,45 @@ public class BaseMojoTest {
 		mojo.configureJsch();
 		final SshAgentSessionFactory factory = (SshAgentSessionFactory) JschConfigSessionFactory.getInstance();
 		assertEquals(KNOWN_HOSTS, factory.getKnownHostsOrNull());
+	}
+
+	@Test
+	public void getRemoteUrlScmIsNull() throws ValidationException {
+		assertNull(getRemoteUrlOrNullIfNoneSet(null));
+	}
+
+	@Test
+	public void getRemoteUrlNoConnectionsOnScm() throws ValidationException {
+		assertNull(getRemoteUrlOrNullIfNoneSet(scm));
+	}
+
+	@Test
+	public void getRemoteUrlUseDeveloperConnection() throws ValidationException {
+		when(scm.getDeveloperConnection()).thenReturn(DEVELOPER_CONNECTION);
+		when(scm.getConnection()).thenReturn(CONNECTION);
+		assertEquals("ssh://some/developerPath", getRemoteUrlOrNullIfNoneSet(scm));
+	}
+
+	@Test
+	public void getRemoteUrlUseConnection() throws ValidationException {
+		when(scm.getConnection()).thenReturn(CONNECTION);
+		assertEquals("ssh://some/commonPath", getRemoteUrlOrNullIfNoneSet(scm));
+	}
+
+	@Test
+	public void getRemoteUrlIllegalProtocol() {
+		when(scm.getDeveloperConnection()).thenReturn("scm:svn:ssh//some/illegal/protocol");
+		try {
+			getRemoteUrlOrNullIfNoneSet(scm);
+			fail("Exception expected");
+		} catch (final ValidationException expected) {
+			assertEquals(
+					"Cannot run the release plugin with a non-Git version control system scm:svn:ssh//some/illegal/protocol",
+					expected.getMessage());
+			final List<String> messages = expected.getMessages();
+			assertEquals(2, messages.size());
+			assertEquals("Cannot run the release plugin with a non-Git version control system", messages.get(0));
+			assertEquals("The value in your scm tag is scm:svn:ssh//some/illegal/protocol", messages.get(1));
+		}
 	}
 }

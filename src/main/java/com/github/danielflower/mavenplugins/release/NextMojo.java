@@ -43,8 +43,9 @@ public class NextMojo extends BaseMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			configureJsch();
-			final Reactor reactor = newReactor();
-			figureOutTagNamesAndThrowIfAlreadyExists(reactor);
+			final String remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
+			final Reactor reactor = newReactor(remoteUrl);
+			figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl);
 
 		} catch (final ValidationException e) {
 			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());

@@ -4,7 +4,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
@@ -13,17 +12,17 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 @Singleton
 class PomWriterFactory {
 	private final SCMRepository repository;
-	private final MavenXpp3Writer writer;
+	private final MavenXpp3WriterFactory writerFactory;
 	private final Log log;
 
 	@Inject
-	PomWriterFactory(final SCMRepository repository, final MavenXpp3Writer writer, final Log log) {
+	PomWriterFactory(final SCMRepository repository, final MavenXpp3WriterFactory writerFactory, final Log log) {
 		this.repository = repository;
-		this.writer = writer;
+		this.writerFactory = writerFactory;
 		this.log = log;
 	}
 
 	PomWriter newWriter() {
-		return new PomWriter(repository, writer, log);
+		return new PomWriter(repository, writerFactory.newWriter(), log);
 	}
 }

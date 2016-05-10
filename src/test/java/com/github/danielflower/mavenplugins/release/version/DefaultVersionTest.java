@@ -29,6 +29,7 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
  *
  */
 public class DefaultVersionTest {
+	private static final String ANY_REMOTE_URL = "anyRemoteUrl";
 	private static final String ARTIFACT_ID = "anyArtifactId";
 	private final SCMRepository gitRepo = mock(SCMRepository.class);
 	private final Git git = mock(Git.class);
@@ -45,32 +46,34 @@ public class DefaultVersionTest {
 
 	@Test
 	public void versionNamerCaresNotForOrderOfTags() throws Exception {
-		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.1.1")).thenReturn(asList(1L, 3L, 2L));
-		final Version version = new DefaultVersion(gitRepo, project, "1.1.1", null);
+		when(gitRepo.getRemoteBuildNumbers(ANY_REMOTE_URL, ARTIFACT_ID, "1.1.1")).thenReturn(asList(1L, 3L, 2L));
+		final Version version = new DefaultVersion(gitRepo, project, "1.1.1", null, ANY_REMOTE_URL);
 		assertThat(version.releaseVersion(), equalTo("1.1.1.4"));
 	}
 
 	@Test
 	public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
 		when(project.getVersion()).thenReturn("1.0-SNAPSHOT");
-		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.0")).thenReturn(Collections.<Long> emptyList());
-		final Version version = new DefaultVersion(gitRepo, project, "1.0", 123L);
+		when(gitRepo.getRemoteBuildNumbers(ANY_REMOTE_URL, ARTIFACT_ID, "1.0"))
+				.thenReturn(Collections.<Long> emptyList());
+		final Version version = new DefaultVersion(gitRepo, project, "1.0", 123L, ANY_REMOTE_URL);
 		assertEquals(version.releaseVersion(), "1.0.123");
 	}
 
 	@Test
 	public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsed() throws Exception {
 		when(project.getVersion()).thenReturn("1.0-SNAPSHOT");
-		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.0")).thenReturn(Collections.<Long> emptyList());
-		final Version version = new DefaultVersion(gitRepo, project, "1.0", null);
+		when(gitRepo.getRemoteBuildNumbers(ANY_REMOTE_URL, ARTIFACT_ID, "1.0"))
+				.thenReturn(Collections.<Long> emptyList());
+		final Version version = new DefaultVersion(gitRepo, project, "1.0", null, ANY_REMOTE_URL);
 		assertEquals("1.0.0", version.releaseVersion());
 	}
 
 	@Test
 	public void ifTheBuildNumberIsNullButThereIsAPreviousBuildNumbersThenThatValueIsIncremented() throws Exception {
 		when(project.getVersion()).thenReturn("1.0-SNAPSHOT");
-		when(gitRepo.getRemoteBuildNumbers(ARTIFACT_ID, "1.0")).thenReturn(asList(9L, 10L, 8L));
-		final Version version = new DefaultVersion(gitRepo, project, "1.0", null);
+		when(gitRepo.getRemoteBuildNumbers(ANY_REMOTE_URL, ARTIFACT_ID, "1.0")).thenReturn(asList(9L, 10L, 8L));
+		final Version version = new DefaultVersion(gitRepo, project, "1.0", null, ANY_REMOTE_URL);
 		assertEquals("1.0.11", version.releaseVersion());
 	}
 
@@ -87,7 +90,7 @@ public class DefaultVersionTest {
 			throws MojoExecutionException, GitAPIException {
 		try {
 			when(project.getVersion()).thenReturn(pomVersion);
-			new DefaultVersion(gitRepo, project, "1.0", buildNumber);
+			new DefaultVersion(gitRepo, project, "1.0", buildNumber, ANY_REMOTE_URL);
 			throw new AssertionError("Did not throw an error");
 		} catch (final ValidationException ex) {
 			return ex.getMessages();

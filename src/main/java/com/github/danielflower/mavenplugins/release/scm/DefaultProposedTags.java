@@ -5,17 +5,18 @@ import static java.util.Collections.unmodifiableCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.ValidationException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+
+import com.github.danielflower.mavenplugins.release.ValidationException;
 
 final class DefaultProposedTags implements ProposedTags {
 	static final String KEY_FORMAT = "%s/%s/%s";
@@ -51,14 +52,14 @@ final class DefaultProposedTags implements ProposedTags {
 	}
 
 	@Override
-	public List<String> getMatchingRemoteTags() throws GitAPIException {
+	public List<String> getMatchingRemoteTags() throws GitAPIException, ValidationException {
 		final List<String> tagNamesToSearchFor = new ArrayList<String>();
 		for (final ProposedTag annotatedTag : proposedTags.values()) {
 			tagNamesToSearchFor.add(annotatedTag.name());
 		}
 
 		final List<String> results = new ArrayList<String>();
-		final Collection<Ref> remoteTags = repo.allRemoteTags();
+		final Collection<Ref> remoteTags = repo.allRemoteTags(remoteUrl);
 		for (final Ref remoteTag : remoteTags) {
 			for (final String proposedTag : tagNamesToSearchFor) {
 				if (remoteTag.getName().equals("refs/tags/" + proposedTag)) {
@@ -75,7 +76,8 @@ final class DefaultProposedTags implements ProposedTags {
 		final String key = toKey(tag, version, buildNumber);
 		final ProposedTag proposedTag = proposedTags.get(key);
 		if (proposedTag == null) {
-			throw new ValidationException(format("No proposed tag registered %s", key));
+			throw new ValidationException(format("No proposed tag registered %s", key),
+					Collections.<String> emptyList());
 		}
 		return proposedTag;
 	}

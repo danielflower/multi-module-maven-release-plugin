@@ -2,9 +2,9 @@ package com.github.danielflower.mavenplugins.release.scm;
 
 import java.util.List;
 
-import javax.xml.bind.ValidationException;
-
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface ProposedTags extends Iterable<ProposedTag> {
 
@@ -13,10 +13,12 @@ public interface ProposedTags extends Iterable<ProposedTag> {
 	/**
 	 * Will be removed when LocalGitRepoTest is refactored
 	 * 
+	 * @throws ValidationException
+	 * 
 	 * @deprecated
 	 */
 	@Deprecated
-	List<String> getMatchingRemoteTags() throws GitAPIException;
+	List<String> getMatchingRemoteTags() throws GitAPIException, ValidationException;
 
 	void tagAndPushRepo() throws GitAPIException;
 }

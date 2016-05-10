@@ -50,14 +50,14 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 		return this;
 	}
 
-	private List<String> getMatchingRemoteTags() throws GitAPIException {
+	private List<String> getMatchingRemoteTags() throws GitAPIException, ValidationException {
 		final List<String> tagNamesToSearchFor = new ArrayList<String>();
 		for (final ProposedTag annotatedTag : proposedTags.values()) {
 			tagNamesToSearchFor.add(annotatedTag.name());
 		}
 
 		final List<String> results = new ArrayList<String>();
-		final Collection<Ref> remoteTags = repo.allRemoteTags();
+		final Collection<Ref> remoteTags = repo.allRemoteTags(remoteUrl);
 		for (final Ref remoteTag : remoteTags) {
 			for (final String proposedTag : tagNamesToSearchFor) {
 				if (remoteTag.getName().equals("refs/tags/" + proposedTag)) {

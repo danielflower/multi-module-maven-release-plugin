@@ -26,12 +26,14 @@ final class DefaultVersion implements Version {
 	private Long buildNumber;
 
 	DefaultVersion(final SCMRepository gitRepo, final MavenProject project, final String versionWithoutBuildNumber,
-			final Long buildNumber) throws MojoExecutionException, ValidationException, GitAPIException {
+			final Long buildNumber, final String remoteUrl)
+					throws MojoExecutionException, ValidationException, GitAPIException {
 		this.gitRepo = gitRepo;
 		this.project = project;
 		this.buildNumber = buildNumber;
 		this.versionWithoutBuildNumber = versionWithoutBuildNumber;
-		this.remoteBuildNumbers = gitRepo.getRemoteBuildNumbers(project.getArtifactId(), versionWithoutBuildNumber);
+		this.remoteBuildNumbers = gitRepo.getRemoteBuildNumbers(remoteUrl, project.getArtifactId(),
+				versionWithoutBuildNumber);
 		previousTagsForThisModule = gitRepo.tagsForVersion(project.getArtifactId(), versionWithoutBuildNumber);
 
 		init();

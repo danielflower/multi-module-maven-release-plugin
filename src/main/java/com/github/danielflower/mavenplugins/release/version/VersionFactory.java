@@ -8,6 +8,6 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface VersionFactory {
 
-	Version newVersioning(MavenProject project, Long buildNumber)
+	Version newVersioning(MavenProject project, Long buildNumber, String remoteUrl)
 			throws MojoExecutionException, ValidationException, GitAPIException;
 }

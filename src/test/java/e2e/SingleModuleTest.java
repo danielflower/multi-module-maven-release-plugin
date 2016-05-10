@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
@@ -18,6 +19,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.scm.GitFactory;
 import com.github.danielflower.mavenplugins.release.scm.GitRepository;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTagsBuilder;
@@ -52,8 +54,10 @@ public class SingleModuleTest extends E2ETest {
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.1"));
 
-		final GitRepository repo = new GitRepository(mock(Log.class), testProject.local, null);
-		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder();
+		final GitFactory gitFactory = mock(GitFactory.class);
+		when(gitFactory.newGit()).thenReturn(testProject.local);
+		final GitRepository repo = new GitRepository(mock(Log.class), gitFactory);
+		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
 		builder.add("single-module-1.0.2", "1.0", 2).build().getTag("single-module-1.0.2", "1.0", 2).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.3"));

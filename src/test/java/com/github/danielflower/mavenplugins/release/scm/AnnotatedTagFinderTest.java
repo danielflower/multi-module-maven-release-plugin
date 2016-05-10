@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -15,12 +16,14 @@ import org.junit.Test;
 import scaffolding.TestProject;
 
 public class AnnotatedTagFinderTest {
+	private final GitFactory gitFactory = mock(GitFactory.class);
 	private static final Log log = mock(Log.class);
 
 	@Test
 	public void findsTheLatestCommitWhereThereHaveBeenNoBranches() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
-		final GitRepository repo = new GitRepository(log, project.local, null);
+		when(gitFactory.newGit()).thenReturn(project.local);
+		final GitRepository repo = new GitRepository(log, gitFactory);
 
 		final ProposedTag tag1 = saveFileInModule(project, "console-app", "1.2", 3);
 		final ProposedTag tag2 = saveFileInModule(project, "core-utils", "2", 0);
@@ -40,8 +43,10 @@ public class AnnotatedTagFinderTest {
 
 	private static ProposedTag tagLocalRepo(final TestProject project, final String tagName, final String version,
 			final long buildNumber) throws Exception {
-		final GitRepository repo = new GitRepository(log, project.local, null);
-		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder();
+		final GitFactory gitFactory = mock(GitFactory.class);
+		when(gitFactory.newGit()).thenReturn(project.local);
+		final GitRepository repo = new GitRepository(log, gitFactory);
+		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
 		builder.add(tagName, version, buildNumber);
 		final ProposedTag tag = builder.build().getTag(tagName, version, buildNumber);
 		tag.saveAtHEAD();
@@ -63,7 +68,8 @@ public class AnnotatedTagFinderTest {
 	@Test
 	public void returnsMultipleTagsOnASingleCommit() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
-		final GitRepository repo = new GitRepository(log, project.local, null);
+		when(gitFactory.newGit()).thenReturn(project.local);
+		final GitRepository repo = new GitRepository(log, gitFactory);
 		saveFileInModule(project, "console-app", "1.2", 1);
 		final ProposedTag tag1 = tagLocalRepo(project, "console-app-1.1.1.1", "1.1.1", 1);
 		final ProposedTag tag3 = tagLocalRepo(project, "console-app-1.1.1.3", "1.1.1", 3);

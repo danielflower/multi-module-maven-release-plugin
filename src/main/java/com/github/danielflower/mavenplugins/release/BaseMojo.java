@@ -2,8 +2,10 @@ package com.github.danielflower.mavenplugins.release;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -27,6 +29,9 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
  *
  */
 public abstract class BaseMojo extends AbstractMojo {
+	static final String ERROR_SUMMARY = "Cannot run the release plugin with a non-Git version control system";
+	static final String GIT_PREFIX = "scm:git:";
+
 	/**
 	 * The Maven Project.
 	 */
@@ -149,9 +154,29 @@ public abstract class BaseMojo extends AbstractMojo {
 		disableSshAgent = true;
 	}
 
-	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor)
+	static String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws ValidationException {
+		String remote = null;
+		if (scm != null) {
+			remote = scm.getDeveloperConnection();
+			if (remote == null) {
+				remote = scm.getConnection();
+			}
+			if (remote != null) {
+				if (!remote.startsWith(GIT_PREFIX)) {
+					final List<String> messages = new ArrayList<String>();
+					messages.add(ERROR_SUMMARY);
+					messages.add(format("The value in your scm tag is %s", remote));
+					throw new ValidationException(format("%s %s", ERROR_SUMMARY, remote), messages);
+				}
+				remote = remote.substring(GIT_PREFIX.length()).replace("file://localhost/", "file:///");
+			}
+		}
+		return remote;
+	}
+
+	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor, final String remoteUrl)
 			throws GitAPIException, ValidationException {
-		final ProposedTagsBuilder builder = repository.newProposedTagsBuilder();
+		final ProposedTagsBuilder builder = repository.newProposedTagsBuilder(remoteUrl);
 		for (final ReleasableModule module : reactor) {
 			if (!module.willBeReleased()) {
 				continue;
@@ -182,10 +207,11 @@ public abstract class BaseMojo extends AbstractMojo {
 		throw new MojoExecutionException(terseMessage);
 	}
 
-	protected final Reactor newReactor() throws ValidationException, MojoExecutionException, GitAPIException {
+	protected final Reactor newReactor(final String remoteUrl)
+			throws ValidationException, MojoExecutionException, GitAPIException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
 		return builder.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
-				.setModulesToForceRelease(modulesToForceRelease).build();
+				.setModulesToForceRelease(modulesToForceRelease).setRemoteUrl(remoteUrl).build();
 	}
 
 	protected final void configureJsch() {

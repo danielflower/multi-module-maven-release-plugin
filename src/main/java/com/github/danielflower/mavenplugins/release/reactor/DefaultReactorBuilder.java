@@ -26,6 +26,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	private List<MavenProject> projects;
 	private Long buildNumber;
 	private List<String> modulesToForceRelease;
+	private String remoteUrl;
 
 	public DefaultReactorBuilder(final Log log, final VersionFactory versioningFactory) {
 		this.log = log;
@@ -90,7 +91,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		for (final MavenProject project : projects) {
 			final String artifactId = project.getArtifactId();
 
-			final Version version = versionFactory.newVersioning(project, buildNumber);
+			final Version version = versionFactory.newVersioning(project, buildNumber, remoteUrl);
 
 			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 			final String relativePathToModule = calculateModulePath(rootProject, project);
@@ -148,5 +149,11 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			relativePathToModule = ".";
 		}
 		return relativePathToModule;
+	}
+
+	@Override
+	public ReactorBuilder setRemoteUrl(final String remoteUrl) {
+		this.remoteUrl = remoteUrl;
+		return this;
 	}
 }

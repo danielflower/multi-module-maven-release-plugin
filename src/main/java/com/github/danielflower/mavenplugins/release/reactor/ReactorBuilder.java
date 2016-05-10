@@ -18,5 +18,7 @@ public interface ReactorBuilder {
 
 	ReactorBuilder setModulesToForceRelease(final List<String> modulesToForceRelease);
 
+	ReactorBuilder setRemoteUrl(String remoteUrl);
+
 	Reactor build() throws ValidationException, GitAPIException, MojoExecutionException;
 }
