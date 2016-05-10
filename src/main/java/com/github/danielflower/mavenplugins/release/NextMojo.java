@@ -5,17 +5,12 @@ import static java.util.Arrays.asList;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.inject.Inject;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
-import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
-import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
  * Logs the versions of the modules that the releaser will release on the next
@@ -32,12 +27,6 @@ requiresProject = true, // this can only run against a maven project
 aggregator = true // the plugin should only run once against the aggregator pom
 )
 public class NextMojo extends BaseMojo {
-
-	@Inject
-	public NextMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
-			final LogHolder logHolder) throws ValidationException {
-		super(builderFactory, repository, logHolder);
-	}
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {

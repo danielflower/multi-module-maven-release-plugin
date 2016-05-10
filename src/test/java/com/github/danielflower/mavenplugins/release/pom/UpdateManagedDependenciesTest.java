@@ -10,7 +10,7 @@ public class UpdateManagedDependenciesTest extends UpdateDependenciesTest {
 
 	@Override
 	protected Command newCommand() {
-		return new UpdateManagedDependencies(log);
+		return new UpdateManagedDependencies();
 	}
 
 	@Override

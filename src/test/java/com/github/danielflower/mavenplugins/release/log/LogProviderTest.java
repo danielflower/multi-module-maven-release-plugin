@@ -12,17 +12,19 @@ import org.junit.Test;
 public class LogProviderTest {
 	private static final String TEST_STRING = "This is a test";
 	private final Throwable throwable = new Throwable();
+	private final LogHolder holder = new DefaultLogHolder();
 	private final Log log = mock(Log.class);
 	private final LogProvider provider = new LogProvider();
 
 	@Before
 	public void setup() {
-		provider.setLog(log);
+		holder.setLog(log);
+		provider.setLogHolder(holder);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void illegalStateWhenLogDelegateNotSet() {
-		provider.setLog(null);
+		holder.setLog(null);
 		provider.isDebugEnabled();
 	}
 
@@ -118,7 +120,7 @@ public class LogProviderTest {
 
 	@Test
 	public void errorWithThrowable() {
-		provider.error(TEST_STRING, throwable);
+		provider.error(throwable);
 		verify(log).error(throwable);
 	}
 }

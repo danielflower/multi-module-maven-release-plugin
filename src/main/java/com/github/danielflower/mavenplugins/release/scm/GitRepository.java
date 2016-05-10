@@ -11,12 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
@@ -34,11 +32,15 @@ import com.github.danielflower.mavenplugins.release.Guard;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
 // TODO: Make this class package private when SingleModuleTest is working with a Guice injector
-@Named
-@Singleton
+@Component(role = SCMRepository.class)
 public final class GitRepository implements SCMRepository {
-	private final Log log;
-	private final GitFactory gitFactory;
+
+	@Requirement(role = Log.class)
+	private Log log;
+
+	@Requirement(role = GitFactory.class)
+	private GitFactory gitFactory;
+
 	private Git git;
 	private ValidationException gitInstantiationException;
 	private boolean hasReverted; // A premature optimisation? In
@@ -47,9 +49,11 @@ public final class GitRepository implements SCMRepository {
 									// this bool prevents
 	private Collection<Ref> remoteTags;
 
-	@Inject
-	public GitRepository(final Log log, final GitFactory gitFactory) {
+	public void setLog(final Log log) {
 		this.log = log;
+	}
+
+	public void setGitFactory(final GitFactory gitFactory) {
 		this.gitFactory = gitFactory;
 	}
 

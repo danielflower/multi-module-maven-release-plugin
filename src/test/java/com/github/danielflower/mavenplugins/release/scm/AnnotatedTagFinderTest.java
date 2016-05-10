@@ -23,7 +23,9 @@ public class AnnotatedTagFinderTest {
 	public void findsTheLatestCommitWhereThereHaveBeenNoBranches() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
 		when(gitFactory.newGit()).thenReturn(project.local);
-		final GitRepository repo = new GitRepository(log, gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 
 		final ProposedTag tag1 = saveFileInModule(project, "console-app", "1.2", 3);
 		final ProposedTag tag2 = saveFileInModule(project, "core-utils", "2", 0);
@@ -45,7 +47,9 @@ public class AnnotatedTagFinderTest {
 			final long buildNumber) throws Exception {
 		final GitFactory gitFactory = mock(GitFactory.class);
 		when(gitFactory.newGit()).thenReturn(project.local);
-		final GitRepository repo = new GitRepository(log, gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
 		builder.add(tagName, version, buildNumber);
 		final ProposedTag tag = builder.build().getTag(tagName, version, buildNumber);
@@ -69,7 +73,9 @@ public class AnnotatedTagFinderTest {
 	public void returnsMultipleTagsOnASingleCommit() throws Exception {
 		final TestProject project = TestProject.independentVersionsProject();
 		when(gitFactory.newGit()).thenReturn(project.local);
-		final GitRepository repo = new GitRepository(log, gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 		saveFileInModule(project, "console-app", "1.2", 1);
 		final ProposedTag tag1 = tagLocalRepo(project, "console-app-1.1.1.1", "1.1.1", 1);
 		final ProposedTag tag3 = tagLocalRepo(project, "console-app-1.1.1.3", "1.1.1", 3);

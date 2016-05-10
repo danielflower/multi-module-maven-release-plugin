@@ -2,13 +2,9 @@ package com.github.danielflower.mavenplugins.release.pom;
 
 import static java.lang.String.format;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
@@ -17,15 +13,9 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
  * @author rolandhauser
  *
  */
-@Named
-@Singleton
+@Component(role = Command.class, hint = "UpdateParent")
 final class UpdateParent extends Command {
 	static final String ERROR_FORMAT = "The parent of %s is %s %s";
-
-	@Inject
-	UpdateParent(final Log log) {
-		super(log);
-	}
 
 	@Override
 	public void alterModel(final Context updateContext) {

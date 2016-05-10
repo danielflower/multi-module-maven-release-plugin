@@ -49,7 +49,7 @@ public class UpdateProcessorTest {
 	private final List<Command> commands = asList(command);
 	private final MavenProject project = mock(MavenProject.class);
 	private final Model originalModel = mock(Model.class);
-	private final UpdateProcessor processor = new UpdateProcessor(contextFactory, writerFactory, log, commands);
+	private UpdateProcessor processor;
 
 	@SuppressWarnings("unchecked")
 	@Before
@@ -80,6 +80,12 @@ public class UpdateProcessorTest {
 
 		// Setup project
 		when(project.getOriginalModel()).thenReturn(originalModel);
+
+		processor = new UpdateProcessor();
+		processor.setCommands(commands);
+		processor.setContextFactory(contextFactory);
+		processor.setLog(log);
+		processor.setPomWriterFactory(writerFactory);
 	}
 
 	@Test

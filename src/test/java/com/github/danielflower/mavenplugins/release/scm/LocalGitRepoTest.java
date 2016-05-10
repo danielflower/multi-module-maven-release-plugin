@@ -31,13 +31,17 @@ public class LocalGitRepoTest {
 	@Before
 	public void setup() throws Exception {
 		when(gitFactory.newGit()).thenReturn(project.local);
-		repo = new GitRepository(log, gitFactory);
+		repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 	}
 
 	@Test
 	public void canDetectLocalTags() throws Exception {
 		when(gitFactory.newGit()).thenReturn(project.local);
-		final GitRepository repo = new GitRepository(log, gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 		tag(project.local, "some-tag");
 		assertThat(repo.hasLocalTag("some-tag"), is(true));
 		assertThat(repo.hasLocalTag("some-ta"), is(false));
@@ -63,7 +67,9 @@ public class LocalGitRepoTest {
 		final String remote = dirToGitScmReference(project.originDir);
 		when(scm.getDeveloperConnection()).thenReturn(remote);
 		when(gitFactory.newGit()).thenReturn(project.local);
-		final GitRepository repo = new GitRepository(log, gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 		tag(project.origin, "some-tag");
 
 		final StoredConfig config = project.local.getRepository().getConfig();
@@ -86,7 +92,9 @@ public class LocalGitRepoTest {
 		project.local.push().setPushTags().call();
 
 		when(gitFactory.newGit()).thenReturn(project.local);
-		final GitRepository repo = new GitRepository(log, gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(log);
 		for (int i = 0; i < numberOfTags; i++) {
 			final String tagName = "this-is-a-tag-" + i;
 			assertThat(repo.hasLocalTag(tagName), is(true));

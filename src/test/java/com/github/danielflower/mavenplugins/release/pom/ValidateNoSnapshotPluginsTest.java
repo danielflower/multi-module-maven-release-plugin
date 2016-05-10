@@ -32,10 +32,11 @@ public class ValidateNoSnapshotPluginsTest {
 	private final Build build = mock(Build.class);
 	private final Plugin plugin = mock(Plugin.class);
 	private final List<Plugin> plugins = asList(plugin);
-	private final ValidateNoSnapshotPlugins vld = new ValidateNoSnapshotPlugins(log);
+	private final ValidateNoSnapshotPlugins vld = new ValidateNoSnapshotPlugins();
 
 	@Before
 	public void setup() {
+		vld.setCommand(log);
 		when(context.getProject()).thenReturn(project);
 		when(project.getModel()).thenReturn(model);
 		when(model.getBuild()).thenReturn(build);

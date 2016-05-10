@@ -49,13 +49,16 @@ public class BaseMojoTest {
 
 	@Before
 	public void setup() throws ValidationException {
-		mojo = new BaseMojo(reactorBuilderFactory, repository, logHolder) {
+		mojo = new BaseMojo() {
 
 			@Override
 			public void execute() throws MojoExecutionException, MojoFailureException {
 				// noop
 			}
 		};
+		mojo.setRepository(repository);
+		mojo.setReactorBuilderFactory(reactorBuilderFactory);
+		mojo.setLogHolder(logHolder);
 		mojo.project = mock(MavenProject.class);
 
 		when(server.getPrivateKey()).thenReturn(SETTINGS_IDENTITY_FILE);

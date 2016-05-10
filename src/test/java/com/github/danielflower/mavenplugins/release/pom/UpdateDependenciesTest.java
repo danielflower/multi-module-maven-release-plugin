@@ -39,11 +39,12 @@ public class UpdateDependenciesTest {
 	private final Command cmd = newCommand();
 
 	protected Command newCommand() {
-		return new UpdateDependencies(log);
+		return new UpdateDependencies();
 	}
 
 	@Before
 	public void setup() throws Exception {
+		cmd.setCommand(log);
 		setupDetermineDependencies();
 
 		// Setup reactor

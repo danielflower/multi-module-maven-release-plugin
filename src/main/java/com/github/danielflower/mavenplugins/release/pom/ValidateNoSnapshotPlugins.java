@@ -1,12 +1,8 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Validates that POM to be release does not refer a plugin with a snapshot
@@ -14,17 +10,11 @@ import org.apache.maven.project.MavenProject;
  * (necessary for testing).
  *
  */
-@Named
-@Singleton
+@Component(role = Command.class, hint = "ValidateNoSnapshotPlugins")
 public class ValidateNoSnapshotPlugins extends Command {
 	static final String ERROR_FORMAT = "%s references plugin %s %s";
 	static final String MULTI_MODULE_MAVEN_PLUGIN_GROUP_ID = "com.github.danielflower.mavenplugins";
 	static final String MULTI_MODULE_MAVEN_PLUGIN_ARTIFACT_ID = "multi-module-maven-release-plugin";
-
-	@Inject
-	ValidateNoSnapshotPlugins(final Log log) {
-		super(log);
-	}
 
 	@Override
 	public void alterModel(final Context updateContext) {

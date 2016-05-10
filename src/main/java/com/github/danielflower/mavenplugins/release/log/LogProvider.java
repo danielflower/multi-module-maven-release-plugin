@@ -1,25 +1,21 @@
 package com.github.danielflower.mavenplugins.release.log;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-@Named
-@Singleton
-final class LogProvider implements Log, LogHolder {
-	private Log delegate;
+@Component(role = Log.class)
+final class LogProvider implements Log {
 
-	@Override
-	public void setLog(final Log log) {
-		delegate = log;
+	@Requirement(role = LogHolder.class)
+	private LogHolder holder;
+
+	void setLogHolder(final LogHolder holder) {
+		this.holder = holder;
 	}
 
 	private Log getLog() {
-		if (delegate == null) {
-			throw new IllegalStateException("Delegate logger has not been set!");
-		}
-		return delegate;
+		return holder.getLog();
 	}
 
 	@Override

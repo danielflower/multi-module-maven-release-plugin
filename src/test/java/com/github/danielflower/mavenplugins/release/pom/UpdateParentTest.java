@@ -35,10 +35,11 @@ public class UpdateParentTest {
 	private final Context context = mock(Context.class);
 	private final Reactor reactor = mock(Reactor.class);
 	private final ReleasableModule module = mock(ReleasableModule.class);
-	private final UpdateParent cmd = new UpdateParent(log);
+	private final UpdateParent cmd = new UpdateParent();
 
 	@Before
 	public void setup() throws Exception {
+		cmd.setCommand(log);
 		when(context.getProject()).thenReturn(project);
 		when(project.getArtifactId()).thenReturn(ANY_ARTIFACT_ID);
 		when(project.getParent()).thenReturn(parentProject);

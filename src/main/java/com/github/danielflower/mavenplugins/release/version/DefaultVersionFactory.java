@@ -1,23 +1,21 @@
 package com.github.danielflower.mavenplugins.release.version;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
-@Named
-@Singleton
+@Component(role = VersionFactory.class)
 final class DefaultVersionFactory implements VersionFactory {
-	private final SCMRepository repository;
 
-	@Inject
-	DefaultVersionFactory(final SCMRepository repository) {
+	@Requirement(role = SCMRepository.class)
+	private SCMRepository repository;
+
+	void setRepository(final SCMRepository repository) {
 		this.repository = repository;
 	}
 

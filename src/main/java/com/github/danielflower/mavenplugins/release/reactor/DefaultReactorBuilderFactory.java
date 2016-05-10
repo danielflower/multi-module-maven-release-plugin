@@ -1,10 +1,8 @@
 package com.github.danielflower.mavenplugins.release.reactor;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
@@ -12,15 +10,20 @@ import com.github.danielflower.mavenplugins.release.version.VersionFactory;
  * @author rolandhauser
  *
  */
-@Named
-@Singleton
+@Component(role = ReactorBuilderFactory.class)
 final class DefaultReactorBuilderFactory implements ReactorBuilderFactory {
-	private final Log log;
-	private final VersionFactory versionFactory;
 
-	@Inject
-	DefaultReactorBuilderFactory(final Log log, final VersionFactory versionFactory) {
+	@Requirement(role = Log.class)
+	private Log log;
+
+	@Requirement(role = VersionFactory.class)
+	private VersionFactory versionFactory;
+
+	void setLog(final Log log) {
 		this.log = log;
+	}
+
+	void setVersionFactory(final VersionFactory versionFactory) {
 		this.versionFactory = versionFactory;
 	}
 

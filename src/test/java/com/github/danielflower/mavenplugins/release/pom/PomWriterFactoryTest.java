@@ -64,7 +64,11 @@ public class PomWriterFactoryTest {
 		when(writerFactory.newWriter()).thenReturn(writer);
 		when(project.getOriginalModel()).thenReturn(originalModel);
 		when(project.getFile()).thenReturn(TEST_FILE);
-		pomWriter = new PomWriterFactory(repository, writerFactory, log).newWriter();
+		final PomWriterFactory factory = new PomWriterFactory();
+		factory.setLog(log);
+		factory.setMavenXpp3WriterFactory(writerFactory);
+		factory.setRepository(repository);
+		pomWriter = factory.newWriter();
 		pomWriter.addProject(project);
 	}
 

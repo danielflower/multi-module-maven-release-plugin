@@ -4,14 +4,10 @@ import static java.lang.String.format;
 
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
@@ -20,15 +16,9 @@ import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependency
  * @author rolandhauser
  *
  */
-@Named
-@Singleton
+@Component(role = Command.class, hint = "UpdateDependencies")
 class UpdateDependencies extends Command {
 	static final String ERROR_FORMAT = "%s references dependency %s %s";
-
-	@Inject
-	UpdateDependencies(final Log log) {
-		super(log);
-	}
 
 	@Override
 	public final void alterModel(final Context updateContext) {

@@ -9,6 +9,7 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
@@ -118,15 +119,24 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "passphrase")
 	private String passphrase;
 
-	private final ReactorBuilderFactory builderFactory;
+	@Component
+	private ReactorBuilderFactory builderFactory;
 
-	protected final SCMRepository repository;
-	private final LogHolder logHolder;
+	@Component
+	protected SCMRepository repository;
 
-	protected BaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
-			final LogHolder logHolder) throws ValidationException {
-		this.builderFactory = builderFactory;
+	@Component
+	private LogHolder logHolder;
+
+	final void setRepository(final SCMRepository repository) {
 		this.repository = repository;
+	}
+
+	final void setReactorBuilderFactory(final ReactorBuilderFactory builderFactory) {
+		this.builderFactory = builderFactory;
+	}
+
+	final void setLogHolder(final LogHolder logHolder) {
 		this.logHolder = logHolder;
 	}
 

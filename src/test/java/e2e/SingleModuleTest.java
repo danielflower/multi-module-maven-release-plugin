@@ -56,7 +56,9 @@ public class SingleModuleTest extends E2ETest {
 
 		final GitFactory gitFactory = mock(GitFactory.class);
 		when(gitFactory.newGit()).thenReturn(testProject.local);
-		final GitRepository repo = new GitRepository(mock(Log.class), gitFactory);
+		final GitRepository repo = new GitRepository();
+		repo.setGitFactory(gitFactory);
+		repo.setLog(mock(Log.class));
 		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
 		builder.add("single-module-1.0.2", "1.0", 2).build().getTag("single-module-1.0.2", "1.0", 2).saveAtHEAD();
 		testProject.mvn("releaser:release");

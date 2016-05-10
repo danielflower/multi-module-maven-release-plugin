@@ -1,28 +1,40 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
-@Named
-@Singleton
+@Component(role = PomWriterFactory.class)
 class PomWriterFactory {
-	private final SCMRepository repository;
-	private final MavenXpp3WriterFactory writerFactory;
-	private final Log log;
 
-	@Inject
-	PomWriterFactory(final SCMRepository repository, final MavenXpp3WriterFactory writerFactory, final Log log) {
+	@Requirement(role = SCMRepository.class)
+	private SCMRepository repository;
+
+	@Requirement(role = MavenXpp3WriterFactory.class)
+	private MavenXpp3WriterFactory writerFactory;
+
+	@Requirement(role = Log.class)
+	private Log log;
+
+	void setRepository(final SCMRepository repository) {
 		this.repository = repository;
+	}
+
+	void setMavenXpp3WriterFactory(final MavenXpp3WriterFactory writerFactory) {
 		this.writerFactory = writerFactory;
+	}
+
+	void setLog(final Log log) {
 		this.log = log;
 	}
 
 	PomWriter newWriter() {
-		return new PomWriter(repository, writerFactory.newWriter(), log);
+		final PomWriter writer = new PomWriter();
+		writer.setRepository(repository);
+		writer.setWriter(writerFactory.newWriter());
+		writer.setLog(log);
+		return writer;
 	}
 }

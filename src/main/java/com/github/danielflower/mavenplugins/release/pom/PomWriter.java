@@ -10,12 +10,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
@@ -24,18 +23,29 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
  * @author rolandhauser
  *
  */
-@Named
-@Singleton
+@Component(role = PomWriter.class)
 class PomWriter {
 	static final String EXCEPTION_MESSAGE = "Unexpected exception while setting the release versions in the pom";
 	private final Collection<MavenProject> changedProjects = new LinkedList<>();
-	private final SCMRepository repository;
-	private final MavenXpp3Writer writer;
-	private final Log log;
 
-	PomWriter(final SCMRepository repository, final MavenXpp3Writer writer, final Log log) {
+	@Requirement(role = SCMRepository.class)
+	private SCMRepository repository;
+
+	@Requirement(role = MavenXpp3Writer.class)
+	private MavenXpp3Writer writer;
+
+	@Requirement(role = Log.class)
+	private Log log;
+
+	void setRepository(final SCMRepository repository) {
 		this.repository = repository;
+	}
+
+	void setWriter(final MavenXpp3Writer writer) {
 		this.writer = writer;
+	}
+
+	void setLog(final Log log) {
 		this.log = log;
 	}
 

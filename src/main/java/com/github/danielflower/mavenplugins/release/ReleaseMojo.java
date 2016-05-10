@@ -9,20 +9,16 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
-import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
-import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
  * Releases the project.
@@ -106,12 +102,10 @@ public class ReleaseMojo extends BaseMojo {
 	@Parameter(property = "localMavenRepo")
 	private File localMavenRepo;
 
-	private final Updater pomUpdater;
+	@Component
+	private Updater pomUpdater;
 
-	@Inject
-	public ReleaseMojo(final ReactorBuilderFactory builderFactory, final SCMRepository repository,
-			final Updater pomUpdater, final LogHolder logHolder) throws ValidationException {
-		super(builderFactory, repository, logHolder);
+	void setUpdater(final Updater pomUpdater) {
 		this.pomUpdater = pomUpdater;
 	}
 

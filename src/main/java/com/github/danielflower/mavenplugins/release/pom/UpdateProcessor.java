@@ -7,35 +7,47 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 
-@Named
-@Singleton
+@Component(role = Updater.class)
 final class UpdateProcessor implements Updater {
 	static final String DEPENDENCY_ERROR_SUMMARY = "Cannot release with references to snapshot dependencies";
 	static final String DEPENDENCY_ERROR_INTRO = "The following dependency errors were found:";
-	private final ContextFactory contextFactory;
-	private final PomWriterFactory writerFactory;
-	private final Log log;
-	private final List<Command> commands;
 
-	@Inject
-	public UpdateProcessor(final ContextFactory contextFactory, final PomWriterFactory writerFactory, final Log log,
-			final List<Command> commands) {
-		this.contextFactory = contextFactory;
-		this.writerFactory = writerFactory;
-		this.log = log;
+	@Requirement(role = ContextFactory.class)
+	private ContextFactory contextFactory;
+
+	@Requirement(role = PomWriterFactory.class)
+	private PomWriterFactory writerFactory;
+
+	@Requirement(role = Log.class)
+	private Log log;
+
+	@Requirement(role = Command.class)
+	private List<Command> commands;
+
+	void setCommands(final List<Command> commands) {
 		this.commands = commands;
+	}
+
+	void setPomWriterFactory(final PomWriterFactory writerFactory) {
+		this.writerFactory = writerFactory;
+	}
+
+	void setContextFactory(final ContextFactory contextFactory) {
+		this.contextFactory = contextFactory;
+	}
+
+	void setLog(final Log log) {
+		this.log = log;
 	}
 
 	private List<String> process(final Log log, final Reactor reactor, final MavenProject project,
