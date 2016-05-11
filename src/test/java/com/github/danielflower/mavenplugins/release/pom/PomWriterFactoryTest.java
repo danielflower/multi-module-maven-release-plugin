@@ -1,6 +1,7 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
 import static com.github.danielflower.mavenplugins.release.pom.PomWriter.EXCEPTION_MESSAGE;
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
@@ -40,7 +41,7 @@ public class PomWriterFactoryTest {
 		@Override
 		public boolean matches(final Object item) {
 			final List<File> changedFiles = (List<File>) item;
-			return changedFiles.size() == 1 && changedFiles.contains(TEST_FILE);
+			return changedFiles.size() == 1 && changedFiles.contains(testFile);
 		}
 
 		@Override
@@ -50,7 +51,6 @@ public class PomWriterFactoryTest {
 	}
 
 	private static final String TEST_LINE = "This is a test";
-	private static final File TEST_FILE = new File("target/pomWriterTest");
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final MavenXpp3Writer writer = mock(MavenXpp3Writer.class);
 	private final MavenXpp3WriterFactory writerFactory = mock(MavenXpp3WriterFactory.class);
@@ -58,12 +58,14 @@ public class PomWriterFactoryTest {
 	private final MavenProject project = mock(MavenProject.class);
 	private final Model originalModel = mock(Model.class);
 	private PomWriter pomWriter;
+	private File testFile;
 
 	@Before
 	public void setup() throws IOException {
+		testFile = new File("target/pomWriterTest").getCanonicalFile();
 		when(writerFactory.newWriter()).thenReturn(writer);
 		when(project.getOriginalModel()).thenReturn(originalModel);
-		when(project.getFile()).thenReturn(TEST_FILE);
+		when(project.getFile()).thenReturn(testFile);
 		final PomWriterFactory factory = new PomWriterFactory();
 		factory.setLog(log);
 		factory.setMavenXpp3WriterFactory(writerFactory);
@@ -85,11 +87,11 @@ public class PomWriterFactoryTest {
 		}).when(writer).write((Writer) Mockito.notNull(), Mockito.same(originalModel));
 
 		final List<File> changedFiles = pomWriter.writePoms();
-		try (final Scanner sc = new Scanner(TEST_FILE)) {
+		try (final Scanner sc = new Scanner(testFile)) {
 			assertEquals(TEST_LINE, sc.nextLine());
 		}
 		assertEquals(1, changedFiles.size());
-		assertEquals(TEST_FILE, changedFiles.get(0));
+		assertEquals(testFile, changedFiles.get(0));
 		verify(repository, never()).revertChanges(Mockito.anyList());
 	}
 
@@ -125,6 +127,6 @@ public class PomWriterFactoryTest {
 
 		final InOrder order = inOrder(log, repository);
 		order.verify(repository).revertChanges(Mockito.argThat(new HasOneChangedPomFile()));
-		order.verify(log).error("Reverting changed POMs [target/pomWriterTest] failed!", revertException);
+		order.verify(log).error(format("Reverting changed POMs [%s] failed!", testFile), revertException);
 	}
 }

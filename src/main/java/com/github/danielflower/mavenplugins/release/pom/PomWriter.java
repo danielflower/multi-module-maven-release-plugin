@@ -57,8 +57,12 @@ class PomWriter {
 		final List<File> changedFiles = new LinkedList<>();
 		try {
 			for (final MavenProject project : changedProjects) {
-				changedFiles.add(project.getFile());
-				try (final Writer fileWriter = new FileWriter(project.getFile())) {
+				// It's necessary to use the canonical file here, otherwise GIT
+				// revert can fail when symbolic links are used (ends up in an
+				// empty path and revert fails).
+				final File changedFile = project.getFile().getCanonicalFile();
+				changedFiles.add(changedFile);
+				try (final Writer fileWriter = new FileWriter(changedFile)) {
 					writer.write(fileWriter, project.getOriginalModel());
 				}
 			}
