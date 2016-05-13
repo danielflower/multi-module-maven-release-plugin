@@ -32,10 +32,12 @@ public class ValidateNoSnapshotPluginsTest {
 	private final Build build = mock(Build.class);
 	private final Plugin plugin = mock(Plugin.class);
 	private final List<Plugin> plugins = asList(plugin);
+	private final VersionSubstitution substitution = mock(VersionSubstitution.class);
 	private final ValidateNoSnapshotPlugins vld = new ValidateNoSnapshotPlugins();
 
 	@Before
 	public void setup() {
+		vld.setVersionSubstitution(substitution);
 		vld.setCommand(log);
 		when(context.getProject()).thenReturn(project);
 		when(project.getModel()).thenReturn(model);
@@ -58,6 +60,7 @@ public class ValidateNoSnapshotPluginsTest {
 	@Test
 	public void alterModelSnapshotPlugin() {
 		when(plugin.getVersion()).thenReturn(ANY_SNAPSHOT_VERSION);
+		when(substitution.getSubstitutedPluginVersionOrNull(project, plugin)).thenReturn(ANY_SNAPSHOT_VERSION);
 		vld.alterModel(context);
 		verify(context).addError(ERROR_FORMAT, ANY_PROJECT_ARTIFACT_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 	}
@@ -66,6 +69,7 @@ public class ValidateNoSnapshotPluginsTest {
 	public void alterModelSnapshotPluginWithMultiReleaseGroupId() {
 		when(plugin.getGroupId()).thenReturn(MULTI_MODULE_MAVEN_PLUGIN_GROUP_ID);
 		when(plugin.getVersion()).thenReturn(ANY_SNAPSHOT_VERSION);
+		when(substitution.getSubstitutedPluginVersionOrNull(project, plugin)).thenReturn(ANY_SNAPSHOT_VERSION);
 		vld.alterModel(context);
 		verify(context).addError(ERROR_FORMAT, ANY_PROJECT_ARTIFACT_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 	}

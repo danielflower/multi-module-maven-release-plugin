@@ -1,6 +1,5 @@
 package scaffolding;
 
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 import java.io.File;
@@ -111,6 +110,16 @@ public class TestProject {
 		}
 	}
 
+	public static String pathOf(final File file) {
+		String path;
+		try {
+			path = file.getCanonicalPath();
+		} catch (final IOException e1) {
+			path = file.getAbsolutePath();
+		}
+		return path;
+	}
+
 	public static String dirToGitScmReference(final File sourceDir) {
 		return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/');
 	}
@@ -125,6 +134,10 @@ public class TestProject {
 
 	public static TestProject nestedProjectManagedDependencies() {
 		return project("nested-project-managed-dependencies");
+	}
+
+	public static TestProject nestedProjectVersionSubstitution() {
+		return project("nested-project-version-substitution");
 	}
 
 	public static TestProject moduleWithScmTag() {

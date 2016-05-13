@@ -9,7 +9,7 @@ public class UpdateManagedDependenciesTest extends UpdateDependenciesTest {
 	private final DependencyManagement mgmt = mock(DependencyManagement.class);
 
 	@Override
-	protected Command newCommand() {
+	protected UpdateManagedDependencies newCommand() {
 		return new UpdateManagedDependencies();
 	}
 

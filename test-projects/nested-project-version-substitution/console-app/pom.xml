@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>parent-module</artifactId>
+		<groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+		<version>1.2.3-SNAPSHOT</version>
+		<relativePath>../parent-module/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>console-app</artifactId>
+	<version>3.2-SNAPSHOT</version>
+	
+	<properties>
+		<core-utils.version>2.0-SNAPSHOT</core-utils.version>
+		<server-module-c.version>3.2-SNAPSHOT</server-module-c.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+				<artifactId>core-utils</artifactId>
+				<version>${core-utils.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.danielflower.mavenplugins.testprojects.nested.misnamed</groupId>
+				<artifactId>server-module-c</artifactId>
+				<version>${server-module-c.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+			<artifactId>core-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.danielflower.mavenplugins.testprojects.nested.misnamed</groupId>
+			<artifactId>server-module-c</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

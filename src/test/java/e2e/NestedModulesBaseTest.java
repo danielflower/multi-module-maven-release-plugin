@@ -33,6 +33,7 @@ import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
+import org.junit.Before;
 import org.junit.Test;
 
 import scaffolding.TestProject;
@@ -48,10 +49,15 @@ public abstract class NestedModulesBaseTest extends E2ETest {
 	final String expectedServerModuleBVersion = "3.1.";
 	final String expectedServerModuleCVersion = "3.2.";
 
-	final TestProject testProject = newTestProject();
+	TestProject testProject;
 	private final RepositorySystem system = newRepositorySystem();
 
-	protected abstract TestProject newTestProject();
+	protected abstract TestProject newTestProject() throws Exception;
+
+	@Before
+	public void setup() throws Exception {
+		testProject = newTestProject();
+	}
 
 	private RepositorySystem newRepositorySystem() {
 		/*
@@ -160,8 +166,8 @@ public abstract class NestedModulesBaseTest extends E2ETest {
 	}
 
 	private Artifact project(final String artifacdId, final String version, final String buildNumber) {
-		return new DefaultArtifact(format("com.github.danielflower.mavenplugins.testprojects.nested:%s:%s%s",
-				artifacdId, version, buildNumber));
+		return new DefaultArtifact(format("com.github.danielflower.mavenplugins.testprojects.nested:%s:%s%s", artifacdId,
+				version, buildNumber));
 	}
 
 	private Artifact misnamedProject(final String artifactId, final String version, final String buildNumber) {
@@ -214,8 +220,8 @@ public abstract class NestedModulesBaseTest extends E2ETest {
 				expectedServerModuleAVersion + "1");
 		assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.nested", "server-module-b",
 				expectedServerModuleBVersion + "1");
-		assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.nested.misnamed",
-				"server-module-c", expectedServerModuleCVersion + "1");
+		assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.nested.misnamed", "server-module-c",
+				expectedServerModuleCVersion + "1");
 	}
 
 	private void assertBothReposTagged(final String module, final String version, final String buildNumber) {

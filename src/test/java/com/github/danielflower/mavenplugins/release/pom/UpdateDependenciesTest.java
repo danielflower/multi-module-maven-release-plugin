@@ -35,16 +35,18 @@ public class UpdateDependenciesTest {
 	private final MavenProject project = mock(MavenProject.class);
 	protected final Model model = mock(Model.class);
 	private final Dependency dependency = mock(Dependency.class);
+	private final VersionSubstitution substitution = mock(VersionSubstitution.class);
 	protected final List<Dependency> dependencies = asList(dependency);
-	private final Command cmd = newCommand();
+	private final UpdateDependencies cmd = newCommand();
 
-	protected Command newCommand() {
+	protected UpdateDependencies newCommand() {
 		return new UpdateDependencies();
 	}
 
 	@Before
 	public void setup() throws Exception {
 		cmd.setCommand(log);
+		cmd.setVersionSubstitution(substitution);
 		setupDetermineDependencies();
 
 		// Setup reactor
@@ -70,6 +72,7 @@ public class UpdateDependenciesTest {
 
 	@Test
 	public void alterModelSnapshotDependencyUpdated() {
+		when(substitution.getSubstitutedDependencyVersionOrNull(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
 		cmd.alterModel(context);
 		final InOrder order = inOrder(dependency, log);
 		order.verify(dependency).setVersion(ANY_VERSION);
@@ -89,6 +92,7 @@ public class UpdateDependenciesTest {
 	public void exceptionOccurred() throws Exception {
 		final UnresolvedSnapshotDependencyException expected = new UnresolvedSnapshotDependencyException(ANY_GROUP_ID,
 				ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
+		when(substitution.getSubstitutedDependencyVersionOrNull(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
 		doThrow(expected).when(reactor).find(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 		cmd.alterModel(context);
 		verify(dependency, never()).setVersion(ANY_VERSION);
