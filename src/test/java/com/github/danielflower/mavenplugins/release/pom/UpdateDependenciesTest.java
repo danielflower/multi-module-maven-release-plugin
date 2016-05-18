@@ -22,6 +22,7 @@ import org.mockito.InOrder;
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
 
 public class UpdateDependenciesTest {
 	private static final String ANY_GROUP_ID = "anyGroupId";
@@ -72,7 +73,7 @@ public class UpdateDependenciesTest {
 
 	@Test
 	public void alterModelSnapshotDependencyUpdated() {
-		when(substitution.getSubstitutedDependencyVersionOrNull(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
+		when(substitution.getActualVersion(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
 		cmd.alterModel(context);
 		final InOrder order = inOrder(dependency, log);
 		order.verify(dependency).setVersion(ANY_VERSION);
@@ -92,7 +93,7 @@ public class UpdateDependenciesTest {
 	public void exceptionOccurred() throws Exception {
 		final UnresolvedSnapshotDependencyException expected = new UnresolvedSnapshotDependencyException(ANY_GROUP_ID,
 				ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
-		when(substitution.getSubstitutedDependencyVersionOrNull(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
+		when(substitution.getActualVersion(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
 		doThrow(expected).when(reactor).find(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 		cmd.alterModel(context);
 		verify(dependency, never()).setVersion(ANY_VERSION);

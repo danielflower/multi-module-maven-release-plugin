@@ -19,6 +19,8 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
+
 public class ValidateNoSnapshotPluginsTest {
 	private static final String ANY_PROJECT_ARTIFACT_ID = "anyProjectArtifactId";
 	private static final String ANY_ARTIFACT_ID = "anyArtifactId";
@@ -60,7 +62,7 @@ public class ValidateNoSnapshotPluginsTest {
 	@Test
 	public void alterModelSnapshotPlugin() {
 		when(plugin.getVersion()).thenReturn(ANY_SNAPSHOT_VERSION);
-		when(substitution.getSubstitutedPluginVersionOrNull(project, plugin)).thenReturn(ANY_SNAPSHOT_VERSION);
+		when(substitution.getActualVersion(project, plugin)).thenReturn(ANY_SNAPSHOT_VERSION);
 		vld.alterModel(context);
 		verify(context).addError(ERROR_FORMAT, ANY_PROJECT_ARTIFACT_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 	}
@@ -69,7 +71,7 @@ public class ValidateNoSnapshotPluginsTest {
 	public void alterModelSnapshotPluginWithMultiReleaseGroupId() {
 		when(plugin.getGroupId()).thenReturn(MULTI_MODULE_MAVEN_PLUGIN_GROUP_ID);
 		when(plugin.getVersion()).thenReturn(ANY_SNAPSHOT_VERSION);
-		when(substitution.getSubstitutedPluginVersionOrNull(project, plugin)).thenReturn(ANY_SNAPSHOT_VERSION);
+		when(substitution.getActualVersion(project, plugin)).thenReturn(ANY_SNAPSHOT_VERSION);
 		vld.alterModel(context);
 		verify(context).addError(ERROR_FORMAT, ANY_PROJECT_ARTIFACT_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 	}

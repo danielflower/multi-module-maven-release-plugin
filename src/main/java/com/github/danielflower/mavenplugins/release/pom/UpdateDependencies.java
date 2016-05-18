@@ -12,6 +12,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
+import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
 
 /**
  * @author rolandhauser
@@ -34,7 +35,7 @@ class UpdateDependencies extends Command {
 		final Model originalModel = project.getOriginalModel();
 
 		for (final Dependency dependency : determineDependencies(originalModel)) {
-			final String version = substitution.getSubstitutedDependencyVersionOrNull(project, dependency);
+			final String version = substitution.getActualVersion(project, dependency);
 			if (isSnapshot(version)) {
 				try {
 					final ReleasableModule dependencyBeingReleased = updateContext.getReactor()
