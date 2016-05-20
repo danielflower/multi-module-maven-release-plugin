@@ -42,6 +42,9 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
 	protected List<MavenProject> projects;
 
+	@Parameter(property = "useLastDigitAsVersionNumber")
+	protected boolean useLastDigitAsVersionNumber;
+
 	/**
 	 * <p>
 	 * The build number to use in the release version. Given a snapshot version
@@ -220,7 +223,8 @@ public abstract class BaseMojo extends AbstractMojo {
 	protected final Reactor newReactor(final String remoteUrl)
 			throws ValidationException, MojoExecutionException, GitAPIException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
-		return builder.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
+		return builder.setRootProject(project).setProjects(projects)
+				.setUseLastDigitAsVersionNumber(useLastDigitAsVersionNumber).setBuildNumber(buildNumber)
 				.setModulesToForceRelease(modulesToForceRelease).setRemoteUrl(remoteUrl).build();
 	}
 

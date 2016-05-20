@@ -11,6 +11,6 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
  */
 public interface VersionFactory {
 
-	Version newVersion(MavenProject project, Long buildNumberOrNull, String remoteUrl)
-			throws MojoExecutionException, ValidationException, GitAPIException;
+	Version newVersion(MavenProject project, boolean useLastDigitAsVersionNumber, Long buildNumberOrNull,
+			String remoteUrl) throws MojoExecutionException, ValidationException, GitAPIException;
 }

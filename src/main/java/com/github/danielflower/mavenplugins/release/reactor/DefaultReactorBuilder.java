@@ -27,6 +27,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	private final VersionFactory versionFactory;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
+	private boolean useLastDigitAsVersionNumber;
 	private Long buildNumber;
 	private List<String> modulesToForceRelease;
 	private String remoteUrl;
@@ -53,6 +54,12 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	@Override
 	public ReactorBuilder setBuildNumber(final Long buildNumber) {
 		this.buildNumber = buildNumber;
+		return this;
+	}
+
+	@Override
+	public ReactorBuilder setUseLastDigitAsVersionNumber(final boolean useLastDigitAsVersionNumber) {
+		this.useLastDigitAsVersionNumber = useLastDigitAsVersionNumber;
 		return this;
 	}
 
@@ -94,7 +101,8 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		final DefaultReactor reactor = new DefaultReactor(log);
 
 		for (final MavenProject project : projects) {
-			final Version version = versionFactory.newVersion(project, buildNumber, remoteUrl);
+			final Version version = versionFactory.newVersion(project, useLastDigitAsVersionNumber, buildNumber,
+					remoteUrl);
 
 			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 			final String relativePathToModule = calculateModulePath(rootProject, project);
@@ -146,8 +154,8 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
 					versioning.getReleaseVersion()));
 		} else if (changedDependencyOrNull != null) {
-			log.info(format("Releasing %s %s as %s has changed.", project.getArtifactId(), versioning.getReleaseVersion(),
-					changedDependencyOrNull));
+			log.info(format("Releasing %s %s as %s has changed.", project.getArtifactId(),
+					versioning.getReleaseVersion(), changedDependencyOrNull));
 		} else {
 			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(project,
 					versioning.getBusinessVersion(), relativePathToModule);

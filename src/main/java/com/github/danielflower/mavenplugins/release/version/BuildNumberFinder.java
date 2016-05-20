@@ -15,6 +15,7 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 @Component(role = BuildNumberFinder.class)
 class BuildNumberFinder {
+	static final String SNAPSHOT_EXTENSION = "-SNAPSHOT";
 
 	@Requirement(role = SCMRepository.class)
 	private SCMRepository repository;
@@ -33,5 +34,13 @@ class BuildNumberFinder {
 
 		prev.addAll(repository.getRemoteBuildNumbers(remoteUrl, project.getArtifactId(), businessVersion));
 		return prev.isEmpty() ? 0l : prev.last() + 1;
+	}
+
+	public String newBusinessVersion(final MavenProject project, final boolean useLastDigitAsVersionNumber) {
+		String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
+		if (useLastDigitAsVersionNumber) {
+			businessVersion = businessVersion.substring(0, businessVersion.lastIndexOf('.'));
+		}
+		return businessVersion;
 	}
 }

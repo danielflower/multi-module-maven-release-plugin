@@ -1,5 +1,7 @@
 package com.github.danielflower.mavenplugins.release.version;
 
+import static java.lang.Long.valueOf;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -39,12 +41,22 @@ final class DefaultVersionFactory implements VersionFactory {
 	 * java.lang.String)
 	 */
 	@Override
-	public Version newVersion(final MavenProject project, final Long buildNumber, final String remoteUrl)
-			throws MojoExecutionException, ValidationException, GitAPIException {
-		final String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
-
-		final long actualBuildNumber = buildNumber == null ? finder.findBuildNumber(project, remoteUrl, businessVersion)
-				: buildNumber;
+	public Version newVersion(final MavenProject project, final boolean useLastDigitAsVersionNumber,
+			final Long buildNumber, final String remoteUrl)
+					throws MojoExecutionException, ValidationException, GitAPIException {
+		String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
+		final long actualBuildNumber;
+		if (buildNumber == null) {
+			if (useLastDigitAsVersionNumber) {
+				final int idx = businessVersion.lastIndexOf('.');
+				businessVersion = businessVersion.substring(0, idx);
+				actualBuildNumber = valueOf(businessVersion.substring(idx + 1));
+			} else {
+				actualBuildNumber = finder.findBuildNumber(project, remoteUrl, businessVersion);
+			}
+		} else {
+			actualBuildNumber = buildNumber;
+		}
 
 		return new DefaultVersion(project.getVersion(), businessVersion, actualBuildNumber);
 	}

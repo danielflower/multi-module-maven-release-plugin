@@ -14,6 +14,8 @@ public interface ReactorBuilder {
 
 	ReactorBuilder setProjects(List<MavenProject> projects);
 
+	ReactorBuilder setUseLastDigitAsVersionNumber(final boolean useLastDigitAsVersionNumber);
+
 	ReactorBuilder setBuildNumber(final Long buildNumber);
 
 	ReactorBuilder setModulesToForceRelease(final List<String> modulesToForceRelease);
