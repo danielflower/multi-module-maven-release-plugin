@@ -30,15 +30,15 @@ public class ReleasableModuleTest {
         project.setArtifactId("some-arty");
         project.setGroupId("some-group");
         Version version = mock(Version.class);
-        when(version.buildNumber()).thenReturn(12l);
-        when(version.businessVersion()).thenReturn("1.2.3");
-        when(version.developmentVersion()).thenReturn("1.2.3-SNAPSHOT");
+        when(version.getBuildNumber()).thenReturn(12l);
+        when(version.getBusinessVersion()).thenReturn("1.2.3");
+        when(version.getDevelopmentVersion()).thenReturn("1.2.3-SNAPSHOT");
         ReleasableModule first = new ReleasableModule(
             project, version, "1.2.3.11", "somewhere"
         );
         assertThat(first.willBeReleased(), is(false));
 
-        when(version.releaseVersion()).thenReturn("1.2.3.12");
+        when(version.getReleaseVersion()).thenReturn("1.2.3.12");
         ReleasableModule changed = first.createReleasableVersion();
         assertThat(changed.getArtifactId(), equalTo("some-arty"));
         assertThat(changed.getBuildNumber(), equalTo(12L));

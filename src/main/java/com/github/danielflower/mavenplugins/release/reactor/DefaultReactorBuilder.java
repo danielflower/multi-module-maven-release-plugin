@@ -94,7 +94,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		final DefaultReactor reactor = new DefaultReactor(log);
 
 		for (final MavenProject project : projects) {
-			final Version version = versionFactory.newVersioning(project, buildNumber, remoteUrl);
+			final Version version = versionFactory.newVersion(project, buildNumber, remoteUrl);
 
 			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 			final String relativePathToModule = calculateModulePath(rootProject, project);
@@ -144,13 +144,13 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		String equivalentVersion = null;
 		if (modulesToForceRelease != null && modulesToForceRelease.contains(project.getArtifactId())) {
 			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
-					versioning.releaseVersion()));
+					versioning.getReleaseVersion()));
 		} else if (changedDependencyOrNull != null) {
-			log.info(format("Releasing %s %s as %s has changed.", project.getArtifactId(), versioning.releaseVersion(),
+			log.info(format("Releasing %s %s as %s has changed.", project.getArtifactId(), versioning.getReleaseVersion(),
 					changedDependencyOrNull));
 		} else {
 			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(project,
-					versioning.businessVersion(), relativePathToModule);
+					versioning.getBusinessVersion(), relativePathToModule);
 
 			if (previousTagThatIsTheSameAsHEADForThisModule != null) {
 				equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
@@ -159,7 +159,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 						equivalentVersion, project.getArtifactId()));
 			} else {
 				log.info(format("Will use version %s for %s as it has changed since the last release.",
-						versioning.releaseVersion(), project.getArtifactId()));
+						versioning.getReleaseVersion(), project.getArtifactId()));
 			}
 		}
 		return equivalentVersion;

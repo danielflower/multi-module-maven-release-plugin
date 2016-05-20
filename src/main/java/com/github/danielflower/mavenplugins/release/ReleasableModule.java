@@ -19,7 +19,7 @@ public class ReleasableModule {
         this.version = version;
         this.equivalentVersion = equivalentVersion;
         this.relativePathToModule = relativePathToModule;
-        this.tagName = project.getArtifactId() + "-" + version.releaseVersion();
+        this.tagName = project.getArtifactId() + "-" + version.getReleaseVersion();
     }
 
     public String getTagName() {
@@ -27,7 +27,7 @@ public class ReleasableModule {
     }
 
     public String getNewVersion() {
-        return version.releaseVersion();
+        return version.getReleaseVersion();
     }
 
     public String getArtifactId() {
@@ -43,11 +43,11 @@ public class ReleasableModule {
     }
 
     public String getVersion() {
-        return version.businessVersion();
+        return version.getBusinessVersion();
     }
 
     public long getBuildNumber() {
-        return version.buildNumber();
+        return version.getBuildNumber();
     }
 
     public boolean isOneOf(List<String> moduleNames) {
@@ -65,7 +65,7 @@ public class ReleasableModule {
     }
 
     public String getVersionToDependOn() {
-        return willBeReleased() ? version.releaseVersion() : equivalentVersion;
+        return willBeReleased() ? version.getReleaseVersion() : equivalentVersion;
     }
 
     public String getRelativePathToModule() {

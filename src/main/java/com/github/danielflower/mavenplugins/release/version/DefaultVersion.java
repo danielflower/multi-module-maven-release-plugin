@@ -2,25 +2,27 @@ package com.github.danielflower.mavenplugins.release.version;
 
 final class DefaultVersion implements Version {
 	private final String developmentVersion;
-	private final String versionWithoutBuildNumber;
+	private final String businessVersion;
+	private final String releaseVersion;
 	private final long buildNumber;
 
 	DefaultVersion(final String developmentVersion, final String businessVersion, final long buildNumber) {
 		this.developmentVersion = developmentVersion;
 		this.buildNumber = buildNumber;
-		this.versionWithoutBuildNumber = businessVersion;
+		this.businessVersion = businessVersion;
+		this.releaseVersion = businessVersion + "." + buildNumber;
 	}
 
 	/**
 	 * For example, "1.0" if the development version is "1.0-SNAPSHOT"
 	 */
 	@Override
-	public String businessVersion() {
-		return versionWithoutBuildNumber;
+	public String getBusinessVersion() {
+		return businessVersion;
 	}
 
 	@Override
-	public long buildNumber() {
+	public long getBuildNumber() {
 		return buildNumber;
 	}
 
@@ -28,7 +30,7 @@ final class DefaultVersion implements Version {
 	 * The snapshot version, e.g. "1.0-SNAPSHOT"
 	 */
 	@Override
-	public String developmentVersion() {
+	public String getDevelopmentVersion() {
 		return developmentVersion;
 	}
 
@@ -36,7 +38,7 @@ final class DefaultVersion implements Version {
 	 * The business version with the build number appended, e.g. "1.0.1"
 	 */
 	@Override
-	public String releaseVersion() {
-		return businessVersion() + "." + buildNumber;
+	public String getReleaseVersion() {
+		return releaseVersion;
 	}
 }

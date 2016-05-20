@@ -48,9 +48,9 @@ public class ReleasableModuleBuilder {
 
 	public ReleasableModule build() throws ValidationException {
 		final Version version = mock(Version.class);
-		when(version.buildNumber()).thenReturn(buildNumber);
-		when(version.developmentVersion()).thenReturn(project.getVersion());
-		when(version.releaseVersion()).thenReturn(project.getVersion().replace("-SNAPSHOT", ".") + buildNumber);
+		when(version.getBuildNumber()).thenReturn(buildNumber);
+		when(version.getDevelopmentVersion()).thenReturn(project.getVersion());
+		when(version.getReleaseVersion()).thenReturn(project.getVersion().replace("-SNAPSHOT", ".") + buildNumber);
 		return new ReleasableModule(project, version, equivalentVersion, relativePathToModule);
 	}
 

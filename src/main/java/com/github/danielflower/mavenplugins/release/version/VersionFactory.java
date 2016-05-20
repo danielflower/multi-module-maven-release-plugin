@@ -6,8 +6,11 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 
+/**
+ * Factory interface for creating new {@link Version} instances.
+ */
 public interface VersionFactory {
 
-	Version newVersioning(MavenProject project, Long buildNumber, String remoteUrl)
+	Version newVersion(MavenProject project, Long buildNumberOrNull, String remoteUrl)
 			throws MojoExecutionException, ValidationException, GitAPIException;
 }

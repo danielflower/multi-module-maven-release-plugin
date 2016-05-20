@@ -2,14 +2,14 @@ package com.github.danielflower.mavenplugins.release.version;
 
 public interface Version {
 
-	String releaseVersion();
+	String getReleaseVersion();
 
-	String businessVersion();
+	String getBusinessVersion();
 
-	long buildNumber();
+	long getBuildNumber();
 
 	/**
 	 * The snapshot version, e.g. "1.0-SNAPSHOT"
 	 */
-	String developmentVersion();
+	String getDevelopmentVersion();
 }
