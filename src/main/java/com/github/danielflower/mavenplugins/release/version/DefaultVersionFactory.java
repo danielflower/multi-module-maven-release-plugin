@@ -41,13 +41,13 @@ final class DefaultVersionFactory implements VersionFactory {
 	 * java.lang.String)
 	 */
 	@Override
-	public Version newVersion(final MavenProject project, final boolean useLastDigitAsVersionNumber,
+	public Version newVersion(final MavenProject project, final boolean useLastDigitAsBuildNumber,
 			final Long buildNumber, final String remoteUrl)
 					throws MojoExecutionException, ValidationException, GitAPIException {
 		String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
 		final long actualBuildNumber;
 		if (buildNumber == null) {
-			if (useLastDigitAsVersionNumber) {
+			if (useLastDigitAsBuildNumber) {
 				final int idx = businessVersion.lastIndexOf('.');
 				actualBuildNumber = valueOf(businessVersion.substring(idx + 1));
 				businessVersion = businessVersion.substring(0, idx);

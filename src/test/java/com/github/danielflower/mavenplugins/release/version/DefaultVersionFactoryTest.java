@@ -39,7 +39,7 @@ public class DefaultVersionFactoryTest {
 
 	@Test
 	public void newVersionWithSpecifiedBuildNumber() throws Exception {
-		// Pass 'true' for useLastDigitAsVersionNumber to insure that in any
+		// Pass 'true' for useLastDigitAsBuildNumber to insure that in any
 		// case the build number specified is used.
 		final Version version = factory.newVersion(project, true, 9l, ANY_REMOTE_URL);
 		assertEquals(VERSION, version.getBusinessVersion());

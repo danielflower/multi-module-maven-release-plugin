@@ -27,7 +27,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	private final VersionFactory versionFactory;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
-	private boolean useLastDigitAsVersionNumber;
+	private boolean useLastDigitAsBuildNumber;
 	private Long buildNumber;
 	private List<String> modulesToForceRelease;
 	private String remoteUrl;
@@ -58,8 +58,8 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	}
 
 	@Override
-	public ReactorBuilder setUseLastDigitAsVersionNumber(final boolean useLastDigitAsVersionNumber) {
-		this.useLastDigitAsVersionNumber = useLastDigitAsVersionNumber;
+	public ReactorBuilder setUseLastDigitAsBuildNumber(final boolean useLastDigitAsBuildNumber) {
+		this.useLastDigitAsBuildNumber = useLastDigitAsBuildNumber;
 		return this;
 	}
 
@@ -101,7 +101,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		final DefaultReactor reactor = new DefaultReactor(log);
 
 		for (final MavenProject project : projects) {
-			final Version version = versionFactory.newVersion(project, useLastDigitAsVersionNumber, buildNumber,
+			final Version version = versionFactory.newVersion(project, useLastDigitAsBuildNumber, buildNumber,
 					remoteUrl);
 
 			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);

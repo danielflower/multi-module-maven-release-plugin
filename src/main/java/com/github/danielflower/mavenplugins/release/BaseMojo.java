@@ -42,8 +42,8 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
 	protected List<MavenProject> projects;
 
-	@Parameter(property = "useLastDigitAsVersionNumber")
-	protected boolean useLastDigitAsVersionNumber;
+	@Parameter(property = "useLastDigitAsBuildNumber")
+	protected boolean useLastDigitAsBuildNumber;
 
 	/**
 	 * <p>
@@ -224,7 +224,7 @@ public abstract class BaseMojo extends AbstractMojo {
 			throws ValidationException, MojoExecutionException, GitAPIException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
 		return builder.setRootProject(project).setProjects(projects)
-				.setUseLastDigitAsVersionNumber(useLastDigitAsVersionNumber).setBuildNumber(buildNumber)
+				.setUseLastDigitAsBuildNumber(useLastDigitAsBuildNumber).setBuildNumber(buildNumber)
 				.setModulesToForceRelease(modulesToForceRelease).setRemoteUrl(remoteUrl).build();
 	}
 
