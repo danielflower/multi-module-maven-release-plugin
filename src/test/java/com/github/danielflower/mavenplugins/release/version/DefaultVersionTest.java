@@ -40,13 +40,13 @@ public class DefaultVersionTest {
 
 	@Test
 	public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
-		final Version version = new DefaultVersion(project, "1.0", 123L);
+		final Version version = new DefaultVersion(ARTIFACT_ID, "1.0", 123L);
 		assertEquals(version.releaseVersion(), "1.0.123");
 	}
 
 	@Test
 	public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsed() throws Exception {
-		final Version version = new DefaultVersion(project, "1.0", 0l);
+		final Version version = new DefaultVersion(ARTIFACT_ID, "1.0", 0l);
 		assertEquals("1.0.0", version.releaseVersion());
 	}
 }

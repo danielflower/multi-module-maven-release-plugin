@@ -1,16 +1,14 @@
 package com.github.danielflower.mavenplugins.release.version;
 
-import org.apache.maven.project.MavenProject;
-
 final class DefaultVersion implements Version {
-	private final MavenProject project;
+	private final String developmentVersion;
 	private final String versionWithoutBuildNumber;
-	private final Long buildNumber;
+	private final long buildNumber;
 
-	DefaultVersion(final MavenProject project, final String versionWithoutBuildNumber, final Long buildNumber) {
-		this.project = project;
+	DefaultVersion(final String developmentVersion, final String businessVersion, final long buildNumber) {
+		this.developmentVersion = developmentVersion;
 		this.buildNumber = buildNumber;
-		this.versionWithoutBuildNumber = versionWithoutBuildNumber;
+		this.versionWithoutBuildNumber = businessVersion;
 	}
 
 	/**
@@ -31,7 +29,7 @@ final class DefaultVersion implements Version {
 	 */
 	@Override
 	public String developmentVersion() {
-		return project.getVersion();
+		return developmentVersion;
 	}
 
 	/**

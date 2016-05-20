@@ -29,11 +29,11 @@ final class DefaultVersionFactory implements VersionFactory {
 	@Override
 	public Version newVersioning(final MavenProject project, final Long buildNumber, final String remoteUrl)
 			throws MojoExecutionException, ValidationException, GitAPIException {
-		final String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
+		final String businessVersion = project.getVersion().replace("-SNAPSHOT", "");
 
-		final Long actualBuildNumber = buildNumber == null
-				? finder.findBuildNumber(project, remoteUrl, versionWithoutBuildNumber) : buildNumber;
+		final long actualBuildNumber = buildNumber == null ? finder.findBuildNumber(project, remoteUrl, businessVersion)
+				: buildNumber;
 
-		return new DefaultVersion(project, versionWithoutBuildNumber, actualBuildNumber);
+		return new DefaultVersion(project.getArtifactId(), businessVersion, actualBuildNumber);
 	}
 }
