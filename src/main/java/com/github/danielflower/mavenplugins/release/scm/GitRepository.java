@@ -2,6 +2,9 @@ package com.github.danielflower.mavenplugins.release.scm;
 
 import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.BUILD_NUMBER;
 import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.VERSION;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static org.eclipse.jgit.lib.Repository.isValidRefName;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +37,9 @@ import com.github.danielflower.mavenplugins.release.ValidationException;
 // TODO: Make this class package private when SingleModuleTest is working with a Guice injector
 @Component(role = SCMRepository.class)
 public final class GitRepository implements SCMRepository {
+	private static final String REFS_TAGS = "refs/tags/";
+
+	static final String INVALID_REF_NAME_MESSAGE = "Sorry, '%s' is not a valid version.";
 
 	@Requirement(role = Log.class)
 	private Log log;
@@ -239,7 +245,7 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	static String stripRefPrefix(final String refName) {
-		return refName.substring("refs/tags/".length());
+		return refName.substring(REFS_TAGS.length());
 	}
 
 	@Override
@@ -247,4 +253,13 @@ public final class GitRepository implements SCMRepository {
 		return new DefaultProposedTagsBuilder(log, getGit(), this, remoteUrl);
 	}
 
+	@Override
+	public void checkValidRefName(final String releaseVersion) throws ValidationException {
+		if (!isValidRefName(format("%s%s", REFS_TAGS, releaseVersion))) {
+			final String summary = format(INVALID_REF_NAME_MESSAGE, releaseVersion);
+			throw new ValidationException(summary, asList(summary,
+					"Version numbers are used in the Git tag, and so can only contain characters that are valid in git tags.",
+					"Please see https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html for tag naming rules."));
+		}
+	}
 }

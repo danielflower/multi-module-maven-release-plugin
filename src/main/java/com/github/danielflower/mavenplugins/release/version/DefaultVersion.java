@@ -1,7 +1,6 @@
 package com.github.danielflower.mavenplugins.release.version;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +9,6 @@ import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
@@ -57,12 +55,7 @@ final class DefaultVersion implements Version {
 			}
 		}
 
-		if (!Repository.isValidRefName("refs/tags/" + releaseVersion())) {
-			final String summary = "Sorry, '" + releaseVersion() + "' is not a valid version.";
-			throw new ValidationException(summary, asList(summary,
-					"Version numbers are used in the Git tag, and so can only contain characters that are valid in git tags.",
-					"Please see https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html for tag naming rules."));
-		}
+		gitRepo.checkValidRefName(releaseVersion());
 	}
 
 	@Override

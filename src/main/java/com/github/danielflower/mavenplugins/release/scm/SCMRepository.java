@@ -30,4 +30,6 @@ public interface SCMRepository {
 	DiffDetector newDiffDetector() throws ValidationException;
 
 	ProposedTagsBuilder newProposedTagsBuilder(String remoteUrl) throws ValidationException;
+
+	void checkValidRefName(String releaseVersion) throws ValidationException;
 }
