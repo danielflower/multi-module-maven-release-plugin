@@ -15,21 +15,26 @@ import org.eclipse.jgit.lib.Repository;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 import com.github.danielflower.mavenplugins.release.version.Version;
 import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 final class DefaultReactorBuilder implements ReactorBuilder {
-	private final VersionFactory versionFactory;
 	private final Log log;
+	private final SCMRepository repository;
+	private final VersionFactory versionFactory;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
 	private Long buildNumber;
 	private List<String> modulesToForceRelease;
 	private String remoteUrl;
 
-	public DefaultReactorBuilder(final Log log, final VersionFactory versioningFactory) {
+	public DefaultReactorBuilder(final Log log, final SCMRepository repository,
+			final VersionFactory versioningFactory) {
 		this.log = log;
+		this.repository = repository;
 		this.versionFactory = versioningFactory;
 	}
 
@@ -89,14 +94,12 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		final DefaultReactor reactor = new DefaultReactor(log);
 
 		for (final MavenProject project : projects) {
-			final String artifactId = project.getArtifactId();
-
 			final Version version = versionFactory.newVersioning(project, buildNumber, remoteUrl);
 
 			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 			final String relativePathToModule = calculateModulePath(rootProject, project);
 
-			final String equivalentVersion = logReleaseInfo(artifactId, version, changedDependencyOrNull,
+			final String equivalentVersion = logReleaseInfo(project, version, changedDependencyOrNull,
 					relativePathToModule);
 
 			reactor.addReleasableModule(
@@ -106,27 +109,57 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		return reactor.finalizeReleaseVersions();
 	}
 
-	private String logReleaseInfo(final String artifactId, final Version versioning,
+	public ProposedTag hasChangedSinceLastRelease(final MavenProject project, final String businessVersion,
+			final String relativePathToModule) throws MojoExecutionException {
+		try {
+			final List<ProposedTag> previousTagsForThisModule = repository.tagsForVersion(project.getArtifactId(),
+					businessVersion);
+			if (previousTagsForThisModule.size() == 0) {
+				return null;
+			}
+			final DiffDetector detector = repository.newDiffDetector();
+			final boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(),
+					previousTagsForThisModule);
+			return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
+		} catch (final Exception e) {
+			throw new MojoExecutionException(
+					format("Error while detecting whether or not %s has changed since the last release",
+							project.getArtifactId()),
+					e);
+		}
+	}
+
+	private ProposedTag tagWithHighestBuildNumber(final List<ProposedTag> previousTagsForThisModule) {
+		ProposedTag cur = null;
+		for (final ProposedTag tag : previousTagsForThisModule) {
+			if (cur == null || tag.buildNumber() > cur.buildNumber()) {
+				cur = tag;
+			}
+		}
+		return cur;
+	}
+
+	private String logReleaseInfo(final MavenProject project, final Version versioning,
 			final String changedDependencyOrNull, final String relativePathToModule) throws MojoExecutionException {
 		String equivalentVersion = null;
-		if (modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
-			log.info(format("Releasing %s %s as we was asked to forced release.", artifactId,
+		if (modulesToForceRelease != null && modulesToForceRelease.contains(project.getArtifactId())) {
+			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
 					versioning.releaseVersion()));
 		} else if (changedDependencyOrNull != null) {
-			log.info(format("Releasing %s %s as %s has changed.", artifactId, versioning.releaseVersion(),
+			log.info(format("Releasing %s %s as %s has changed.", project.getArtifactId(), versioning.releaseVersion(),
 					changedDependencyOrNull));
 		} else {
-			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = versioning
-					.hasChangedSinceLastRelease(relativePathToModule);
+			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(project,
+					versioning.businessVersion(), relativePathToModule);
 
 			if (previousTagThatIsTheSameAsHEADForThisModule != null) {
 				equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
 						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
 				log.info(format("Will use version %s for %s as it has not been changed since that release.",
-						equivalentVersion, artifactId));
+						equivalentVersion, project.getArtifactId()));
 			} else {
 				log.info(format("Will use version %s for %s as it has changed since the last release.",
-						versioning.releaseVersion(), artifactId));
+						versioning.releaseVersion(), project.getArtifactId()));
 			}
 		}
 		return equivalentVersion;

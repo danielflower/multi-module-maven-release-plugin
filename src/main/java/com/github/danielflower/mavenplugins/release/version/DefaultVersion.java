@@ -1,7 +1,5 @@
 package com.github.danielflower.mavenplugins.release.version;
 
-import static java.lang.String.format;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +9,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
-import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
@@ -58,45 +55,12 @@ final class DefaultVersion implements Version {
 		gitRepo.checkValidRefName(releaseVersion());
 	}
 
-	@Override
-	public List<ProposedTag> getPreviousTagsForThisModule() throws MojoExecutionException {
-		return previousTagsForThisModule;
-	}
-
 	private static long nextBuildNumber(final Collection<Long> previousBuildNumbers) {
 		long max = 0;
 		for (final Long buildNumber : previousBuildNumbers) {
 			max = Math.max(max, buildNumber);
 		}
 		return max + 1;
-	}
-
-	@Override
-	public ProposedTag hasChangedSinceLastRelease(final String relativePathToModule) throws MojoExecutionException {
-		try {
-			if (previousTagsForThisModule.size() == 0) {
-				return null;
-			}
-			final DiffDetector detector = gitRepo.newDiffDetector();
-			final boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(),
-					previousTagsForThisModule);
-			return hasChanged ? null : tagWithHighestBuildNumber();
-		} catch (final Exception e) {
-			throw new MojoExecutionException(
-					format("Error while detecting whether or not %s has changed since the last release",
-							project.getArtifactId()),
-					e);
-		}
-	}
-
-	private ProposedTag tagWithHighestBuildNumber() {
-		ProposedTag cur = null;
-		for (final ProposedTag tag : previousTagsForThisModule) {
-			if (cur == null || tag.buildNumber() > cur.buildNumber()) {
-				cur = tag;
-			}
-		}
-		return cur;
 	}
 
 	/**

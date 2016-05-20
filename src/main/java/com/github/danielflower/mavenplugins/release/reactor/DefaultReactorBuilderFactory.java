@@ -4,6 +4,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 /**
@@ -19,6 +20,9 @@ final class DefaultReactorBuilderFactory implements ReactorBuilderFactory {
 	@Requirement(role = VersionFactory.class)
 	private VersionFactory versionFactory;
 
+	@Requirement(role = SCMRepository.class)
+	private SCMRepository repository;
+
 	void setLog(final Log log) {
 		this.log = log;
 	}
@@ -27,9 +31,13 @@ final class DefaultReactorBuilderFactory implements ReactorBuilderFactory {
 		this.versionFactory = versionFactory;
 	}
 
+	void setRepository(final SCMRepository repository) {
+		this.repository = repository;
+	}
+
 	@Override
 	public ReactorBuilder newBuilder() {
-		return new DefaultReactorBuilder(log, versionFactory);
+		return new DefaultReactorBuilder(log, repository, versionFactory);
 	}
 
 }
