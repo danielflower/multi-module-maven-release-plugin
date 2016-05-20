@@ -49,8 +49,8 @@ final class DefaultVersionFactory implements VersionFactory {
 		if (buildNumber == null) {
 			if (useLastDigitAsVersionNumber) {
 				final int idx = businessVersion.lastIndexOf('.');
-				businessVersion = businessVersion.substring(0, idx);
 				actualBuildNumber = valueOf(businessVersion.substring(idx + 1));
+				businessVersion = businessVersion.substring(0, idx);
 			} else {
 				actualBuildNumber = finder.findBuildNumber(project, remoteUrl, businessVersion);
 			}
