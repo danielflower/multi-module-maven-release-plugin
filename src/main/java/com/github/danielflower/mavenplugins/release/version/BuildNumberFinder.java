@@ -1,5 +1,8 @@
 package com.github.danielflower.mavenplugins.release.version;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -7,33 +10,28 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
-@Component(role = VersionFactory.class)
-final class DefaultVersionFactory implements VersionFactory {
+@Component(role = BuildNumberFinder.class)
+class BuildNumberFinder {
 
 	@Requirement(role = SCMRepository.class)
 	private SCMRepository repository;
-
-	@Requirement(role = BuildNumberFinder.class)
-	private BuildNumberFinder finder;
 
 	void setRepository(final SCMRepository repository) {
 		this.repository = repository;
 	}
 
-	void setFinder(final BuildNumberFinder finder) {
-		this.finder = finder;
-	}
-
-	@Override
-	public Version newVersioning(final MavenProject project, final Long buildNumber, final String remoteUrl)
+	public long findBuildNumber(final MavenProject project, final String remoteUrl, final String businessVersion)
 			throws MojoExecutionException, ValidationException, GitAPIException {
-		final String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
+		final SortedSet<Long> prev = new TreeSet<>();
 
-		final Long actualBuildNumber = buildNumber == null
-				? finder.findBuildNumber(project, remoteUrl, versionWithoutBuildNumber) : buildNumber;
+		for (final ProposedTag previousTag : repository.tagsForVersion(project.getArtifactId(), businessVersion)) {
+			prev.add(previousTag.buildNumber());
+		}
 
-		return new DefaultVersion(project, versionWithoutBuildNumber, actualBuildNumber);
+		prev.addAll(repository.getRemoteBuildNumbers(remoteUrl, project.getArtifactId(), businessVersion));
+		return prev.isEmpty() ? 0l : prev.last() + 1;
 	}
 }
