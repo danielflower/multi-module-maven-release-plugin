@@ -30,6 +30,7 @@ public class NextMojo extends BaseMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		super.execute();
 		try {
 			configureJsch();
 			final String remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());

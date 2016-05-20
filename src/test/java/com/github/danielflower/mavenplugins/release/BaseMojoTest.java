@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
@@ -51,10 +50,6 @@ public class BaseMojoTest {
 	public void setup() throws ValidationException {
 		mojo = new BaseMojo() {
 
-			@Override
-			public void execute() throws MojoExecutionException, MojoFailureException {
-				// noop
-			}
 		};
 		mojo.setRepository(repository);
 		mojo.setReactorBuilderFactory(reactorBuilderFactory);
@@ -67,6 +62,14 @@ public class BaseMojoTest {
 		mojo.setSettings(settings);
 		mojo.setLog(log);
 		JschConfigSessionFactory.setInstance(null);
+	}
+
+	@Test(expected = MojoExecutionException.class)
+	public void buildNumberAndUseLastDigitAsBuildNumberToghetherIsIllegal() throws Exception {
+		mojo.buildNumber = 9l;
+		mojo.useLastDigitAsBuildNumber = true;
+
+		mojo.execute();
 	}
 
 	@Test

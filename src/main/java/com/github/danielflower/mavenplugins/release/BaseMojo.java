@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -42,6 +43,20 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "projects", required = true, readonly = true, defaultValue = "${reactorProjects}")
 	protected List<MavenProject> projects;
 
+	/**
+	 * <p>
+	 * Tells the plugin to use the last digit of the current version of the
+	 * POM(s) to be released as build number. Given a snapshot version of
+	 * "1.0.3-SNAPSHOT", the actual released version will be "1.0.3".
+	 * </p>
+	 * 
+	 * <p>
+	 * This setting <em>cannot</em> be used in conjunction with
+	 * {@link #buildNumber}. If this property is set to {@code true} and
+	 * {@link #buildNumber} has non-{@code null} value, a
+	 * {@link MojoExecutionException} will be caused to be thrown.
+	 * </p>
+	 */
 	@Parameter(property = "useLastDigitAsBuildNumber")
 	protected boolean useLastDigitAsBuildNumber;
 
@@ -185,6 +200,14 @@ public abstract class BaseMojo extends AbstractMojo {
 			}
 		}
 		return remote;
+	}
+
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (useLastDigitAsBuildNumber && buildNumber != null) {
+			throw new MojoExecutionException(
+					"You cannot use 'useLastDigitAsBuildNumber' in conjunction with 'buildNumber'!");
+		}
 	}
 
 	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor, final String remoteUrl)

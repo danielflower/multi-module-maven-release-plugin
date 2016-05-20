@@ -111,6 +111,7 @@ public class ReleaseMojo extends BaseMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		super.execute();
 		try {
 			configureJsch();
 			repository.errorIfNotClean();
