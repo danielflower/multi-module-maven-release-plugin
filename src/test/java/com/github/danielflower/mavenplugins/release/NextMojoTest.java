@@ -1,6 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static com.github.danielflower.mavenplugins.release.BaseMojo.getRemoteUrlOrNullIfNoneSet;
+import static com.github.danielflower.mavenplugins.release.NextMojo.getRemoteUrlOrNullIfNoneSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -11,8 +11,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
@@ -29,7 +27,7 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
  * @author Roland Hauser sourcepond@gmail.com
  *
  */
-public class BaseMojoTest {
+public class NextMojoTest {
 	private static final String DEVELOPER_CONNECTION = "scm:git:ssh://some/developerPath";
 	private static final String CONNECTION = "scm:git:ssh://some/commonPath";
 	private static final String KNOWN_HOSTS = "anyKnownHosts";
@@ -45,17 +43,11 @@ public class BaseMojoTest {
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final LogHolder logHolder = mock(LogHolder.class);
 	private final Scm scm = mock(Scm.class);
-	private BaseMojo mojo;
+	private NextMojo mojo;
 
 	@Before
 	public void setup() throws ValidationException {
-		mojo = new BaseMojo() {
-
-			@Override
-			public void execute() throws MojoExecutionException, MojoFailureException {
-				// noop
-			}
-		};
+		mojo = new NextMojo();
 		mojo.setRepository(repository);
 		mojo.setReactorBuilderFactory(reactorBuilderFactory);
 		mojo.setLogHolder(logHolder);
