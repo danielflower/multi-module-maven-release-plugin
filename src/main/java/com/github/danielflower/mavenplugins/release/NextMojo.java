@@ -1,10 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.maven.model.Scm;
@@ -211,25 +208,6 @@ public class NextMojo extends AbstractMojo {
 		return builder.build();
 	}
 
-	protected void printBigErrorMessageAndThrow(final String terseMessage, final List<String> linesToLog)
-			throws MojoExecutionException {
-		final Log log = getLog();
-		log.error("");
-		log.error("");
-		log.error("");
-		log.error("************************************");
-		log.error("Could not execute the release plugin");
-		log.error("************************************");
-		log.error("");
-		log.error("");
-		for (final String line : linesToLog) {
-			log.error(line);
-		}
-		log.error("");
-		log.error("");
-		throw new MojoExecutionException(terseMessage);
-	}
-
 	protected final Reactor newReactor(final String remoteUrl) throws ReactorException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
 		return builder.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
@@ -273,16 +251,7 @@ public class NextMojo extends AbstractMojo {
 			final Reactor reactor = newReactor(remoteUrl);
 			execute(reactor, figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl));
 		} catch (final PluginException e) {
-			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());
-		} catch (final Exception gae) { // TODO: Moved this to SCMException
-
-			final StringWriter sw = new StringWriter();
-			gae.printStackTrace(new PrintWriter(sw));
-			final String exceptionAsString = sw.toString();
-
-			printBigErrorMessageAndThrow("Could not release due to a Git error",
-					asList("There was an error while accessing the Git repository. The error returned from git was:",
-							gae.getMessage(), "Stack trace:", exceptionAsString));
+			e.printBigErrorMessageAndThrow(getLog());
 		}
 	}
 }

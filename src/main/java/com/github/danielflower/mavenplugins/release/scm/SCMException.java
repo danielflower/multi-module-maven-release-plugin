@@ -1,5 +1,11 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+
 import com.github.danielflower.mavenplugins.release.PluginException;
 
 /**
@@ -20,6 +26,18 @@ public class SCMException extends PluginException {
 	public SCMException add(final String format, final Object... args) {
 		super.add(format, args);
 		return this;
+	}
+
+	@Override
+	protected void printBigErrorMessageAndThrow(final Log log) throws MojoExecutionException {
+		final StringWriter sw = new StringWriter();
+		printStackTrace(new PrintWriter(sw));
+		final String exceptionAsString = sw.toString();
+		add("Could not release due to a Git error");
+		add("There was an error while accessing the Git repository. The error returned from git was:");
+		add("Stack trace:");
+		add(exceptionAsString);
+		super.printBigErrorMessageAndThrow(log);
 	}
 
 }

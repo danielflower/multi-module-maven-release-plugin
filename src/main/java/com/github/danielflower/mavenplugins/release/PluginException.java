@@ -6,6 +6,9 @@ import static java.util.Collections.unmodifiableList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+
 @SuppressWarnings("serial")
 public class PluginException extends Exception {
 	private final List<String> messages = new LinkedList<>();
@@ -27,6 +30,23 @@ public class PluginException extends Exception {
 
 	public List<String> getMessages() {
 		return unmodifiableList(messages);
+	}
+
+	protected void printBigErrorMessageAndThrow(final Log log) throws MojoExecutionException {
+		log.error("");
+		log.error("");
+		log.error("");
+		log.error("************************************");
+		log.error("Could not execute the release plugin");
+		log.error("************************************");
+		log.error("");
+		log.error("");
+		for (final String line : messages) {
+			log.error(line);
+		}
+		log.error("");
+		log.error("");
+		throw new MojoExecutionException(getMessage());
 	}
 
 }
