@@ -3,7 +3,6 @@ package com.github.danielflower.mavenplugins.release.scm;
 import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.BUILD_NUMBER;
 import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTag.VERSION;
 import static com.github.danielflower.mavenplugins.release.scm.DefaultProposedTags.toKey;
-import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,11 +12,8 @@ import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.json.simple.JSONObject;
-
-import com.github.danielflower.mavenplugins.release.ValidationException;
 
 final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 	private final Map<String, ProposedTag> proposedTags = new LinkedHashMap<>();
@@ -34,13 +30,11 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 	}
 
 	@Override
-	public ProposedTagsBuilder add(final String tag, final String version, final long buildNumber)
-			throws ValidationException, GitAPIException {
+	public ProposedTagsBuilder add(final String tag, final String version, final long buildNumber) throws SCMException {
 		if (repo.hasLocalTag(tag)) {
-			final String summary = "There is already a tag named " + tag + " in this repository.";
-			throw new ValidationException(summary,
-					asList(summary, "It is likely that this version has been released before.",
-							"Please try incrementing the build number and trying again."));
+			throw new SCMException("There is already a tag named %s in this repository.", tag)
+					.add("It is likely that this version has been released before.")
+					.add("Please try incrementing the build number and trying again.");
 		}
 		final JSONObject message = new JSONObject();
 		message.put(VERSION, version);
@@ -50,7 +44,7 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 		return this;
 	}
 
-	private List<String> getMatchingRemoteTags() throws GitAPIException, ValidationException {
+	private List<String> getMatchingRemoteTags() throws SCMException {
 		final List<String> tagNamesToSearchFor = new ArrayList<String>();
 		for (final ProposedTag annotatedTag : proposedTags.values()) {
 			tagNamesToSearchFor.add(annotatedTag.name());
@@ -69,17 +63,15 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 	}
 
 	@Override
-	public ProposedTags build() throws ValidationException, GitAPIException {
+	public ProposedTags build() throws SCMException {
 		final List<String> matchingRemoteTags = getMatchingRemoteTags();
 		if (!matchingRemoteTags.isEmpty()) {
-			final String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
-			final List<String> messages = new ArrayList<String>();
-			messages.add(summary);
+			final SCMException exception = new SCMException(
+					"Cannot release because there is already a tag with the same build number on the remote Git repo.");
 			for (final String matchingRemoteTag : matchingRemoteTags) {
-				messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
+				exception.add(" * There is already a tag named %s in the remote repo.", matchingRemoteTag);
 			}
-			messages.add("Please try releasing again with a new build number.");
-			throw new ValidationException(summary, messages);
+			throw exception.add("Please try releasing again with a new build number.");
 		}
 		return new DefaultProposedTags(log, git, repo, remoteUrl, proposedTags);
 	}

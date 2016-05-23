@@ -4,6 +4,7 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.version.Version;
 
 import static org.hamcrest.CoreMatchers.is;

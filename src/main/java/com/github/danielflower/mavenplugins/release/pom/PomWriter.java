@@ -16,7 +16,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -53,7 +53,7 @@ class PomWriter {
 		changedProjects.add(project);
 	}
 
-	List<File> writePoms() throws ValidationException {
+	List<File> writePoms() throws POMUpdateException {
 		final List<File> changedFiles = new LinkedList<>();
 		try {
 			for (final MavenProject project : changedProjects) {
@@ -69,10 +69,10 @@ class PomWriter {
 		} catch (final IOException e) {
 			try {
 				repository.revertChanges(changedFiles);
-			} catch (final IOException revertException) {
+			} catch (final SCMException revertException) {
 				log.error(format("Reverting changed POMs %s failed!", changedFiles), revertException);
 			}
-			throw new ValidationException(EXCEPTION_MESSAGE, e);
+			throw new POMUpdateException(e, EXCEPTION_MESSAGE);
 		}
 
 		return changedFiles;

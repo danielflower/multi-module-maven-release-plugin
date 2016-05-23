@@ -17,9 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
+import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 
 public class UpdateParentTest {
 	private static final String ANY_ARTIFACT_ID = "anyArtifactId";

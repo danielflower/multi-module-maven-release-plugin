@@ -47,7 +47,7 @@ public class GitRelatedTest extends E2ETest {
 			testProject.mvnRelease("1");
 			Assert.fail("Should have failed");
 		} catch (final MavenExecutionException e) {
-			assertThat(e.output, oneOf(containsString("[ERROR] origin: not found.")));
+			assertThat(e.output, oneOf(containsString("[ERROR] Remote tags could not be listed!")));
 		}
 	}
 

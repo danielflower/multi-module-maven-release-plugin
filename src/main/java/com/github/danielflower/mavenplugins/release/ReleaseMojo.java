@@ -1,18 +1,17 @@
 package com.github.danielflower.mavenplugins.release;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 
 /**
  * Releases the project.
@@ -105,7 +104,7 @@ public class ReleaseMojo extends NextMojo {
 
 	@Override
 	protected void execute(final Reactor reactor, final ProposedTags proposedTags)
-			throws IOException, ValidationException, GitAPIException, MojoExecutionException {
+			throws MojoExecutionException, PluginException {
 		final List<File> changedFiles = pomUpdater.updatePoms(reactor);
 
 		// Do this before running the maven build in case the build uploads
@@ -147,7 +146,7 @@ public class ReleaseMojo extends NextMojo {
 	}
 
 	private void revertChanges(final List<File> changedFiles, final boolean throwIfError)
-			throws IOException, ValidationException, MojoExecutionException {
+			throws SCMException, MojoExecutionException {
 		if (!repository.revertChanges(changedFiles)) {
 			final String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
 			if (throwIfError) {

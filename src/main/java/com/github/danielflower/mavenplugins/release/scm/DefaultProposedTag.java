@@ -40,9 +40,13 @@ class DefaultProposedTag implements ProposedTag {
 	}
 
 	@Override
-	public Ref saveAtHEAD() throws GitAPIException {
+	public Ref saveAtHEAD() throws SCMException {
 		final String json = message.toJSONString();
-		ref = git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
+		try {
+			ref = git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
+		} catch (final GitAPIException e) {
+			throw new SCMException(e, "Ref could be saved at HEAD!");
+		}
 		return ref;
 	}
 

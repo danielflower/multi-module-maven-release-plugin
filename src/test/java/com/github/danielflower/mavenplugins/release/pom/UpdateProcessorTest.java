@@ -25,9 +25,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 
 /**
  * @author rolandhauser
@@ -53,7 +52,7 @@ public class UpdateProcessorTest {
 
 	@SuppressWarnings("unchecked")
 	@Before
-	public void setup() throws ValidationException {
+	public void setup() throws POMUpdateException {
 		// Setup context factory
 		when(contextFactory.newContext(reactor, project, ANY_VERSION)).thenReturn(context);
 
@@ -107,7 +106,7 @@ public class UpdateProcessorTest {
 		try {
 			processor.updatePoms(reactor);
 			fail("Exception expected");
-		} catch (final ValidationException e) {
+		} catch (final POMUpdateException e) {
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, e.getMessage());
 			final List<String> msgs = e.getMessages();
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, msgs.get(0));

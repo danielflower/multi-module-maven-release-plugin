@@ -32,7 +32,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 public class PomWriterFactoryTest {
@@ -102,7 +102,7 @@ public class PomWriterFactoryTest {
 		try {
 			pomWriter.writePoms();
 			fail("Exception expected");
-		} catch (final ValidationException e) {
+		} catch (final POMUpdateException e) {
 			assertSame(expected, e.getCause());
 			assertEquals(EXCEPTION_MESSAGE, e.getMessage());
 		}
@@ -112,7 +112,7 @@ public class PomWriterFactoryTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void ioExceptionOccurredWhileReverting() throws Exception {
-		final IOException revertException = new IOException();
+		final SCMException revertException = new SCMException("any");
 		doThrow(revertException).when(repository).revertChanges(Mockito.anyList());
 
 		final IOException expected = new IOException();
@@ -120,7 +120,7 @@ public class PomWriterFactoryTest {
 		try {
 			pomWriter.writePoms();
 			fail("Exception expected");
-		} catch (final ValidationException e) {
+		} catch (final POMUpdateException e) {
 			assertSame(expected, e.getCause());
 			assertEquals(EXCEPTION_MESSAGE, e.getMessage());
 		}

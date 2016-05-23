@@ -10,8 +10,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
+import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
 
 /**

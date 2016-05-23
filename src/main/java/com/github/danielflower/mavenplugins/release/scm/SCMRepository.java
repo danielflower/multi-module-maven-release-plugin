@@ -1,35 +1,29 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-
-import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public interface SCMRepository {
 
-	ProposedTag fromRef(Ref gitTag) throws IOException, ValidationException;
+	ProposedTag fromRef(Ref gitTag) throws SCMException;
 
-	void errorIfNotClean() throws ValidationException;
+	void errorIfNotClean() throws SCMException;
 
-	boolean hasLocalTag(String tag) throws ValidationException, GitAPIException;
+	boolean hasLocalTag(String tag) throws SCMException;
 
-	boolean revertChanges(List<File> changedFiles) throws ValidationException, IOException;
+	boolean revertChanges(List<File> changedFiles) throws SCMException;
 
 	Collection<Long> getRemoteBuildNumbers(String remoteUrl, String artifactId, String versionWithoutBuildNumber)
-			throws ValidationException, GitAPIException;
+			throws SCMException;
 
-	List<ProposedTag> tagsForVersion(String module, String versionWithoutBuildNumber)
-			throws ValidationException, MojoExecutionException;
+	List<ProposedTag> tagsForVersion(String module, String versionWithoutBuildNumber) throws SCMException;
 
-	DiffDetector newDiffDetector() throws ValidationException;
+	DiffDetector newDiffDetector() throws SCMException;
 
-	ProposedTagsBuilder newProposedTagsBuilder(String remoteUrl) throws ValidationException;
+	ProposedTagsBuilder newProposedTagsBuilder(String remoteUrl) throws SCMException;
 
-	void checkValidRefName(String releaseVersion) throws ValidationException;
+	void checkValidRefName(String releaseVersion) throws SCMException;
 }

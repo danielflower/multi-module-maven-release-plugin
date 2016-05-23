@@ -3,11 +3,9 @@ package com.github.danielflower.mavenplugins.release;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.Scm;
@@ -21,15 +19,17 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
 import com.github.danielflower.mavenplugins.release.log.LogHolder;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilder;
 import com.github.danielflower.mavenplugins.release.reactor.ReactorBuilderFactory;
+import com.github.danielflower.mavenplugins.release.reactor.ReactorException;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTagsBuilder;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -202,7 +202,7 @@ public class NextMojo extends AbstractMojo {
 	}
 
 	protected ProposedTags figureOutTagNamesAndThrowIfAlreadyExists(final Reactor reactor, final String remoteUrl)
-			throws GitAPIException, ValidationException {
+			throws ReactorException, SCMException {
 		final ProposedTagsBuilder builder = repository.newProposedTagsBuilder(remoteUrl);
 		for (final ReleasableModule module : reactor) {
 			if (!module.willBeReleased()) {
@@ -234,8 +234,7 @@ public class NextMojo extends AbstractMojo {
 		throw new MojoExecutionException(terseMessage);
 	}
 
-	protected final Reactor newReactor(final String remoteUrl)
-			throws ValidationException, MojoExecutionException, GitAPIException {
+	protected final Reactor newReactor(final String remoteUrl) throws ReactorException {
 		final ReactorBuilder builder = builderFactory.newBuilder();
 		return builder.setRootProject(project).setProjects(projects).setBuildNumber(buildNumber)
 				.setModulesToForceRelease(modulesToForceRelease).setRemoteUrl(remoteUrl).build();
@@ -265,7 +264,7 @@ public class NextMojo extends AbstractMojo {
 	}
 
 	protected void execute(final Reactor reactor, final ProposedTags proposedTags)
-			throws IOException, ValidationException, MojoExecutionException, GitAPIException {
+			throws MojoExecutionException, PluginException {
 		// noop by default
 	}
 
@@ -277,11 +276,11 @@ public class NextMojo extends AbstractMojo {
 			final String remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
 			final Reactor reactor = newReactor(remoteUrl);
 			execute(reactor, figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl));
-		} catch (final IOException e) {
-			printBigErrorMessageAndThrow(e.getMessage(), Collections.<String> emptyList());
+		} catch (final PluginException e) {
+			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());
 		} catch (final ValidationException e) {
 			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());
-		} catch (final GitAPIException gae) {
+		} catch (final Exception gae) { // TODO: Moved this to SCMException
 
 			final StringWriter sw = new StringWriter();
 			gae.printStackTrace(new PrintWriter(sw));

@@ -5,7 +5,6 @@ import static java.util.Collections.unmodifiableCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +14,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-
-import com.github.danielflower.mavenplugins.release.ValidationException;
 
 final class DefaultProposedTags implements ProposedTags {
 	static final String KEY_FORMAT = "%s/%s/%s";
@@ -39,7 +36,7 @@ final class DefaultProposedTags implements ProposedTags {
 	}
 
 	@Override
-	public void tagAndPushRepo() throws GitAPIException {
+	public void tagAndPushRepo() throws SCMException {
 		for (final ProposedTag tag : proposedTags.values()) {
 			log.info("About to tag the repository with " + tag.name());
 			final Ref tagRef = tag.saveAtHEAD();
@@ -47,12 +44,16 @@ final class DefaultProposedTags implements ProposedTags {
 			if (remoteUrl != null) {
 				pushCommand.setRemote(remoteUrl);
 			}
-			pushCommand.call();
+			try {
+				pushCommand.call();
+			} catch (final GitAPIException e) {
+				throw new SCMException(e, "Repository could be tagged with %s", tag);
+			}
 		}
 	}
 
 	@Override
-	public List<String> getMatchingRemoteTags() throws GitAPIException, ValidationException {
+	public List<String> getMatchingRemoteTags() throws SCMException {
 		final List<String> tagNamesToSearchFor = new ArrayList<String>();
 		for (final ProposedTag annotatedTag : proposedTags.values()) {
 			tagNamesToSearchFor.add(annotatedTag.name());
@@ -71,13 +72,11 @@ final class DefaultProposedTags implements ProposedTags {
 	}
 
 	@Override
-	public ProposedTag getTag(final String tag, final String version, final long buildNumber)
-			throws ValidationException {
+	public ProposedTag getTag(final String tag, final String version, final long buildNumber) throws SCMException {
 		final String key = toKey(tag, version, buildNumber);
 		final ProposedTag proposedTag = proposedTags.get(key);
 		if (proposedTag == null) {
-			throw new ValidationException(format("No proposed tag registered %s", key),
-					Collections.<String> emptyList());
+			throw new SCMException("No proposed tag registered %s", key);
 		}
 		return proposedTag;
 	}

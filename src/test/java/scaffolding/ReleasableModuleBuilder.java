@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import org.apache.maven.project.MavenProject;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.version.Version;
 
 public class ReleasableModuleBuilder {

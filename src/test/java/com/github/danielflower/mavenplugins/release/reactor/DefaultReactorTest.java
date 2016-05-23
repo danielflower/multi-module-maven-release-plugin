@@ -16,9 +16,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
-
 public class DefaultReactorTest {
 	private final Log log = mock(Log.class);
 	private final DefaultReactor reactor = new DefaultReactor(log);

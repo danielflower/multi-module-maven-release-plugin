@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.reactor;
 
 import org.apache.maven.project.MavenProject;
 

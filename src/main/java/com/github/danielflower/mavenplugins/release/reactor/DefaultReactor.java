@@ -7,9 +7,6 @@ import java.util.List;
 
 import org.apache.maven.plugin.logging.Log;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
-
 final class DefaultReactor implements Reactor {
 	private final List<ReleasableModule> modulesInBuildOrder = new LinkedList<ReleasableModule>();
 	private final Log log;
