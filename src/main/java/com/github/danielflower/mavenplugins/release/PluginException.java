@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public abstract class PluginException extends Exception {
+public class PluginException extends Exception {
 	private final List<String> messages = new LinkedList<>();
 
 	public PluginException(final Throwable cause, final String format, final Object... args) {
@@ -20,11 +20,10 @@ public abstract class PluginException extends Exception {
 		messages.add(getMessage());
 	}
 
-	protected final void addLine(final String format, final Object... args) {
+	public PluginException add(final String format, final Object... args) {
 		messages.add(format(format, args));
+		return this;
 	}
-
-	public abstract PluginException add(final String format, final Object... args);
 
 	public List<String> getMessages() {
 		return unmodifiableList(messages);

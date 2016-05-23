@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import org.apache.maven.project.MavenProject;
 
-import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.version.Version;
 
@@ -46,7 +45,7 @@ public class ReleasableModuleBuilder {
 		return this;
 	}
 
-	public ReleasableModule build() throws ValidationException {
+	public ReleasableModule build() {
 		final Version version = mock(Version.class);
 		when(version.getBuildNumber()).thenReturn(buildNumber);
 		when(version.getDevelopmentVersion()).thenReturn(project.getVersion());

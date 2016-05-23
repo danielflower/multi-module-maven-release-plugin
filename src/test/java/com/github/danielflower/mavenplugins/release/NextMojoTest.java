@@ -46,7 +46,7 @@ public class NextMojoTest {
 	private NextMojo mojo;
 
 	@Before
-	public void setup() throws ValidationException {
+	public void setup() {
 		mojo = new NextMojo();
 		mojo.setRepository(repository);
 		mojo.setReactorBuilderFactory(reactorBuilderFactory);
@@ -123,24 +123,24 @@ public class NextMojoTest {
 	}
 
 	@Test
-	public void getRemoteUrlScmIsNull() throws ValidationException {
+	public void getRemoteUrlScmIsNull() throws PluginException {
 		assertNull(getRemoteUrlOrNullIfNoneSet(null));
 	}
 
 	@Test
-	public void getRemoteUrlNoConnectionsOnScm() throws ValidationException {
+	public void getRemoteUrlNoConnectionsOnScm() throws PluginException {
 		assertNull(getRemoteUrlOrNullIfNoneSet(scm));
 	}
 
 	@Test
-	public void getRemoteUrlUseDeveloperConnection() throws ValidationException {
+	public void getRemoteUrlUseDeveloperConnection() throws PluginException {
 		when(scm.getDeveloperConnection()).thenReturn(DEVELOPER_CONNECTION);
 		when(scm.getConnection()).thenReturn(CONNECTION);
 		assertEquals("ssh://some/developerPath", getRemoteUrlOrNullIfNoneSet(scm));
 	}
 
 	@Test
-	public void getRemoteUrlUseConnection() throws ValidationException {
+	public void getRemoteUrlUseConnection() throws PluginException {
 		when(scm.getConnection()).thenReturn(CONNECTION);
 		assertEquals("ssh://some/commonPath", getRemoteUrlOrNullIfNoneSet(scm));
 	}
@@ -151,10 +151,8 @@ public class NextMojoTest {
 		try {
 			getRemoteUrlOrNullIfNoneSet(scm);
 			fail("Exception expected");
-		} catch (final ValidationException expected) {
-			assertEquals(
-					"Cannot run the release plugin with a non-Git version control system scm:svn:ssh//some/illegal/protocol",
-					expected.getMessage());
+		} catch (final PluginException expected) {
+			assertEquals("Cannot run the release plugin with a non-Git version control system", expected.getMessage());
 			final List<String> messages = expected.getMessages();
 			assertEquals(2, messages.size());
 			assertEquals("Cannot run the release plugin with a non-Git version control system", messages.get(0));

@@ -5,7 +5,6 @@ import static java.util.Arrays.asList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Scm;
@@ -181,7 +180,7 @@ public class NextMojo extends AbstractMojo {
 		disableSshAgent = true;
 	}
 
-	static String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws ValidationException {
+	static String getRemoteUrlOrNullIfNoneSet(final Scm scm) throws PluginException {
 		String remote = null;
 		if (scm != null) {
 			remote = scm.getDeveloperConnection();
@@ -190,10 +189,7 @@ public class NextMojo extends AbstractMojo {
 			}
 			if (remote != null) {
 				if (!remote.startsWith(GIT_PREFIX)) {
-					final List<String> messages = new ArrayList<String>();
-					messages.add(ERROR_SUMMARY);
-					messages.add(format("The value in your scm tag is %s", remote));
-					throw new ValidationException(format("%s %s", ERROR_SUMMARY, remote), messages);
+					throw new PluginException(ERROR_SUMMARY).add("The value in your scm tag is %s", remote);
 				}
 				remote = remote.substring(GIT_PREFIX.length()).replace("file://localhost/", "file:///");
 			}
@@ -277,8 +273,6 @@ public class NextMojo extends AbstractMojo {
 			final Reactor reactor = newReactor(remoteUrl);
 			execute(reactor, figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl));
 		} catch (final PluginException e) {
-			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());
-		} catch (final ValidationException e) {
 			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());
 		} catch (final Exception gae) { // TODO: Moved this to SCMException
 

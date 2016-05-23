@@ -11,7 +11,7 @@ public class VersionException extends PluginException {
 
 	@Override
 	public VersionException add(final String format, final Object... args) {
-		addLine(format, args);
+		super.add(format, args);
 		return this;
 	}
 
