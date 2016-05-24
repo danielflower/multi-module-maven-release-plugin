@@ -29,7 +29,7 @@ public class DefaultVersionFactoryTest {
 
 	@Test
 	public void newVersionWithSpecifiedBuildNumber() throws Exception {
-		final Version version = factory.newVersion(project, 9l, ANY_REMOTE_URL);
+		final Version version = factory.newVersion(project, false, 9l, ANY_REMOTE_URL);
 		assertEquals(VERSION, version.getBusinessVersion());
 		assertEquals("1.0-SNAPSHOT", version.getDevelopmentVersion());
 		assertEquals("1.0.9", version.getReleaseVersion());
@@ -39,8 +39,8 @@ public class DefaultVersionFactoryTest {
 	@Test
 	public void newVersionWithImplicitBuildNumber() throws Exception {
 		when(finder.findBuildNumber(project, ANY_REMOTE_URL, VERSION)).thenReturn(10l);
-		final Version version = factory.newVersion(project, null, ANY_REMOTE_URL);
-		assertEquals("1.0", version.getBusinessVersion());
+		final Version version = factory.newVersion(project, false, null, ANY_REMOTE_URL);
+		assertEquals(VERSION, version.getBusinessVersion());
 		assertEquals("1.0-SNAPSHOT", version.getDevelopmentVersion());
 		assertEquals("1.0.10", version.getReleaseVersion());
 		assertEquals(10, version.getBuildNumber());
