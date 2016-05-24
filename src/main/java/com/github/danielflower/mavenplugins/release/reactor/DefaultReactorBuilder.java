@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.lib.Repository;
@@ -59,33 +58,6 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		return this;
 	}
 
-	private String getChangedDependencyOrNull(final Reactor reactor, final MavenProject project) {
-		boolean oneOfTheDependenciesHasChanged = false;
-		String changedDependency = null;
-		for (final ReleasableModule module : reactor) {
-			if (module.willBeReleased()) {
-				for (final Dependency dependency : project.getModel().getDependencies()) {
-					if (dependency.getGroupId().equals(module.getGroupId())
-							&& dependency.getArtifactId().equals(module.getArtifactId())) {
-						oneOfTheDependenciesHasChanged = true;
-						changedDependency = dependency.getArtifactId();
-						break;
-					}
-				}
-				if (project.getParent() != null && (project.getParent().getGroupId().equals(module.getGroupId())
-						&& project.getParent().getArtifactId().equals(module.getArtifactId()))) {
-					oneOfTheDependenciesHasChanged = true;
-					changedDependency = project.getParent().getArtifactId();
-					break;
-				}
-			}
-			if (oneOfTheDependenciesHasChanged) {
-				break;
-			}
-		}
-		return changedDependency;
-	}
-
 	@Override
 	public Reactor build() throws ReactorException {
 		final DefaultReactor reactor = new DefaultReactor(log);
@@ -134,9 +106,9 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		return cur;
 	}
 
-	private String logReleaseInfo(final MavenProject project, final Reactor reactor, final Version versioning,
+	private String logReleaseInfo(final MavenProject project, final DefaultReactor reactor, final Version versioning,
 			final String relativePathToModule) throws ReactorException {
-		final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
+		final String changedDependencyOrNull = reactor.getChangedDependencyOrNull(project);
 		String equivalentVersion = null;
 		if (modulesToForceRelease != null && modulesToForceRelease.contains(project.getArtifactId())) {
 			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
