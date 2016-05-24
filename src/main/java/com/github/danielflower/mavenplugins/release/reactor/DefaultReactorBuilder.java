@@ -93,12 +93,8 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		for (final MavenProject project : projects) {
 			try {
 				final Version version = versionFactory.newVersion(project, buildNumber, remoteUrl);
-
-				final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 				final String relativePathToModule = calculateModulePath(rootProject, project);
-
-				final String equivalentVersion = logReleaseInfo(project, version, changedDependencyOrNull,
-						relativePathToModule);
+				final String equivalentVersion = logReleaseInfo(project, reactor, version, relativePathToModule);
 
 				reactor.addReleasableModule(
 						new ReleasableModule(project, version, equivalentVersion, relativePathToModule));
@@ -138,8 +134,9 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 		return cur;
 	}
 
-	private String logReleaseInfo(final MavenProject project, final Version versioning,
-			final String changedDependencyOrNull, final String relativePathToModule) throws ReactorException {
+	private String logReleaseInfo(final MavenProject project, final Reactor reactor, final Version versioning,
+			final String relativePathToModule) throws ReactorException {
+		final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
 		String equivalentVersion = null;
 		if (modulesToForceRelease != null && modulesToForceRelease.contains(project.getArtifactId())) {
 			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
