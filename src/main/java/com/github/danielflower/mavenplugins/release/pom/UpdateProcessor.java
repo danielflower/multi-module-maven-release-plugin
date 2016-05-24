@@ -2,7 +2,7 @@ package com.github.danielflower.mavenplugins.release.pom;
 
 import static java.lang.String.format;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.maven.model.Model;
@@ -49,7 +49,7 @@ final class UpdateProcessor implements Updater {
 
 	private List<String> process(final Log log, final Reactor reactor, final MavenProject project,
 			final String newVersion) {
-		final Context context = contextFactory.newContext(reactor, project, newVersion);
+		final Context context = contextFactory.newContext(reactor, project);
 		final Model originalModel = project.getOriginalModel();
 		originalModel.setVersion(newVersion);
 
@@ -63,7 +63,7 @@ final class UpdateProcessor implements Updater {
 	@Override
 	public ChangeSet updatePoms(final Reactor reactor) throws POMUpdateException {
 		final PomWriter writer = writerFactory.newWriter();
-		final List<String> errors = new ArrayList<String>();
+		final List<String> errors = new LinkedList<String>();
 
 		for (final ReleasableModule module : reactor) {
 			final MavenProject project = module.getProject();

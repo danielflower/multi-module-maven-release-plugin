@@ -57,7 +57,7 @@ public class UpdateProcessorTest {
 	@Before
 	public void setup() throws POMUpdateException {
 		// Setup context factory
-		when(contextFactory.newContext(reactor, project, ANY_VERSION)).thenReturn(context);
+		when(contextFactory.newContext(reactor, project)).thenReturn(context);
 
 		// Setup context
 		when(context.getErrors()).thenReturn(Collections.<String> emptyList());

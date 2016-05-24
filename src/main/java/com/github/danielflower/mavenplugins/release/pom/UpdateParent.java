@@ -6,7 +6,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
-import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 
 /**
@@ -25,11 +24,10 @@ final class UpdateParent extends Command {
 
 		if (parent != null && isSnapshot(parent.getVersion())) {
 			try {
-				final ReleasableModule parentBeingReleased = updateContext.getReactor().find(parent.getGroupId(),
+				final String versionToDependOn = updateContext.getVersionToDependOn(parent.getGroupId(),
 						parent.getArtifactId(), parent.getVersion());
-				originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
-				log.debug(format(" Parent %s rewritten to version %s", parent.getArtifactId(),
-						parentBeingReleased.getVersionToDependOn()));
+				originalModel.getParent().setVersion(versionToDependOn);
+				log.debug(format(" Parent %s rewritten to version %s", parent.getArtifactId(), versionToDependOn));
 			} catch (final UnresolvedSnapshotDependencyException e) {
 				updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, e.version);
 			}

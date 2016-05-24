@@ -14,7 +14,7 @@ import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitu
  *
  */
 @Component(role = Command.class, hint = "ValidateNoSnapshotPlugins")
-public class ValidateNoSnapshotPlugins extends Command {
+final class ValidateNoSnapshotPlugins extends Command {
 	static final String ERROR_FORMAT = "%s references plugin %s %s";
 	static final String MULTI_MODULE_MAVEN_PLUGIN_GROUP_ID = "com.github.danielflower.mavenplugins";
 	static final String MULTI_MODULE_MAVEN_PLUGIN_ARTIFACT_ID = "multi-module-maven-release-plugin";
