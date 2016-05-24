@@ -1,8 +1,8 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jgit.lib.ObjectId;
@@ -27,7 +27,7 @@ public class TreeWalkingDiffDetector implements DiffDetector {
 		final RevWalk walk = new RevWalk(repo);
 		try {
 			walk.setRetainBody(false);
-			walk.markStart(walk.parseCommit(repo.getRef("HEAD").getObjectId()));
+			walk.markStart(walk.parseCommit(repo.findRef("HEAD").getObjectId()));
 			filterOutOtherModulesChanges(modulePath, childModules, walk);
 			stopWalkingWhenTheTagsAreHit(tags, walk);
 			return walk.iterator().hasNext();
@@ -39,7 +39,7 @@ public class TreeWalkingDiffDetector implements DiffDetector {
 	private static void stopWalkingWhenTheTagsAreHit(final Collection<ProposedTag> tags, final RevWalk walk)
 			throws IOException {
 		for (final ProposedTag tag : tags) {
-			final ObjectId commitId = tag.ref().getTarget().getObjectId();
+			final ObjectId commitId = tag.getObjectId();
 			final RevCommit revCommit = walk.parseCommit(commitId);
 			walk.markUninteresting(revCommit);
 		}
@@ -49,7 +49,7 @@ public class TreeWalkingDiffDetector implements DiffDetector {
 			final RevWalk walk) {
 		final boolean isRootModule = ".".equals(modulePath);
 		final boolean isMultiModuleProject = !isRootModule || !childModules.isEmpty();
-		final List<TreeFilter> treeFilters = new ArrayList<TreeFilter>();
+		final List<TreeFilter> treeFilters = new LinkedList<TreeFilter>();
 		treeFilters.add(TreeFilter.ANY_DIFF);
 		if (isMultiModuleProject) {
 			if (!isRootModule) {

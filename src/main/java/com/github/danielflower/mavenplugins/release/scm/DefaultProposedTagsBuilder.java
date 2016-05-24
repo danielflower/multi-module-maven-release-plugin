@@ -39,8 +39,8 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 		final JSONObject message = new JSONObject();
 		message.put(VERSION, version);
 		message.put(BUILD_NUMBER, String.valueOf(buildNumber));
-		final ProposedTag proposedTag = new DefaultProposedTag(git, null, tag, message);
-		proposedTags.put(toKey(tag, version, buildNumber), new DefaultProposedTag(git, null, tag, message));
+		final ProposedTag proposedTag = new DefaultProposedTag(git, log, null, tag, message);
+		proposedTags.put(toKey(tag, version, buildNumber), new DefaultProposedTag(git, log, null, tag, message));
 		return this;
 	}
 
@@ -73,7 +73,7 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 			}
 			throw exception.add("Please try releasing again with a new build number.");
 		}
-		return new DefaultProposedTags(log, git, repo, remoteUrl, proposedTags);
+		return new DefaultProposedTags(repo, remoteUrl, proposedTags);
 	}
 
 }

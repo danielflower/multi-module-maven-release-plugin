@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 
 public interface ProposedTag {
@@ -10,8 +11,9 @@ public interface ProposedTag {
 
 	long buildNumber();
 
-	Ref ref();
-
 	Ref saveAtHEAD() throws SCMException;
 
+	void tagAndPush(String remoteUrl) throws SCMException;
+
+	ObjectId getObjectId();
 }

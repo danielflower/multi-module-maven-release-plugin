@@ -9,27 +9,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.plugin.logging.Log;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 
 final class DefaultProposedTags implements ProposedTags {
 	static final String KEY_FORMAT = "%s/%s/%s";
 	private final Map<String, ProposedTag> proposedTags;
-	private final Log log;
-	private final Git git;
 
 	// TODO: Removed this when getMatchingRemoteTags is removed
 	private final GitRepository repo;
 
 	private final String remoteUrl;
 
-	DefaultProposedTags(final Log log, final Git git, final GitRepository repo, final String remoteUrl,
-			final Map<String, ProposedTag> proposedTags) {
-		this.log = log;
-		this.git = git;
+	DefaultProposedTags(final GitRepository repo, final String remoteUrl, final Map<String, ProposedTag> proposedTags) {
 		this.repo = repo;
 		this.remoteUrl = remoteUrl;
 		this.proposedTags = proposedTags;
@@ -38,17 +29,7 @@ final class DefaultProposedTags implements ProposedTags {
 	@Override
 	public void tagAndPushRepo() throws SCMException {
 		for (final ProposedTag tag : proposedTags.values()) {
-			log.info("About to tag the repository with " + tag.name());
-			final Ref tagRef = tag.saveAtHEAD();
-			final PushCommand pushCommand = git.push().add(tagRef);
-			if (remoteUrl != null) {
-				pushCommand.setRemote(remoteUrl);
-			}
-			try {
-				pushCommand.call();
-			} catch (final GitAPIException e) {
-				throw new SCMException(e, "Repository could be tagged with %s", tag);
-			}
+			tag.tagAndPush(remoteUrl);
 		}
 	}
 

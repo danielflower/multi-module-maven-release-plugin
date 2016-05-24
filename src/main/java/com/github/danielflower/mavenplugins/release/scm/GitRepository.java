@@ -247,7 +247,7 @@ public final class GitRepository implements SCMRepository {
 			message.put(VERSION, "0");
 			message.put(BUILD_NUMBER, "0");
 		}
-		return new DefaultProposedTag(getGit(), gitTag, stripRefPrefix(gitTag.getName()), message);
+		return new DefaultProposedTag(getGit(), log, gitTag, stripRefPrefix(gitTag.getName()), message);
 	}
 
 	static String stripRefPrefix(final String refName) {

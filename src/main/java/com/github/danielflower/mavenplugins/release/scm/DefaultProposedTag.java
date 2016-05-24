@@ -1,7 +1,10 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
+import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.json.simple.JSONObject;
 
@@ -10,14 +13,16 @@ import com.github.danielflower.mavenplugins.release.Guard;
 class DefaultProposedTag implements ProposedTag {
 	public static final String VERSION = "version";
 	public static final String BUILD_NUMBER = "buildNumber";
+	private final Log log;
 	private final String name;
 	private final JSONObject message;
 	private final Git git;
 	private Ref ref;
 
-	DefaultProposedTag(final Git git, final Ref ref, final String name, final JSONObject message) {
+	DefaultProposedTag(final Git git, final Log log, final Ref ref, final String name, final JSONObject message) {
 		Guard.notBlank("tag name", name);
 		Guard.notNull("tag message", message);
+		this.log = log;
 		this.git = git;
 		this.ref = ref;
 		this.name = name;
@@ -39,7 +44,6 @@ class DefaultProposedTag implements ProposedTag {
 		return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
 	}
 
-	@Override
 	public Ref saveAtHEAD() throws SCMException {
 		final String json = message.toJSONString();
 		try {
@@ -48,6 +52,20 @@ class DefaultProposedTag implements ProposedTag {
 			throw new SCMException(e, "Ref could be saved at HEAD!");
 		}
 		return ref;
+	}
+
+	@Override
+	public void tagAndPush(final String remoteUrl) throws SCMException {
+		log.info(String.format("About to tag the repository with %s", name()));
+		try {
+			final PushCommand pushCommand = git.push().add(saveAtHEAD());
+			if (remoteUrl != null) {
+				pushCommand.setRemote(remoteUrl);
+			}
+			pushCommand.call();
+		} catch (final GitAPIException e) {
+			throw new SCMException(e, "Repository could be tagged with %s", name());
+		}
 	}
 
 	@Override
@@ -72,7 +90,7 @@ class DefaultProposedTag implements ProposedTag {
 	}
 
 	@Override
-	public Ref ref() {
-		return ref;
+	public ObjectId getObjectId() {
+		return ref.getTarget().getObjectId();
 	}
 }
