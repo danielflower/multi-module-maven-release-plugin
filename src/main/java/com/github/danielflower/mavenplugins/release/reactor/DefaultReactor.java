@@ -64,26 +64,23 @@ final class DefaultReactor implements Reactor {
 	}
 
 	public String getChangedDependencyOrNull(final MavenProject project) {
-		boolean oneOfTheDependenciesHasChanged = false;
 		String changedDependency = null;
 		for (final ReleasableModule module : this) {
 			if (module.willBeReleased()) {
 				for (final Dependency dependency : project.getModel().getDependencies()) {
 					if (dependency.getGroupId().equals(module.getGroupId())
 							&& dependency.getArtifactId().equals(module.getArtifactId())) {
-						oneOfTheDependenciesHasChanged = true;
 						changedDependency = dependency.getArtifactId();
 						break;
 					}
 				}
 				if (project.getParent() != null && (project.getParent().getGroupId().equals(module.getGroupId())
 						&& project.getParent().getArtifactId().equals(module.getArtifactId()))) {
-					oneOfTheDependenciesHasChanged = true;
 					changedDependency = project.getParent().getArtifactId();
 					break;
 				}
 			}
-			if (oneOfTheDependenciesHasChanged) {
+			if (changedDependency != null) {
 				break;
 			}
 		}
