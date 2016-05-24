@@ -10,8 +10,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.lib.Repository;
 
-import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 import com.github.danielflower.mavenplugins.release.version.Version;
 import com.github.danielflower.mavenplugins.release.version.VersionException;
@@ -86,11 +86,10 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			if (previousTagsForThisModule.size() == 0) {
 				return null;
 			}
-			final DiffDetector detector = repository.newDiffDetector();
-			final boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(),
+			final boolean hasChanged = repository.hasChangedSince(relativePathToModule, project.getModel().getModules(),
 					previousTagsForThisModule);
 			return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
-		} catch (final Exception e) {
+		} catch (final SCMException e) {
 			throw new ReactorException(e, "Error while detecting whether or not %s has changed since the last release",
 					project.getArtifactId());
 		}

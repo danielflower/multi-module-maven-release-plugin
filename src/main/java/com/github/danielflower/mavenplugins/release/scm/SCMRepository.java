@@ -21,9 +21,10 @@ public interface SCMRepository {
 
 	List<ProposedTag> tagsForVersion(String module, String versionWithoutBuildNumber) throws SCMException;
 
-	DiffDetector newDiffDetector() throws SCMException;
-
 	ProposedTagsBuilder newProposedTagsBuilder(String remoteUrl) throws SCMException;
 
 	void checkValidRefName(String releaseVersion) throws SCMException;
+
+	boolean hasChangedSince(String modulePath, List<String> childModules, Collection<ProposedTag> tags)
+			throws SCMException;
 }

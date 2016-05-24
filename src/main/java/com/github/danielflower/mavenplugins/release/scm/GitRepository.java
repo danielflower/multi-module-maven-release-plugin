@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -24,8 +25,12 @@ import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTag;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -213,11 +218,6 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public DiffDetector newDiffDetector() throws SCMException {
-		return new TreeWalkingDiffDetector(getGit().getRepository());
-	}
-
-	@Override
 	public ProposedTag fromRef(final Ref gitTag) throws SCMException {
 		Guard.notNull("gitTag", gitTag);
 
@@ -257,5 +257,57 @@ public final class GitRepository implements SCMRepository {
 					.add("Version numbers are used in the Git tag, and so can only contain characters that are valid in git tags.")
 					.add("Please see https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html for tag naming rules.");
 		}
+	}
+
+	@Override
+	public boolean hasChangedSince(final String modulePath, final List<String> childModules,
+			final Collection<ProposedTag> tags) throws SCMException {
+		final RevWalk walk = new RevWalk(getGit().getRepository());
+		try {
+			walk.setRetainBody(false);
+			walk.markStart(walk.parseCommit(getGit().getRepository().findRef("HEAD").getObjectId()));
+			filterOutOtherModulesChanges(modulePath, childModules, walk);
+			stopWalkingWhenTheTagsAreHit(tags, walk);
+			return walk.iterator().hasNext();
+		} catch (final IOException e) {
+			throw new SCMException(e, "Diff detector could not determine whether module %s has been changed!",
+					modulePath);
+		} finally {
+			walk.dispose();
+		}
+	}
+
+	private static void stopWalkingWhenTheTagsAreHit(final Collection<ProposedTag> tags, final RevWalk walk)
+			throws IOException {
+		for (final ProposedTag tag : tags) {
+			final ObjectId commitId = tag.getObjectId();
+			final RevCommit revCommit = walk.parseCommit(commitId);
+			walk.markUninteresting(revCommit);
+		}
+	}
+
+	private void filterOutOtherModulesChanges(final String modulePath, final List<String> childModules,
+			final RevWalk walk) {
+		final boolean isRootModule = ".".equals(modulePath);
+		final boolean isMultiModuleProject = !isRootModule || !childModules.isEmpty();
+		final List<TreeFilter> treeFilters = new LinkedList<TreeFilter>();
+		treeFilters.add(TreeFilter.ANY_DIFF);
+		if (isMultiModuleProject) {
+			if (!isRootModule) {
+				// for sub-modules, look for changes only in the sub-module
+				// path...
+				treeFilters.add(PathFilter.create(modulePath));
+			}
+
+			// ... but ignore any sub-modules of the current sub-module, because
+			// they can change independently of the current module
+			for (final String childModule : childModules) {
+				final String path = isRootModule ? childModule : modulePath + "/" + childModule;
+				treeFilters.add(PathFilter.create(path).negate());
+			}
+
+		}
+		final TreeFilter treeFilter = treeFilters.size() == 1 ? treeFilters.get(0) : AndTreeFilter.create(treeFilters);
+		walk.setTreeFilter(treeFilter);
 	}
 }
