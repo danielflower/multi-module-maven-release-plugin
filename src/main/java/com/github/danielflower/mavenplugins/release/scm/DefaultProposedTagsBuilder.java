@@ -73,7 +73,7 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 			}
 			throw exception.add("Please try releasing again with a new build number.");
 		}
-		return new DefaultProposedTags(repo, remoteUrl, proposedTags);
+		return new DefaultProposedTags(remoteUrl, proposedTags);
 	}
 
 }
