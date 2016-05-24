@@ -1,7 +1,6 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
 import static com.github.danielflower.mavenplugins.release.pom.PomWriter.EXCEPTION_MESSAGE;
-import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -9,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -30,7 +28,6 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -125,13 +122,11 @@ public class PomWriterFactoryTest {
 		try {
 			pomWriter.writePoms();
 			fail("Exception expected");
-		} catch (final POMUpdateException e) {
+		} catch (final ChangeSetCloseException e) {
 			assertSame(expected, e.getCause());
 			assertEquals(EXCEPTION_MESSAGE, e.getMessage());
 		}
 
-		final InOrder order = inOrder(log, repository);
-		order.verify(repository).revertChanges(Mockito.argThat(new HasOneChangedPomFile()));
-		order.verify(log).error(format("Reverting changed POMs [%s] failed!", testFile), revertException);
+		verify(repository).revertChanges(Mockito.argThat(new HasOneChangedPomFile()));
 	}
 }

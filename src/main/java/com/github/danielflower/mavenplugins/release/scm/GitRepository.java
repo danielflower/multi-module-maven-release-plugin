@@ -46,10 +46,6 @@ public final class GitRepository implements SCMRepository {
 
 	private Git git;
 	private SCMException gitInstantiationException;
-	private boolean hasReverted; // A premature optimisation? In
-									// the normal case, file
-									// reverting occurs twice, which
-									// this bool prevents
 	private Collection<Ref> remoteTags;
 
 	public void setLog(final Log log) {
@@ -151,34 +147,29 @@ public final class GitRepository implements SCMRepository {
 		}
 	}
 
-	private File workingDir() throws SCMException {
+	@Override
+	public void revertChanges(final List<File> changedFiles) throws SCMException {
 		try {
-			return getGit().getRepository().getWorkTree().getCanonicalFile();
+			final File workTree = getGit().getRepository().getWorkTree().getCanonicalFile();
+			final SCMException exception = new SCMException("Reverting changed POMs failed!");
+
+			for (final File changedFile : changedFiles) {
+				try {
+					final String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
+					getGit().checkout().addPath(pathRelativeToWorkingTree).call();
+				} catch (final Exception e) {
+					exception.add(
+							" * Unable to revert changes to %s - you may need to manually revert this file. Error was: %s",
+							changedFile, e.getMessage());
+				}
+			}
+
+			if (!exception.getMessages().isEmpty()) {
+				throw exception;
+			}
 		} catch (NoWorkTreeException | IOException e) {
 			throw new SCMException(e, "Working directory could not be determined!");
 		}
-	}
-
-	@Override
-	public boolean revertChanges(final List<File> changedFiles) throws SCMException {
-		if (hasReverted) {
-			return true;
-		}
-		log.info("Going to revert changes because there was an error.");
-		boolean hasErrors = false;
-		final File workTree = workingDir();
-		for (final File changedFile : changedFiles) {
-			try {
-				final String pathRelativeToWorkingTree = Repository.stripWorkDir(workTree, changedFile);
-				getGit().checkout().addPath(pathRelativeToWorkingTree).call();
-			} catch (final Exception e) {
-				hasErrors = true;
-				log.error("Unable to revert changes to " + changedFile
-						+ " - you may need to manually revert this file. Error was: " + e.getMessage());
-			}
-		}
-		hasReverted = true;
-		return !hasErrors;
 	}
 
 	@Override

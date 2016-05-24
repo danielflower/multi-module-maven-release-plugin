@@ -23,7 +23,7 @@ public interface ChangeSet extends Iterable<File>, AutoCloseable {
 	 *            Exception which shall be caused to be thrown when
 	 *            {@link #close()} is called.
 	 */
-	void setFailure(Exception e);
+	void setFailure(String message, Exception failure);
 
 	@Override
 	void close() throws ChangeSetCloseException;

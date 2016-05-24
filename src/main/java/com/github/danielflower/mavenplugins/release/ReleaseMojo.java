@@ -128,7 +128,7 @@ public class ReleaseMojo extends NextMojo {
 				invoker.setStacktraceEnabled(stacktraceEnabled);
 				invoker.runMavenBuild(reactor);
 			} catch (final Exception e) {
-				changedFiles.setFailure(e);
+				changedFiles.setFailure("Exception occurred while release invokation!", e);
 			}
 		}
 	}

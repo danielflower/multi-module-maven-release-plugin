@@ -14,7 +14,7 @@ public interface SCMRepository {
 
 	boolean hasLocalTag(String tag) throws SCMException;
 
-	boolean revertChanges(List<File> changedFiles) throws SCMException;
+	void revertChanges(List<File> changedFiles) throws SCMException;
 
 	Collection<Long> getRemoteBuildNumbers(String remoteUrl, String artifactId, String versionWithoutBuildNumber)
 			throws SCMException;

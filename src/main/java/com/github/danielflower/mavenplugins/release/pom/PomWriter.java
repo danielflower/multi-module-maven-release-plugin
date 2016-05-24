@@ -1,7 +1,5 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
-import static java.lang.String.format;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,7 +13,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -66,12 +63,8 @@ class PomWriter {
 				}
 			}
 		} catch (final IOException e) {
-			try {
-				repository.revertChanges(changedFiles);
-			} catch (final SCMException revertException) {
-				log.error(format("Reverting changed POMs %s failed!", changedFiles), revertException);
-			}
-			throw new POMUpdateException(e, EXCEPTION_MESSAGE);
+			changedFiles.setFailure(EXCEPTION_MESSAGE, e);
+			changedFiles.close();
 		}
 
 		return changedFiles;

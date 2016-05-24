@@ -154,9 +154,9 @@ public class NextMojoTest {
 		} catch (final PluginException expected) {
 			assertEquals("Cannot run the release plugin with a non-Git version control system", expected.getMessage());
 			final List<String> messages = expected.getMessages();
-			assertEquals(2, messages.size());
-			assertEquals("Cannot run the release plugin with a non-Git version control system", messages.get(0));
-			assertEquals("The value in your scm tag is scm:svn:ssh//some/illegal/protocol", messages.get(1));
+			assertEquals(1, messages.size());
+			assertEquals("Cannot run the release plugin with a non-Git version control system", expected.getMessage());
+			assertEquals("The value in your scm tag is scm:svn:ssh//some/illegal/protocol", messages.get(0));
 		}
 	}
 }

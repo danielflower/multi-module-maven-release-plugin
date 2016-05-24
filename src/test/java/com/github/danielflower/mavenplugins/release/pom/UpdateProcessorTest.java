@@ -115,9 +115,9 @@ public class UpdateProcessorTest {
 		} catch (final POMUpdateException e) {
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, e.getMessage());
 			final List<String> msgs = e.getMessages();
-			assertEquals(DEPENDENCY_ERROR_SUMMARY, msgs.get(0));
-			assertEquals(DEPENDENCY_ERROR_INTRO, msgs.get(1));
-			assertEquals(" * anyError", msgs.get(2));
+			assertEquals(2, msgs.size());
+			assertEquals(DEPENDENCY_ERROR_INTRO, msgs.get(0));
+			assertEquals(" * anyError", msgs.get(1));
 		}
 	}
 

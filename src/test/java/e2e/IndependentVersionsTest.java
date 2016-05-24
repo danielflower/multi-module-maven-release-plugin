@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.oneOf;
-import static scaffolding.ExactCountMatcher.threeOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
@@ -92,7 +91,7 @@ public class IndependentVersionsTest extends E2ETest {
 					"releaser:release");
 			Assert.fail("Should not have worked");
 		} catch (final MavenExecutionException e) {
-			assertThat(e.output, threeOf(
+			assertThat(e.output, twoOf(
 					containsString("The release plugin can only be run from the root folder of your Git repository")));
 			assertThat(e.output, oneOf(
 					containsString("Try running the release plugin from " + testProject.localDir.getCanonicalPath())));

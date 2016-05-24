@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
@@ -17,6 +16,7 @@ import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 public class DefaultChangeSetTest {
+	private static final String ANY_MESSAGE = "anyMessage";
 	private final Log log = mock(Log.class);
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final DefaultChangeSet set = new DefaultChangeSet(log, repository);
@@ -26,7 +26,6 @@ public class DefaultChangeSetTest {
 	 */
 	@Test
 	public void closeNoFailureSetRevertSuccess() throws Exception {
-		when(repository.revertChanges(set)).thenReturn(true);
 		set.close();
 		verify(repository).revertChanges(set);
 		verify(log, never()).warn(REVERT_ERROR_MESSAGE);
@@ -34,40 +33,33 @@ public class DefaultChangeSetTest {
 
 	@Test
 	public void closeFailureSetRevertSuccess() throws Exception {
-		when(repository.revertChanges(set)).thenReturn(true);
 		final Exception expected = new Exception();
-		set.setFailure(expected);
+		set.setFailure(ANY_MESSAGE, expected);
 		try {
 			set.close();
 			fail("Exception expected!");
 		} catch (final ChangeSetCloseException e) {
+			assertEquals(ANY_MESSAGE, e.getMessage());
 			assertSame(expected, e.getCause());
-		}
-		verify(log, never()).warn(REVERT_ERROR_MESSAGE);
-	}
-
-	@Test
-	public void closeNoFailureSetRevertFailed() throws Exception {
-		try {
-			set.close();
-			fail("Exception expected!");
-		} catch (final ChangeSetCloseException e) {
-			assertEquals(REVERT_ERROR_MESSAGE, e.getMessage());
 		}
 		verify(log, never()).warn(REVERT_ERROR_MESSAGE);
 	}
 
 	@Test
 	public void closeFailureSetRevertFailed() throws Exception {
+		final SCMException revertException = new SCMException("any");
+		doThrow(revertException).when(repository).revertChanges(set);
+
 		final Exception expected = new Exception();
-		set.setFailure(expected);
+		set.setFailure(ANY_MESSAGE, expected);
 		try {
 			set.close();
 			fail("Exception expected!");
-		} catch (final Exception e) {
+		} catch (final ChangeSetCloseException e) {
+			assertEquals(ANY_MESSAGE, e.getMessage());
 			assertSame(expected, e.getCause());
 		}
-		verify(log).warn(REVERT_ERROR_MESSAGE);
+		verify(log).warn(REVERT_ERROR_MESSAGE, revertException);
 	}
 
 	@Test
@@ -77,7 +69,7 @@ public class DefaultChangeSetTest {
 		try {
 			set.close();
 			fail("Exception expected!");
-		} catch (final Exception e) {
+		} catch (final ChangeSetCloseException e) {
 			assertSame(expected, e.getCause());
 		}
 		verify(log, never()).warn(REVERT_ERROR_MESSAGE);
