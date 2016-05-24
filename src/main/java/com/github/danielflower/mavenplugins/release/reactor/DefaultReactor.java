@@ -67,7 +67,7 @@ final class DefaultReactor implements Reactor {
 		String changedDependency = null;
 		for (final ReleasableModule module : this) {
 			if (module.willBeReleased()) {
-				for (final Dependency dependency : project.getModel().getDependencies()) {
+				for (final Dependency dependency : project.getDependencies()) {
 					if (dependency.getGroupId().equals(module.getGroupId())
 							&& dependency.getArtifactId().equals(module.getArtifactId())) {
 						changedDependency = dependency.getArtifactId();
