@@ -7,6 +7,7 @@ import org.apache.maven.project.MavenProject;
  */
 public interface VersionFactory {
 
-	Version newVersion(MavenProject project, boolean useLastDigitAsVersionNumber, Long buildNumberOrNull,
+	Version newVersion(MavenProject project, boolean useLastDigitAsBuildNumber, Long buildNumberOrNull,
 			String remoteUrl) throws VersionException;
+
 }

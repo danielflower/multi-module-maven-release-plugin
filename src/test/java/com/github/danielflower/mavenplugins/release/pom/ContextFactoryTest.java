@@ -1,22 +1,35 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import org.apache.maven.project.MavenProject;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 
 public class ContextFactoryTest {
+	private static final String ANY_GROUP_ID = "anyGroupId";
+	private static final String ANY_ARTIFACT_ID = "anyArtifactId";
 	private static final String ANY_VERSION = "anyVersion";
 	private static final String TEST_STRING = "test";
 	private final Reactor reactor = mock(Reactor.class);
 	private final MavenProject project = mock(MavenProject.class);
-	private final Context context = new ContextFactory().newContext(reactor, project, ANY_VERSION);
+	private final MavenProject clone = mock(MavenProject.class);
+	private Context context;
+
+	@Before
+	public void setup() {
+		when(project.clone()).thenReturn(clone);
+		context = new ContextFactory().newReleaseContext(reactor, project);
+	}
 
 	@Test
 	public void verfiyAddGetError() {
@@ -30,16 +43,16 @@ public class ContextFactoryTest {
 
 	@Test
 	public void getProject() {
-		assertSame(project, context.getProject());
+		assertNotSame(project, context.getProject());
+		assertSame(clone, context.getProject());
 	}
 
 	@Test
-	public void getReactor() {
-		assertSame(reactor, context.getReactor());
+	public void getVersionToDependOn() throws Exception {
+		final ReleasableModule module = mock(ReleasableModule.class);
+		when(module.getVersionToDependOn()).thenReturn(TEST_STRING);
+		when(reactor.find(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_VERSION)).thenReturn(module);
+		assertEquals(TEST_STRING, context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_VERSION));
 	}
 
-	@Test
-	public void getNewVersion() {
-		assertEquals(ANY_VERSION, context.getNewVersion());
-	}
 }

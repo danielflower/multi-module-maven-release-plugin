@@ -17,8 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import com.github.danielflower.mavenplugins.release.reactor.Reactor;
-import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 
 public class UpdateParentTest {
@@ -33,8 +31,6 @@ public class UpdateParentTest {
 	private final Parent parent = mock(Parent.class);
 	private final MavenProject parentProject = mock(MavenProject.class);
 	private final Context context = mock(Context.class);
-	private final Reactor reactor = mock(Reactor.class);
-	private final ReleasableModule module = mock(ReleasableModule.class);
 	private final UpdateParent cmd = new UpdateParent();
 
 	@Before
@@ -49,10 +45,9 @@ public class UpdateParentTest {
 		when(parentProject.getArtifactId()).thenReturn(ANY_PARENT_ARTIFACT_ID);
 		when(parentProject.getGroupId()).thenReturn(ANY_PARENT_GROUP_ID);
 		when(parentProject.getVersion()).thenReturn(ANY_PARENT_SNAPSHOT_VERSION);
-		when(module.getVersionToDependOn()).thenReturn(ANY_PARENT_VERSION);
 
-		when(context.getReactor()).thenReturn(reactor);
-		when(reactor.find(ANY_PARENT_GROUP_ID, ANY_PARENT_ARTIFACT_ID, ANY_PARENT_SNAPSHOT_VERSION)).thenReturn(module);
+		when(context.getVersionToDependOn(ANY_PARENT_GROUP_ID, ANY_PARENT_ARTIFACT_ID, ANY_PARENT_SNAPSHOT_VERSION))
+				.thenReturn(ANY_PARENT_VERSION);
 	}
 
 	@Test
@@ -81,7 +76,8 @@ public class UpdateParentTest {
 	public void exceptionOccurred() throws Exception {
 		final UnresolvedSnapshotDependencyException expected = new UnresolvedSnapshotDependencyException(
 				ANY_PARENT_GROUP_ID, ANY_PARENT_ARTIFACT_ID, ANY_PARENT_SNAPSHOT_VERSION);
-		doThrow(expected).when(reactor).find(ANY_PARENT_GROUP_ID, ANY_PARENT_ARTIFACT_ID, ANY_PARENT_SNAPSHOT_VERSION);
+		doThrow(expected).when(context).getVersionToDependOn(ANY_PARENT_GROUP_ID, ANY_PARENT_ARTIFACT_ID,
+				ANY_PARENT_SNAPSHOT_VERSION);
 		cmd.alterModel(context);
 		verify(parent, never()).setVersion(ANY_PARENT_VERSION);
 		verify(context).addError(ERROR_FORMAT, ANY_ARTIFACT_ID, ANY_PARENT_ARTIFACT_ID, ANY_PARENT_SNAPSHOT_VERSION);

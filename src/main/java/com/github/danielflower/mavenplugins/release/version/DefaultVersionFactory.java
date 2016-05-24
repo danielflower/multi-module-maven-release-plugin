@@ -38,15 +38,19 @@ final class DefaultVersionFactory implements VersionFactory {
 	 * java.lang.String)
 	 */
 	@Override
-	public Version newVersion(final MavenProject project, final boolean useLastDigitAsVersionNumber,
+	public Version newVersion(final MavenProject project, final boolean useLastDigitAsBuildNumber,
 			final Long buildNumber, final String remoteUrl) throws VersionException {
+		if (useLastDigitAsBuildNumber && buildNumber != null) {
+			throw new VersionException("You cannot use 'useLastDigitAsBuildNumber' in conjunction with 'buildNumber'!");
+		}
+
 		String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
 		final long actualBuildNumber;
 		if (buildNumber == null) {
-			if (useLastDigitAsVersionNumber) {
+			if (useLastDigitAsBuildNumber) {
 				final int idx = businessVersion.lastIndexOf('.');
-				businessVersion = businessVersion.substring(0, idx);
 				actualBuildNumber = valueOf(businessVersion.substring(idx + 1));
+				businessVersion = businessVersion.substring(0, idx);
 			} else {
 				actualBuildNumber = finder.findBuildNumber(project, remoteUrl, businessVersion);
 			}

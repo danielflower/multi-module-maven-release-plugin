@@ -10,7 +10,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
 
@@ -38,11 +37,11 @@ class UpdateDependencies extends Command {
 			final String version = substitution.getActualVersion(project, dependency);
 			if (isSnapshot(version)) {
 				try {
-					final ReleasableModule dependencyBeingReleased = updateContext.getReactor()
-							.find(dependency.getGroupId(), dependency.getArtifactId(), version);
-					dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
+					final String versionToDependOn = updateContext.getVersionToDependOn(dependency.getGroupId(),
+							dependency.getArtifactId(), version);
+					dependency.setVersion(versionToDependOn);
 					log.debug(format(" Dependency on %s rewritten to version %s", dependency.getArtifactId(),
-							dependencyBeingReleased.getVersionToDependOn()));
+							versionToDependOn));
 				} catch (final UnresolvedSnapshotDependencyException e) {
 					updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, e.version);
 				}

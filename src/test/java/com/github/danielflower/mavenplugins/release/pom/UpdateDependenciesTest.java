@@ -19,8 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import com.github.danielflower.mavenplugins.release.reactor.Reactor;
-import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
 
@@ -29,8 +27,6 @@ public class UpdateDependenciesTest {
 	private static final String ANY_ARTIFACT_ID = "anyArtifactId";
 	private static final String ANY_VERSION = "anyVersion";
 	private static final String ANY_SNAPSHOT_VERSION = ANY_VERSION + "-SNAPSHOT";
-	private final Reactor reactor = mock(Reactor.class);
-	private final ReleasableModule module = mock(ReleasableModule.class);
 	protected final Log log = mock(Log.class);
 	private final Context context = mock(Context.class);
 	private final MavenProject project = mock(MavenProject.class);
@@ -51,13 +47,12 @@ public class UpdateDependenciesTest {
 		setupDetermineDependencies();
 
 		// Setup reactor
-		when(reactor.find(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION)).thenReturn(module);
-		when(module.getVersionToDependOn()).thenReturn(ANY_VERSION);
+		when(context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_VERSION)).thenReturn(ANY_VERSION);
+		when(context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION)).thenReturn(ANY_VERSION);
 
 		// Setup project
 		when(context.getProject()).thenReturn(project);
 		when(project.getArtifactId()).thenReturn(ANY_ARTIFACT_ID);
-		when(context.getReactor()).thenReturn(reactor);
 		when(project.getOriginalModel()).thenReturn(model);
 
 		// Setup dependency
@@ -94,7 +89,7 @@ public class UpdateDependenciesTest {
 		final UnresolvedSnapshotDependencyException expected = new UnresolvedSnapshotDependencyException(ANY_GROUP_ID,
 				ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 		when(substitution.getActualVersion(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
-		doThrow(expected).when(reactor).find(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
+		doThrow(expected).when(context).getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
 		cmd.alterModel(context);
 		verify(dependency, never()).setVersion(ANY_VERSION);
 		verify(context).addError(ERROR_FORMAT, ANY_ARTIFACT_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);

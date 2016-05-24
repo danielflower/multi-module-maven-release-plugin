@@ -28,12 +28,18 @@ public class DefaultVersionFactoryTest {
 	}
 
 	@Test
-	public void newVersionWithSpecifiedBuildNumber() throws Exception {
-		final Version version = factory.newVersion(project, false, 9l, ANY_REMOTE_URL);
+	public void newVersionWithLastDigitAsBuildNumberNoExplicitBuildNumberSpecified() throws Exception {
+		when(project.getVersion()).thenReturn("1.0.1-SNAPSHOT");
+		final Version version = factory.newVersion(project, true, null, ANY_REMOTE_URL);
 		assertEquals(VERSION, version.getBusinessVersion());
-		assertEquals("1.0-SNAPSHOT", version.getDevelopmentVersion());
-		assertEquals("1.0.9", version.getReleaseVersion());
-		assertEquals(9, version.getBuildNumber());
+		assertEquals("1.0.1-SNAPSHOT", version.getDevelopmentVersion());
+		assertEquals("1.0.1", version.getReleaseVersion());
+		assertEquals(1, version.getBuildNumber());
+	}
+
+	@Test(expected = VersionException.class)
+	public void newVersionWithLastDigitAsBuildNumberAndExplicitBuildNumber() throws Exception {
+		factory.newVersion(project, true, 9l, ANY_REMOTE_URL);
 	}
 
 	@Test
