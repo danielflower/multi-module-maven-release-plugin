@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
@@ -60,14 +59,6 @@ public class NextMojoTest {
 		mojo.setSettings(settings);
 		mojo.setLog(log);
 		JschConfigSessionFactory.setInstance(null);
-	}
-
-	@Test(expected = MojoExecutionException.class)
-	public void buildNumberAndUseLastDigitAsBuildNumberToghetherIsIllegal() throws Exception {
-		mojo.buildNumber = 9l;
-		mojo.useLastDigitAsBuildNumber = true;
-
-		mojo.execute();
 	}
 
 	@Test

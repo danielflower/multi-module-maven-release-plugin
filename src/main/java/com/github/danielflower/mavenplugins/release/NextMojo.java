@@ -262,10 +262,6 @@ public class NextMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (useLastDigitAsBuildNumber && buildNumber != null) {
-			throw new MojoExecutionException(
-					"You cannot use 'useLastDigitAsBuildNumber' in conjunction with 'buildNumber'!");
-		}
 		try {
 			repository.errorIfNotClean();
 			configureJsch();

@@ -37,15 +37,9 @@ public class DefaultVersionFactoryTest {
 		assertEquals(1, version.getBuildNumber());
 	}
 
-	@Test
-	public void newVersionWithSpecifiedBuildNumber() throws Exception {
-		// Pass 'true' for useLastDigitAsBuildNumber to insure that in any
-		// case the build number specified is used.
-		final Version version = factory.newVersion(project, true, 9l, ANY_REMOTE_URL);
-		assertEquals(VERSION, version.getBusinessVersion());
-		assertEquals("1.0-SNAPSHOT", version.getDevelopmentVersion());
-		assertEquals("1.0.9", version.getReleaseVersion());
-		assertEquals(9, version.getBuildNumber());
+	@Test(expected = VersionException.class)
+	public void newVersionWithLastDigitAsBuildNumberAndExplicitBuildNumber() throws Exception {
+		factory.newVersion(project, true, 9l, ANY_REMOTE_URL);
 	}
 
 	@Test

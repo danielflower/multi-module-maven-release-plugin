@@ -40,6 +40,10 @@ final class DefaultVersionFactory implements VersionFactory {
 	@Override
 	public Version newVersion(final MavenProject project, final boolean useLastDigitAsBuildNumber,
 			final Long buildNumber, final String remoteUrl) throws VersionException {
+		if (useLastDigitAsBuildNumber && buildNumber != null) {
+			throw new VersionException("You cannot use 'useLastDigitAsBuildNumber' in conjunction with 'buildNumber'!");
+		}
+
 		String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
 		final long actualBuildNumber;
 		if (buildNumber == null) {
