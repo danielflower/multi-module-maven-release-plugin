@@ -8,7 +8,7 @@ import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 @Component(role = ContextFactory.class)
 class ContextFactory {
 
-	Context newContext(final Reactor reactor, final MavenProject project) {
-		return new ReleaseContext(reactor, project);
+	Context newReleaseContext(final Reactor reactor, final MavenProject project) {
+		return new ReleaseContext(reactor, project.clone());
 	}
 }

@@ -49,7 +49,7 @@ final class UpdateProcessor implements Updater {
 
 	private List<String> process(final Log log, final Reactor reactor, final MavenProject project,
 			final String newVersion) {
-		final Context context = contextFactory.newContext(reactor, project);
+		final Context context = contextFactory.newReleaseContext(reactor, project);
 		final Model originalModel = project.getOriginalModel();
 		originalModel.setVersion(newVersion);
 
