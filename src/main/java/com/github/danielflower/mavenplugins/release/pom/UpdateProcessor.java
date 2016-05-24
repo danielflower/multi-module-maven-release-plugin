@@ -2,7 +2,6 @@ package com.github.danielflower.mavenplugins.release.pom;
 
 import static java.lang.String.format;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +61,7 @@ final class UpdateProcessor implements Updater {
 	}
 
 	@Override
-	public List<File> updatePoms(final Reactor reactor) throws POMUpdateException {
+	public ChangeSet updatePoms(final Reactor reactor) throws POMUpdateException {
 		final PomWriter writer = writerFactory.newWriter();
 		final List<String> errors = new ArrayList<String>();
 

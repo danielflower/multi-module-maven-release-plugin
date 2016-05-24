@@ -29,8 +29,11 @@ final class DefaultChangeSet extends LinkedList<File>implements ChangeSet {
 		try {
 			if (!repository.revertChanges(this)) {
 				if (failure == null) {
+					// throw if you can't revert as that is the root problem
 					throw new ChangeSetCloseException(REVERT_ERROR_MESSAGE);
 				} else {
+					// warn if you can't revert but keep throwing the original
+					// exception so the root cause isn't lost
 					log.warn(REVERT_ERROR_MESSAGE);
 				}
 			}

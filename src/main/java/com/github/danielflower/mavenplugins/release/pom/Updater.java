@@ -1,8 +1,6 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 
@@ -17,6 +15,6 @@ public interface Updater {
 	 * @throws IOException
 	 * @throws POMUpdateException
 	 */
-	List<File> updatePoms(Reactor reactor) throws POMUpdateException;
+	ChangeSet updatePoms(Reactor reactor) throws POMUpdateException;
 
 }

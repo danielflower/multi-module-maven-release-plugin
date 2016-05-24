@@ -8,10 +8,10 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import com.github.danielflower.mavenplugins.release.pom.ChangeSet;
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
-import com.github.danielflower.mavenplugins.release.scm.SCMException;
 
 /**
  * Releases the project.
@@ -105,54 +105,30 @@ public class ReleaseMojo extends NextMojo {
 	@Override
 	protected void execute(final Reactor reactor, final ProposedTags proposedTags)
 			throws MojoExecutionException, PluginException {
-		final List<File> changedFiles = pomUpdater.updatePoms(reactor);
+		try (final ChangeSet changedFiles = pomUpdater.updatePoms(reactor)) {
 
-		// Do this before running the maven build in case the build uploads
-		// some artifacts and then fails. If it is
-		// not tagged in a half-failed build, then subsequent releases will
-		// re-use a version that is already in Nexus
-		// and so fail. The downside is that failed builds result in tags
-		// being pushed.
-		proposedTags.tagAndPushRepo();
+			// Do this before running the maven build in case the build uploads
+			// some artifacts and then fails. If it is
+			// not tagged in a half-failed build, then subsequent releases will
+			// re-use a version that is already in Nexus
+			// and so fail. The downside is that failed builds result in tags
+			// being pushed.
+			proposedTags.tagAndPushRepo();
 
-		try {
-			final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
-			invoker.setGlobalSettings(globalSettings);
-			invoker.setUserSettings(userSettings);
-			invoker.setLocalMavenRepo(localMavenRepo);
-			invoker.setGoals(goals);
-			invoker.setModulesToRelease(modulesToRelease);
-			invoker.setReleaseProfiles(releaseProfiles);
-			invoker.setSkipTests(skipTests);
-			invoker.setDebugEnabled(debugEnabled);
-			invoker.setStacktraceEnabled(stacktraceEnabled);
-			invoker.runMavenBuild(reactor);
-			revertChanges(changedFiles, true); // throw if you
-												// can't revert
-												// as that is
-												// the root
-												// problem
-		} finally {
-			revertChanges(changedFiles, false); // warn if you
-												// can't revert
-												// but keep
-												// throwing the
-												// original
-												// exception so
-												// the root
-												// cause isn't
-												// lost
-		}
-	}
-
-	private void revertChanges(final List<File> changedFiles, final boolean throwIfError)
-			throws SCMException, MojoExecutionException {
-		if (!repository.revertChanges(changedFiles)) {
-			final String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
-			if (throwIfError) {
-				throw new MojoExecutionException(message);
-			} else {
-				getLog().warn(message);
+			try {
+				final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
+				invoker.setGlobalSettings(globalSettings);
+				invoker.setUserSettings(userSettings);
+				invoker.setLocalMavenRepo(localMavenRepo);
+				invoker.setGoals(goals);
+				invoker.setModulesToRelease(modulesToRelease);
+				invoker.setReleaseProfiles(releaseProfiles);
+				invoker.setSkipTests(skipTests);
+				invoker.setDebugEnabled(debugEnabled);
+				invoker.setStacktraceEnabled(stacktraceEnabled);
+				invoker.runMavenBuild(reactor);
+			} catch (final Exception e) {
+				changedFiles.setFailure(e);
 			}
 		}
 	}

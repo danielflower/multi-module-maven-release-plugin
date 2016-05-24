@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
@@ -53,8 +52,8 @@ class PomWriter {
 		changedProjects.add(project);
 	}
 
-	List<File> writePoms() throws POMUpdateException {
-		final List<File> changedFiles = new LinkedList<>();
+	ChangeSet writePoms() throws POMUpdateException {
+		final DefaultChangeSet changedFiles = new DefaultChangeSet(log, repository);
 		try {
 			for (final MavenProject project : changedProjects) {
 				// It's necessary to use the canonical file here, otherwise GIT
