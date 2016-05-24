@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release.scm;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 
 public interface ProposedTag {
@@ -13,6 +12,6 @@ public interface ProposedTag {
 
 	Ref ref();
 
-	Ref saveAtHEAD() throws GitAPIException;
+	Ref saveAtHEAD() throws SCMException;
 
 }

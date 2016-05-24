@@ -2,13 +2,10 @@ package com.github.danielflower.mavenplugins.release.version;
 
 import static java.lang.Long.valueOf;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -42,8 +39,7 @@ final class DefaultVersionFactory implements VersionFactory {
 	 */
 	@Override
 	public Version newVersion(final MavenProject project, final boolean useLastDigitAsBuildNumber,
-			final Long buildNumber, final String remoteUrl)
-					throws MojoExecutionException, ValidationException, GitAPIException {
+			final Long buildNumber, final String remoteUrl) throws VersionException {
 		String businessVersion = project.getVersion().replace(SNAPSHOT_EXTENSION, "");
 		final long actualBuildNumber;
 		if (buildNumber == null) {

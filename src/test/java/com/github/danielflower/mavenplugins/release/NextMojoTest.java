@@ -1,6 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static com.github.danielflower.mavenplugins.release.BaseMojo.getRemoteUrlOrNullIfNoneSet;
+import static com.github.danielflower.mavenplugins.release.NextMojo.getRemoteUrlOrNullIfNoneSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -28,7 +28,7 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
  * @author Roland Hauser sourcepond@gmail.com
  *
  */
-public class BaseMojoTest {
+public class NextMojoTest {
 	private static final String DEVELOPER_CONNECTION = "scm:git:ssh://some/developerPath";
 	private static final String CONNECTION = "scm:git:ssh://some/commonPath";
 	private static final String KNOWN_HOSTS = "anyKnownHosts";
@@ -44,13 +44,11 @@ public class BaseMojoTest {
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final LogHolder logHolder = mock(LogHolder.class);
 	private final Scm scm = mock(Scm.class);
-	private BaseMojo mojo;
+	private NextMojo mojo;
 
 	@Before
-	public void setup() throws ValidationException {
-		mojo = new BaseMojo() {
-
-		};
+	public void setup() {
+		mojo = new NextMojo();
 		mojo.setRepository(repository);
 		mojo.setReactorBuilderFactory(reactorBuilderFactory);
 		mojo.setLogHolder(logHolder);
@@ -134,24 +132,24 @@ public class BaseMojoTest {
 	}
 
 	@Test
-	public void getRemoteUrlScmIsNull() throws ValidationException {
+	public void getRemoteUrlScmIsNull() throws PluginException {
 		assertNull(getRemoteUrlOrNullIfNoneSet(null));
 	}
 
 	@Test
-	public void getRemoteUrlNoConnectionsOnScm() throws ValidationException {
+	public void getRemoteUrlNoConnectionsOnScm() throws PluginException {
 		assertNull(getRemoteUrlOrNullIfNoneSet(scm));
 	}
 
 	@Test
-	public void getRemoteUrlUseDeveloperConnection() throws ValidationException {
+	public void getRemoteUrlUseDeveloperConnection() throws PluginException {
 		when(scm.getDeveloperConnection()).thenReturn(DEVELOPER_CONNECTION);
 		when(scm.getConnection()).thenReturn(CONNECTION);
 		assertEquals("ssh://some/developerPath", getRemoteUrlOrNullIfNoneSet(scm));
 	}
 
 	@Test
-	public void getRemoteUrlUseConnection() throws ValidationException {
+	public void getRemoteUrlUseConnection() throws PluginException {
 		when(scm.getConnection()).thenReturn(CONNECTION);
 		assertEquals("ssh://some/commonPath", getRemoteUrlOrNullIfNoneSet(scm));
 	}
@@ -162,10 +160,8 @@ public class BaseMojoTest {
 		try {
 			getRemoteUrlOrNullIfNoneSet(scm);
 			fail("Exception expected");
-		} catch (final ValidationException expected) {
-			assertEquals(
-					"Cannot run the release plugin with a non-Git version control system scm:svn:ssh//some/illegal/protocol",
-					expected.getMessage());
+		} catch (final PluginException expected) {
+			assertEquals("Cannot run the release plugin with a non-Git version control system", expected.getMessage());
 			final List<String> messages = expected.getMessages();
 			assertEquals(2, messages.size());
 			assertEquals("Cannot run the release plugin with a non-Git version control system", messages.get(0));

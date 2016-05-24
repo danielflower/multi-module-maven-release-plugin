@@ -19,6 +19,7 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -104,7 +105,7 @@ class ReleaseInvoker {
 		this.localMavenRepo = localMavenRepo;
 	}
 
-	public final void runMavenBuild(final Reactor reactor) throws MojoExecutionException, IOException {
+	public final void runMavenBuild(final Reactor reactor) throws MojoExecutionException {
 		request.setInteractive(false);
 		request.setShowErrors(true);
 		request.setDebug(log.isDebugEnabled());
@@ -114,7 +115,11 @@ class ReleaseInvoker {
 			goals.add(SKIP_TESTS);
 		}
 		if (localMavenRepo != null) {
-			goals.add(format(LOCAL_REPO, localMavenRepo.getCanonicalFile()));
+			try {
+				goals.add(format(LOCAL_REPO, localMavenRepo.getCanonicalFile()));
+			} catch (final IOException e) {
+				throw new MojoExecutionException("Local repository path could not be determined!", e);
+			}
 		}
 		if (debugEnabled) {
 			goals.add("-X");

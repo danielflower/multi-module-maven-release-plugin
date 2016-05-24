@@ -30,6 +30,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com

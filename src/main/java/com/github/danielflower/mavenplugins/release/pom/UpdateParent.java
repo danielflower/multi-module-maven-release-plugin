@@ -6,8 +6,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.UnresolvedSnapshotDependencyException;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
+import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 
 /**
  * @author rolandhauser

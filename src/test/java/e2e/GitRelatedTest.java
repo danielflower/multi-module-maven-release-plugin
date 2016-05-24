@@ -3,6 +3,7 @@ package e2e;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.ExactCountMatcher.threeOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class GitRelatedTest extends E2ETest {
 			new MvnRunner().runMaven(projectRoot, "releaser:release");
 			Assert.fail("Should have failed");
 		} catch (final MavenExecutionException e) {
-			assertThat(e.output, twoOf(containsString("Releases can only be performed from Git repositories.")));
+			assertThat(e.output, threeOf(containsString("Releases can only be performed from Git repositories.")));
 			assertThat(e.output, oneOf(containsString(projectRoot.getCanonicalPath() + " is not a Git repository.")));
 		}
 	}
@@ -47,7 +48,7 @@ public class GitRelatedTest extends E2ETest {
 			testProject.mvnRelease("1");
 			Assert.fail("Should have failed");
 		} catch (final MavenExecutionException e) {
-			assertThat(e.output, oneOf(containsString("[ERROR] origin: not found.")));
+			assertThat(e.output, oneOf(containsString("[ERROR] Remote tags could not be listed!")));
 		}
 	}
 

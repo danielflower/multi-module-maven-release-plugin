@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
@@ -16,7 +15,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 /**
@@ -53,8 +52,8 @@ class PomWriter {
 		changedProjects.add(project);
 	}
 
-	List<File> writePoms() throws ValidationException {
-		final List<File> changedFiles = new LinkedList<>();
+	ChangeSet writePoms() throws POMUpdateException {
+		final DefaultChangeSet changedFiles = new DefaultChangeSet(log, repository);
 		try {
 			for (final MavenProject project : changedProjects) {
 				// It's necessary to use the canonical file here, otherwise GIT
@@ -69,10 +68,10 @@ class PomWriter {
 		} catch (final IOException e) {
 			try {
 				repository.revertChanges(changedFiles);
-			} catch (final IOException revertException) {
+			} catch (final SCMException revertException) {
 				log.error(format("Reverting changed POMs %s failed!", changedFiles), revertException);
 			}
-			throw new ValidationException(EXCEPTION_MESSAGE, e);
+			throw new POMUpdateException(e, EXCEPTION_MESSAGE);
 		}
 
 		return changedFiles;

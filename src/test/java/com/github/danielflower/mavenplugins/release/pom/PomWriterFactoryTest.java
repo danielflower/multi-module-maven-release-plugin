@@ -3,7 +3,9 @@ package com.github.danielflower.mavenplugins.release.pom;
 import static com.github.danielflower.mavenplugins.release.pom.PomWriter.EXCEPTION_MESSAGE;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
@@ -17,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -32,7 +35,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.github.danielflower.mavenplugins.release.ValidationException;
+import com.github.danielflower.mavenplugins.release.scm.SCMException;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 public class PomWriterFactoryTest {
@@ -86,12 +89,14 @@ public class PomWriterFactoryTest {
 			}
 		}).when(writer).write((Writer) Mockito.notNull(), Mockito.same(originalModel));
 
-		final List<File> changedFiles = pomWriter.writePoms();
+		final ChangeSet changedFiles = pomWriter.writePoms();
 		try (final Scanner sc = new Scanner(testFile)) {
 			assertEquals(TEST_LINE, sc.nextLine());
 		}
-		assertEquals(1, changedFiles.size());
-		assertEquals(testFile, changedFiles.get(0));
+		final Iterator<File> it = changedFiles.iterator();
+		assertTrue(it.hasNext());
+		assertEquals(testFile, it.next());
+		assertFalse(it.hasNext());
 		verify(repository, never()).revertChanges(Mockito.anyList());
 	}
 
@@ -102,7 +107,7 @@ public class PomWriterFactoryTest {
 		try {
 			pomWriter.writePoms();
 			fail("Exception expected");
-		} catch (final ValidationException e) {
+		} catch (final POMUpdateException e) {
 			assertSame(expected, e.getCause());
 			assertEquals(EXCEPTION_MESSAGE, e.getMessage());
 		}
@@ -112,7 +117,7 @@ public class PomWriterFactoryTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void ioExceptionOccurredWhileReverting() throws Exception {
-		final IOException revertException = new IOException();
+		final SCMException revertException = new SCMException("any");
 		doThrow(revertException).when(repository).revertChanges(Mockito.anyList());
 
 		final IOException expected = new IOException();
@@ -120,7 +125,7 @@ public class PomWriterFactoryTest {
 		try {
 			pomWriter.writePoms();
 			fail("Exception expected");
-		} catch (final ValidationException e) {
+		} catch (final POMUpdateException e) {
 			assertSame(expected, e.getCause());
 			assertEquals(EXCEPTION_MESSAGE, e.getMessage());
 		}

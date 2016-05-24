@@ -1,21 +1,14 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
+import com.github.danielflower.mavenplugins.release.pom.ChangeSet;
 import com.github.danielflower.mavenplugins.release.pom.Updater;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
@@ -32,7 +25,7 @@ inheritByDefault = true, // so you can configure this in a shared parent pom
 requiresProject = true, // this can only run against a maven project
 aggregator = true // the plugin should only run once against the aggregator pom
 )
-public class ReleaseMojo extends BaseMojo {
+public class ReleaseMojo extends NextMojo {
 
 	/**
 	 * <p>
@@ -110,17 +103,9 @@ public class ReleaseMojo extends BaseMojo {
 	}
 
 	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		super.execute();
-		try {
-			configureJsch();
-			repository.errorIfNotClean();
-			final String remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
-			final Reactor reactor = newReactor(remoteUrl);
-
-			final ProposedTags proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl);
-
-			final List<File> changedFiles = pomUpdater.updatePoms(reactor);
+	protected void execute(final Reactor reactor, final ProposedTags proposedTags)
+			throws MojoExecutionException, PluginException {
+		try (final ChangeSet changedFiles = pomUpdater.updatePoms(reactor)) {
 
 			// Do this before running the maven build in case the build uploads
 			// some artifacts and then fails. If it is
@@ -142,47 +127,8 @@ public class ReleaseMojo extends BaseMojo {
 				invoker.setDebugEnabled(debugEnabled);
 				invoker.setStacktraceEnabled(stacktraceEnabled);
 				invoker.runMavenBuild(reactor);
-				revertChanges(changedFiles, true); // throw if you
-													// can't revert
-													// as that is
-													// the root
-													// problem
-			} finally {
-				revertChanges(changedFiles, false); // warn if you
-													// can't revert
-													// but keep
-													// throwing the
-													// original
-													// exception so
-													// the root
-													// cause isn't
-													// lost
-			}
-
-		} catch (final IOException e) {
-			printBigErrorMessageAndThrow(e.getMessage(), Collections.<String> emptyList());
-		} catch (final ValidationException e) {
-			printBigErrorMessageAndThrow(e.getMessage(), e.getMessages());
-		} catch (final GitAPIException gae) {
-
-			final StringWriter sw = new StringWriter();
-			gae.printStackTrace(new PrintWriter(sw));
-			final String exceptionAsString = sw.toString();
-
-			printBigErrorMessageAndThrow("Could not release due to a Git error",
-					asList("There was an error while accessing the Git repository. The error returned from git was:",
-							gae.getMessage(), "Stack trace:", exceptionAsString));
-		}
-	}
-
-	private void revertChanges(final List<File> changedFiles, final boolean throwIfError)
-			throws IOException, ValidationException, MojoExecutionException {
-		if (!repository.revertChanges(changedFiles)) {
-			final String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
-			if (throwIfError) {
-				throw new MojoExecutionException(message);
-			} else {
-				getLog().warn(message);
+			} catch (final Exception e) {
+				changedFiles.setFailure(e);
 			}
 		}
 	}

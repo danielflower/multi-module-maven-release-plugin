@@ -7,18 +7,15 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.scm.DiffDetector;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTag;
 import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 import com.github.danielflower.mavenplugins.release.version.Version;
+import com.github.danielflower.mavenplugins.release.version.VersionException;
 import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 final class DefaultReactorBuilder implements ReactorBuilder {
@@ -97,28 +94,32 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	}
 
 	@Override
-	public Reactor build() throws ValidationException, GitAPIException, MojoExecutionException {
+	public Reactor build() throws ReactorException {
 		final DefaultReactor reactor = new DefaultReactor(log);
 
 		for (final MavenProject project : projects) {
-			final Version version = versionFactory.newVersion(project, useLastDigitAsBuildNumber, buildNumber,
-					remoteUrl);
+			try {
+				final Version version = versionFactory.newVersion(project, useLastDigitAsBuildNumber, buildNumber,
+						remoteUrl);
 
-			final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
-			final String relativePathToModule = calculateModulePath(rootProject, project);
+				final String changedDependencyOrNull = getChangedDependencyOrNull(reactor, project);
+				final String relativePathToModule = calculateModulePath(rootProject, project);
 
-			final String equivalentVersion = logReleaseInfo(project, version, changedDependencyOrNull,
-					relativePathToModule);
+				final String equivalentVersion = logReleaseInfo(project, version, changedDependencyOrNull,
+						relativePathToModule);
 
-			reactor.addReleasableModule(
-					new ReleasableModule(project, version, equivalentVersion, relativePathToModule));
+				reactor.addReleasableModule(
+						new ReleasableModule(project, version, equivalentVersion, relativePathToModule));
+			} catch (final VersionException e) {
+				throw new ReactorException(e, "Version could be created for project %s", project);
+			}
 		}
 
 		return reactor.finalizeReleaseVersions();
 	}
 
 	public ProposedTag hasChangedSinceLastRelease(final MavenProject project, final String businessVersion,
-			final String relativePathToModule) throws MojoExecutionException {
+			final String relativePathToModule) throws ReactorException {
 		try {
 			final List<ProposedTag> previousTagsForThisModule = repository.tagsForVersion(project.getArtifactId(),
 					businessVersion);
@@ -130,10 +131,8 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 					previousTagsForThisModule);
 			return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
 		} catch (final Exception e) {
-			throw new MojoExecutionException(
-					format("Error while detecting whether or not %s has changed since the last release",
-							project.getArtifactId()),
-					e);
+			throw new ReactorException(e, "Error while detecting whether or not %s has changed since the last release",
+					project.getArtifactId());
 		}
 	}
 
@@ -148,7 +147,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	}
 
 	private String logReleaseInfo(final MavenProject project, final Version versioning,
-			final String changedDependencyOrNull, final String relativePathToModule) throws MojoExecutionException {
+			final String changedDependencyOrNull, final String relativePathToModule) throws ReactorException {
 		String equivalentVersion = null;
 		if (modulesToForceRelease != null && modulesToForceRelease.contains(project.getArtifactId())) {
 			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
@@ -174,7 +173,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	}
 
 	private static String calculateModulePath(final MavenProject rootProject, final MavenProject project)
-			throws MojoExecutionException {
+			throws ReactorException {
 		// Getting canonical files because on Windows, it's possible one returns
 		// "C:\..." and the other "c:\..." which is rather amazing
 		File projectRoot;
@@ -183,7 +182,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			projectRoot = rootProject.getBasedir().getCanonicalFile();
 			moduleRoot = project.getBasedir().getCanonicalFile();
 		} catch (final IOException e) {
-			throw new MojoExecutionException("Could not find directory paths for maven project", e);
+			throw new ReactorException(e, "Could not find directory paths for maven project");
 		}
 		String relativePathToModule = Repository.stripWorkDir(projectRoot, moduleRoot);
 		if (relativePathToModule.length() == 0) {

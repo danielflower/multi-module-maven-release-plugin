@@ -4,7 +4,9 @@ import static com.github.danielflower.mavenplugins.release.pom.UpdateProcessor.D
 import static com.github.danielflower.mavenplugins.release.pom.UpdateProcessor.DEPENDENCY_ERROR_SUMMARY;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -25,9 +27,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 
 /**
  * @author rolandhauser
@@ -48,12 +49,13 @@ public class UpdateProcessorTest {
 	private final Command command = mock(Command.class);
 	private final List<Command> commands = asList(command);
 	private final MavenProject project = mock(MavenProject.class);
+	private final ChangeSet changeSet = mock(ChangeSet.class);
 	private final Model originalModel = mock(Model.class);
 	private UpdateProcessor processor;
 
 	@SuppressWarnings("unchecked")
 	@Before
-	public void setup() throws ValidationException {
+	public void setup() throws POMUpdateException {
 		// Setup context factory
 		when(contextFactory.newContext(reactor, project, ANY_VERSION)).thenReturn(context);
 
@@ -64,7 +66,8 @@ public class UpdateProcessorTest {
 		when(writerFactory.newWriter()).thenReturn(writer);
 
 		// Setup writer
-		when(writer.writePoms()).thenReturn(Arrays.asList(ANY_POM));
+		when(writer.writePoms()).thenReturn(changeSet);
+		when(changeSet.iterator()).thenReturn(Arrays.asList(ANY_POM).iterator());
 
 		// Setup reactor
 		final Iterator<ReleasableModule> it = mock(Iterator.class);
@@ -90,9 +93,11 @@ public class UpdateProcessorTest {
 
 	@Test
 	public void updatePomsCompletedSuccessfully() throws Exception {
-		final List<File> updatedPoms = processor.updatePoms(reactor);
-		assertEquals(1, updatedPoms.size());
-		assertSame(ANY_POM, updatedPoms.get(0));
+		final ChangeSet updatedPoms = processor.updatePoms(reactor);
+		final Iterator<File> it = updatedPoms.iterator();
+		assertTrue(it.hasNext());
+		assertSame(ANY_POM, it.next());
+		assertFalse(it.hasNext());
 
 		final InOrder order = inOrder(originalModel, command, log, writer);
 		order.verify(log).info("Going to release anyArtifactId anyVersion");
@@ -107,7 +112,7 @@ public class UpdateProcessorTest {
 		try {
 			processor.updatePoms(reactor);
 			fail("Exception expected");
-		} catch (final ValidationException e) {
+		} catch (final POMUpdateException e) {
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, e.getMessage());
 			final List<String> msgs = e.getMessages();
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, msgs.get(0));
@@ -124,9 +129,11 @@ public class UpdateProcessorTest {
 	@Test
 	public void updatePomsModuleWillNotBeReleased() throws Exception {
 		when(module.willBeReleased()).thenReturn(false);
-		final List<File> updatedPoms = processor.updatePoms(reactor);
-		assertEquals(1, updatedPoms.size());
-		assertSame(ANY_POM, updatedPoms.get(0));
+		final ChangeSet updatedPoms = processor.updatePoms(reactor);
+		final Iterator<File> it = updatedPoms.iterator();
+		assertTrue(it.hasNext());
+		assertSame(ANY_POM, it.next());
+		assertFalse(it.hasNext());
 
 		final InOrder order = inOrder(originalModel, command, log, writer);
 

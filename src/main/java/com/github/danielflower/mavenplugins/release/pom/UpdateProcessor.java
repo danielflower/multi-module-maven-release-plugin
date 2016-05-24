@@ -2,8 +2,6 @@ package com.github.danielflower.mavenplugins.release.pom;
 
 import static java.lang.String.format;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +11,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.ReleasableModule;
-import com.github.danielflower.mavenplugins.release.ValidationException;
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 
 @Component(role = Updater.class)
 final class UpdateProcessor implements Updater {
@@ -64,7 +61,7 @@ final class UpdateProcessor implements Updater {
 	}
 
 	@Override
-	public List<File> updatePoms(final Reactor reactor) throws IOException, ValidationException {
+	public ChangeSet updatePoms(final Reactor reactor) throws POMUpdateException {
 		final PomWriter writer = writerFactory.newWriter();
 		final List<String> errors = new ArrayList<String>();
 
@@ -85,13 +82,12 @@ final class UpdateProcessor implements Updater {
 		}
 
 		if (!errors.isEmpty()) {
-			final List<String> messages = new ArrayList<String>();
-			messages.add(DEPENDENCY_ERROR_SUMMARY);
-			messages.add(DEPENDENCY_ERROR_INTRO);
+			final POMUpdateException exception = new POMUpdateException(DEPENDENCY_ERROR_SUMMARY);
+			exception.add(DEPENDENCY_ERROR_INTRO);
 			for (final String dependencyError : errors) {
-				messages.add(format(" * %s", dependencyError));
+				exception.add(" * %s", dependencyError);
 			}
-			throw new ValidationException(DEPENDENCY_ERROR_SUMMARY, messages);
+			throw exception;
 		}
 
 		// At this point it's guaranteed that no dependency errors occurred.
