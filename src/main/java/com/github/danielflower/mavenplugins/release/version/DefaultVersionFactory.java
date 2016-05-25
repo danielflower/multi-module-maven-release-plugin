@@ -73,43 +73,39 @@ final class DefaultVersionFactory implements VersionFactory {
 		}
 
 		final String releaseVersion = businessVersion + "." + actualBuildNumber;
-		final String equivalentVersion = logReleaseInfo(project, changedDependencyOrNull, businessVersion,
-				releaseVersion, relativePathToModuleOrNull);
+
+		String equivalentVersion = null;
+		if (relativePathToModuleOrNull != null && changedDependencyOrNull == null) {
+			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(project,
+					businessVersion, relativePathToModuleOrNull);
+			if (previousTagThatIsTheSameAsHEADForThisModule == null) {
+				log.info(format("Will use version %s for %s as it has changed since the last release.", releaseVersion,
+						project.getArtifactId()));
+			} else {
+				equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
+						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+				log.info(format("Will use version %s for %s as it has not been changed since that release.",
+						equivalentVersion, project.getArtifactId()));
+			}
+		}
+		logReleaseInfo(project, changedDependencyOrNull, businessVersion, releaseVersion, relativePathToModuleOrNull);
 
 		return new DefaultVersion(equivalentVersion, releaseVersion, project.getVersion(), businessVersion,
 				actualBuildNumber, useLastDigitAsBuildNumber);
 	}
 
-	private String logReleaseInfo(final MavenProject project, final String changedDependencyOrNull,
+	private void logReleaseInfo(final MavenProject project, final String changedDependencyOrNull,
 			final String businessVersion, final String releaseVersion, final String relativePathToModuleOrNull)
 					throws VersionException {
-		String equivalentVersion = null;
-
 		if (relativePathToModuleOrNull == null) {
 			log.info(format("Releasing %s %s as we was asked to forced release.", project.getArtifactId(),
 					releaseVersion));
-			return null;
 		}
 
 		if (changedDependencyOrNull != null) {
 			log.info(format("Releasing %s %s as %s has changed.", project.getArtifactId(), releaseVersion,
 					changedDependencyOrNull));
-			return null;
 		}
-
-		final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(project,
-				businessVersion, relativePathToModuleOrNull);
-		if (previousTagThatIsTheSameAsHEADForThisModule == null) {
-			log.info(format("Will use version %s for %s as it has changed since the last release.", releaseVersion,
-					project.getArtifactId()));
-			return null;
-		}
-
-		equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
-				+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
-		log.info(format("Will use version %s for %s as it has not been changed since that release.", equivalentVersion,
-				project.getArtifactId()));
-		return equivalentVersion;
 	}
 
 	private ProposedTag hasChangedSinceLastRelease(final MavenProject project, final String businessVersion,
