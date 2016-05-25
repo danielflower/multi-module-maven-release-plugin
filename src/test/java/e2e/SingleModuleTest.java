@@ -23,6 +23,7 @@ import com.github.danielflower.mavenplugins.release.scm.GitFactory;
 import com.github.danielflower.mavenplugins.release.scm.GitRepository;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTags;
 import com.github.danielflower.mavenplugins.release.scm.ProposedTagsBuilder;
+import com.github.danielflower.mavenplugins.release.version.Version;
 
 import scaffolding.TestProject;
 
@@ -60,15 +61,24 @@ public class SingleModuleTest extends E2ETest {
 		repo.setGitFactory(gitFactory);
 		repo.setLog(mock(Log.class));
 		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
-		builder.add("single-module-1.0.2", "1.0", 2).build().getTag("single-module-1.0.2", "1.0", 2).saveAtHEAD();
+		final Version version = mock(Version.class);
+		when(version.getBusinessVersion()).thenReturn("1.0");
+		when(version.getBuildNumber()).thenReturn(2l);
+		builder.add("single-module-1.0.2", version).build().getTag("single-module-1.0.2", version).saveAtHEAD();
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.3"));
 
-		builder.add("single-module-1.0.4", "1.0", 4);
-		builder.add("unrelated-module-1.0.5", "1.0", 5);
+		final Version version1 = mock(Version.class);
+		when(version1.getBusinessVersion()).thenReturn("1.0");
+		when(version1.getBuildNumber()).thenReturn(4l);
+		builder.add("single-module-1.0.4", version1);
+		final Version version2 = mock(Version.class);
+		when(version2.getBusinessVersion()).thenReturn("1.0");
+		when(version2.getBuildNumber()).thenReturn(5l);
+		builder.add("unrelated-module-1.0.5", version2);
 		final ProposedTags tags = builder.build();
-		tags.getTag("single-module-1.0.4", "1.0", 4).saveAtHEAD();
-		tags.getTag("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD();
+		tags.getTag("single-module-1.0.4", version1).saveAtHEAD();
+		tags.getTag("unrelated-module-1.0.5", version2).saveAtHEAD();
 
 		testProject.mvn("releaser:release");
 		assertThat(testProject.local, hasTag("single-module-1.0.5"));

@@ -71,10 +71,11 @@ final class UpdateProcessor implements Updater {
 			// TODO: If a module will not be released, is further processing
 			// necessary or should we continue the loop here?
 			if (module.willBeReleased()) {
-				log.info(format("Going to release %s %s", module.getArtifactId(), module.getNewVersion()));
+				log.info(format("Going to release %s %s", module.getArtifactId(),
+						module.getVersion().getReleaseVersion()));
 			}
 
-			errors.addAll(process(log, reactor, project, module.getNewVersion()));
+			errors.addAll(process(log, reactor, project, module.getVersion().getReleaseVersion()));
 
 			// Mark project to be written at a later stage; if an exception
 			// occurs, we don't need to revert anything.

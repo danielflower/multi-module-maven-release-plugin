@@ -2,6 +2,7 @@ package com.github.danielflower.mavenplugins.release.scm;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +10,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.lib.Ref;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.version.Version;
 
 import scaffolding.TestProject;
 
@@ -29,11 +32,14 @@ public class AnnotatedTagTest {
 		final TestProject project = TestProject.singleModuleProject();
 		when(gitFactory.newGit()).thenReturn(project.local);
 		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
-		builder.add("my-name", "the-version", 2134);
-		final ProposedTag tag = builder.build().getTag("my-name", "the-version", 2134);
-		assertThat(tag.name(), equalTo("my-name"));
-		assertThat(tag.version(), equalTo("the-version"));
-		assertThat(tag.buildNumber(), equalTo(2134L));
+		final Version ver = mock(Version.class);
+		when(ver.getBusinessVersion()).thenReturn("the-version");
+		when(ver.getBuildNumber()).thenReturn(2134l);
+		builder.add("my-name", ver);
+		final ProposedTag tag = builder.build().getTag("my-name", ver);
+		assertEquals("my-name", tag.name());
+		assertEquals("the-version", tag.version());
+		assertEquals(2134l, tag.buildNumber());
 	}
 
 	@Test
@@ -44,8 +50,11 @@ public class AnnotatedTagTest {
 		repo.setGitFactory(gitFactory);
 		repo.setLog(log);
 		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
-		builder.add("my-name", "the-version", 2134);
-		final ProposedTag tag = builder.build().getTag("my-name", "the-version", 2134);
+		final Version ver = mock(Version.class);
+		when(ver.getBusinessVersion()).thenReturn("the-version");
+		when(ver.getBuildNumber()).thenReturn(2134l);
+		builder.add("my-name", ver);
+		final ProposedTag tag = builder.build().getTag("my-name", ver);
 		tag.saveAtHEAD();
 
 		final Ref ref = project.local.tagList().call().get(0);

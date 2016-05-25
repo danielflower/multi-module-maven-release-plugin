@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
+import com.github.danielflower.mavenplugins.release.version.Version;
 
 /**
  * @author rolandhauser
@@ -76,10 +77,12 @@ public class UpdateProcessorTest {
 		when(reactor.iterator()).thenReturn(it);
 
 		// Setup module
+		final Version version = mock(Version.class);
+		when(version.getReleaseVersion()).thenReturn(ANY_VERSION);
 		when(module.willBeReleased()).thenReturn(true);
 		when(module.getProject()).thenReturn(project);
 		when(module.getArtifactId()).thenReturn(ANY_ARTIFACT_ID);
-		when(module.getNewVersion()).thenReturn(ANY_VERSION);
+		when(module.getVersion()).thenReturn(version);
 
 		// Setup project
 		when(project.getOriginalModel()).thenReturn(originalModel);

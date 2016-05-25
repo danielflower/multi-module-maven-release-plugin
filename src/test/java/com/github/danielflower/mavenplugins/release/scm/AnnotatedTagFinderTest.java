@@ -13,6 +13,8 @@ import java.util.List;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.version.Version;
+
 import scaffolding.TestProject;
 
 public class AnnotatedTagFinderTest {
@@ -51,8 +53,11 @@ public class AnnotatedTagFinderTest {
 		repo.setGitFactory(gitFactory);
 		repo.setLog(log);
 		final ProposedTagsBuilder builder = repo.newProposedTagsBuilder(null);
-		builder.add(tagName, version, buildNumber);
-		final ProposedTag tag = builder.build().getTag(tagName, version, buildNumber);
+		final Version ver = mock(Version.class);
+		when(ver.getBusinessVersion()).thenReturn(version);
+		when(ver.getBuildNumber()).thenReturn(buildNumber);
+		builder.add(tagName, ver);
+		final ProposedTag tag = builder.build().getTag(tagName, ver);
 		tag.saveAtHEAD();
 		return tag;
 	}

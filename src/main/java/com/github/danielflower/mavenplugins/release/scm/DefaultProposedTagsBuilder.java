@@ -15,6 +15,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Ref;
 import org.json.simple.JSONObject;
 
+import com.github.danielflower.mavenplugins.release.version.Version;
+
 final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 	private final Map<String, ProposedTag> proposedTags = new LinkedHashMap<>();
 	private final Log log;
@@ -30,17 +32,17 @@ final class DefaultProposedTagsBuilder implements ProposedTagsBuilder {
 	}
 
 	@Override
-	public ProposedTagsBuilder add(final String tag, final String version, final long buildNumber) throws SCMException {
+	public ProposedTagsBuilder add(final String tag, final Version version) throws SCMException {
 		if (repo.hasLocalTag(tag)) {
 			throw new SCMException("There is already a tag named %s in this repository.", tag)
 					.add("It is likely that this version has been released before.")
 					.add("Please try incrementing the build number and trying again.");
 		}
 		final JSONObject message = new JSONObject();
-		message.put(VERSION, version);
-		message.put(BUILD_NUMBER, String.valueOf(buildNumber));
+		message.put(VERSION, version.getBusinessVersion());
+		message.put(BUILD_NUMBER, String.valueOf(version.getBuildNumber()));
 		final ProposedTag proposedTag = new DefaultProposedTag(git, log, null, tag, message);
-		proposedTags.put(toKey(tag, version, buildNumber), new DefaultProposedTag(git, log, null, tag, message));
+		proposedTags.put(toKey(tag, version), new DefaultProposedTag(git, log, null, tag, message));
 		return this;
 	}
 

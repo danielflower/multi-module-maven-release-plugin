@@ -219,7 +219,7 @@ public class NextMojo extends AbstractMojo {
 				continue;
 			}
 			if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
-				builder.add(module.getTagName(), module.getVersion(), module.getBuildNumber());
+				builder.add(module.getTagName(), module.getVersion());
 			}
 		}
 		return builder.build();

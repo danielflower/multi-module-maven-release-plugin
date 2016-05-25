@@ -6,6 +6,8 @@ import static java.util.Collections.unmodifiableCollection;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.github.danielflower.mavenplugins.release.version.Version;
+
 final class DefaultProposedTags implements ProposedTags {
 	static final String KEY_FORMAT = "%s/%s/%s";
 	private final Map<String, ProposedTag> proposedTags;
@@ -24,8 +26,8 @@ final class DefaultProposedTags implements ProposedTags {
 	}
 
 	@Override
-	public ProposedTag getTag(final String tag, final String version, final long buildNumber) throws SCMException {
-		final String key = toKey(tag, version, buildNumber);
+	public ProposedTag getTag(final String tag, final Version version) throws SCMException {
+		final String key = toKey(tag, version);
 		final ProposedTag proposedTag = proposedTags.get(key);
 		if (proposedTag == null) {
 			throw new SCMException("No proposed tag registered %s", key);
@@ -33,8 +35,8 @@ final class DefaultProposedTags implements ProposedTags {
 		return proposedTag;
 	}
 
-	static String toKey(final String tag, final String version, final long buildNumber) {
-		return format(KEY_FORMAT, tag, version, buildNumber);
+	static String toKey(final String tag, final Version version) {
+		return format(KEY_FORMAT, tag, version.getBusinessVersion(), version.getBuildNumber());
 	}
 
 	@Override
