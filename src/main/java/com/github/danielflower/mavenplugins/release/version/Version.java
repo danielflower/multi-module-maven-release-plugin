@@ -14,4 +14,6 @@ public interface Version {
 	String getDevelopmentVersion();
 
 	boolean useLastDigitAsBuildNumber();
+
+	String getEquivalentVersion();
 }
