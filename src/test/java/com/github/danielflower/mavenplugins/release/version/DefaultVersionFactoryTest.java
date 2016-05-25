@@ -2,6 +2,8 @@ package com.github.danielflower.mavenplugins.release.version;
 
 import static com.github.danielflower.mavenplugins.release.version.DefaultVersionFactory.SNAPSHOT_EXTENSION;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +33,7 @@ public class DefaultVersionFactoryTest {
 	public void newVersionWithLastDigitAsBuildNumberNoExplicitBuildNumberSpecified() throws Exception {
 		when(project.getVersion()).thenReturn("1.0.1-SNAPSHOT");
 		final Version version = factory.newVersion(project, true, null, ANY_REMOTE_URL);
+		assertTrue(version.useLastDigitAsBuildNumber());
 		assertEquals(VERSION, version.getBusinessVersion());
 		assertEquals("1.0.2-SNAPSHOT", version.getDevelopmentVersion());
 		assertEquals("1.0.1", version.getReleaseVersion());
@@ -46,6 +49,7 @@ public class DefaultVersionFactoryTest {
 	public void newVersionWithImplicitBuildNumber() throws Exception {
 		when(finder.findBuildNumber(project, ANY_REMOTE_URL, VERSION)).thenReturn(10l);
 		final Version version = factory.newVersion(project, false, null, ANY_REMOTE_URL);
+		assertFalse(version.useLastDigitAsBuildNumber());
 		assertEquals(VERSION, version.getBusinessVersion());
 		assertEquals("1.0-SNAPSHOT", version.getDevelopmentVersion());
 		assertEquals("1.0.10", version.getReleaseVersion());

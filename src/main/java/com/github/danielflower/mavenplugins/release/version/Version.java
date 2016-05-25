@@ -12,4 +12,6 @@ public interface Version {
 	 * The snapshot version, e.g. "1.0-SNAPSHOT"
 	 */
 	String getDevelopmentVersion();
+
+	boolean useLastDigitAsBuildNumber();
 }

@@ -4,6 +4,7 @@ final class DefaultVersion implements Version {
 	private final String developmentVersion;
 	private final String businessVersion;
 	private final String releaseVersion;
+	private final boolean useLastDigitAsBuildNumber;
 	private final long buildNumber;
 
 	DefaultVersion(final String developmentVersion, final String businessVersion, final long buildNumber,
@@ -11,6 +12,7 @@ final class DefaultVersion implements Version {
 		this.buildNumber = buildNumber;
 		this.businessVersion = businessVersion;
 		this.releaseVersion = businessVersion + "." + buildNumber;
+		this.useLastDigitAsBuildNumber = useLastDigitAsBuildNumber;
 		this.developmentVersion = useLastDigitAsBuildNumber ? businessVersion + "." + (buildNumber + 1) + "-SNAPSHOT"
 				: developmentVersion;
 	}
@@ -42,5 +44,10 @@ final class DefaultVersion implements Version {
 	@Override
 	public String getReleaseVersion() {
 		return releaseVersion;
+	}
+
+	@Override
+	public boolean useLastDigitAsBuildNumber() {
+		return useLastDigitAsBuildNumber;
 	}
 }
