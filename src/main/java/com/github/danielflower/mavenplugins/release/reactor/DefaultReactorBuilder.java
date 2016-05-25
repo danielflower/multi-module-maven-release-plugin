@@ -94,7 +94,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			if (previousTagsForThisModule.size() == 0) {
 				return null;
 			}
-			final boolean hasChanged = repository.hasChangedSince(relativePathToModule, project.getModel().getModules(),
+			final boolean hasChanged = repository.hasChangedSince(relativePathToModule, project.getModules(),
 					previousTagsForThisModule);
 			return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
 		} catch (final SCMException e) {
