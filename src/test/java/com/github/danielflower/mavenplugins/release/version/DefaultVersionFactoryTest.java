@@ -32,7 +32,7 @@ public class DefaultVersionFactoryTest {
 		when(project.getVersion()).thenReturn("1.0.1-SNAPSHOT");
 		final Version version = factory.newVersion(project, true, null, ANY_REMOTE_URL);
 		assertEquals(VERSION, version.getBusinessVersion());
-		assertEquals("1.0.1-SNAPSHOT", version.getDevelopmentVersion());
+		assertEquals("1.0.2-SNAPSHOT", version.getDevelopmentVersion());
 		assertEquals("1.0.1", version.getReleaseVersion());
 		assertEquals(1, version.getBuildNumber());
 	}

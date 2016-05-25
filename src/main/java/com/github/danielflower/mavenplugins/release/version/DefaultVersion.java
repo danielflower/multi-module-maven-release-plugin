@@ -6,11 +6,13 @@ final class DefaultVersion implements Version {
 	private final String releaseVersion;
 	private final long buildNumber;
 
-	DefaultVersion(final String developmentVersion, final String businessVersion, final long buildNumber) {
-		this.developmentVersion = developmentVersion;
+	DefaultVersion(final String developmentVersion, final String businessVersion, final long buildNumber,
+			final boolean useLastDigitAsBuildNumber) {
 		this.buildNumber = buildNumber;
 		this.businessVersion = businessVersion;
 		this.releaseVersion = businessVersion + "." + buildNumber;
+		this.developmentVersion = useLastDigitAsBuildNumber ? businessVersion + "." + (buildNumber + 1) + "-SNAPSHOT"
+				: developmentVersion;
 	}
 
 	/**

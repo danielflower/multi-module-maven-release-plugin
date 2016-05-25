@@ -58,6 +58,6 @@ final class DefaultVersionFactory implements VersionFactory {
 			actualBuildNumber = buildNumber;
 		}
 
-		return new DefaultVersion(project.getVersion(), businessVersion, actualBuildNumber);
+		return new DefaultVersion(project.getVersion(), businessVersion, actualBuildNumber, useLastDigitAsBuildNumber);
 	}
 }
