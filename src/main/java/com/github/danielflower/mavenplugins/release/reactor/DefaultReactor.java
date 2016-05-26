@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release.reactor;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,10 +23,8 @@ final class DefaultReactor implements Reactor {
 	Reactor finalizeReleaseVersions() {
 		if (!atLeastOneBeingReleased()) {
 			log.warn("No changes have been detected in any modules so will re-release them all");
-			final List<ReleasableModule> copy = new ArrayList<>(modulesInBuildOrder);
-			modulesInBuildOrder.clear();
-			for (final ReleasableModule module : copy) {
-				addReleasableModule(module.createReleasableVersion());
+			for (final ReleasableModule module : modulesInBuildOrder) {
+				module.getVersion().makeReleaseable();
 			}
 		}
 		return this;

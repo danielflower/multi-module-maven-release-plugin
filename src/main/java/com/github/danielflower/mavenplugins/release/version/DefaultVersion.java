@@ -70,4 +70,9 @@ final class DefaultVersion implements Version {
 	public String getEquivalentVersion() {
 		return equivalentVersion;
 	}
+
+	@Override
+	public void makeReleaseable() {
+		setEquivalentVersion(null);
+	}
 }

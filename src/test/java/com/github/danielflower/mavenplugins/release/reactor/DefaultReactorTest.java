@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static scaffolding.ReleasableModuleBuilder.aModule;
 
@@ -15,6 +16,8 @@ import java.util.Iterator;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.version.Version;
 
 public class DefaultReactorTest {
 	private final Log log = mock(Log.class);
@@ -62,11 +65,12 @@ public class DefaultReactorTest {
 	@Test
 	public void finalizeReleaseVersionsWhenNoReleasableModuleHasBeenAdded() {
 		final ReleasableModule willNotBeReleased = mock(ReleasableModule.class);
-		final ReleasableModule willBeReleased = mock(ReleasableModule.class);
-		when(willNotBeReleased.createReleasableVersion()).thenReturn(willBeReleased);
+		final Version version = mock(Version.class);
+		when(willNotBeReleased.getVersion()).thenReturn(version);
 		reactor.addReleasableModule(willNotBeReleased);
 		final Iterator<ReleasableModule> modules = reactor.finalizeReleaseVersions().iterator();
-		assertSame(willBeReleased, modules.next());
+		verify(version).makeReleaseable();
+		assertSame(willNotBeReleased, modules.next());
 		assertFalse(modules.hasNext());
 	}
 }

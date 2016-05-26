@@ -50,7 +50,8 @@ public class ReleasableModuleBuilder {
 		when(version.getBuildNumber()).thenReturn(buildNumber);
 		when(version.getDevelopmentVersion()).thenReturn(project.getVersion());
 		when(version.getReleaseVersion()).thenReturn(project.getVersion().replace("-SNAPSHOT", ".") + buildNumber);
-		return new ReleasableModule(project, version, equivalentVersion, relativePathToModule);
+		when(version.getEquivalentVersion()).thenReturn(equivalentVersion);
+		return new ReleasableModule(project, version, relativePathToModule);
 	}
 
 	public static ReleasableModuleBuilder aModule() {

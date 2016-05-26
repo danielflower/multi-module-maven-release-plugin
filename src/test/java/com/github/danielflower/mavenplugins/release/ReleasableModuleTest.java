@@ -1,9 +1,9 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static scaffolding.ReleasableModuleBuilder.aModule;
@@ -15,11 +15,12 @@ import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.version.Version;
 
 public class ReleasableModuleTest {
+
 	@Test
 	public void getsTheTagFromTheArtifactAndVersion() throws Exception {
 		final ReleasableModule module = aModule().withArtifactId("my-artifact").withSnapshotVersion("1.0-SNAPSHOT")
 				.withBuildNumber(123).build();
-		assertThat(module.getTagName(), equalTo("my-artifact-1.0.123"));
+		assertEquals("my-artifact-1.0.123", module.getTagName());
 	}
 
 	@Test
@@ -31,18 +32,20 @@ public class ReleasableModuleTest {
 		when(version.getBuildNumber()).thenReturn(12l);
 		when(version.getBusinessVersion()).thenReturn("1.2.3");
 		when(version.getDevelopmentVersion()).thenReturn("1.2.3-SNAPSHOT");
-		final ReleasableModule first = new ReleasableModule(project, version, "1.2.3.11", "somewhere");
-		assertThat(first.willBeReleased(), is(false));
+		when(version.getEquivalentVersion()).thenReturn("1.2.3.11");
+		final ReleasableModule first = new ReleasableModule(project, version, "somewhere");
+		assertFalse(first.willBeReleased());
 
 		when(version.getReleaseVersion()).thenReturn("1.2.3.12");
-		final ReleasableModule changed = first.createReleasableVersion();
+		when(version.getEquivalentVersion()).thenReturn(null);
+		first.getVersion().makeReleaseable();
 
-		assertSame(version, changed.getVersion());
+		assertSame(version, first.getVersion());
 
-		assertThat(changed.getArtifactId(), equalTo("some-arty"));
-		assertThat(changed.getGroupId(), equalTo("some-group"));
-		assertThat(changed.getProject(), is(project));
-		assertThat(changed.getRelativePathToModule(), equalTo("somewhere"));
-		assertThat(changed.willBeReleased(), is(true));
+		assertEquals("some-arty", first.getArtifactId());
+		assertEquals("some-group", first.getGroupId());
+		assertSame(project, first.getProject());
+		assertEquals("somewhere", first.getRelativePathToModule());
+		assertTrue(first.willBeReleased());
 	}
 }

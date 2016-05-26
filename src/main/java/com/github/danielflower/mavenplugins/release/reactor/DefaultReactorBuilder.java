@@ -74,8 +74,7 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 							relativePathToModule, changedDependencyOrNull, remoteUrl);
 				}
 
-				reactor.addReleasableModule(
-						new ReleasableModule(project, version, version.getEquivalentVersion(), relativePathToModule));
+				reactor.addReleasableModule(new ReleasableModule(project, version, relativePathToModule));
 			} catch (final VersionException e) {
 				throw new ReactorException(e, "Version could be created for project %s", project);
 			}

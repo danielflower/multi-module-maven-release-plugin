@@ -7,18 +7,14 @@ import org.apache.maven.project.MavenProject;
 import com.github.danielflower.mavenplugins.release.version.Version;
 
 public class ReleasableModule {
-
 	private final MavenProject project;
 	private final Version version;
 	private final String tagName;
-	private final String equivalentVersion;
 	private final String relativePathToModule;
 
-	public ReleasableModule(final MavenProject project, final Version version, final String equivalentVersion,
-			final String relativePathToModule) {
+	public ReleasableModule(final MavenProject project, final Version version, final String relativePathToModule) {
 		this.project = project;
 		this.version = version;
-		this.equivalentVersion = equivalentVersion;
 		this.relativePathToModule = relativePathToModule;
 		this.tagName = project.getArtifactId() + "-" + version.getReleaseVersion();
 	}
@@ -54,18 +50,14 @@ public class ReleasableModule {
 	}
 
 	public boolean willBeReleased() {
-		return equivalentVersion == null;
+		return version.getEquivalentVersion() == null;
 	}
 
 	public String getVersionToDependOn() {
-		return willBeReleased() ? version.getReleaseVersion() : equivalentVersion;
+		return willBeReleased() ? version.getReleaseVersion() : version.getEquivalentVersion();
 	}
 
 	public String getRelativePathToModule() {
 		return relativePathToModule;
-	}
-
-	public ReleasableModule createReleasableVersion() {
-		return new ReleasableModule(project, version, null, relativePathToModule);
 	}
 }

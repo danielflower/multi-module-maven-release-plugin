@@ -16,4 +16,6 @@ public interface Version {
 	boolean useLastDigitAsBuildNumber();
 
 	String getEquivalentVersion();
+
+	void makeReleaseable();
 }
