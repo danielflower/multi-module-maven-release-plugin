@@ -67,7 +67,7 @@ final class DefaultVersion implements Version {
 	}
 
 	@Override
-	public String getEquivalentVersion() {
+	public String getEquivalentVersionOrNull() {
 		return equivalentVersion;
 	}
 

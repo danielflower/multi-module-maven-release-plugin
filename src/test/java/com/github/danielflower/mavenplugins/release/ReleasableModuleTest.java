@@ -32,12 +32,12 @@ public class ReleasableModuleTest {
 		when(version.getBuildNumber()).thenReturn(12l);
 		when(version.getBusinessVersion()).thenReturn("1.2.3");
 		when(version.getDevelopmentVersion()).thenReturn("1.2.3-SNAPSHOT");
-		when(version.getEquivalentVersion()).thenReturn("1.2.3.11");
+		when(version.getEquivalentVersionOrNull()).thenReturn("1.2.3.11");
 		final ReleasableModule first = new ReleasableModule(project, version, "somewhere");
 		assertFalse(first.willBeReleased());
 
 		when(version.getReleaseVersion()).thenReturn("1.2.3.12");
-		when(version.getEquivalentVersion()).thenReturn(null);
+		when(version.getEquivalentVersionOrNull()).thenReturn(null);
 		first.getVersion().makeReleaseable();
 
 		assertSame(version, first.getVersion());

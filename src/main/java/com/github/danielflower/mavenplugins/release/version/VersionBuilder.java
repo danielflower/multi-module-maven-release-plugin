@@ -76,7 +76,7 @@ class VersionBuilder {
 				version.setEquivalentVersion(previousTagThatIsTheSameAsHEADForThisModule.version() + "."
 						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber());
 				log.info(format("Will use version %s for %s as it has not been changed since that release.",
-						version.getEquivalentVersion(), project.getArtifactId()));
+						version.getEquivalentVersionOrNull(), project.getArtifactId()));
 			} else {
 				log.info(format("Will use version %s for %s as it has changed since the last release.", releaseVersion,
 						project.getArtifactId()));
