@@ -69,22 +69,27 @@ class VersionBuilder {
 					changedDependency));
 		}
 
-		String equivalentVersion = null;
+		final DefaultVersion version = new DefaultVersion();
 		if (relativePathToModule != null && changedDependency == null) {
 			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease();
 			if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-				equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
-						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+				version.setEquivalentVersion(previousTagThatIsTheSameAsHEADForThisModule.version() + "."
+						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber());
 				log.info(format("Will use version %s for %s as it has not been changed since that release.",
-						equivalentVersion, project.getArtifactId()));
+						version.getEquivalentVersion(), project.getArtifactId()));
 			} else {
 				log.info(format("Will use version %s for %s as it has changed since the last release.", releaseVersion,
 						project.getArtifactId()));
 			}
 		}
 
-		return new DefaultVersion(equivalentVersion, releaseVersion, project.getVersion(), businessVersion, buildNumber,
-				useLastDigitAsBuildNumber);
+		version.setBuildNumber(buildNumber);
+		version.setBusinessVersion(businessVersion);
+		version.setDevelopmentVersion(useLastDigitAsBuildNumber
+				? businessVersion + "." + (buildNumber + 1) + "-SNAPSHOT" : project.getVersion());
+		version.setReleaseVersion(releaseVersion);
+		version.setUseLastDigitAsBuildNumber(useLastDigitAsBuildNumber);
+		return version;
 	}
 
 	private ProposedTag hasChangedSinceLastRelease() throws VersionException {
