@@ -3,13 +3,11 @@ package com.github.danielflower.mavenplugins.release.scm;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 
-public interface ProposedTag {
+import com.github.danielflower.mavenplugins.release.version.Version;
+
+public interface ProposedTag extends Version {
 
 	String name();
-
-	String version();
-
-	long buildNumber();
 
 	Ref saveAtHEAD() throws SCMException;
 

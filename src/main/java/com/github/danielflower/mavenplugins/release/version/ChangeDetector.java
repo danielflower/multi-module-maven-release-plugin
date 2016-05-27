@@ -67,8 +67,7 @@ class ChangeDetector {
 		if (relativePathToModule != null && changedDependency == null) {
 			final ProposedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease();
 			if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-				equivalentVersionOrNull = previousTagThatIsTheSameAsHEADForThisModule.version() + "."
-						+ previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+				equivalentVersionOrNull = previousTagThatIsTheSameAsHEADForThisModule.getReleaseVersion();
 				log.info(format("Will use version %s for %s as it has not been changed since that release.",
 						equivalentVersionOrNull, project.getArtifactId()));
 			} else {
@@ -99,7 +98,7 @@ class ChangeDetector {
 	private ProposedTag tagWithHighestBuildNumber(final List<ProposedTag> previousTagsForThisModule) {
 		ProposedTag cur = null;
 		for (final ProposedTag tag : previousTagsForThisModule) {
-			if (cur == null || tag.buildNumber() > cur.buildNumber()) {
+			if (cur == null || tag.getBuildNumber() > cur.getBuildNumber()) {
 				cur = tag;
 			}
 		}

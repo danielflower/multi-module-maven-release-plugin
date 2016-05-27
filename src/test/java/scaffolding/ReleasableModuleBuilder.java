@@ -48,7 +48,6 @@ public class ReleasableModuleBuilder {
 	public ReleasableModule build() {
 		final Version version = mock(Version.class);
 		when(version.getBuildNumber()).thenReturn(buildNumber);
-		when(version.getDevelopmentVersion()).thenReturn(project.getVersion());
 		when(version.getReleaseVersion()).thenReturn(project.getVersion().replace("-SNAPSHOT", ".") + buildNumber);
 		when(version.getEquivalentVersionOrNull()).thenReturn(equivalentVersion);
 		return new ReleasableModule(project, version, relativePathToModule);

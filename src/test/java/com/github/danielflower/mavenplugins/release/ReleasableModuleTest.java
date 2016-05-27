@@ -31,7 +31,6 @@ public class ReleasableModuleTest {
 		final Version version = mock(Version.class);
 		when(version.getBuildNumber()).thenReturn(12l);
 		when(version.getBusinessVersion()).thenReturn("1.2.3");
-		when(version.getDevelopmentVersion()).thenReturn("1.2.3-SNAPSHOT");
 		when(version.getEquivalentVersionOrNull()).thenReturn("1.2.3.11");
 		final ReleasableModule first = new ReleasableModule(project, version, "somewhere");
 		assertFalse(first.willBeReleased());

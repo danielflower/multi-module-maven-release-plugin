@@ -38,8 +38,8 @@ public class AnnotatedTagTest {
 		builder.add("my-name", ver);
 		final ProposedTag tag = builder.build().getTag("my-name", ver);
 		assertEquals("my-name", tag.name());
-		assertEquals("the-version", tag.version());
-		assertEquals(2134l, tag.buildNumber());
+		assertEquals("the-version", tag.getBusinessVersion());
+		assertEquals(2134l, tag.getBuildNumber());
 	}
 
 	@Test
@@ -60,8 +60,8 @@ public class AnnotatedTagTest {
 		final Ref ref = project.local.tagList().call().get(0);
 		final ProposedTag inflatedTag = repo.fromRef(ref);
 		assertThat(inflatedTag.name(), equalTo("my-name"));
-		assertThat(inflatedTag.version(), equalTo("the-version"));
-		assertThat(inflatedTag.buildNumber(), equalTo(2134L));
+		assertThat(inflatedTag.getBusinessVersion(), equalTo("the-version"));
+		assertThat(inflatedTag.getBuildNumber(), equalTo(2134L));
 	}
 
 	@Test
@@ -76,8 +76,8 @@ public class AnnotatedTagTest {
 		repo.setLog(log);
 		final ProposedTag inflatedTag = repo.fromRef(ref);
 		assertThat(inflatedTag.name(), equalTo("my-name-1.0.2"));
-		assertThat(inflatedTag.version(), equalTo("0"));
-		assertThat(inflatedTag.buildNumber(), equalTo(0L));
+		assertThat(inflatedTag.getBusinessVersion(), equalTo("0"));
+		assertThat(inflatedTag.getBuildNumber(), equalTo(0L));
 	}
 
 }

@@ -35,15 +35,6 @@ class DefaultProposedTag implements ProposedTag {
 	}
 
 	@Override
-	public String version() {
-		return String.valueOf(message.get(VERSION));
-	}
-
-	@Override
-	public long buildNumber() {
-		return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
-	}
-
 	public Ref saveAtHEAD() throws SCMException {
 		final String json = message.toJSONString();
 		try {
@@ -70,8 +61,8 @@ class DefaultProposedTag implements ProposedTag {
 
 	@Override
 	public String toString() {
-		return "AnnotatedTag{" + "name='" + name + '\'' + ", version=" + version() + ", buildNumber=" + buildNumber()
-				+ '}';
+		return "AnnotatedTag{" + "name='" + name + '\'' + ", version=" + getBusinessVersion() + ", buildNumber="
+				+ getBuildNumber() + '}';
 	}
 
 	@Override
@@ -92,5 +83,30 @@ class DefaultProposedTag implements ProposedTag {
 	@Override
 	public ObjectId getObjectId() {
 		return ref.getTarget().getObjectId();
+	}
+
+	@Override
+	public String getReleaseVersion() {
+		return getBusinessVersion() + "." + getBuildNumber();
+	}
+
+	@Override
+	public String getBusinessVersion() {
+		return String.valueOf(message.get(VERSION));
+	}
+
+	@Override
+	public long getBuildNumber() {
+		return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
+	}
+
+	@Override
+	public String getEquivalentVersionOrNull() {
+		return null;
+	}
+
+	@Override
+	public void makeReleaseable() {
+		// noop
 	}
 }

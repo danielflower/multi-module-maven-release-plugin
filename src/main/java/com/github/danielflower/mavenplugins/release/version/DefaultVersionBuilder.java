@@ -84,9 +84,6 @@ final class DefaultVersionBuilder implements VersionBuilder {
 		version.setReleaseVersion(releaseVersion);
 		version.setBuildNumber(actualBuildNumber);
 		version.setBusinessVersion(businessVersion);
-		version.setDevelopmentVersion(useLastDigitAsBuildNumber
-				? businessVersion + "." + (actualBuildNumber + 1) + SNAPSHOT_EXTENSION : project.getVersion());
-		version.setUseLastDigitAsBuildNumber(useLastDigitAsBuildNumber);
 		version.setEquivalentVersion(detectorFactory.newDetector().setProject(project).setBuildNumber(actualBuildNumber)
 				.setChangedDependency(changedDependencyOrNull).setRelativePathToModule(relativePathToModuleOrNull)
 				.setBusinessVersion(businessVersion).equivalentVersionOrNull());

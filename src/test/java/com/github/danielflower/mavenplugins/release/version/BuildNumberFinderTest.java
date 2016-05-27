@@ -29,7 +29,7 @@ public class BuildNumberFinderTest {
 	@Before
 	public void setup() {
 		when(project.getArtifactId()).thenReturn(ANY_ARTIFACT_ID);
-		when(tag.buildNumber()).thenReturn(6l);
+		when(tag.getBuildNumber()).thenReturn(6l);
 		finder.setRepository(repository);
 	}
 

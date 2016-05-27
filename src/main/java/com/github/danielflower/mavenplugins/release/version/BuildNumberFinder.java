@@ -28,7 +28,7 @@ class BuildNumberFinder {
 
 		try {
 			for (final ProposedTag previousTag : repository.tagsForVersion(project.getArtifactId(), businessVersion)) {
-				prev.add(previousTag.buildNumber());
+				prev.add(previousTag.getBuildNumber());
 			}
 
 			prev.addAll(repository.getRemoteBuildNumbers(remoteUrl, project.getArtifactId(), businessVersion));
