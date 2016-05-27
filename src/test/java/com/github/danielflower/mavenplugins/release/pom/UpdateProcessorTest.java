@@ -58,7 +58,7 @@ public class UpdateProcessorTest {
 	@Before
 	public void setup() throws POMUpdateException {
 		// Setup context factory
-		when(contextFactory.newReleaseContext(reactor, project)).thenReturn(context);
+		when(contextFactory.newReleaseContext(reactor, project, false)).thenReturn(context);
 
 		// Setup context
 		when(context.getErrors()).thenReturn(Collections.<String> emptyList());
@@ -104,7 +104,6 @@ public class UpdateProcessorTest {
 
 		final InOrder order = inOrder(originalModel, command, log, writer);
 		order.verify(log).info("Going to release anyArtifactId anyVersion");
-		order.verify(originalModel).setVersion(ANY_VERSION);
 		order.verify(command).alterModel(context);
 		order.verify(writer).addProject(project);
 	}
@@ -145,7 +144,6 @@ public class UpdateProcessorTest {
 		// updatePomsCompletedSuccessfully
 		order.verify(log, Mockito.never()).info("Going to release anyArtifactId anyVersion");
 
-		order.verify(originalModel).setVersion(ANY_VERSION);
 		order.verify(command).alterModel(context);
 		order.verify(writer).addProject(project);
 	}

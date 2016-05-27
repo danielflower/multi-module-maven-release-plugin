@@ -34,16 +34,18 @@ class UpdateDependencies extends Command {
 		final Model originalModel = project.getOriginalModel();
 
 		for (final Dependency dependency : determineDependencies(originalModel)) {
-			final String version = substitution.getActualVersion(project, dependency);
-			if (isSnapshot(version)) {
+			if (updateContext.incrementSnapshotVersionAfterRelease()
+					|| isSnapshot(substitution.getActualVersion(project, dependency))) {
 				try {
-					final String versionToDependOn = updateContext.getVersionToDependOn(dependency.getGroupId(),
-							dependency.getArtifactId(), version);
+					final String versionToDependOn = updateContext
+							.getVersionToDependOn(dependency.getGroupId(), dependency.getArtifactId())
+							.getVersionToDependOn();
 					dependency.setVersion(versionToDependOn);
 					log.debug(format(" Dependency on %s rewritten to version %s", dependency.getArtifactId(),
 							versionToDependOn));
 				} catch (final UnresolvedSnapshotDependencyException e) {
-					updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, e.version);
+					updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId,
+							dependency.getVersion());
 				}
 			} else {
 				log.debug(format(" Dependency on %s kept at version %s", dependency.getArtifactId(),

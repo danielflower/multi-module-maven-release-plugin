@@ -8,16 +8,20 @@ import java.util.List;
 import org.apache.maven.project.MavenProject;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 
 final class ReleaseContext implements Context {
 	private final List<String> errors = new LinkedList<>();
 	private final Reactor reactor;
 	private final MavenProject project;
+	private final boolean incrementSnapshotVersionAfterRelease;
 
-	ReleaseContext(final Reactor reactor, final MavenProject project) {
+	ReleaseContext(final Reactor reactor, final MavenProject project,
+			final boolean incrementSnapshotVersionAfterRelease) {
 		this.reactor = reactor;
 		this.project = project;
+		this.incrementSnapshotVersionAfterRelease = incrementSnapshotVersionAfterRelease;
 	}
 
 	@Override
@@ -36,8 +40,13 @@ final class ReleaseContext implements Context {
 	}
 
 	@Override
-	public String getVersionToDependOn(final String groupId, final String artifactId, final String version)
+	public ReleasableModule getVersionToDependOn(final String groupId, final String artifactId)
 			throws UnresolvedSnapshotDependencyException {
-		return reactor.find(groupId, artifactId, version).getVersionToDependOn();
+		return reactor.find(groupId, artifactId);
+	}
+
+	@Override
+	public boolean incrementSnapshotVersionAfterRelease() {
+		return incrementSnapshotVersionAfterRelease;
 	}
 }

@@ -5,7 +5,6 @@ import static java.lang.String.format;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.maven.model.Model;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -47,21 +46,16 @@ final class UpdateProcessor implements Updater {
 		this.log = log;
 	}
 
-	private List<String> process(final Log log, final Reactor reactor, final MavenProject project,
-			final String newVersion) {
-		final Context context = contextFactory.newReleaseContext(reactor, project);
-		final Model originalModel = project.getOriginalModel();
-		originalModel.setVersion(newVersion);
-
+	private List<String> process(final MavenProject project, final Context context, final String newVersion) {
 		for (final Command cmd : commands) {
 			cmd.alterModel(context);
 		}
-
 		return context.getErrors();
 	}
 
 	@Override
 	public ChangeSet updatePoms(final Reactor reactor) throws POMUpdateException {
+		final boolean incrementSnapshotVersionAfterRelease = false;
 		final PomWriter writer = writerFactory.newWriter();
 		final List<String> errors = new LinkedList<String>();
 
@@ -75,7 +69,13 @@ final class UpdateProcessor implements Updater {
 						module.getVersion().getReleaseVersion()));
 			}
 
-			errors.addAll(process(log, reactor, project, module.getVersion().getReleaseVersion()));
+			errors.addAll(process(project,
+					contextFactory.newReleaseContext(reactor, project, incrementSnapshotVersionAfterRelease),
+					module.getVersion().getReleaseVersion()));
+
+			if (incrementSnapshotVersionAfterRelease) {
+
+			}
 
 			// Mark project to be written at a later stage; if an exception
 			// occurs, we don't need to revert anything.

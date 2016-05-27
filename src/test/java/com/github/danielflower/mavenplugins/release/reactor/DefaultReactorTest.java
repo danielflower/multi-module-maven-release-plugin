@@ -29,7 +29,7 @@ public class DefaultReactorTest {
 		reactor.addReleasableModule(aModule().build());
 		reactor.addReleasableModule(arty);
 		reactor.addReleasableModule(aModule().build());
-		assertThat(reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT"), is(arty));
+		assertThat(reactor.find("my.great.group", "some-arty"), is(arty));
 		assertThat(reactor.findByLabel("my.great.group:some-arty"), is(arty));
 	}
 
@@ -45,10 +45,10 @@ public class DefaultReactorTest {
 		reactor.addReleasableModule(aModule().build());
 		reactor.addReleasableModule(aModule().build());
 		try {
-			reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT");
+			reactor.find("my.great.group", "some-arty");
 			Assert.fail("Should have thrown");
 		} catch (final UnresolvedSnapshotDependencyException e) {
-			assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty:1.0-SNAPSHOT"));
+			assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty"));
 		}
 	}
 

@@ -18,7 +18,6 @@ import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 public class ContextFactoryTest {
 	private static final String ANY_GROUP_ID = "anyGroupId";
 	private static final String ANY_ARTIFACT_ID = "anyArtifactId";
-	private static final String ANY_VERSION = "anyVersion";
 	private static final String TEST_STRING = "test";
 	private final Reactor reactor = mock(Reactor.class);
 	private final MavenProject project = mock(MavenProject.class);
@@ -28,7 +27,7 @@ public class ContextFactoryTest {
 	@Before
 	public void setup() {
 		when(project.clone()).thenReturn(clone);
-		context = new ContextFactory().newReleaseContext(reactor, project);
+		context = new ContextFactory().newReleaseContext(reactor, project, false);
 	}
 
 	@Test
@@ -51,8 +50,8 @@ public class ContextFactoryTest {
 	public void getVersionToDependOn() throws Exception {
 		final ReleasableModule module = mock(ReleasableModule.class);
 		when(module.getVersionToDependOn()).thenReturn(TEST_STRING);
-		when(reactor.find(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_VERSION)).thenReturn(module);
-		assertEquals(TEST_STRING, context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_VERSION));
+		when(reactor.find(ANY_GROUP_ID, ANY_ARTIFACT_ID)).thenReturn(module);
+		assertEquals(module, context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID));
 	}
 
 }

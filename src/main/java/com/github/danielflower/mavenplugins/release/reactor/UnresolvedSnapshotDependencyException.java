@@ -4,12 +4,10 @@ package com.github.danielflower.mavenplugins.release.reactor;
 public class UnresolvedSnapshotDependencyException extends ReactorException {
 	public final String groupId;
 	public final String artifactId;
-	public final String version;
 
-	public UnresolvedSnapshotDependencyException(final String groupId, final String artifactId, final String version) {
-		super("Could not find %s:%s:%s", groupId, artifactId, version);
+	public UnresolvedSnapshotDependencyException(final String groupId, final String artifactId) {
+		super("Could not find %s:%s", groupId, artifactId);
 		this.groupId = groupId;
 		this.artifactId = artifactId;
-		this.version = version;
 	}
 }

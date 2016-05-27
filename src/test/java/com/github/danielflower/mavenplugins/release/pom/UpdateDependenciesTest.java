@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.reactor.UnresolvedSnapshotDependencyException;
 import com.github.danielflower.mavenplugins.release.substitution.VersionSubstitution;
 
@@ -34,6 +35,7 @@ public class UpdateDependenciesTest {
 	private final Dependency dependency = mock(Dependency.class);
 	private final VersionSubstitution substitution = mock(VersionSubstitution.class);
 	protected final List<Dependency> dependencies = asList(dependency);
+	private final ReleasableModule module = mock(ReleasableModule.class);
 	private final UpdateDependencies cmd = newCommand();
 
 	protected UpdateDependencies newCommand() {
@@ -47,8 +49,8 @@ public class UpdateDependenciesTest {
 		setupDetermineDependencies();
 
 		// Setup reactor
-		when(context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_VERSION)).thenReturn(ANY_VERSION);
-		when(context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION)).thenReturn(ANY_VERSION);
+		when(module.getVersionToDependOn()).thenReturn(ANY_VERSION);
+		when(context.getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID)).thenReturn(module);
 
 		// Setup project
 		when(context.getProject()).thenReturn(project);
@@ -87,9 +89,9 @@ public class UpdateDependenciesTest {
 	@Test
 	public void exceptionOccurred() throws Exception {
 		final UnresolvedSnapshotDependencyException expected = new UnresolvedSnapshotDependencyException(ANY_GROUP_ID,
-				ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
+				ANY_ARTIFACT_ID);
 		when(substitution.getActualVersion(project, dependency)).thenReturn(ANY_SNAPSHOT_VERSION);
-		doThrow(expected).when(context).getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);
+		doThrow(expected).when(context).getVersionToDependOn(ANY_GROUP_ID, ANY_ARTIFACT_ID);
 		cmd.alterModel(context);
 		verify(dependency, never()).setVersion(ANY_VERSION);
 		verify(context).addError(ERROR_FORMAT, ANY_ARTIFACT_ID, ANY_ARTIFACT_ID, ANY_SNAPSHOT_VERSION);

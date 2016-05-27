@@ -22,14 +22,15 @@ final class UpdateParent extends Command {
 		final Model originalModel = project.getOriginalModel();
 		final MavenProject parent = project.getParent();
 
-		if (parent != null && isSnapshot(parent.getVersion())) {
+		if (parent != null
+				&& (isSnapshot(parent.getVersion()) || updateContext.incrementSnapshotVersionAfterRelease())) {
 			try {
-				final String versionToDependOn = updateContext.getVersionToDependOn(parent.getGroupId(),
-						parent.getArtifactId(), parent.getVersion());
+				final String versionToDependOn = updateContext
+						.getVersionToDependOn(parent.getGroupId(), parent.getArtifactId()).getVersionToDependOn();
 				originalModel.getParent().setVersion(versionToDependOn);
 				log.debug(format(" Parent %s rewritten to version %s", parent.getArtifactId(), versionToDependOn));
 			} catch (final UnresolvedSnapshotDependencyException e) {
-				updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, e.version);
+				updateContext.addError(ERROR_FORMAT, project.getArtifactId(), e.artifactId, parent.getVersion());
 			}
 		}
 	}

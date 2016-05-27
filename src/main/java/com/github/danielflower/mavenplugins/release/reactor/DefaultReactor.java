@@ -51,11 +51,11 @@ final class DefaultReactor implements Reactor {
 	}
 
 	@Override
-	public ReleasableModule find(final String groupId, final String artifactId, final String version)
+	public ReleasableModule find(final String groupId, final String artifactId)
 			throws UnresolvedSnapshotDependencyException {
 		final ReleasableModule value = findByLabel(groupId + ":" + artifactId);
 		if (value == null) {
-			throw new UnresolvedSnapshotDependencyException(groupId, artifactId, version);
+			throw new UnresolvedSnapshotDependencyException(groupId, artifactId);
 		}
 		return value;
 	}
