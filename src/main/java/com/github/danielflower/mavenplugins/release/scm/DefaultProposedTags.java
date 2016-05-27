@@ -9,7 +9,7 @@ import java.util.Map;
 import com.github.danielflower.mavenplugins.release.version.Version;
 
 final class DefaultProposedTags implements ProposedTags {
-	static final String KEY_FORMAT = "%s/%s/%s";
+	static final String KEY_FORMAT = "%s/%s";
 	private final Map<String, ProposedTag> proposedTags;
 	private final String remoteUrl;
 
@@ -36,7 +36,7 @@ final class DefaultProposedTags implements ProposedTags {
 	}
 
 	static String toKey(final String tag, final Version version) {
-		return format(KEY_FORMAT, tag, version.getBusinessVersion(), version.getBuildNumber());
+		return format(KEY_FORMAT, tag, version.getReleaseVersion());
 	}
 
 	@Override
