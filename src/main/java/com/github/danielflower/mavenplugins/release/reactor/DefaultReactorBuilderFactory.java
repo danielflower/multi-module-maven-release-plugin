@@ -4,7 +4,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import com.github.danielflower.mavenplugins.release.version.VersionFactory;
+import com.github.danielflower.mavenplugins.release.version.VersionBuilderFactory;
 
 /**
  * @author rolandhauser
@@ -16,14 +16,14 @@ final class DefaultReactorBuilderFactory implements ReactorBuilderFactory {
 	@Requirement(role = Log.class)
 	private Log log;
 
-	@Requirement(role = VersionFactory.class)
-	private VersionFactory versionFactory;
+	@Requirement(role = VersionBuilderFactory.class)
+	private VersionBuilderFactory versionFactory;
 
 	void setLog(final Log log) {
 		this.log = log;
 	}
 
-	void setVersionFactory(final VersionFactory versionFactory) {
+	void setVersionFactory(final VersionBuilderFactory versionFactory) {
 		this.versionFactory = versionFactory;
 	}
 

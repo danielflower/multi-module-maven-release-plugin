@@ -8,13 +8,13 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.lib.Repository;
 
-import com.github.danielflower.mavenplugins.release.version.Version;
+import com.github.danielflower.mavenplugins.release.version.VersionBuilder;
+import com.github.danielflower.mavenplugins.release.version.VersionBuilderFactory;
 import com.github.danielflower.mavenplugins.release.version.VersionException;
-import com.github.danielflower.mavenplugins.release.version.VersionFactory;
 
 final class DefaultReactorBuilder implements ReactorBuilder {
 	private final Log log;
-	private final VersionFactory versionFactory;
+	private final VersionBuilderFactory versionBuilderFactory;
 	private MavenProject rootProject;
 	private List<MavenProject> projects;
 	private boolean useLastDigitAsBuildNumber;
@@ -22,9 +22,9 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 	private List<String> modulesToForceRelease;
 	private String remoteUrl;
 
-	public DefaultReactorBuilder(final Log log, final VersionFactory versioningFactory) {
+	public DefaultReactorBuilder(final Log log, final VersionBuilderFactory versioningFactory) {
 		this.log = log;
-		this.versionFactory = versioningFactory;
+		this.versionBuilderFactory = versioningFactory;
 	}
 
 	@Override
@@ -65,16 +65,19 @@ final class DefaultReactorBuilder implements ReactorBuilder {
 			try {
 				final String relativePathToModule = calculateModulePath(rootProject, project);
 				final String changedDependencyOrNull = reactor.getChangedDependencyOrNull(project);
-				final Version version;
-				if (modulesToForceRelease != null && modulesToForceRelease.contains(project.getArtifactId())) {
-					version = versionFactory.newVersion(project, useLastDigitAsBuildNumber, buildNumber, null,
-							changedDependencyOrNull, remoteUrl);
-				} else {
-					version = versionFactory.newVersion(project, useLastDigitAsBuildNumber, buildNumber,
-							relativePathToModule, changedDependencyOrNull, remoteUrl);
+				final VersionBuilder versionBuilder = versionBuilderFactory.newBuilder();
+				versionBuilder.setProject(project);
+				versionBuilder.setUseLastDigitAsBuildNumber(useLastDigitAsBuildNumber);
+				versionBuilder.setBuildNumber(buildNumber);
+				versionBuilder.setChangedDependency(changedDependencyOrNull);
+				versionBuilder.setRemoteUrl(remoteUrl);
+
+				if (modulesToForceRelease == null || !modulesToForceRelease.contains(project.getArtifactId())) {
+					versionBuilder.setRelativePath(relativePathToModule);
 				}
 
-				reactor.addReleasableModule(new ReleasableModule(project, version, relativePathToModule));
+				reactor.addReleasableModule(
+						new ReleasableModule(project, versionBuilder.build(), relativePathToModule));
 			} catch (final VersionException e) {
 				throw new ReactorException(e, "Version could be created for project %s", project);
 			}
