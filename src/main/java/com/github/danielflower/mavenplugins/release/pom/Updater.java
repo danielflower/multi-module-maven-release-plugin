@@ -15,6 +15,7 @@ public interface Updater {
 	 * @throws IOException
 	 * @throws POMUpdateException
 	 */
-	ChangeSet updatePoms(Reactor reactor) throws POMUpdateException;
+	ChangeSet updatePoms(Reactor reactor, String remoteUrl, boolean incrementSnapshotVersionAfterRelease)
+			throws POMUpdateException;
 
 }

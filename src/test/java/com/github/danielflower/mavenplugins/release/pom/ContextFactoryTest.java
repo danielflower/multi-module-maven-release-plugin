@@ -1,7 +1,6 @@
 package com.github.danielflower.mavenplugins.release.pom;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,13 +20,11 @@ public class ContextFactoryTest {
 	private static final String TEST_STRING = "test";
 	private final Reactor reactor = mock(Reactor.class);
 	private final MavenProject project = mock(MavenProject.class);
-	private final MavenProject clone = mock(MavenProject.class);
 	private Context context;
 
 	@Before
 	public void setup() {
-		when(project.clone()).thenReturn(clone);
-		context = new ContextFactory().newReleaseContext(reactor, project, false);
+		context = new ContextFactory().newContext(reactor, project, false);
 	}
 
 	@Test
@@ -42,8 +39,7 @@ public class ContextFactoryTest {
 
 	@Test
 	public void getProject() {
-		assertNotSame(project, context.getProject());
-		assertSame(clone, context.getProject());
+		assertSame(project, context.getProject());
 	}
 
 	@Test

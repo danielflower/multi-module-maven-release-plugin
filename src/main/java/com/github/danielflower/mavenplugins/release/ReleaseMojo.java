@@ -67,6 +67,9 @@ public class ReleaseMojo extends NextMojo {
 	@Parameter(alias = "releaseProfiles")
 	private List<String> releaseProfiles;
 
+	@Parameter(property = "incrementSnapshotVersionAfterRelease")
+	private boolean incrementSnapshotVersionAfterRelease;
+
 	/**
 	 * If true then tests will not be run during a release. This is the same as
 	 * adding -DskipTests=true to the release goals.
@@ -103,9 +106,10 @@ public class ReleaseMojo extends NextMojo {
 	}
 
 	@Override
-	protected void execute(final Reactor reactor, final ProposedTags proposedTags)
+	protected void execute(final Reactor reactor, final ProposedTags proposedTags, final String remoteUrl)
 			throws MojoExecutionException, PluginException {
-		try (final ChangeSet changedFiles = pomUpdater.updatePoms(reactor)) {
+		try (final ChangeSet changedFiles = pomUpdater.updatePoms(reactor, remoteUrl,
+				incrementSnapshotVersionAfterRelease)) {
 
 			// Do this before running the maven build in case the build uploads
 			// some artifacts and then fails. If it is

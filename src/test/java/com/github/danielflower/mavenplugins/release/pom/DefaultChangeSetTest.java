@@ -19,7 +19,8 @@ public class DefaultChangeSetTest {
 	private static final String ANY_MESSAGE = "anyMessage";
 	private final Log log = mock(Log.class);
 	private final SCMRepository repository = mock(SCMRepository.class);
-	private final DefaultChangeSet set = new DefaultChangeSet(log, repository);
+	private final SnapshotIncrementChangeSet snapshotIncrementChangeSet = mock(SnapshotIncrementChangeSet.class);
+	private final DefaultChangeSet set = new DefaultChangeSet(log, repository, snapshotIncrementChangeSet);
 
 	/**
 	 * @throws Exception

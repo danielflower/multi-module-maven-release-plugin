@@ -17,11 +17,14 @@ final class DefaultChangeSet extends LinkedList<File>implements ChangeSet {
 	static final String REVERT_ERROR_MESSAGE = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
 	private final Log log;
 	private final SCMRepository repository;
+	private final SnapshotIncrementChangeSet snapshotIncrementChangeSet;
 	private ChangeSetCloseException failure;
 
-	DefaultChangeSet(final Log log, final SCMRepository repository) {
+	DefaultChangeSet(final Log log, final SCMRepository repository,
+			final SnapshotIncrementChangeSet snapshotIncrementChangeSet) {
 		this.log = log;
 		this.repository = repository;
+		this.snapshotIncrementChangeSet = snapshotIncrementChangeSet;
 	}
 
 	@Override
@@ -42,6 +45,8 @@ final class DefaultChangeSet extends LinkedList<File>implements ChangeSet {
 			log.info("Reverted changes because there was an error.");
 			throw failure;
 		}
+
+		snapshotIncrementChangeSet.close();
 	}
 
 	@Override

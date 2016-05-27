@@ -50,6 +50,7 @@ public class PomWriterFactoryTest {
 		}
 	}
 
+	private static final String ANY_REMOTE_URL = "anyRemoteUrl";
 	private static final String TEST_LINE = "This is a test";
 	private final SCMRepository repository = mock(SCMRepository.class);
 	private final MavenXpp3Writer writer = mock(MavenXpp3Writer.class);
@@ -71,7 +72,7 @@ public class PomWriterFactoryTest {
 		factory.setMavenXpp3WriterFactory(writerFactory);
 		factory.setRepository(repository);
 		pomWriter = factory.newWriter();
-		pomWriter.addProject(project);
+		pomWriter.markRelease(project);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,7 +87,7 @@ public class PomWriterFactoryTest {
 			}
 		}).when(writer).write((Writer) Mockito.notNull(), Mockito.same(originalModel));
 
-		final ChangeSet changedFiles = pomWriter.writePoms();
+		final ChangeSet changedFiles = pomWriter.writePoms(ANY_REMOTE_URL);
 		try (final Scanner sc = new Scanner(testFile)) {
 			assertEquals(TEST_LINE, sc.nextLine());
 		}
@@ -102,7 +103,7 @@ public class PomWriterFactoryTest {
 		final IOException expected = new IOException();
 		doThrow(expected).when(writer).write((Writer) Mockito.notNull(), Mockito.same(originalModel));
 		try {
-			pomWriter.writePoms();
+			pomWriter.writePoms(ANY_REMOTE_URL);
 			fail("Exception expected");
 		} catch (final POMUpdateException e) {
 			assertSame(expected, e.getCause());
@@ -120,7 +121,7 @@ public class PomWriterFactoryTest {
 		final IOException expected = new IOException();
 		doThrow(expected).when(writer).write((Writer) Mockito.notNull(), Mockito.same(originalModel));
 		try {
-			pomWriter.writePoms();
+			pomWriter.writePoms(ANY_REMOTE_URL);
 			fail("Exception expected");
 		} catch (final ChangeSetCloseException e) {
 			assertSame(expected, e.getCause());

@@ -12,6 +12,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 import com.github.danielflower.mavenplugins.release.reactor.Reactor;
 import com.github.danielflower.mavenplugins.release.reactor.ReleasableModule;
+import com.github.danielflower.mavenplugins.release.version.Version;
 
 @Component(role = Updater.class)
 final class UpdateProcessor implements Updater {
@@ -46,40 +47,45 @@ final class UpdateProcessor implements Updater {
 		this.log = log;
 	}
 
-	private List<String> process(final MavenProject project, final Context context, final String newVersion) {
+	private void process(final MavenProject project, final Context context, final List<String> errors,
+			final String newVersion) {
 		for (final Command cmd : commands) {
 			cmd.alterModel(context);
 		}
-		return context.getErrors();
+		errors.addAll(context.getErrors());
 	}
 
 	@Override
-	public ChangeSet updatePoms(final Reactor reactor) throws POMUpdateException {
-		final boolean incrementSnapshotVersionAfterRelease = false;
+	public ChangeSet updatePoms(final Reactor reactor, final String remoteUrl,
+			final boolean incrementSnapshotVersionAfterRelease) throws POMUpdateException {
 		final PomWriter writer = writerFactory.newWriter();
 		final List<String> errors = new LinkedList<String>();
 
 		for (final ReleasableModule module : reactor) {
-			final MavenProject project = module.getProject();
+			final Version version = module.getVersion();
 
 			// TODO: If a module will not be released, is further processing
 			// necessary or should we continue the loop here?
 			if (module.willBeReleased()) {
-				log.info(format("Going to release %s %s", module.getArtifactId(),
-						module.getVersion().getReleaseVersion()));
+				log.info(format("Going to release %s %s", module.getArtifactId(), version.getReleaseVersion()));
 			}
 
-			errors.addAll(process(project,
-					contextFactory.newReleaseContext(reactor, project, incrementSnapshotVersionAfterRelease),
-					module.getVersion().getReleaseVersion()));
-
-			if (incrementSnapshotVersionAfterRelease) {
-
-			}
-
+			final MavenProject releaseClone = module.getProject().clone();
+			process(releaseClone,
+					contextFactory.newContext(reactor, releaseClone, incrementSnapshotVersionAfterRelease), errors,
+					version.getReleaseVersion());
 			// Mark project to be written at a later stage; if an exception
 			// occurs, we don't need to revert anything.
-			writer.addProject(project);
+			writer.markRelease(releaseClone);
+
+			if (incrementSnapshotVersionAfterRelease) {
+				final MavenProject snapshotIncrementClone = module.getProject().clone();
+				process(snapshotIncrementClone,
+						contextFactory.newContext(reactor, snapshotIncrementClone,
+								incrementSnapshotVersionAfterRelease),
+						errors, format("%s.%d", version.getBusinessVersion(), version.getBuildNumber() + 1));
+				writer.markSnapshotVersionIncrement(snapshotIncrementClone);
+			}
 		}
 
 		if (!errors.isEmpty()) {
@@ -92,6 +98,6 @@ final class UpdateProcessor implements Updater {
 		}
 
 		// At this point it's guaranteed that no dependency errors occurred.
-		return writer.writePoms();
+		return writer.writePoms(remoteUrl);
 	}
 }

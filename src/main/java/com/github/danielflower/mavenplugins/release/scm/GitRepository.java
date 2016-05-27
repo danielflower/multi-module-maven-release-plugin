@@ -310,4 +310,10 @@ public final class GitRepository implements SCMRepository {
 		final TreeFilter treeFilter = treeFilters.size() == 1 ? treeFilters.get(0) : AndTreeFilter.create(treeFilters);
 		walk.setTreeFilter(treeFilter);
 	}
+
+	@Override
+	public void pushChanges(final String remoteUrl, final List<File> changedFiles) throws SCMException {
+		// TODO Auto-generated method stub
+
+	}
 }

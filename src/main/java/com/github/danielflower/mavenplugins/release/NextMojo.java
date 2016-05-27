@@ -255,7 +255,7 @@ public class NextMojo extends AbstractMojo {
 		logHolder.setLog(log);
 	}
 
-	protected void execute(final Reactor reactor, final ProposedTags proposedTags)
+	protected void execute(final Reactor reactor, final ProposedTags proposedTags, final String remoteUrl)
 			throws MojoExecutionException, PluginException {
 		// noop by default
 	}
@@ -267,7 +267,7 @@ public class NextMojo extends AbstractMojo {
 			configureJsch();
 			final String remoteUrl = getRemoteUrlOrNullIfNoneSet(project.getScm());
 			final Reactor reactor = newReactor(remoteUrl);
-			execute(reactor, figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl));
+			execute(reactor, figureOutTagNamesAndThrowIfAlreadyExists(reactor, remoteUrl), remoteUrl);
 		} catch (final PluginException e) {
 			e.printBigErrorMessageAndThrow(getLog());
 		}

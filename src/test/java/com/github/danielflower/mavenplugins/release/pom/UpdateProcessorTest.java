@@ -36,6 +36,7 @@ import com.github.danielflower.mavenplugins.release.version.Version;
  *
  */
 public class UpdateProcessorTest {
+	private static final String ANY_REMOTE_URL = "anyRemoteUrl";
 	private static final String ANY_ARTIFACT_ID = "anyArtifactId";
 	private static final String ANY_VERSION = "anyVersion";
 	private static final String ANY_ERROR = "anyError";
@@ -58,7 +59,7 @@ public class UpdateProcessorTest {
 	@Before
 	public void setup() throws POMUpdateException {
 		// Setup context factory
-		when(contextFactory.newReleaseContext(reactor, project, false)).thenReturn(context);
+		when(contextFactory.newContext(reactor, project, false)).thenReturn(context);
 
 		// Setup context
 		when(context.getErrors()).thenReturn(Collections.<String> emptyList());
@@ -67,7 +68,7 @@ public class UpdateProcessorTest {
 		when(writerFactory.newWriter()).thenReturn(writer);
 
 		// Setup writer
-		when(writer.writePoms()).thenReturn(changeSet);
+		when(writer.writePoms(ANY_REMOTE_URL)).thenReturn(changeSet);
 		when(changeSet.iterator()).thenReturn(Arrays.asList(ANY_POM).iterator());
 
 		// Setup reactor
@@ -85,6 +86,7 @@ public class UpdateProcessorTest {
 		when(module.getVersion()).thenReturn(version);
 
 		// Setup project
+		when(project.clone()).thenReturn(project);
 		when(project.getOriginalModel()).thenReturn(originalModel);
 
 		processor = new UpdateProcessor();
@@ -96,7 +98,7 @@ public class UpdateProcessorTest {
 
 	@Test
 	public void updatePomsCompletedSuccessfully() throws Exception {
-		final ChangeSet updatedPoms = processor.updatePoms(reactor);
+		final ChangeSet updatedPoms = processor.updatePoms(reactor, ANY_REMOTE_URL, false);
 		final Iterator<File> it = updatedPoms.iterator();
 		assertTrue(it.hasNext());
 		assertSame(ANY_POM, it.next());
@@ -105,14 +107,14 @@ public class UpdateProcessorTest {
 		final InOrder order = inOrder(originalModel, command, log, writer);
 		order.verify(log).info("Going to release anyArtifactId anyVersion");
 		order.verify(command).alterModel(context);
-		order.verify(writer).addProject(project);
+		order.verify(writer).markRelease(project);
 	}
 
 	@Test
 	public void updatePomsDependencyErrorsOccurred() throws Exception {
 		when(context.getErrors()).thenReturn(asList(ANY_ERROR));
 		try {
-			processor.updatePoms(reactor);
+			processor.updatePoms(reactor, ANY_REMOTE_URL, false);
 			fail("Exception expected");
 		} catch (final POMUpdateException e) {
 			assertEquals(DEPENDENCY_ERROR_SUMMARY, e.getMessage());
@@ -131,7 +133,7 @@ public class UpdateProcessorTest {
 	@Test
 	public void updatePomsModuleWillNotBeReleased() throws Exception {
 		when(module.willBeReleased()).thenReturn(false);
-		final ChangeSet updatedPoms = processor.updatePoms(reactor);
+		final ChangeSet updatedPoms = processor.updatePoms(reactor, ANY_REMOTE_URL, false);
 		final Iterator<File> it = updatedPoms.iterator();
 		assertTrue(it.hasNext());
 		assertSame(ANY_POM, it.next());
@@ -145,6 +147,6 @@ public class UpdateProcessorTest {
 		order.verify(log, Mockito.never()).info("Going to release anyArtifactId anyVersion");
 
 		order.verify(command).alterModel(context);
-		order.verify(writer).addProject(project);
+		order.verify(writer).markRelease(project);
 	}
 }

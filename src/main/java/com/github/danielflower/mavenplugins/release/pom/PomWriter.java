@@ -22,7 +22,8 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 @Component(role = PomWriter.class)
 class PomWriter {
 	static final String EXCEPTION_MESSAGE = "Unexpected exception while setting the release versions in the pom";
-	private final Collection<MavenProject> changedProjects = new LinkedList<>();
+	private final Collection<MavenProject> releases = new LinkedList<>();
+	private final Collection<MavenProject> snapshotVersionIncrements = new LinkedList<>();
 
 	@Requirement(role = SCMRepository.class)
 	private SCMRepository repository;
@@ -45,14 +46,21 @@ class PomWriter {
 		this.log = log;
 	}
 
-	void addProject(final MavenProject project) {
-		changedProjects.add(project);
+	void markRelease(final MavenProject project) {
+		releases.add(project);
 	}
 
-	ChangeSet writePoms() throws POMUpdateException {
-		final DefaultChangeSet changedFiles = new DefaultChangeSet(log, repository);
+	void markSnapshotVersionIncrement(final MavenProject project) {
+		snapshotVersionIncrements.add(project);
+	}
+
+	ChangeSet writePoms(final String remoteUrl) throws POMUpdateException {
+		final SnapshotIncrementChangeSet snapshotIncrementChangeSet = new SnapshotIncrementChangeSet(log, repository,
+				writer, remoteUrl);
+		snapshotIncrementChangeSet.addAll(this.snapshotVersionIncrements);
+		final DefaultChangeSet changedFiles = new DefaultChangeSet(log, repository, snapshotIncrementChangeSet);
 		try {
-			for (final MavenProject project : changedProjects) {
+			for (final MavenProject project : releases) {
 				// It's necessary to use the canonical file here, otherwise GIT
 				// revert can fail when symbolic links are used (ends up in an
 				// empty path and revert fails).
