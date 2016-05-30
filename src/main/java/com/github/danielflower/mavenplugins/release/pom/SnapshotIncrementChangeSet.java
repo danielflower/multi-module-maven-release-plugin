@@ -18,51 +18,57 @@ import com.github.danielflower.mavenplugins.release.scm.SCMRepository;
 
 @SuppressWarnings("serial")
 class SnapshotIncrementChangeSet extends LinkedList<MavenProject>implements AutoCloseable {
-	static final String IO_EXCEPTION_FORMAT = "Updated pom %s could not be written!";
+	static final String IO_EXCEPTION_FORMAT = "Updated project %s could not be written!";
 	static final String PUSH_EXCEPTION_FORMAT = "Changed files %s could not be pushed";
 	private final Log log;
 	private final SCMRepository repository;
 	private final MavenXpp3Writer pomWriter;
-	private final String remoteUrl;
+	private final String remoteUrlOrNull;
 
 	SnapshotIncrementChangeSet(final Log log, final SCMRepository repository, final MavenXpp3Writer pomWriter,
-			final String remoteUrl) {
+			final String remoteUrlOrNull) {
 		this.log = log;
 		this.repository = repository;
 		this.pomWriter = pomWriter;
-		this.remoteUrl = remoteUrl;
+		this.remoteUrlOrNull = remoteUrlOrNull;
 	}
 
 	@Override
 	public void close() throws ChangeSetCloseException {
-		final List<File> changedFiles = new LinkedList<>();
-
-		for (final MavenProject project : this) {
-			try {
-				// It's necessary to use the canonical file here, otherwise GIT
-				// revert can fail when symbolic links are used (ends up in an
-				// empty path and revert fails).
-				final File changedFile = project.getFile().getCanonicalFile();
-				changedFiles.add(changedFile);
-				try (final Writer fileWriter = new FileWriter(changedFile)) {
-					pomWriter.write(fileWriter, project.getOriginalModel());
-				}
-			} catch (final IOException e) {
+		if (!isEmpty()) {
+			final List<File> changedFiles = new LinkedList<>();
+			for (final MavenProject project : this) {
 				try {
-					repository.revertChanges(changedFiles);
-				} catch (final SCMException revertException) {
-					// warn if you can't revert but keep throwing the original
-					// exception so the root cause isn't lost
-					log.warn(REVERT_ERROR_MESSAGE, e);
-				}
-				throw new ChangeSetCloseException(e, IO_EXCEPTION_FORMAT, project);
-			}
-		}
+					// It's necessary to use the canonical file here, otherwise
+					// GIT
+					// revert can fail when symbolic links are used (ends up in
+					// an
+					// empty path and revert fails).
+					final File changedFile = project.getFile().getCanonicalFile();
+					changedFiles.add(changedFile);
+					try (final Writer fileWriter = new FileWriter(changedFile)) {
+						pomWriter.write(fileWriter, project.getOriginalModel());
+					}
 
-		try {
-			repository.pushChanges(remoteUrl);
-		} catch (final SCMException e) {
-			throw new ChangeSetCloseException(e, IO_EXCEPTION_FORMAT, changedFiles);
+					if (remoteUrlOrNull != null) {
+						try {
+							repository.pushChanges(remoteUrlOrNull);
+						} catch (final SCMException e) {
+							throw new ChangeSetCloseException(e, IO_EXCEPTION_FORMAT, changedFiles);
+						}
+					}
+				} catch (final IOException e) {
+					try {
+						repository.revertChanges(changedFiles);
+					} catch (final SCMException revertException) {
+						// warn if you can't revert but keep throwing the
+						// original
+						// exception so the root cause isn't lost
+						log.warn(REVERT_ERROR_MESSAGE, e);
+					}
+					throw new ChangeSetCloseException(e, IO_EXCEPTION_FORMAT, project);
+				}
+			}
 		}
 	}
 }
