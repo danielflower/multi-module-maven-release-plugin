@@ -60,7 +60,7 @@ class SnapshotIncrementChangeSet extends LinkedList<MavenProject>implements Auto
 		}
 
 		try {
-			repository.pushChanges(remoteUrl, changedFiles);
+			repository.pushChanges(remoteUrl);
 		} catch (final SCMException e) {
 			throw new ChangeSetCloseException(e, IO_EXCEPTION_FORMAT, changedFiles);
 		}

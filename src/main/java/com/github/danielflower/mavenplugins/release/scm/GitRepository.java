@@ -312,8 +312,12 @@ public final class GitRepository implements SCMRepository {
 	}
 
 	@Override
-	public void pushChanges(final String remoteUrl, final List<File> changedFiles) throws SCMException {
-		// TODO Auto-generated method stub
-
+	public void pushChanges(final String remoteUrl) throws SCMException {
+		try {
+			git.commit().setMessage("Incremented SNAPSHOT-version for next development iteration").call();
+			git.push().setRemote(remoteUrl).setAtomic(true).call();
+		} catch (final GitAPIException e) {
+			throw new SCMException(e, "Changed POM files could not be committed and pushed!");
+		}
 	}
 }
