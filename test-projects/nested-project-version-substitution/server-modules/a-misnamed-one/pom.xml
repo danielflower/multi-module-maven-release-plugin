@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>parent-module</artifactId>
+		<groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+		<version>1.2.3-SNAPSHOT</version>
+		<relativePath>../../parent-module/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.danielflower.mavenplugins.testprojects.nested.misnamed</groupId>
+	<artifactId>server-module-c</artifactId>
+	<version>3.2-SNAPSHOT</version>
+
+	<properties>
+		<junit.version>4.11</junit.version>
+		<server-module-b.version>3.1-SNAPSHOT</server-module-b.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+				<artifactId>server-module-b</artifactId>
+				<version>${server-module-b.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+			<artifactId>server-module-b</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

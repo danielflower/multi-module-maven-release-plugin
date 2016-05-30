@@ -1,11 +1,8 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.io.IOException;
@@ -19,9 +16,8 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
-import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-public class ParentAsSiblingTest {
+public class ParentAsSiblingTest extends E2ETest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
     final String expectedAggregatorVersion = "1.0." + buildNumber;
@@ -29,11 +25,6 @@ public class ParentAsSiblingTest {
     final String expectedCoreVersion = "2.0." + buildNumber;
     final String expectedAppVersion = "3.2." + buildNumber;
     final TestProject testProject = TestProject.parentAsSibilngProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {

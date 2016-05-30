@@ -1,9 +1,6 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import java.util.List;
@@ -13,15 +10,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 
-public class ExecutionTest {
+public class ExecutionTest extends E2ETest{
 
     final TestProject testProject = TestProject.moduleWithProfilesProject();
     final String echoPluginOutput = "echo-maven-plugin running because profileActivatedByReleasePlugin is activated";
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
 
     @Test
     public void profilesNotPassedToTheReleaseExecutionAreNotPassedOnToTheDeploymentButConfiguredProfilesAre() throws Exception {
