@@ -3,6 +3,7 @@ package com.github.danielflower.mavenplugins.release;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.lib.Ref;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class AnnotatedTagFinder {
             if (isPotentiallySameVersionIgnoringBuildNumber(tagWithoutBuildNumber, tag.getName())) {
                 try {
                     results.add(AnnotatedTag.fromRef(git.getRepository(), tag));
+                } catch (IncorrectObjectTypeException ignored) {
+                    // not actually a tag, so skip it.
                 } catch (IOException e) {
                     throw new MojoExecutionException("Error while looking up tag " + tag, e);
                 }

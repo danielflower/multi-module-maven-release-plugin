@@ -1,16 +1,17 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.lang.String.format;
-
-import java.util.List;
-
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
+
+import java.util.List;
+
+import static java.lang.String.format;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -91,7 +92,7 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "passphrase")
 	private String passphrase;
 
-	final void setSettings(final Settings settings) {
+    final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
 
@@ -130,4 +131,21 @@ public abstract class BaseMojo extends AbstractMojo {
 			JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, privateKey, passphrase));
 		}
 	}
+
+    static void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
+        log.error("");
+        log.error("");
+        log.error("");
+        log.error("************************************");
+        log.error("Could not execute the release plugin");
+        log.error("************************************");
+        log.error("");
+        log.error("");
+        for (String line : linesToLog) {
+            log.error(line);
+        }
+        log.error("");
+        log.error("");
+        throw new MojoExecutionException(terseMessage);
+    }
 }

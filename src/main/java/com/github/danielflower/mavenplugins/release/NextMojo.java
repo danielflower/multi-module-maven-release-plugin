@@ -1,18 +1,15 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import static java.util.Arrays.asList;
 
 /**
  * Logs the versions of the modules that the releaser will release on the next release. Does not run the build nor
@@ -35,9 +32,9 @@ public class NextMojo extends BaseMojo {
         try {
             configureJsch(log);
 
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getScm()));
+            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(ReleaseMojo.getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm()));
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease);
-            figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
+            ReleaseMojo.figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
@@ -52,73 +49,5 @@ public class NextMojo extends BaseMojo {
                     gae.getMessage(), "Stack trace:", exceptionAsString));
         }
     }
-
-    private static String getRemoteUrlOrNullIfNoneSet(Scm scm) throws ValidationException {
-        if (scm == null) {
-            return null;
-        }
-        String remote = scm.getDeveloperConnection();
-        if (remote == null) {
-            remote = scm.getConnection();
-        }
-        if (remote == null) {
-            return null;
-        }
-        return GitHelper.scmUrlToRemote(remote);
-    }
-
-    private static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
-        for (ReleasableModule module : modules) {
-            if (!module.willBeReleased()) {
-                continue;
-            }
-            if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
-                String tag = module.getTagName();
-                if (git.hasLocalTag(tag)) {
-                    String summary = "There is already a tag named " + tag + " in this repository.";
-                    throw new ValidationException(summary, asList(
-                        summary,
-                        "It is likely that this version has been released before.",
-                        "Please try incrementing the build number and trying again."
-                    ));
-                }
-
-                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.getBuildNumber());
-                tags.add(annotatedTag);
-            }
-        }
-        List<String> matchingRemoteTags = git.remoteTagsFrom(tags);
-        if (matchingRemoteTags.size() > 0) {
-            String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
-            List<String> messages = new ArrayList<String>();
-            messages.add(summary);
-            for (String matchingRemoteTag : matchingRemoteTags) {
-                messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
-            }
-            messages.add("Please try releasing again with a new build number.");
-            throw new ValidationException(summary, messages);
-        }
-        return tags;
-    }
-
-    private static void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws MojoExecutionException {
-        log.error("");
-        log.error("");
-        log.error("");
-        log.error("************************************");
-        log.error("Could not execute the release plugin");
-        log.error("************************************");
-        log.error("");
-        log.error("");
-        for (String line : linesToLog) {
-            log.error(line);
-        }
-        log.error("");
-        log.error("");
-        throw new MojoExecutionException(terseMessage);
-    }
-
-
 
 }

@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+### 2.0.4
+
+* The SCM details are no longer inherited from parent POMs.
+* Fixed bug [#31](https://github.com/danielflower/multi-module-maven-release-plugin/issues/31)
+
+# 2.0.0
+
+* Breaking change: now requires Java 7 or later to run.
+* More bug fixes where it thought there were changes, even though the repo is clean.
+
 ### 1.4.2
 
 * Fixed some bugs around change detection in modules where sometimes changes were not being detected.
