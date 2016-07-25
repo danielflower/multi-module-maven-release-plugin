@@ -97,12 +97,21 @@ public class LocalGitRepo {
     }
 
     public void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException {
-        Ref tagRef = tag.saveAtHEAD(git);
+        Ref tagRef = tagRepo(tag);
+        pushTag(tagRef);
+    }
+
+    private void pushTag(Ref tagRef) throws GitAPIException {
         PushCommand pushCommand = git.push().add(tagRef);
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }
         pushCommand.call();
+    }
+
+    public Ref tagRepo(AnnotatedTag tag) throws GitAPIException {
+        Ref tagRef = tag.saveAtHEAD(git);
+        return tagRef;
     }
 
     /**
