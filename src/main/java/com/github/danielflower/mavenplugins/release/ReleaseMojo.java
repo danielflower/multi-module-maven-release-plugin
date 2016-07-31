@@ -83,6 +83,12 @@ public class ReleaseMojo extends BaseMojo {
 	 */
 	@Parameter(alias = "globalSettings")
 	private File globalSettings;
+        
+    /**
+     * Push tags to remote repository as they are created.
+     */
+    @Parameter(alias = "pushTags", defaultValue="true", property="push")
+    private boolean pushTags;
     
 
     @Override
@@ -139,7 +145,11 @@ public class ReleaseMojo extends BaseMojo {
     private void tagAndPushRepo(Log log, LocalGitRepo repo, List<AnnotatedTag> proposedTags) throws GitAPIException {
         for (AnnotatedTag proposedTag : proposedTags) {
             log.info("About to tag the repository with " + proposedTag.name());
-            repo.tagRepoAndPush(proposedTag);
+            if (pushTags) {
+                repo.tagRepoAndPush(proposedTag);
+            } else {
+                repo.tagRepo(proposedTag);
+            }
         }
     }
 

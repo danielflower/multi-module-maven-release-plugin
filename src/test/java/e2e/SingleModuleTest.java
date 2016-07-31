@@ -17,6 +17,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
@@ -68,6 +69,16 @@ public class SingleModuleTest {
         String expectedTag = "single-module-" + expected;
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, hasTag(expectedTag));
+    }
+
+    @Test
+    public void onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush() throws IOException, InterruptedException {
+        testProject.mvn("-DbuildNumber=" + buildNumber,
+                "-Dpush=false",
+                "releaser:release");
+        String expectedTag = "single-module-" + expected;
+        assertThat(testProject.local, hasTag(expectedTag));
+        assertThat(testProject.origin, not(hasTag(expectedTag)));
     }
 
     @Test
