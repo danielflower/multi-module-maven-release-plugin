@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
+import static scaffolding.ExactCountMatcher.fourOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
 import java.io.File;
@@ -144,7 +145,7 @@ public class ValidationTest {
             badOne.mvnRelease("1");
             Assert.fail("Should not have worked as there are snapshot dependencies");
         } catch (MavenExecutionException mee) {
-            assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
+            assertThat(mee.output, fourOf(containsString("Cannot release with references to snapshot dependencies")));
             assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
             assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies-with-version-properties references dependency core-utils 2.0-SNAPSHOT")));
         }
