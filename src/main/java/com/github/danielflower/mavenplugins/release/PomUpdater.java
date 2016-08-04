@@ -1,17 +1,17 @@
 package com.github.danielflower.mavenplugins.release;
 
+import java.io.File;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 import org.codehaus.plexus.util.WriterFactory;
 
 public class PomUpdater {
@@ -87,8 +87,10 @@ public class PomUpdater {
                 errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
             }
         }
+
+        Properties projectProperties = project.getProperties();
         for (Dependency dependency : originalModel.getDependencies()) {
-            String version = dependency.getVersion();
+            String version = resolveVersionOfDependency(dependency, projectProperties);
             if (isSnapshot(version)) {
                 try {
                     ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
@@ -109,6 +111,11 @@ public class PomUpdater {
             }
         }
         return errors;
+    }
+    
+    private String resolveVersionOfDependency(Dependency dependency, Properties projectProperties) {
+    	String version = dependency.getVersion().replace("${", "").replace("}", "");
+    	return projectProperties.getProperty(version, version);
     }
 
     private static boolean isMultiModuleReleasePlugin(Plugin plugin) {
