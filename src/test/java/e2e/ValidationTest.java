@@ -146,7 +146,7 @@ public class ValidationTest {
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
             assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
-            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies-with-version-properties references dependency core-utils 2.0-SNAPSHOT")));
+            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies-with-version-properties references dependency core-utils ${core-utils.version}")));
         }
 
         assertThat(badOne.local, hasCleanWorkingDirectory());
