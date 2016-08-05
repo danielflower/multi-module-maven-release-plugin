@@ -90,8 +90,8 @@ public class PomUpdater {
 
         Properties projectProperties = project.getProperties();
         for (Dependency dependency : originalModel.getDependencies()) {
-            String version = resolveVersionOfDependency(dependency, projectProperties);
-            if (isSnapshot(version)) {
+            String version = dependency.getVersion();
+            if (isSnapshot(resolveVersion(version, projectProperties))) {
                 try {
                     ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
                     dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
@@ -104,7 +104,7 @@ public class PomUpdater {
         }
         for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
             String version = plugin.getVersion();
-            if (isSnapshot(version)) {
+            if (isSnapshot(resolveVersion(version, projectProperties))) {
                 if (!isMultiModuleReleasePlugin(plugin)) {
                     errors.add(searchingFrom + " references plugin " + plugin.getArtifactId() + " " + version);
                 }
@@ -113,10 +113,12 @@ public class PomUpdater {
         return errors;
     }
     
-    private String resolveVersionOfDependency(Dependency dependency, Properties projectProperties) {
-    	String version = dependency.getVersion().replace("${", "").replace("}", "");
-    	return projectProperties.getProperty(version, version);
-    }
+	private String resolveVersion(String version, Properties projectProperties) {
+		if (version != null && version.startsWith("${")) {
+			return projectProperties.getProperty(version.replace("${", "").replace("}", ""), version);
+		}
+		return version;
+	}
 
     private static boolean isMultiModuleReleasePlugin(Plugin plugin) {
         return plugin.getGroupId().equals("com.github.danielflower.mavenplugins") && plugin.getArtifactId().equals("multi-module-maven-release-plugin");
