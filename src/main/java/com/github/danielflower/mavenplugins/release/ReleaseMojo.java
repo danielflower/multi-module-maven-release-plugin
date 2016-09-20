@@ -99,7 +99,7 @@ public class ReleaseMojo extends BaseMojo {
             configureJsch(log);
 
 
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm()));
+            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             repo.errorIfNotClean();
 
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease);
@@ -153,13 +153,16 @@ public class ReleaseMojo extends BaseMojo {
         }
     }
 
-    static String getRemoteUrlOrNullIfNoneSet(Scm scm) throws ValidationException {
-        if (scm == null) {
+    static String getRemoteUrlOrNullIfNoneSet(Scm originalScm, Scm actualScm) throws ValidationException {
+        if (originalScm == null) {
+            // No scm was specified, so don't inherit from any parent poms as they are probably used in different git repos
             return null;
         }
-        String remote = scm.getDeveloperConnection();
+
+        // There is an SCM specified, so the actual SCM with derived values is used in case (so that variables etc are interpolated)
+        String remote = actualScm.getDeveloperConnection();
         if (remote == null) {
-            remote = scm.getConnection();
+            remote = actualScm.getConnection();
         }
         if (remote == null) {
             return null;
