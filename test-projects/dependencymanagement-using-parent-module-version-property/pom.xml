@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.danielflower.mavenplugins.testprojects.dependencymanagement-using-parent-module-version-property</groupId>
+    <artifactId>dependencymanagement-aggregator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.danielflower.mavenplugins</groupId>
+                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <version>${current.plugin.version}</version>
+                <configuration>
+                    <releaseGoals>
+                        <releaseGoal>install</releaseGoal>
+                    </releaseGoals>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <modules>
+        <module>root-bom</module>
+        <module>parent-module</module>
+        <module>more-utilities</module>
+        <module>the-core-utilities</module>
+        <module>console-app</module>
+    </modules>
+</project>

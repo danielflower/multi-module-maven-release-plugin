@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static com.github.danielflower.mavenplugins.release.MavenVersionResolver.resolveVersionsDefinedThroughProperties;
 
 public class Reactor {
 
@@ -29,6 +32,9 @@ public class Reactor {
     public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
+
+        resolveVersionsDefinedThroughProperties(projects);
+
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();
@@ -53,14 +59,24 @@ public class Reactor {
             for (ReleasableModule module : modules) {
                 if (module.willBeReleased()) {
                     for (Dependency dependency : project.getModel().getDependencies()) {
-                        if (dependency.getGroupId().equals(module.getGroupId()) && dependency.getArtifactId().equals(module.getArtifactId())) {
+                        if (hasSameMavenGA(module, dependency)) {
                             oneOfTheDependenciesHasChanged = true;
                             changedDependency = dependency.getArtifactId();
                             break;
                         }
                     }
-                    if (project.getParent() != null
-                            && (project.getParent().getGroupId().equals(module.getGroupId()) && project.getParent().getArtifactId().equals(module.getArtifactId()))) {
+
+                    if (project.getModel().getDependencyManagement() != null) {
+                        for (Dependency dependency : project.getModel().getDependencyManagement().getDependencies()) {
+                            if (hasSameMavenGAByDependencyLocation(module, dependency)) {
+                                oneOfTheDependenciesHasChanged = true;
+                                changedDependency = module.getArtifactId();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (project.getParent() != null && hasSameMavenGA(module, project.getParent())) {
                         oneOfTheDependenciesHasChanged = true;
                         changedDependency = project.getParent().getArtifactId();
                         break;
@@ -114,6 +130,19 @@ public class Reactor {
         }
 
         return new Reactor(modules);
+    }
+
+    private static boolean hasSameMavenGA(ReleasableModule module, Dependency dependency) {
+        return dependency.getGroupId().equals(module.getGroupId()) && dependency.getArtifactId().equals(module.getArtifactId());
+    }
+
+    private static boolean hasSameMavenGA(ReleasableModule module, MavenProject project) {
+        return project.getGroupId().equals(module.getGroupId()) && project.getArtifactId().equals(module.getArtifactId());
+    }
+
+    private static boolean hasSameMavenGAByDependencyLocation(ReleasableModule module, Dependency dependency) {
+        String[] modelId = dependency.getLocation("").getSource().getModelId().split(":");
+        return modelId[0].equals(module.getGroupId()) && modelId[1].equals(module.getArtifactId());
     }
 
     private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber) throws GitAPIException {
