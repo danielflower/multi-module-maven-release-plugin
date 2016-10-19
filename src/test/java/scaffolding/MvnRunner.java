@@ -1,5 +1,6 @@
 package scaffolding;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.shared.invoker.*;
 
@@ -57,9 +58,20 @@ public class MvnRunner {
     }
 
     public List<String> runMaven(File workingDir, String... arguments) {
+        return runMavenInternal(workingDir, null, arguments);
+    }
+
+    public List<String> runMavenWithProfile(File workingDir, String profile, String...arguments) {
+        return runMavenInternal(workingDir, profile, arguments);
+    }
+
+    private List<String> runMavenInternal(File workingDir, String profile, String[] arguments) {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
+        if (profile != null) {
+            request.setProfiles(Arrays.asList(new String[]{profile}));
+        }
 
         Invoker invoker = new DefaultInvoker();
 

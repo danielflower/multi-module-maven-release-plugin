@@ -1,26 +1,23 @@
 package e2e;
 
-import com.github.danielflower.mavenplugins.release.FileUtils;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.ExactCountMatcher.twoOf;
+import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.GitMatchers;
+
 import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
-
-import java.io.File;
-import java.io.IOException;
-
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.noneOf;
-import static scaffolding.ExactCountMatcher.oneOf;
-import static scaffolding.ExactCountMatcher.twoOf;
-import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
 public class ValidationTest {
 
@@ -133,4 +130,25 @@ public class ValidationTest {
         assertThat(badOne.local, hasCleanWorkingDirectory());
     }
 
+    @Test
+    public void failsIfThereAreDependenciesOnSnapshotVersionsWithVersionPropertiesThatAreNotPartOfTheReactor() throws Exception {
+        // Install the snapshot dependency so that it can be built
+        TestProject dependency = TestProject.independentVersionsProject();
+        dependency.mvn("install");
+    	
+        TestProject badOne = TestProject.moduleWithSnapshotDependenciesWithVersionProperties();
+
+        badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
+
+        try {
+            badOne.mvnRelease("1");
+            Assert.fail("Should not have worked as there are snapshot dependencies");
+        } catch (MavenExecutionException mee) {
+            assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
+            assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
+            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies-with-version-properties references dependency core-utils ${core-utils.version}")));
+        }
+
+        assertThat(badOne.local, hasCleanWorkingDirectory());
+    }
 }

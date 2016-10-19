@@ -43,6 +43,10 @@ public class TestProject {
         return mvnRunner.runMaven(localDir, arguments);
     }
 
+    public List<String> mvnWithProfile(String profile, String... arguments) throws IOException {
+        return mvnRunner.runMavenWithProfile(localDir, profile, arguments);
+    }
+
     public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
         return mvnRunner.runMaven(localDir,
             "-DbuildNumber=" + buildNumber,
@@ -114,7 +118,7 @@ public class TestProject {
             xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
             FileUtils.writeStringToFile(pom, xml, "UTF-8");
         }
-        for (File child : sourceDir.listFiles((FileFilter)FileFilterUtils.directoryFileFilter())) {
+        for (File child : sourceDir.listFiles((FileFilter) FileFilterUtils.directoryFileFilter())) {
             performPomSubstitution(child);
         }
     }
@@ -150,15 +154,28 @@ public class TestProject {
     public static TestProject parentAsSibilngProject() {
         return project("parent-as-sibling");
     }
+
     public static TestProject deepDependenciesProject() {
         return project("deep-dependencies");
     }
 
+    public static TestProject dependencyManagementProject() {
+        return project("dependencymanagement");
+    }
+
+    public static TestProject dependencyManagementUsingParentModuleVersionPropertyProject() {
+	    return project("dependencymanagement-using-parent-module-version-property");
+    }
+    
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }
+
     public static TestProject moduleWithSnapshotDependencies() {
         return project("snapshot-dependencies");
+    }
+    public static TestProject moduleWithSnapshotDependenciesWithVersionProperties() {
+        return project("snapshot-dependencies-with-version-properties");
     }
 
     public void setMvnRunner(MvnRunner mvnRunner) {
