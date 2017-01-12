@@ -96,6 +96,10 @@ public abstract class BaseMojo extends AbstractMojo {
 		this.settings = settings;
 	}
 
+    final Settings getSettings() {
+        return settings;
+    }
+
 	final void setServerId(final String serverId) {
 		this.serverId = serverId;
 	}

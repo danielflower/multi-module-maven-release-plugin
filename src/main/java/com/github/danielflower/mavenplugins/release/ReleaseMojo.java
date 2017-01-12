@@ -6,9 +6,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.io.DefaultSettingsWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -116,7 +118,14 @@ public class ReleaseMojo extends BaseMojo {
             try {
             	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
             	invoker.setGlobalSettings(globalSettings);
-            	invoker.setUserSettings(userSettings);
+                if (userSettings != null) {
+                    invoker.setUserSettings(userSettings);
+                } else if (getSettings() != null) {
+                    File settingsFile = File.createTempFile("tmp", ".xml");
+                    settingsFile.deleteOnExit();
+                    new DefaultSettingsWriter().write(settingsFile, null, getSettings());
+                    invoker.setUserSettings(settingsFile);
+                }
             	invoker.setGoals(goals);
             	invoker.setModulesToRelease(modulesToRelease);
             	invoker.setReleaseProfiles(releaseProfiles);
@@ -139,6 +148,13 @@ public class ReleaseMojo extends BaseMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+
+            printBigErrorMessageAndThrow(log, e.getMessage(),
+                    asList("There was an error while creating temporary settings file. The error was:", e.getMessage(), "Stack trace:", exceptionAsString));
         }
     }
 
