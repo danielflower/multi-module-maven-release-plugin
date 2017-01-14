@@ -58,4 +58,9 @@ public class ExactCountMatcher extends TypeSafeDiagnosingMatcher<List<String>> {
     public static Matcher<? super List<String>> threeOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 3);
     }
+    
+    @Factory
+    public static Matcher<? super List<String>> fourOf(Matcher<String> stringMatcher) {
+        return new ExactCountMatcher(stringMatcher, 4);
+    }
 }

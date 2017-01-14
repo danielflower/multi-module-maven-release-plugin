@@ -160,6 +160,9 @@ public class TestProject {
     public static TestProject moduleWithSnapshotDependencies() {
         return project("snapshot-dependencies");
     }
+    public static TestProject moduleWithSnapshotDependenciesWithVersionProperties() {
+        return project("snapshot-dependencies-with-version-properties");
+    }
 
     public void setMvnRunner(MvnRunner mvnRunner) {
         this.mvnRunner = mvnRunner;
