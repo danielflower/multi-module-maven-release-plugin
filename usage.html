@@ -124,7 +124,7 @@
                 
                     
                   <li id="publishDate">Last Published: 2017-01-14</li>
-                  <li class="divider">|</li> <li id="projectVersion">Version: 2.0.11</li>
+                  <li class="divider">|</li> <li id="projectVersion">Version: 2.1.0</li>
                       
                 
                     
@@ -219,7 +219,7 @@
         &lt;plugin&gt;
             &lt;groupId&gt;com.github.danielflower.mavenplugins&lt;/groupId&gt;
             &lt;artifactId&gt;multi-module-maven-release-plugin&lt;/artifactId&gt;
-            &lt;version&gt;2.0.11&lt;/version&gt;
+            &lt;version&gt;2.1.0&lt;/version&gt;
             &lt;configuration&gt;
                 &lt;releaseGoals&gt;
                     &lt;releaseGoal&gt;deploy&lt;/releaseGoal&gt;
@@ -262,41 +262,12 @@
 <p>In this case the <tt>MyApp</tt> module will be built, even if there where no changes found.</p></div>
 <div class="section">
 <h2><a name="Specify_custom_globaluser_Maven_settings_for_release_build"></a>Specify custom global/user Maven settings for release build</h2>
-<p>Sometimes it&#x2019;s necessary to specify custom Maven settings for the release build. This can be done with the optional plugin properties <b>globalSettings</b> (defaults to <tt>$M2_HOME/conf/settings.xml</tt>) and <b>userSettings</b> (defaults to <tt>${user.home}/.m2/settings.xml</tt>). These properties are used to specify the path to a custom Maven settings file:</p>
+<p>Sometimes it&#x2019;s necessary to specify custom Maven settings for the release build. This can be done with the following standard maven command line parameters:</p>
 
 <div class="source">
 <div class="source">
-<pre>&lt;plugin&gt;
-    ...
-    &lt;configuration&gt;
-       &lt;userSettings&gt;/path/to/my/settings.xml&lt;/userSettings&gt;
-    &lt;/configuration&gt;
-&lt;/plugin&gt;   
-</pre></div></div>
-<p>Or</p>
-
-<div class="source">
-<div class="source">
-<pre>&lt;plugin&gt;
-    ...
-    &lt;configuration&gt;
-       &lt;globalSettings&gt;/path/to/global/settings.xml&lt;/globalSettings&gt;
-    &lt;/configuration&gt;
-&lt;/plugin&gt;
-</pre></div></div>
-<p>Or both</p>
-
-<div class="source">
-<div class="source">
-<pre>&lt;plugin&gt;
-    ...
-    &lt;configuration&gt;
-       &lt;globalSettings&gt;/path/to/global/settings.xml&lt;/globalSettings&gt;
-       &lt;userSettings&gt;/path/to/my/settings.xml&lt;/userSettings&gt;
-    &lt;/configuration&gt;
-&lt;/plugin&gt;
-</pre></div></div>
-<p>Note: properties from user settings always <i>override</i> those derived from global settings, see <a class="externalLink" href="https://maven.apache.org/settings.html#Quick_Overview">https://maven.apache.org/settings.html#Quick_Overview</a> for further information.</p></div>
+<pre>mvn releaser:release -s /path/to/custom/user/settings.xml -s /path/to/custom/global/settings.xml
+</pre></div></div></div>
 <div class="section">
 <h2><a name="SSH_authentication"></a>SSH authentication</h2>
 <p>Currently, only public key authentication is supported. By default, the plugin reads the private key from <tt>~/.ssh/id_rsa</tt>. If it&#x2019;s required to use a private key file from another location, you have two opportunities to achieve this:</p>

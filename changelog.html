@@ -124,7 +124,7 @@
                 
                     
                   <li id="publishDate">Last Published: 2017-01-14</li>
-                  <li class="divider">|</li> <li id="projectVersion">Version: 2.0.11</li>
+                  <li class="divider">|</li> <li id="projectVersion">Version: 2.1.0</li>
                       
                 
                     
@@ -211,12 +211,18 @@
             <div class="section">
 <h2><a name="Changelog"></a>Changelog</h2>
 <div class="section">
+<h3><a name="a2.1.0"></a>2.1.0</h3>
+
+<ul>
+  
+<li>When custom user settings or global settings are passed in to the command line (via <tt>-s</tt> or <tt>-gs</tt> arguments)  these are now inherited by the release portion of the build. This should make the need for <tt>userSettings</tt> and  <tt>globalSettings</tt> options in the plugin to be unnecessary, and so these have been marked as deprecated.</li>
+</ul>
 <div class="section">
 <h4><a name="a2.0.11"></a>2.0.11</h4>
 
 <ul>
   
-<li>Reverted jgit version change to support java 7</li>
+<li>Reverted jgit version change from 2.0.10 to support java 7</li>
 </ul></div>
 <div class="section">
 <h4><a name="a2.0.10"></a>2.0.10</h4>
