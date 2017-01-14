@@ -1,0 +1,16 @@
+<settings>
+
+
+    <profiles>
+        <profile>
+            <id>settingsFileStuff</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <settings.file.is.activated>value-from-settings-file</settings.file.is.activated>
+            </properties>
+        </profile>
+    </profiles>
+
+</settings>

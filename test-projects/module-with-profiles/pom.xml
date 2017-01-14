@@ -73,7 +73,7 @@
                         <version>1.0.0</version>
                         <inherited>false</inherited>
                         <configuration>
-                            <message>echo-maven-plugin running because profileActivatedByReleasePlugin is activated</message>
+                            <message>echo-maven-plugin running because profileActivatedByReleasePlugin is activated - ${settings.file.is.activated}</message>
                         </configuration>
                         <executions>
                             <execution>
