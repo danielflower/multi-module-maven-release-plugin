@@ -43,9 +43,6 @@ public class ExecutionTest {
         File globalSettings = new File("test-projects/module-with-profiles/custom-settings.xml");
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1",
             "releaser:release", "-gs", globalSettings.getCanonicalPath());
-        for (String s : consoleOutput) {
-            System.out.println("s = " + s);
-        }
         assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
     }
 

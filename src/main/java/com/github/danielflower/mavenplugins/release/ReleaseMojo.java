@@ -73,16 +73,22 @@ public class ReleaseMojo extends BaseMojo {
     private boolean skipTests;
     
 	/**
-	 * Specifies a custom, user specific Maven settings file to be used during
-	 * the release build.
+	 * Specifies a custom, user specific Maven settings file to be used during the release build.
+     *
+     * @deprecated In versions prior to 2.1, if the plugin was run with custom user settings the settings were ignored
+     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
+     * Please use the '-s' command line parameter to set custom user settings.
 	 */
 	@Parameter(alias = "userSettings")
 	private File userSettings;
 
 	/**
-	 * Specifies a custom, global Maven settings file to be used during the
-	 * release build.
-	 */
+	 * Specifies a custom, global Maven settings file to be used during the release build.
+     *
+     * @deprecated In versions prior to 2.1, if the plugin was run with custom global settings the settings were ignored
+     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
+     * Please use the '-gs' command line parameter to set custom global settings.
+     */
 	@Parameter(alias = "globalSettings")
 	private File globalSettings;
         

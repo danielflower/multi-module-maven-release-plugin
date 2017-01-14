@@ -1,9 +1,15 @@
 Changelog
 ---------
 
+### 2.1.0
+
+* When custom user settings or global settings are passed in to the command line (via `-s` or `-gs` arguments)
+ these are now inherited by the release portion of the build. This should make the need for `userSettings` and
+ `globalSettings` options in the plugin to be unnecessary, and so these have been marked as deprecated.
+
 #### 2.0.11
 
-* Reverted jgit version change to support java 7
+* Reverted jgit version change from 2.0.10 to support java 7
 
 #### 2.0.10
 

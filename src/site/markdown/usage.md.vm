@@ -53,38 +53,11 @@ In this case the `MyApp` module will be built, even if there where no changes fo
 
 Specify custom global/user Maven settings for release build
 -----------------------------------------------------------
-Sometimes it's necessary to specify custom Maven settings for the release build. This can be done with the optional plugin properties 
-**globalSettings** (defaults to `$M2_HOME/conf/settings.xml`) and **userSettings** (defaults to `${user.home}/.m2/settings.xml`). 
-These properties are used to specify the path to a custom Maven settings file:
 
-	<plugin>
-		...
-		<configuration>
-			<userSettings>/path/to/my/settings.xml</userSettings>
-		</configuration>
-	</plugin>	
+Sometimes it's necessary to specify custom Maven settings for the release build. This can be done with the following
+standard maven command line parameters:
 
-Or
-
-	<plugin>
-		...
-		<configuration>
-			<globalSettings>/path/to/global/settings.xml</globalSettings>
-		</configuration>
-	</plugin>
-	
-Or both
-
-	<plugin>
-		...
-		<configuration>
-			<globalSettings>/path/to/global/settings.xml</globalSettings>
-			<userSettings>/path/to/my/settings.xml</userSettings>
-		</configuration>
-	</plugin>
-	
-Note: properties from user settings always _override_ those derived from global settings, see <https://maven.apache.org/settings.html#Quick_Overview>
-for further information.
+	mvn releaser:release -s /path/to/custom/user/settings.xml -s /path/to/custom/global/settings.xml
 
 SSH authentication
 ------------------
