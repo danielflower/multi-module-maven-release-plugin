@@ -1,0 +1,12 @@
+<settings>
+
+    <profiles>
+        <profile>
+            <id>profileActivatedBySettingsFile</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
+</settings>

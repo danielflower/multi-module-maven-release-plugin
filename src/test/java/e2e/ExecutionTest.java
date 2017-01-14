@@ -6,6 +6,7 @@ import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
+import java.io.File;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -35,6 +36,18 @@ public class ExecutionTest {
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", "releaser:release", "-P runTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("The module-with-profiles test has run")));
         assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
+    }
+
+    @Test
+    public void userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters() throws Exception {
+        File globalSettings = new File("test-projects/sample-global-settings.xml");
+
+        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1",
+            "releaser:release", "-s", globalSettings.getCanonicalPath());
+        for (String s : consoleOutput) {
+            System.out.println("s = " + s);
+        }
+        assertThat(consoleOutput, oneOf(containsString("echo-maven-plugin running because profileActivatedBySettingsFile is activated")));
     }
 
 

@@ -86,5 +86,28 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>profileActivatedBySettingsFile</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <version>1.0.0</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <message>echo-maven-plugin running because profileActivatedBySettingsFile is activated</message>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
