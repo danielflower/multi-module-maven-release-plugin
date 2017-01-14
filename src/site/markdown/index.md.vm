@@ -21,6 +21,21 @@ This plugin automatically generates build numbers, starting from 0 and increment
 releases in the Git history. Alternatively, you can use a number that increments on each release - like your CI server's
 build number for example.
 
+Quickstart
+----------
+
+Add the following to your plugins section:
+
+	<plugin>
+		<groupId>${project.groupId}</groupId>
+		<artifactId>${project.artifactId}</artifactId>
+		<version>${project.version}</version>
+	</plugin>
+
+Release your project by running `mvn releaser:release`
+
+See [usage](usage.html) for more details.
+
 Differences with the maven-release-plugin
 -----------------------------------------
 
