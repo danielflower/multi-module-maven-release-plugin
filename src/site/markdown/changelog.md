@@ -1,7 +1,13 @@
 Changelog
 ---------
 
+#### 2.0.11
+
+* Reverted jgit version change to support java 7
+
 #### 2.0.10
+
+Warning: inadvertently requires java 8 (rather than java 7). Use 2.0.11 for java 7.
 
 * Errors if dependencies specified with properties are snapshots.
 * Another jgit update for better git stuff.
