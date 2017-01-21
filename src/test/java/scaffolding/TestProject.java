@@ -43,23 +43,12 @@ public class TestProject {
         return mvnRunner.runMaven(localDir, arguments);
     }
 
-    public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "releaser:release");
+    public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
+        return mvnRun("releaser:release", buildNumber, arguments);
     }
 
-    public List<String> mvnReleaserNext(String buildNumber) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "releaser:next");
-    }
-
-    public List<String> mvnRelease(String buildNumber, String moduleToRelease) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "-DmodulesToRelease=" + moduleToRelease,
-            "releaser:release");
+    public List<String> mvnReleaserNext(String buildNumber, String...arguments) throws IOException, InterruptedException {
+        return mvnRun("releaser:next", buildNumber, arguments);
     }
 
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
@@ -77,6 +66,14 @@ public class TestProject {
 
     public void pushIt() throws GitAPIException {
         local.push().call();
+    }
+
+    private List<String> mvnRun(String goal, String buildNumber, String[] arguments) {
+        String[] args = new String[arguments.length + 2];
+        args[0] = "-DbuildNumber=" + buildNumber;
+        System.arraycopy(arguments, 0, args, 1, arguments.length);
+        args[args.length-1] = goal;
+        return mvnRunner.runMaven(localDir, args);
     }
 
     private static TestProject project(String name) {
