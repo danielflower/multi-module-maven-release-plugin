@@ -73,6 +73,27 @@ public class NextMojoTest {
     }
 
     @Test
+    public void ifThereHaveBeenNoChangesCanOptToReleaseNoModules() throws Exception {
+        List<String> firstBuildOutput = testProject.mvnRelease("1");
+        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
+        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
+        List<String> output = testProject.mvnReleaserNext("2", "-DnoChangesAction=ReleaseNone");
+
+        assertTagDoesNotExist("console-app-3.2.2");
+        assertTagDoesNotExist("parent-module-1.2.3.2");
+        assertTagDoesNotExist("core-utils-2.0.2");
+        assertTagDoesNotExist("more-utils-10.0.2");
+        assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
+
+        assertThat(output, oneOf(containsString("[INFO] Will use version 1.2.3.1 for parent-module as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 10.0.1 for more-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 2.0.1 for core-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 3.2.1 for console-app as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 1.0.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[WARNING] No changes have been detected in any modules so will not perform release")));
+    }
+
+    @Test
     public void ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased() throws Exception {
         testProject.mvnRelease("1");
         testProject.commitRandomFile("more-utilities").pushIt();

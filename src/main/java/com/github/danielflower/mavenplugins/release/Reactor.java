@@ -26,7 +26,7 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer();
@@ -92,12 +92,20 @@ public class Reactor {
         }
 
         if (!atLeastOneBeingReleased(modules)) {
-            log.warn("No changes have been detected in any modules so will re-release them all");
-            List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
-            for (ReleasableModule module : modules) {
-                newList.add(module.createReleasableVersion());
+            switch (actionWhenNoChangesDetected) {
+                case ReleaseNone:
+                    log.warn("No changes have been detected in any modules so will not perform release");
+                    return null;
+                case FailBuild:
+                    throw new MojoExecutionException("No module changes have been detected");
+                default:
+                    log.warn("No changes have been detected in any modules so will re-release them all");
+                    List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
+                    for (ReleasableModule module : modules) {
+                        newList.add(module.createReleasableVersion());
+                    }
+                    modules = newList;
             }
-            modules = newList;
         }
 
         return new Reactor(modules);

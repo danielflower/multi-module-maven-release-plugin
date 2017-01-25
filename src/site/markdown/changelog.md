@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+### 2.1.1
+
+* Adding ability to control the behavior when no changes are detected. New property noChangesAction can be set
+ to one of ReleaseAll, ReleaseNone, FailBuild; default is ReleaseAll.
+
 ### 2.1.0
 
 * When custom user settings or global settings are passed in to the command line (via `-s` or `-gs` arguments)
