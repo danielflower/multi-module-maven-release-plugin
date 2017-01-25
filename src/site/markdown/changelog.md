@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-### 2.1.1
+### 2.1.2
 
 * Adding ability to control the behavior when no changes are detected. New property noChangesAction can be set
  to one of ReleaseAll, ReleaseNone, FailBuild; default is ReleaseAll.
