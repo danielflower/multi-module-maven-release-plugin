@@ -55,16 +55,27 @@ public class DiffDetectorTest {
     }
 
     @Test
-    public void canIgnoreModuleFolders() throws IOException, GitAPIException {
-        TestProject project = TestProject.independentVersionsProject();
+    public void canIgnoreChangesInModuleFolders() throws IOException, GitAPIException {
+        TestProject project = TestProject.nestedProject();
 
-        saveFileInModule(project, "console-app", "1.2", 3);
-        saveFileInModule(project, "core-utils", "2", 0);
-        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
-        project.commitRandomFile("console-app");
+        AnnotatedTag tag1 = saveFileInModule(project, "server-modules", "1.0.2.4", 0);
+        project.commitRandomFile("server-modules/server-module-a");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
-        assertThat(detector.hasChangedSince("console-app", asList("console-app"), asList(tag3)), is(false));
+        assertThat(detector.hasChangedSince("server-modules", asList("server-module-a", "server-module-b"),
+            asList(tag1)), is(false));
+    }
+
+    @Test
+    public void canDetectLocalChangesWithModuleFolders() throws IOException, GitAPIException {
+        TestProject project = TestProject.nestedProject();
+
+        AnnotatedTag tag1 = saveFileInModule(project, "server-modules", "1.0.2.4", 0);
+        project.commitRandomFile("server-modules");
+
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        assertThat(detector.hasChangedSince("server-modules", asList("server-module-a", "server-module-b"),
+            asList(tag1)), is(true));
     }
 
 

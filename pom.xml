@@ -6,7 +6,7 @@
 
     <groupId>com.github.danielflower.mavenplugins</groupId>
     <artifactId>multi-module-maven-release-plugin</artifactId>
-    <version>2.1-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
+    <version>3.0-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
 
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>4.5.0.201609210915-r</version>
+            <version>4.7.0.201704051617-r</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -239,8 +239,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -398,5 +398,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>

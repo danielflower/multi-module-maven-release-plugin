@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+### 3.0.0
+
+* Update JGit to 4.7.0 to ensure changed files are detected for projects
+  with sub-projects defined.
+* Changed minimum version of java to Java 8 (required by JGit)
+
 ### 2.1.3
 
 * Modules will be released if they cannot be resolved, even if it looks like it hasn't been changed before. See
