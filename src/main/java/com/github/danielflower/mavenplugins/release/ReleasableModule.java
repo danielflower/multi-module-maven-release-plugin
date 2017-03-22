@@ -1,8 +1,8 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.project.MavenProject;
-
 import java.util.List;
+
+import org.apache.maven.project.MavenProject;
 
 public class ReleasableModule {
 
@@ -44,7 +44,7 @@ public class ReleasableModule {
         return version.businessVersion();
     }
 
-    public long getBuildNumber() {
+    public VersionInfo versionInfo() {
         return version.buildNumber();
     }
 

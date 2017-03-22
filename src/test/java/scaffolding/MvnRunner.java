@@ -1,7 +1,8 @@
 package scaffolding;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.maven.shared.invoker.*;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -12,9 +13,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.apache.maven.shared.invoker.PrintStreamHandler;
 
 public class MvnRunner {
 
@@ -37,6 +43,8 @@ public class MvnRunner {
         mvnRunner.runMaven(new File("."), "-Dartifact=org.apache.maven:apache-maven:" + version + ":zip:bin",
             "-DmarkersDirectory=" + dirWithMavens,
             "-DoutputDirectory=" + dirWithMavens,
+            "-X",
+            "-e",
             "org.apache.maven.plugins:maven-dependency-plugin:2.10:unpack");
         File mvnHome = new File(dirWithMavens).listFiles((FileFilter) DirectoryFileFilter.INSTANCE)[0];
         System.out.println("Maven " + version + " available at " + mvnHome.getAbsolutePath());
@@ -60,6 +68,7 @@ public class MvnRunner {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
+        request.setDebug(false);
 
         Invoker invoker = new DefaultInvoker();
 
@@ -67,7 +76,7 @@ public class MvnRunner {
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-
+        //invoker.setErrorHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
 
         int exitCode;
         try {

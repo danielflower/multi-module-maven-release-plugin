@@ -1,5 +1,9 @@
 package com.github.danielflower.mavenplugins.release;
 
+import static java.lang.String.format;
+
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -8,10 +12,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
-
-import java.util.List;
-
-import static java.lang.String.format;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -65,6 +65,9 @@ public abstract class BaseMojo extends AbstractMojo {
 
 	@Parameter(defaultValue = "${settings}", readonly = true, required = true)
 	private Settings settings;
+
+	@Parameter(defaultValue = "false", alias = "performBugfixRelease", property = "performBugfixRelease")
+    protected boolean bugfixRelease;
 
 	/**
 	 * If set, the identityFile and passphrase will be read from the Maven
