@@ -6,6 +6,7 @@ import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
+import java.io.File;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -34,6 +35,14 @@ public class ExecutionTest {
     public void profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment() throws Exception {
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", "releaser:release", "-P runTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("The module-with-profiles test has run")));
+        assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
+    }
+
+    @Test
+    public void userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters() throws Exception {
+        File globalSettings = new File("test-projects/module-with-profiles/custom-settings.xml");
+        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1",
+            "releaser:release", "-gs", globalSettings.getCanonicalPath());
         assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
     }
 

@@ -36,7 +36,7 @@ public class PartialReleaseTest {
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
-        List<String> commandOutput = testProject.mvnRelease(buildNumber, "core-utils");
+        List<String> commandOutput = testProject.mvnRelease(buildNumber, "-DmodulesToRelease=core-utils");
         buildsEachProjectOnceAndOnlyOnce(commandOutput);
         installsAllModulesIntoTheRepoWithTheBuildNumber();
         theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
@@ -44,8 +44,8 @@ public class PartialReleaseTest {
 
     @Test
     public void whenNoChangesHaveBeenDetectedTheRequestedModuleIsBuiltAnyway() throws IOException, InterruptedException {
-        testProject.mvnRelease("1", "core-utils");
-        testProject.mvnRelease(buildNumber, "core-utils");
+        testProject.mvnRelease("1", "-DmodulesToRelease=core-utils");
+        testProject.mvnRelease(buildNumber, "-DmodulesToRelease=core-utils");
     }
 
     private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {

@@ -11,6 +11,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasTag;
@@ -73,6 +74,32 @@ public class SkippingUnchangedModulesTest {
         assertTagExists("core-utils-2.0.2");
         assertTagExists("more-utils-10.0.2");
         assertTagExists("deep-dependencies-aggregator-1.0.2");
+    }
+
+    @Test
+    public void ifThereHaveBeenNoChangesThenCanOptNotToReleaseAnything() throws Exception {
+        List<String> firstBuildOutput = testProject.mvnRelease("1");
+        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
+        List<String> secondBuildOutput = testProject.mvnRelease("2", "-DnoChangesAction=ReleaseNone");
+        assertThat(secondBuildOutput, oneOf(containsString("No changes have been detected in any modules so will not perform release")));
+
+        assertTagExists("console-app-3.2.1");
+        assertTagExists("parent-module-1.2.3.1");
+        assertTagExists("core-utils-2.0.1");
+        assertTagExists("more-utils-10.0.1");
+        assertTagExists("deep-dependencies-aggregator-1.0.1");
+    }
+
+    @Test
+    public void ifThereHaveBeenNoChangesThenCanOptToFailTheBuild() throws Exception {
+        List<String> firstBuildOutput = testProject.mvnRelease("1");
+        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
+        try {
+            testProject.mvnRelease("2", "-DnoChangesAction=FailBuild");
+            fail("Expected an exception to be thrown");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("No module changes have been detected"));
+        }
     }
 
     @Test

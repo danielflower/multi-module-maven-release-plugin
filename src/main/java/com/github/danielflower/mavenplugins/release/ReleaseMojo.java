@@ -1,20 +1,22 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.io.DefaultSettingsWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Releases the project.
@@ -71,16 +73,22 @@ public class ReleaseMojo extends BaseMojo {
     private boolean skipTests;
     
 	/**
-	 * Specifies a custom, user specific Maven settings file to be used during
-	 * the release build.
+	 * Specifies a custom, user specific Maven settings file to be used during the release build.
+     *
+     * @deprecated In versions prior to 2.1, if the plugin was run with custom user settings the settings were ignored
+     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
+     * Please use the '-s' command line parameter to set custom user settings.
 	 */
 	@Parameter(alias = "userSettings")
 	private File userSettings;
 
 	/**
-	 * Specifies a custom, global Maven settings file to be used during the
-	 * release build.
-	 */
+	 * Specifies a custom, global Maven settings file to be used during the release build.
+     *
+     * @deprecated In versions prior to 2.1, if the plugin was run with custom global settings the settings were ignored
+     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
+     * Please use the '-gs' command line parameter to set custom global settings.
+     */
 	@Parameter(alias = "globalSettings")
 	private File globalSettings;
         
@@ -99,11 +107,13 @@ public class ReleaseMojo extends BaseMojo {
             configureJsch(log);
 
 
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm()));
+            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             repo.errorIfNotClean();
 
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease,
-                                                   bugfixRelease);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction);
+            if (reactor == null) {
+                return;
+            }
 
             List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
 
@@ -117,7 +127,14 @@ public class ReleaseMojo extends BaseMojo {
             try {
             	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
             	invoker.setGlobalSettings(globalSettings);
-            	invoker.setUserSettings(userSettings);
+                if (userSettings != null) {
+                    invoker.setUserSettings(userSettings);
+                } else if (getSettings() != null) {
+                    File settingsFile = File.createTempFile("tmp", ".xml");
+                    settingsFile.deleteOnExit();
+                    new DefaultSettingsWriter().write(settingsFile, null, getSettings());
+                    invoker.setUserSettings(settingsFile);
+                }
             	invoker.setGoals(goals);
             	invoker.setModulesToRelease(modulesToRelease);
             	invoker.setReleaseProfiles(releaseProfiles);
@@ -140,6 +157,13 @@ public class ReleaseMojo extends BaseMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+
+            printBigErrorMessageAndThrow(log, e.getMessage(),
+                    asList("There was an error while creating temporary settings file. The error was:", e.getMessage(), "Stack trace:", exceptionAsString));
         }
     }
 
@@ -154,13 +178,16 @@ public class ReleaseMojo extends BaseMojo {
         }
     }
 
-    static String getRemoteUrlOrNullIfNoneSet(Scm scm) throws ValidationException {
-        if (scm == null) {
+    static String getRemoteUrlOrNullIfNoneSet(Scm originalScm, Scm actualScm) throws ValidationException {
+        if (originalScm == null) {
+            // No scm was specified, so don't inherit from any parent poms as they are probably used in different git repos
             return null;
         }
-        String remote = scm.getDeveloperConnection();
+
+        // There is an SCM specified, so the actual SCM with derived values is used in case (so that variables etc are interpolated)
+        String remote = actualScm.getDeveloperConnection();
         if (remote == null) {
-            remote = scm.getConnection();
+            remote = actualScm.getConnection();
         }
         if (remote == null) {
             return null;

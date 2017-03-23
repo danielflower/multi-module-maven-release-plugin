@@ -60,6 +60,13 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(alias = "forceRelease", property = "forceRelease")
 	protected List<String> modulesToForceRelease;
 
+    /**
+     * Determines the action to take when no module changes are detected. Possible values:
+     * {@code ReleaseAll}, {@code ReleaseNone}, {@code FailBuild}
+     */
+    @Parameter(alias = "noChangesAction", defaultValue="ReleaseAll", property = "noChangesAction")
+    protected NoChangesAction noChangesAction;
+
 	@Parameter(property = "disableSshAgent")
 	private boolean disableSshAgent;
 
@@ -98,6 +105,10 @@ public abstract class BaseMojo extends AbstractMojo {
     final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
+
+    final Settings getSettings() {
+        return settings;
+    }
 
 	final void setServerId(final String serverId) {
 		this.serverId = serverId;
