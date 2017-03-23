@@ -23,15 +23,15 @@ public class VersionNamer {
             if (maxVersion.getBugfixBranchNumber() == null) {
                 // first bugfix release
                 System.err.println("first bugfix from " + maxVersion);
-                return new VersionInfo(1L, maxVersion.getBuildNumber());
+                return new VersionInfo(maxVersion.getBuildNumber(), 1L);
             } else {
                 // following bugfix releases
                 System.err.println("followup bugfix from " + maxVersion);
-                return new VersionInfo(maxVersion.getBuildNumber() + 1, maxVersion.getBugfixBranchNumber());
+                return new VersionInfo(maxVersion.getBugfixBranchNumber(), maxVersion.getBuildNumber() + 1);
             }
         } else {
             System.err.println("no bugfix");
-            return new VersionInfo(maxVersion.getBuildNumber() + 1, maxVersion.getBugfixBranchNumber());
+            return new VersionInfo(maxVersion.getBugfixBranchNumber(), maxVersion.getBuildNumber() + 1);
         }
     }
 
@@ -60,12 +60,12 @@ public class VersionNamer {
 
         if (buildNumber == null) {
             if (previousBuildNumbers == null || previousBuildNumbers.size() == 0) {
-                nextVersion = new VersionInfo(0L, null);
+                nextVersion = new VersionInfo(null, 0L);
             } else {
                 nextVersion = nextBuildVersion(previousBuildNumbers);
             }
         } else {
-            nextVersion = new VersionInfo(buildNumber, null);
+            nextVersion = new VersionInfo(null, buildNumber);
         }
 
         VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), nextVersion);

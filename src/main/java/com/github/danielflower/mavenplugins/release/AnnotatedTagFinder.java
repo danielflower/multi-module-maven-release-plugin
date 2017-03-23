@@ -72,15 +72,15 @@ public class AnnotatedTagFinder {
                         final long firstNumber = Long.parseLong(matcher.group("first"));
                         final String secondGroup = matcher.group("second");
                         if (secondGroup == null) {
-                            return new VersionInfo(firstNumber, null);
+                            return new VersionInfo(null, firstNumber);
                         } else {
                             final long secondNumber = Long.parseLong(secondGroup);
-                            return new VersionInfo(secondNumber, firstNumber);
+                            return new VersionInfo(firstNumber, secondNumber);
                         }
                     }
                 } else {
                     if (SINGLE_NUMBER.matcher(versionNumber).matches()) {
-                        return new VersionInfo(Long.parseLong(versionNumber), null);
+                        return new VersionInfo(null, Long.parseLong(versionNumber));
                     }
                 }
             }

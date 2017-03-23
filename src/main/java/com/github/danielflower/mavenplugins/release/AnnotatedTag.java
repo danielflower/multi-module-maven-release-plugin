@@ -77,9 +77,9 @@ public class AnnotatedTag {
         final long buildNumber = Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
         final Object branchNumber = message.get(BUGFIX_BRANCH_NUMBER);
         if (branchNumber == null) {
-            return new VersionInfo(buildNumber, null);
+            return new VersionInfo(null, buildNumber);
         } else {
-            return new VersionInfo(buildNumber, Long.parseLong(String.valueOf(branchNumber)));
+            return new VersionInfo(Long.parseLong(String.valueOf(branchNumber)), buildNumber);
         }
     }
 

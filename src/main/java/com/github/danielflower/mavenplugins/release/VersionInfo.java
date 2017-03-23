@@ -5,15 +5,15 @@ package com.github.danielflower.mavenplugins.release;
  */
 public final class VersionInfo implements Comparable<VersionInfo>{
     private final Long buildNumber;
-    private final Long releaseNumber;
+    private final Long bugfixBranchNumber;
 
     public VersionInfo(Long buildNumber) {
-        this(buildNumber, null);
+        this(null, buildNumber);
     }
 
-    public VersionInfo(Long buildNumber, Long bugfixBranchNumber) {
+    public VersionInfo(Long bugfixBranchNumber, Long buildNumber) {
         this.buildNumber = buildNumber;
-        this.releaseNumber = bugfixBranchNumber;
+        this.bugfixBranchNumber = bugfixBranchNumber;
     }
 
     /**
@@ -27,7 +27,7 @@ public final class VersionInfo implements Comparable<VersionInfo>{
      * @return the number before the build number. Used for bugfix releases.
      */
     public Long getBugfixBranchNumber() {
-        return releaseNumber;
+        return bugfixBranchNumber;
     }
 
     @Override
@@ -46,9 +46,9 @@ public final class VersionInfo implements Comparable<VersionInfo>{
             : that.buildNumber != null) {
             return false;
         }
-        return releaseNumber != null
-               ? releaseNumber.equals(that.releaseNumber)
-               : that.releaseNumber == null;
+        return bugfixBranchNumber != null
+               ? bugfixBranchNumber.equals(that.bugfixBranchNumber)
+               : that.bugfixBranchNumber == null;
     }
 
     @Override
@@ -56,18 +56,18 @@ public final class VersionInfo implements Comparable<VersionInfo>{
         int result = buildNumber != null
                      ? buildNumber.hashCode()
                      : 0;
-        result = 31 * result + (releaseNumber != null
-                                ? releaseNumber.hashCode()
+        result = 31 * result + (bugfixBranchNumber != null
+                                ? bugfixBranchNumber.hashCode()
                                 : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        if (releaseNumber == null) {
+        if (bugfixBranchNumber == null) {
             return buildNumber + "";
         } else {
-            return releaseNumber + "." + buildNumber;
+            return bugfixBranchNumber + "." + buildNumber;
         }
     }
 
@@ -76,20 +76,20 @@ public final class VersionInfo implements Comparable<VersionInfo>{
         if (this.equals(o)) {
             return 0;
         }
-        if (releaseNumber == null) {
-            if (o.releaseNumber == null) {
+        if (bugfixBranchNumber == null) {
+            if (o.bugfixBranchNumber == null) {
                 return compareLong(this.buildNumber, o.buildNumber);
             } else {
                 return -1;
             }
         } else {
-            if (o.releaseNumber == null) {
+            if (o.bugfixBranchNumber == null) {
                 return 1;
             } else {
-                if (releaseNumber.equals(o.releaseNumber)) {
+                if (bugfixBranchNumber.equals(o.bugfixBranchNumber)) {
                     return compareLong(this.buildNumber, o.buildNumber);
                 } else {
-                    return compareLong(releaseNumber, o.releaseNumber);
+                    return compareLong(bugfixBranchNumber, o.bugfixBranchNumber);
                 }
             }
         }

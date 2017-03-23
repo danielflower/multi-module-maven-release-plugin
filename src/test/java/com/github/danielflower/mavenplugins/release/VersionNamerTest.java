@@ -71,7 +71,7 @@ public class VersionNamerTest {
     private Collection<VersionInfo> createVersionList(Long ... numbers) {
         final ArrayList<VersionInfo> versionInfos = new ArrayList<>();
         for (Long number : numbers) {
-            versionInfos.add(new VersionInfo(number, null));
+            versionInfos.add(new VersionInfo(null, number));
         }
 
         return versionInfos;

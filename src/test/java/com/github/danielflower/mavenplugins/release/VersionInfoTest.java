@@ -9,7 +9,7 @@ public class VersionInfoTest {
 
     @Test
     public void compareEqual() {
-        compare(1L, 2L, 1L, 2L, 0);
+        compare(2L, 1L, 2L, 1L, 0);
     }
 
     @Test
@@ -18,41 +18,51 @@ public class VersionInfoTest {
     }
 
     @Test
+    public void compareBugfixNumberNull() {
+        compare(null, 1L, null, 2L, -1);
+    }
+
+    @Test
     public void compareEqualBugfixNumberNull() {
-        compare(1L, null, 1L, null, 0);
+        compare(null, 1L, null, 1L, 0);
     }
 
     @Test
     public void compareEqualBuildnumberNull() {
-        compare(null, 2L, null, 2L, 0);
+        compare(2L, null, 2L, null, 0);
     }
 
 
     @Test
     public void compareBiggerBuildNumber() {
-        compare(2L, 2L, 1L, 2L, 1);
+        compare(2L, 2L, 2L, 1L, 1);
     }
 
     @Test
     public void compareBiggerBranchNumber() {
-        compare(1L, 3L, 1L, 2L, 1);
+        compare(3L, 1L, 2L, 1L, 1);
     }
 
     @Test
     public void compareOtherBranchNull() {
-        compare(1L, 2L, 1L, null, 1);
+        compare(2L, 1L, null, 1L, 1);
     }
 
     @Test
     public void compareOtherBuildNull() {
-        compare(1L, 2L, null, 2L, 1);
+        compare(2L, 1L, 2L, null, 1);
     }
 
-    private void compare(Long buildOne, Long branchOne, Long buildTwo, Long branchTwo, int exptected) {
-        final VersionInfo infoOne = new VersionInfo(buildOne, branchOne);
-        final VersionInfo infoTwo = new VersionInfo(buildTwo, branchTwo);
-        assertThat(infoOne.compareTo(infoTwo), is(exptected));
-        assertThat(infoTwo.compareTo(infoOne), is(-exptected));
+    @Test
+    public void branchNumberSucceeds() {
+        compare(2L, 1L, 1L, 4L, 1);
+    }
+
+    private void compare(Long branchOne, Long buildOne, Long branchTwo, Long buildTwo, int expected) {
+        final VersionInfo infoOne = new VersionInfo(branchOne, buildOne);
+        final VersionInfo infoTwo = new VersionInfo(branchTwo, buildTwo);
+        assertThat(infoOne.compareTo(infoTwo), is(expected));
+        assertThat(infoTwo.compareTo(infoOne), is(-expected));
     }
 
 
