@@ -1,15 +1,15 @@
 package com.github.danielflower.mavenplugins.release;
 
+import static java.util.Arrays.asList;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import static java.util.Arrays.asList;
 
 /**
  * Logs the versions of the modules that the releaser will release on the next release. Does not run the build nor
@@ -33,7 +33,8 @@ public class NextMojo extends BaseMojo {
             configureJsch(log);
 
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(ReleaseMojo.getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease,
+                                                   noChangesAction, bugfixRelease);
             if (reactor == null) {
                 return;
             }

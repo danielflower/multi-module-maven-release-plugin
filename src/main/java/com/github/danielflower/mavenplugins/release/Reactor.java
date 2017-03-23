@@ -1,5 +1,13 @@
 package com.github.danielflower.mavenplugins.release;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -7,12 +15,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class Reactor {
 
@@ -26,7 +28,11 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject,
+                                       List<MavenProject> projects, Long buildNumber,
+                                       List<String> modulesToForceRelease,
+                                       NoChangesAction actionWhenNoChangesDetected, boolean bugfixRelease)
+            throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<>();
         AnnotatedTagFinder tagFinder = new AnnotatedTagFinder(bugfixRelease);

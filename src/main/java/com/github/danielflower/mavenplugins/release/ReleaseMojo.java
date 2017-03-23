@@ -1,13 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.settings.io.DefaultSettingsWriter;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +9,14 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import org.apache.maven.model.Scm;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.io.DefaultSettingsWriter;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
  * Releases the project.
@@ -110,7 +110,8 @@ public class ReleaseMojo extends BaseMojo {
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             repo.errorIfNotClean();
 
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease,
+                                                   noChangesAction, bugfixRelease);
             if (reactor == null) {
                 return;
             }
