@@ -32,8 +32,7 @@ public class VersionNamerTest {
     public void removesTheSnapshotAndSticksTheBuildNumberOnTheEndBugfixActive() throws Exception {
         assertThat(errorMessageOf("1.0-SNAPSHOT", 123L, bugfixNamer, createVersionList(2L)),
                    hasItems(
-                       "Version numbers must match pattern '[0-9]+-SNAPSHOT' when using bugfix release feature for " +
-                           "creation of bugfix tags."
+                       VersionNamer.SINGLE_VERSION_NUMBER_REQUIRED
                    )
         );
     }
