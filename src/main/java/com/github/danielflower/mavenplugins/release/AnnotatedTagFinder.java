@@ -1,19 +1,31 @@
 package com.github.danielflower.mavenplugins.release;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.lib.Ref;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class AnnotatedTagFinder {
 
-    public static List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber) throws MojoExecutionException {
+    private static final Pattern SINGLE_NUMBER                 = Pattern.compile("\\d+");
+    private static final Pattern SINGLE_OR_MAJOR_MINOR_VERSION = Pattern.compile("(?<first>\\d+)(\\.(?<second>\\d+))?");
+
+    private final boolean findBugfixReleases;
+
+    public AnnotatedTagFinder(boolean findBugfixReleases) {
+        this.findBugfixReleases = findBugfixReleases;
+    }
+
+    public List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber) throws
+                                                                                                       MojoExecutionException {
         ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
         List<Ref> tags;
         try {
@@ -37,22 +49,42 @@ public class AnnotatedTagFinder {
         return results;
     }
 
-    public static boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
-        return buildNumberOf(versionWithoutBuildNumber, refName) != null;
+    boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
+        return buildNumberOf(versionWithoutBuildNumber, refName).getBuildNumber() != null;
     }
 
-    public static Long buildNumberOf(String versionWithoutBuildNumber, String refName) {
+    public VersionInfo buildNumberOf(String versionWithoutBuildNumber, String refName) {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
-        String prefix = versionWithoutBuildNumber + ".";
-        if (tagName.startsWith(prefix)) {
-            String end = tagName.substring(prefix.length());
-            try {
-                return Long.parseLong(end);
-            } catch (NumberFormatException e) {
-                return null;
+        String prefix;
+        if (findBugfixReleases) {
+            prefix = versionWithoutBuildNumber.replaceFirst("^([^.]+).*$", "$1");
+        } else {
+            prefix = versionWithoutBuildNumber;
+        }
+        final int beginIndex = prefix.length() + 1;
+        if (tagName.length() > beginIndex) {
+            String versionNumber = tagName.substring(beginIndex);
+
+            if (tagName.startsWith(prefix)) {
+                if (findBugfixReleases) {
+                    final Matcher matcher = SINGLE_OR_MAJOR_MINOR_VERSION.matcher(versionNumber);
+                    if (matcher.matches()) {
+                        final long firstNumber = Long.parseLong(matcher.group("first"));
+                        final String secondGroup = matcher.group("second");
+                        if (secondGroup == null) {
+                            return new VersionInfo(firstNumber, null);
+                        } else {
+                            final long secondNumber = Long.parseLong(secondGroup);
+                            return new VersionInfo(secondNumber, firstNumber);
+                        }
+                    }
+                } else {
+                    if (SINGLE_NUMBER.matcher(versionNumber).matches()) {
+                        return new VersionInfo(Long.parseLong(versionNumber), null);
+                    }
+                }
             }
         }
-        return null;
+        return new VersionInfo(null, null);
     }
-
 }

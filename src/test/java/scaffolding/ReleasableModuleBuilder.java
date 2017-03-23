@@ -7,7 +7,7 @@ import org.apache.maven.project.MavenProject;
 
 public class ReleasableModuleBuilder {
 
-    private final VersionNamer versionNamer = new VersionNamer();
+    private final VersionNamer versionNamer = new VersionNamer(false);
     MavenProject project = new MavenProject();
     private long buildNumber = 123;
     private String equivalentVersion = null;

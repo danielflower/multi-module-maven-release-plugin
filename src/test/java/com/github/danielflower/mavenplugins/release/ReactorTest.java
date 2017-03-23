@@ -1,18 +1,20 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.junit.Assert;
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.ReleasableModuleBuilder.aModule;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ReleasableModuleBuilder.aModule;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ReactorTest {
 
@@ -49,8 +51,8 @@ public class ReactorTest {
 
     @Test
     public void returnsTheLatestTagIfThereAreChanges() throws MojoExecutionException {
-        AnnotatedTag onePointNine = AnnotatedTag.create("whatever-1.1.9", "1.1", 9);
-        AnnotatedTag onePointTen = AnnotatedTag.create("whatever-1.1.10", "1.1", 10);
+        AnnotatedTag onePointNine = AnnotatedTag.create("whatever-1.1.9", "1.1", new VersionInfo(9L));
+        AnnotatedTag onePointTen = AnnotatedTag.create("whatever-1.1.10", "1.1", new VersionInfo(10L));
         assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointNine, onePointTen), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
         assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointTen, onePointNine), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
     }

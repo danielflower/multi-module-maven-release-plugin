@@ -1,5 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
+import java.io.IOException;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -11,11 +13,11 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.io.IOException;
-
 public class AnnotatedTag {
     public static final String VERSION = "version";
     public static final String BUILD_NUMBER = "buildNumber";
+    public static final String BUGFIX_BRANCH_NUMBER = "bugfixBranchNumber";
+
     private final String name;
     private final JSONObject message;
     private Ref ref;
@@ -28,10 +30,14 @@ public class AnnotatedTag {
         this.message = message;
     }
 
-    public static AnnotatedTag create(String name, String version, long buildNumber) {
+    public static AnnotatedTag create(String name, String version, VersionInfo buildNumber) {
         JSONObject message = new JSONObject();
         message.put(VERSION, version);
-        message.put(BUILD_NUMBER, String.valueOf(buildNumber));
+        message.put(BUILD_NUMBER, String.valueOf(buildNumber.getBuildNumber()));
+        final Long bugfixBranchNumber = buildNumber.getBugfixBranchNumber();
+        if (bugfixBranchNumber != null) {
+            message.put(BUGFIX_BRANCH_NUMBER, String.valueOf(bugfixBranchNumber));
+        }
         return new AnnotatedTag(null, name, message);
     }
 
@@ -67,8 +73,14 @@ public class AnnotatedTag {
         return String.valueOf(message.get(VERSION));
     }
 
-    public long buildNumber() {
-        return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
+    public VersionInfo versionInfo() {
+        final long buildNumber = Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
+        final Object branchNumber = message.get(BUGFIX_BRANCH_NUMBER);
+        if (branchNumber == null) {
+            return new VersionInfo(buildNumber, null);
+        } else {
+            return new VersionInfo(buildNumber, Long.parseLong(String.valueOf(branchNumber)));
+        }
     }
 
     public Ref saveAtHEAD(Git git) throws GitAPIException {
@@ -82,7 +94,7 @@ public class AnnotatedTag {
         return "AnnotatedTag{" +
             "name='" + name + '\'' +
             ", version=" + version() +
-            ", buildNumber=" + buildNumber() +
+            ", buildNumber=" + versionInfo() +
             '}';
     }
 

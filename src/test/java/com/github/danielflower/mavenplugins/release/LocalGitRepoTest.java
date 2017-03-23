@@ -1,20 +1,21 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.StoredConfig;
-import org.junit.Test;
 import scaffolding.TestProject;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static com.github.danielflower.mavenplugins.release.GitHelper.scmUrlToRemote;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.TestProject.dirToGitScmReference;
-import static com.github.danielflower.mavenplugins.release.GitHelper.scmUrlToRemote;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.StoredConfig;
+import org.junit.Test;
 
 public class LocalGitRepoTest {
 
@@ -67,7 +68,7 @@ public class LocalGitRepoTest {
     private static List<AnnotatedTag> tags(String... tagNames) {
         List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (String tagName : tagNames) {
-            tags.add(AnnotatedTag.create(tagName, "1", 0));
+            tags.add(AnnotatedTag.create(tagName, "1", new VersionInfo(0L)));
         }
         return tags;
     }
