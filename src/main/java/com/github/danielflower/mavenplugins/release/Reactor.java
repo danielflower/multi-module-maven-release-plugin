@@ -26,7 +26,7 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         VersionNamer versionNamer = new VersionNamer();
@@ -76,13 +76,19 @@ public class Reactor {
 
             if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we was asked to forced release.");
-            }else if (oneOfTheDependenciesHasChanged) {
+            } else if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
                 AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
-                    log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
+                    // attempt to resolve
+                    if (resolverWrapper.isResolvable(project.getGroupId(), project.getArtifactId(), equivalentVersion, project.getPackaging(), log)) {
+                        log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
+                    } else {
+                        log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as although no change was detected, the artifact cannot be resolved!");
+                        equivalentVersion = null;
+                    }
                 } else {
                     log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
                 }

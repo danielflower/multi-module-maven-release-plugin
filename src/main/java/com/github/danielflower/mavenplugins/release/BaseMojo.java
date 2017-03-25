@@ -1,8 +1,12 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
@@ -66,6 +70,31 @@ public abstract class BaseMojo extends AbstractMojo {
      */
     @Parameter(alias = "noChangesAction", defaultValue="ReleaseAll", property = "noChangesAction")
     protected NoChangesAction noChangesAction;
+
+    /**
+     * Used to look up Artifacts in the remote repository.
+     */
+    @Component
+    protected ArtifactFactory factory;
+
+    /**
+     * Used to look up Artifacts in the remote repository.
+     */
+    @Component
+    protected ArtifactResolver artifactResolver;
+
+    /**
+     * List of Remote Repositories used by the resolver
+     */
+    @Parameter(property = "remoteRepositories", required = true, readonly = true, defaultValue = "${project.remoteArtifactRepositories}")
+    protected List remoteRepositories;
+
+    /**
+     * Location of the local repository.
+     *
+     */
+    @Parameter(property = "localRepository", required = true, readonly = true, defaultValue = "${localRepository}")
+    protected ArtifactRepository localRepository;
 
 	@Parameter(property = "disableSshAgent")
 	private boolean disableSshAgent;

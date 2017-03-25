@@ -91,6 +91,29 @@ public class SkippingUnchangedModulesTest {
     }
 
     @Test
+    public void ifThereHaveBeenNoChangesButArtifactsCannotBeResolvedThenReleaseIsForcedForTheseArtifacts() throws Exception {
+        List<String> firstBuildOutput = testProject.mvnRelease("1", "-DnoChangesAction=ReleaseNone");
+        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
+
+        assertTagExists("console-app-3.2.1");
+        assertTagExists("parent-module-1.2.3.1");
+        assertTagExists("core-utils-2.0.1");
+        assertTagExists("more-utils-10.0.1");
+        assertTagExists("deep-dependencies-aggregator-1.0.1");
+
+        testProject.mvn("dependency:purge-local-repository -DactTransitively=false -DreResolve=false " +
+            "-DmanualInclude=com.github.danielflower.mavenplugins.testprojects.deepdependencies:console-app");
+        List<String> secondBuildOutput = testProject.mvnRelease("2", "-DnoChangesAction=ReleaseNone");
+        assertThat(secondBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
+        assertTagExists("console-app-3.2.2");
+        assertTagDoesNotExist("parent-module-1.2.3.2");
+        assertTagDoesNotExist("core-utils-2.0.2");
+        assertTagDoesNotExist("more-utils-10.0.2");
+        assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
+
+    }
+
+    @Test
     public void ifThereHaveBeenNoChangesThenCanOptToFailTheBuild() throws Exception {
         List<String> firstBuildOutput = testProject.mvnRelease("1");
         assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
