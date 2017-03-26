@@ -44,18 +44,18 @@ public class VersionNamerTest {
 
     @Test
     public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsed() throws Exception {
-        assertThat(namer.name("1.0-SNAPSHOT", null, new ArrayList<VersionInfo>()).releaseVersion(), is(equalTo("1.0.0")));
+        assertThat(namer.name("1.0-SNAPSHOT", null, new ArrayList<VersionInfoImpl>()).releaseVersion(), is(equalTo("1.0.0")));
     }
 
     @Test
     public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsedBugfixSupport() throws Exception {
-        assertThat(namer.name("1-SNAPSHOT", null, new ArrayList<VersionInfo>()).releaseVersion(), is(equalTo("1.0")));
+        assertThat(namer.name("1-SNAPSHOT", null, new ArrayList<VersionInfoImpl>()).releaseVersion(), is(equalTo("1.0")));
     }
 
     @Test
     public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenZeroIsUsedBugfixSupportOn() throws
                                                                                                           Exception {
-        assertThat(errorMessageOf("1-SNAPSHOT", null, bugfixNamer, new ArrayList<VersionInfo>()),
+        assertThat(errorMessageOf("1-SNAPSHOT", null, bugfixNamer, new ArrayList<VersionInfoImpl>()),
                    hasItems(
                        VersionNamer.PREVIOUS_BUILDS_REQUIRED
                    )
@@ -68,10 +68,10 @@ public class VersionNamerTest {
                                                                                                       ("1.0.11")));
     }
 
-    private Collection<VersionInfo> createVersionList(Long ... numbers) {
-        final ArrayList<VersionInfo> versionInfos = new ArrayList<>();
+    private Collection<VersionInfoImpl> createVersionList(Long ... numbers) {
+        final ArrayList<VersionInfoImpl> versionInfos = new ArrayList<>();
         for (Long number : numbers) {
-            versionInfos.add(new VersionInfo(null, number));
+            versionInfos.add(new VersionInfoImpl(null, number));
         }
 
         return versionInfos;
@@ -109,7 +109,7 @@ public class VersionNamerTest {
 
 
     private List<String> errorMessageOf(String pomVersion, Long buildNumber, VersionNamer namer,
-                                        Collection<VersionInfo> previousBuildNumbers) {
+                                        Collection<VersionInfoImpl> previousBuildNumbers) {
         try {
 
             namer.name(pomVersion, buildNumber, previousBuildNumbers);

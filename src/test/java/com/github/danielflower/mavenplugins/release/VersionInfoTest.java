@@ -59,8 +59,8 @@ public class VersionInfoTest {
     }
 
     private void compare(Long branchOne, Long buildOne, Long branchTwo, Long buildTwo, int expected) {
-        final VersionInfo infoOne = new VersionInfo(branchOne, buildOne);
-        final VersionInfo infoTwo = new VersionInfo(branchTwo, buildTwo);
+        final VersionInfoImpl infoOne = new VersionInfoImpl(branchOne, buildOne);
+        final VersionInfoImpl infoTwo = new VersionInfoImpl(branchTwo, buildTwo);
         assertThat(infoOne.compareTo(infoTwo), is(expected));
         assertThat(infoTwo.compareTo(infoOne), is(-expected));
     }

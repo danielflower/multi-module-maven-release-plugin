@@ -17,21 +17,21 @@ public class VersionNamer {
         this.bugfixRelease = bugfixRelease;
     }
 
-    private VersionInfo nextBuildVersion(Collection<VersionInfo> previousBuildNumbers) {
+    private VersionInfo nextBuildVersion(Collection<VersionInfoImpl> previousBuildNumbers) {
         final VersionInfo maxVersion = java.util.Collections.max(previousBuildNumbers);
         if (bugfixRelease) {
             if (maxVersion.getBugfixBranchNumber() == null) {
                 // first bugfix release
                 System.err.println("first bugfix from " + maxVersion);
-                return new VersionInfo(maxVersion.getBuildNumber(), 1L);
+                return new VersionInfoImpl(maxVersion.getBuildNumber(), 1L);
             } else {
                 // following bugfix releases
                 System.err.println("followup bugfix from " + maxVersion);
-                return new VersionInfo(maxVersion.getBugfixBranchNumber(), maxVersion.getBuildNumber() + 1);
+                return new VersionInfoImpl(maxVersion.getBugfixBranchNumber(), maxVersion.getBuildNumber() + 1);
             }
         } else {
             System.err.println("no bugfix");
-            return new VersionInfo(maxVersion.getBugfixBranchNumber(), maxVersion.getBuildNumber() + 1);
+            return new VersionInfoImpl(maxVersion.getBugfixBranchNumber(), maxVersion.getBuildNumber() + 1);
         }
     }
 
@@ -44,7 +44,8 @@ public class VersionNamer {
      *
      * @throws ValidationException
      */
-    public VersionName name(String pomVersion, Long buildNumber, Collection<VersionInfo> previousBuildNumbers) throws
+    public VersionName name(String pomVersion, Long buildNumber, Collection<VersionInfoImpl> previousBuildNumbers)
+        throws
                                                                                                         ValidationException {
 
         if (bugfixRelease) {
@@ -60,12 +61,12 @@ public class VersionNamer {
 
         if (buildNumber == null) {
             if (previousBuildNumbers == null || previousBuildNumbers.size() == 0) {
-                nextVersion = new VersionInfo(null, 0L);
+                nextVersion = new VersionInfoImpl(null, 0L);
             } else {
                 nextVersion = nextBuildVersion(previousBuildNumbers);
             }
         } else {
-            nextVersion = new VersionInfo(null, buildNumber);
+            nextVersion = new VersionInfoImpl(null, buildNumber);
         }
 
         VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), nextVersion);

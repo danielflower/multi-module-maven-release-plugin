@@ -83,7 +83,7 @@ public class AnnotatedTagFinderTest {
 
     private static AnnotatedTag tagLocalRepo(TestProject project, String tagName, String version, long buildNumber,
                                              Long bugfixBranchNumber) throws GitAPIException {
-        AnnotatedTag tag = AnnotatedTag.create(tagName, version, new VersionInfo(bugfixBranchNumber, buildNumber));
+        AnnotatedTag tag = AnnotatedTag.create(tagName, version, new VersionInfoImpl(bugfixBranchNumber, buildNumber));
         tag.saveAtHEAD(project.local);
         return tag;
     }
@@ -112,8 +112,8 @@ public class AnnotatedTagFinderTest {
     public void versionNamerCaresNotForOrderOfTags() throws ValidationException {
         VersionNamer versionNamer = new VersionNamer(false);
         VersionName name = versionNamer.name("1.1.1", null,
-                                             asList(new VersionInfo(null, 1L), new VersionInfo(null, 2L), new VersionInfo(null,
-                                                                                                                          3L)));
+                                             asList(new VersionInfoImpl(null, 1L), new VersionInfoImpl(null, 2L), new VersionInfoImpl(null,
+                                                                                                                                      3L)));
         assertThat(name.releaseVersion(), equalTo("1.1.1.4"));
     }
 

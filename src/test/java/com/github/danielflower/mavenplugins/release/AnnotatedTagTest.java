@@ -15,7 +15,7 @@ public class AnnotatedTagTest {
     @Test
     public void gettersReturnValuesPassedIn() throws Exception {
         // yep, testing getters... but only because it isn't a simple POJO
-        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", new VersionInfo(2134L));
+        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", new VersionInfoImpl(2134L));
         assertThat(tag.name(), equalTo("my-name"));
         assertThat(tag.version(), equalTo("the-version"));
         assertThat(tag.versionInfo().getBuildNumber(), equalTo(2134L));
@@ -24,7 +24,7 @@ public class AnnotatedTagTest {
     @Test
     public void aTagCanBeCreatedFromAGitTag() throws GitAPIException, IOException {
         TestProject project = TestProject.singleModuleProject();
-        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", new VersionInfo(2134L));
+        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", new VersionInfoImpl(2134L));
         tag.saveAtHEAD(project.local);
 
         Ref ref = project.local.tagList().call().get(0);

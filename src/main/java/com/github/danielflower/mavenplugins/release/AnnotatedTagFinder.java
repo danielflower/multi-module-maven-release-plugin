@@ -53,7 +53,7 @@ public class AnnotatedTagFinder {
         return buildNumberOf(versionWithoutBuildNumber, refName).getBuildNumber() != null;
     }
 
-    public VersionInfo buildNumberOf(String versionWithoutBuildNumber, String refName) {
+    public VersionInfoImpl buildNumberOf(String versionWithoutBuildNumber, String refName) {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
         String prefix;
         if (findBugfixReleases) {
@@ -72,19 +72,19 @@ public class AnnotatedTagFinder {
                         final long firstNumber = Long.parseLong(matcher.group("first"));
                         final String secondGroup = matcher.group("second");
                         if (secondGroup == null) {
-                            return new VersionInfo(null, firstNumber);
+                            return new VersionInfoImpl(null, firstNumber);
                         } else {
                             final long secondNumber = Long.parseLong(secondGroup);
-                            return new VersionInfo(firstNumber, secondNumber);
+                            return new VersionInfoImpl(firstNumber, secondNumber);
                         }
                     }
                 } else {
                     if (SINGLE_NUMBER.matcher(versionNumber).matches()) {
-                        return new VersionInfo(null, Long.parseLong(versionNumber));
+                        return new VersionInfoImpl(null, Long.parseLong(versionNumber));
                     }
                 }
             }
         }
-        return new VersionInfo(null, null);
+        return new VersionInfoImpl(null, null);
     }
 }

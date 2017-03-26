@@ -73,13 +73,13 @@ public class AnnotatedTag {
         return String.valueOf(message.get(VERSION));
     }
 
-    public VersionInfo versionInfo() {
+    public VersionInfoImpl versionInfo() {
         final long buildNumber = Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
         final Object branchNumber = message.get(BUGFIX_BRANCH_NUMBER);
         if (branchNumber == null) {
-            return new VersionInfo(null, buildNumber);
+            return new VersionInfoImpl(null, buildNumber);
         } else {
-            return new VersionInfo(Long.parseLong(String.valueOf(branchNumber)), buildNumber);
+            return new VersionInfoImpl(Long.parseLong(String.valueOf(branchNumber)), buildNumber);
         }
     }
 

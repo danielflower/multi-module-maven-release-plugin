@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.VersionInfo;
+import com.github.danielflower.mavenplugins.release.VersionInfoImpl;
 import com.github.danielflower.mavenplugins.release.VersionNamer;
 
 public class SingleModuleTest {
@@ -70,12 +70,12 @@ public class SingleModuleTest {
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.1"));
 
-        AnnotatedTag.create("single-module-1.0.2", "1.0", new VersionInfo(2L)).saveAtHEAD(testProject.local);
+        AnnotatedTag.create("single-module-1.0.2", "1.0", new VersionInfoImpl(2L)).saveAtHEAD(testProject.local);
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.3"));
 
-        AnnotatedTag.create("single-module-1.0.4", "1.0", new VersionInfo(4L)).saveAtHEAD(testProject.origin);
-        AnnotatedTag.create("unrelated-module-1.0.5", "1.0", new VersionInfo(5L)).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("single-module-1.0.4", "1.0", new VersionInfoImpl(4L)).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("unrelated-module-1.0.5", "1.0", new VersionInfoImpl(5L)).saveAtHEAD(testProject.origin);
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.5"));
 

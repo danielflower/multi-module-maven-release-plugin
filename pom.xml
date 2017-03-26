@@ -22,11 +22,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.global.server>github</github.global.server>
         <jsch.agentproxy.version>0.0.9</jsch.agentproxy.version>
+        <immutables.version>2.4.4</immutables.version>
     </properties>
 
     <ciManagement>
         <system>travis-ci</system>
-        <url>https://travis-ci.org/danielflower/multi-module-maven-release-plugin</url>
+        <url>https://travis-ci.org/guhilling/multi-module-maven-release-plugin</url>
     </ciManagement>
 
     <scm>
@@ -75,6 +76,18 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch.agentproxy.usocket-nc</artifactId>
             <version>${jsch.agentproxy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <version>${immutables.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>serial</artifactId>
+            <version>${immutables.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

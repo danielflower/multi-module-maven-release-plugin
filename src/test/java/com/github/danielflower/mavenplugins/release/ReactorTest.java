@@ -51,8 +51,8 @@ public class ReactorTest {
 
     @Test
     public void returnsTheLatestTagIfThereAreChanges() throws MojoExecutionException {
-        AnnotatedTag onePointNine = AnnotatedTag.create("whatever-1.1.9", "1.1", new VersionInfo(9L));
-        AnnotatedTag onePointTen = AnnotatedTag.create("whatever-1.1.10", "1.1", new VersionInfo(10L));
+        AnnotatedTag onePointNine = AnnotatedTag.create("whatever-1.1.9", "1.1", new VersionInfoImpl(9L));
+        AnnotatedTag onePointTen = AnnotatedTag.create("whatever-1.1.10", "1.1", new VersionInfoImpl(10L));
         assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointNine, onePointTen), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
         assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointTen, onePointNine), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
     }

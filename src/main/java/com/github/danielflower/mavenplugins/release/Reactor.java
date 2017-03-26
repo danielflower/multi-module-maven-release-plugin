@@ -44,14 +44,15 @@ public class Reactor {
             List<AnnotatedTag> previousTagsForThisModule = tagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
 
 
-            Collection<VersionInfo> previousVersionInfos = new ArrayList<>();
+            Collection<VersionInfoImpl> previousVersionInfos = new ArrayList<>();
             if (previousTagsForThisModule != null) {
                 for (AnnotatedTag previousTag : previousTagsForThisModule) {
                     previousVersionInfos.add(previousTag.versionInfo());
                 }
             }
 
-            Collection<VersionInfo> remoteVersionInfos = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber,
+            Collection<VersionInfoImpl> remoteVersionInfos = getRemoteBuildNumbers(gitRepo, artifactId,
+                                                                                versionWithoutBuildNumber,
                                                                                tagFinder);
             previousVersionInfos.addAll(remoteVersionInfos);
 
@@ -119,15 +120,15 @@ public class Reactor {
         return new Reactor(modules);
     }
 
-    private static Collection<VersionInfo> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId,
+    private static Collection<VersionInfoImpl> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId,
                                                                  String versionWithoutBuildNumber,
                                                                  AnnotatedTagFinder tagFinder) throws GitAPIException {
         Collection<Ref> remoteTagRefs = gitRepo.allRemoteTags();
-        Collection<VersionInfo> remoteVersionInfos = new ArrayList<>();
+        Collection<VersionInfoImpl> remoteVersionInfos = new ArrayList<>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
         for (Ref remoteTagRef : remoteTagRefs) {
             String remoteTagName = remoteTagRef.getName();
-            VersionInfo versionInfo = tagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
+            VersionInfoImpl versionInfo = tagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
             if (versionInfo != null) {
                 remoteVersionInfos.add(versionInfo);
             }
