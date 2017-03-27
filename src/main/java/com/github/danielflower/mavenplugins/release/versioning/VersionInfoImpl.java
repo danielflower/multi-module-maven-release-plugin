@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.versioning;
 
 /**
  * Build number consisting of "generic build number",

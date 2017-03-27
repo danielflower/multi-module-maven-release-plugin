@@ -8,6 +8,9 @@ import static scaffolding.ReleasableModuleBuilder.aModule;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+import com.github.danielflower.mavenplugins.release.versioning.VersionName;
+
 public class ReleasableModuleTest {
     @Test
     public void getsTheTagFromTheArtifactAndVersion() throws Exception {

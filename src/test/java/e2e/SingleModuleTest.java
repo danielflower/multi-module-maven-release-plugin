@@ -1,6 +1,5 @@
 package e2e;
 
-import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
@@ -21,18 +20,16 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.VersionInfoImpl;
-import com.github.danielflower.mavenplugins.release.VersionNamer;
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
 
 public class SingleModuleTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
-    final String expected = "1.0." + buildNumber;
+    final String expected = "1." + buildNumber;
     final TestProject testProject = TestProject.singleModuleProject();
 
     @BeforeClass
@@ -52,32 +49,20 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void canUpdateSnapshotVersionToBugfixReleaseVersionAndInstallToLocalRepo() throws Exception {
-        String buildNumber = "2";
-        testProject.mvnRelease(buildNumber);
-        try {
-            testProject.mvnReleaseBugfix();
-            Assert.fail("Should not have worked");
-        } catch (MavenExecutionException e) {
-            assertThat(e.output, oneOf(containsString(VersionNamer.SINGLE_VERSION_NUMBER_REQUIRED)));
-        }
-    }
-
-    @Test
     public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags() throws IOException, GitAPIException {
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.0.0"));
+        assertThat(testProject.local, hasTag("single-module-1.0"));
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.0.1"));
+        assertThat(testProject.local, hasTag("single-module-1.1"));
 
-        AnnotatedTag.create("single-module-1.0.2", "1.0", new VersionInfoImpl(2L)).saveAtHEAD(testProject.local);
+        AnnotatedTag.create("single-module-1.2", "1", new VersionInfoImpl(2L)).saveAtHEAD(testProject.local);
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.0.3"));
+        assertThat(testProject.local, hasTag("single-module-1.3"));
 
-        AnnotatedTag.create("single-module-1.0.4", "1.0", new VersionInfoImpl(4L)).saveAtHEAD(testProject.origin);
-        AnnotatedTag.create("unrelated-module-1.0.5", "1.0", new VersionInfoImpl(5L)).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("single-module-1.4", "1", new VersionInfoImpl(4L)).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("unrelated-module-1.5", "1", new VersionInfoImpl(5L)).saveAtHEAD(testProject.origin);
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.0.5"));
+        assertThat(testProject.local, hasTag("single-module-1.5"));
 
     }
 

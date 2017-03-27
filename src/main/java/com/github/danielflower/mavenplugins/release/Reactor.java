@@ -16,6 +16,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+import com.github.danielflower.mavenplugins.release.versioning.VersionName;
+import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;
+
 public class Reactor {
 
     private final List<ReleasableModule> modulesInBuildOrder;

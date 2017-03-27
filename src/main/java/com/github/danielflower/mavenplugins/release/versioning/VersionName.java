@@ -1,4 +1,6 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.versioning;
+
+import com.github.danielflower.mavenplugins.release.Guard;
 
 public class VersionName {
     private final String version;

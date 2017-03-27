@@ -13,6 +13,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.lib.Ref;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+
 public class AnnotatedTagFinder {
 
     private static final Pattern SINGLE_NUMBER                 = Pattern.compile("\\d+");

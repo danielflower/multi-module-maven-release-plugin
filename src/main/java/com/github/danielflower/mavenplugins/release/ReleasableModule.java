@@ -4,13 +4,16 @@ import java.util.List;
 
 import org.apache.maven.project.MavenProject;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfo;
+import com.github.danielflower.mavenplugins.release.versioning.VersionName;
+
 public class ReleasableModule {
 
     private final MavenProject project;
-    private final VersionName version;
-    private final String tagName;
-    private final String equivalentVersion;
-    private final String relativePathToModule;
+    private final VersionName  version;
+    private final String       tagName;
+    private final String       equivalentVersion;
+    private final String       relativePathToModule;
 
     public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule) {
         this.project = project;

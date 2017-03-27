@@ -12,6 +12,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;
+
 public class VersionNamerTest {
 
     private VersionNamer namer;

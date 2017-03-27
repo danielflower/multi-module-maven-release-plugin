@@ -13,6 +13,9 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfo;
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+
 public class AnnotatedTag {
     public static final String VERSION = "version";
     public static final String BUILD_NUMBER = "buildNumber";

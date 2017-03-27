@@ -11,6 +11,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+
 public class AnnotatedTagTest {
     @Test
     public void gettersReturnValuesPassedIn() throws Exception {

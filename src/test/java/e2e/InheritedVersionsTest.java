@@ -1,15 +1,7 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
-
-import java.io.IOException;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -21,11 +13,20 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 public class InheritedVersionsTest {
 
     public static final String[] ARTIFACT_IDS = new String[]{"inherited-versions-from-parent", "core-utils", "console-app"};
     final String buildNumber = String.valueOf(System.currentTimeMillis());
-    final String expected = "1.0." + buildNumber;
+    final String expected = "1." + buildNumber;
     final TestProject testProject = TestProject.inheritedVersionsFromParent();
 
     @BeforeClass

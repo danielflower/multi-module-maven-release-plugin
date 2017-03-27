@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.versioning;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -6,6 +6,8 @@ import static java.util.Collections.singletonList;
 import java.util.Collection;
 
 import org.eclipse.jgit.lib.Repository;
+
+import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public class VersionNamer {
 

@@ -2,7 +2,7 @@ package scaffolding;
 
 import com.github.danielflower.mavenplugins.release.ReleasableModule;
 import com.github.danielflower.mavenplugins.release.ValidationException;
-import com.github.danielflower.mavenplugins.release.VersionNamer;
+import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;
 import org.apache.maven.project.MavenProject;
 
 public class ReleasableModuleBuilder {

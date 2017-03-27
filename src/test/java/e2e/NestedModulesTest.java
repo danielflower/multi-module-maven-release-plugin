@@ -1,15 +1,7 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
-
-import java.io.IOException;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -22,16 +14,25 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 public class NestedModulesTest {
 
-    final String expectedAggregatorVersion = "0.0.";
-    final String expectedParentVersion = "1.2.3.";
-    final String expectedCoreVersion = "2.0.";
-    final String expectedAppVersion = "3.2.";
-    final String expectedServerModulesVersion = "1.0.2.4.";
-    final String expectedServerModuleAVersion = "3.0.";
-    final String expectedServerModuleBVersion = "3.1.";
-    final String expectedServerModuleCVersion = "3.2.";
+    final String expectedAggregatorVersion = "0.";
+    final String expectedParentVersion = "1.";
+    final String expectedCoreVersion = "2.";
+    final String expectedAppVersion = "3.";
+    final String expectedServerModulesVersion = "1.";
+    final String expectedServerModuleAVersion = "3.";
+    final String expectedServerModuleBVersion = "3.";
+    final String expectedServerModuleCVersion = "3.";
 
     final TestProject testProject = TestProject.nestedProject();
 

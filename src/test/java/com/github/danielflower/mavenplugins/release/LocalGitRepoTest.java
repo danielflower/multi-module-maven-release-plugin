@@ -17,6 +17,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+
 public class LocalGitRepoTest {
 
     TestProject project = TestProject.singleModuleProject();

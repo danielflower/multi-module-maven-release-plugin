@@ -1,5 +1,9 @@
 package e2e;
 
+import scaffolding.MavenExecutionException;
+import scaffolding.MvnRunner;
+import scaffolding.TestProject;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
@@ -14,10 +18,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
-import scaffolding.TestProject;
 
 public class ValidationTest {
 
@@ -36,7 +36,7 @@ public class ValidationTest {
             Assert.fail("Should not have completed running");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output,
-                twoOf(containsString("There is already a tag named single-module-1.0.1 in this repository.")));
+                twoOf(containsString("There is already a tag named single-module-1.1 in this repository.")));
             assertThat(mee.output,
                 oneOf(containsString("It is likely that this version has been released before.")));
             assertThat(mee.output,
@@ -48,13 +48,13 @@ public class ValidationTest {
     public void ifAReleaseTagAlreadyExistsInTheRemoteRepoThenItErrorsEarly() throws Exception {
         TestProject testProject = TestProject.singleModuleProject();
         testProject.origin.tag()
-            .setAnnotated(true).setName("single-module-1.0.1").setMessage("Simulating remote tag").call();
+            .setAnnotated(true).setName("single-module-1.1").setMessage("Simulating remote tag").call();
         try {
             testProject.mvnRelease("1");
             Assert.fail("Should not have completed running");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release because there is already a tag with the same build number on the remote Git repo.")));
-            assertThat(mee.output, oneOf(containsString("* There is already a tag named single-module-1.0.1 in the remote repo.")));
+            assertThat(mee.output, oneOf(containsString("* There is already a tag named single-module-1.1 in the remote repo.")));
             assertThat(mee.output, oneOf(containsString("Please try releasing again with a new build number.")));
         }
     }
@@ -120,8 +120,8 @@ public class ValidationTest {
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
             assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
-            assertThat(mee.output, oneOf(containsString(" * The parent of snapshot-dependencies is independent-versions 1.0-SNAPSHOT")));
-            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils 2.0-SNAPSHOT")));
+            assertThat(mee.output, oneOf(containsString(" * The parent of snapshot-dependencies is independent-versions 1-SNAPSHOT")));
+            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils 2-SNAPSHOT")));
 
             // commented out because this plugin is allowed to be a snapshot for testing purposes only
 //            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references plugin multi-module-maven-release-plugin 0.2-SNAPSHOT")));

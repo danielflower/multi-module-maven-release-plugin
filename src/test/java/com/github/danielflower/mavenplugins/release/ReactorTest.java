@@ -16,6 +16,8 @@ import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+
 public class ReactorTest {
 
     @Test

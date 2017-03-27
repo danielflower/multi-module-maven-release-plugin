@@ -15,6 +15,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+import com.github.danielflower.mavenplugins.release.versioning.VersionName;
+import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;
+
 public class AnnotatedTagFinderTest {
 
     private AnnotatedTagFinder tagFinder;

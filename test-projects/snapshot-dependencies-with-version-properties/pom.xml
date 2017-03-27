@@ -7,14 +7,14 @@
 
     <groupId>com.github.danielflower.mavenplugins.testprojects.snapshotdependencies</groupId>
     <artifactId>snapshot-dependencies-with-version-properties</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Project with snapshot dependencies</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
-        <core-utils.version>2.0-SNAPSHOT</core-utils.version>
+        <core-utils.version>2-SNAPSHOT</core-utils.version>
     </properties>
 
     <dependencies>

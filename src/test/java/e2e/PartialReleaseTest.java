@@ -1,17 +1,11 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.noneOf;
@@ -20,13 +14,22 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 public class PartialReleaseTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
-    final String expectedAggregatorVersion = "1.0." + buildNumber;
-    final String expectedParentVersion = "1.2.3." + buildNumber;
-    final String expectedCoreVersion = "2.0." + buildNumber;
-    final String expectedAppVersion = "3.2." + buildNumber;
+    final String expectedAggregatorVersion = "1." + buildNumber;
+    final String expectedParentVersion = "1." + buildNumber;
+    final String expectedCoreVersion = "2." + buildNumber;
+    final String expectedAppVersion = "3." + buildNumber;
     final TestProject testProject = TestProject.parentAsSibilngProject();
 
     @BeforeClass

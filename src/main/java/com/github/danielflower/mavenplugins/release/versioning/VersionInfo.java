@@ -1,8 +1,5 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.versioning;
 
-import org.immutables.value.Value;
-
-@Value.Immutable
 public interface VersionInfo {
     /**
      * @return the last number of the automatically created version.
