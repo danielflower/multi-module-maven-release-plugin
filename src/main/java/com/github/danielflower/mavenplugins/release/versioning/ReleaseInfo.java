@@ -13,9 +13,9 @@ public interface ReleaseInfo {
      */
     Optional<String> getTagName();
 
-    List<ModuleVersion> getModules();
+    List<ImmutableModuleVersion> getModules();
 
-    default Optional<ModuleVersion> versionForModule(String moduleName) {
+    default Optional<ImmutableModuleVersion> versionForModule(String moduleName) {
         return getModules().stream().filter(mv -> mv.getName().equals(moduleName)).findFirst();
     }
 }

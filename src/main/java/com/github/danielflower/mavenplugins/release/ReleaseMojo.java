@@ -18,7 +18,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
-import com.github.danielflower.mavenplugins.release.versioning.ModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**
@@ -100,7 +99,7 @@ public class ReleaseMojo extends BaseMojo {
                 return;
             }
 
-            List<ModuleVersion> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(),
+            List<ImmutableModuleVersion> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(),
                                                                                         repo,
                                                                                         modulesToRelease);
 
@@ -138,7 +137,7 @@ public class ReleaseMojo extends BaseMojo {
         }
     }
 
-    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ModuleVersion> versions) throws GitAPIException {
+    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ImmutableModuleVersion> versions) throws GitAPIException {
         final ImmutableReleaseInfo.Builder builder = ImmutableReleaseInfo.builder();
         builder.tagName(project.getArtifactId() + "irgendwas");
         builder.addAllModules(versions);
@@ -203,9 +202,9 @@ public class ReleaseMojo extends BaseMojo {
         return result.alteredPoms;
     }
 
-    static List<ModuleVersion> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git,
+    static List<ImmutableModuleVersion> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git,
                                                             List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<ModuleVersion> tags = new ArrayList<>();
+        List<ImmutableModuleVersion> tags = new ArrayList<>();
         for (ReleasableModule module : modules) {
             if (!module.willBeReleased()) {
                 // TODO add version anyway

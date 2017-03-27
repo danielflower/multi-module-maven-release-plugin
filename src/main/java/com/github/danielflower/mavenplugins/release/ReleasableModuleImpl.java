@@ -45,7 +45,7 @@ public class ReleasableModuleImpl implements ReleasableModule {
     }
 
     @Override
-    public long getVersion() {
+    public Long getVersion() {
         return version.getMajorVersion();
     }
 

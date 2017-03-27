@@ -19,9 +19,11 @@ import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 public class ReactorTest {
 
     private ReleaseInfo previousRelease;
+    private int number;
 
     @Before
     public void setUp() {
+        number = 0;
         previousRelease = TestUtils.releaseInfo(2, 4, "testtag", "some-arty");
     }
 
@@ -36,7 +38,9 @@ public class ReactorTest {
     }
 
     private ImmutableReleasableModule.Builder aModule() {
-        return ImmutableReleasableModule.builder();
+        final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder();
+        builder.groupId("my.great.group").artifactId("some-arty" + number++);
+        return builder;
     }
 
     @Test

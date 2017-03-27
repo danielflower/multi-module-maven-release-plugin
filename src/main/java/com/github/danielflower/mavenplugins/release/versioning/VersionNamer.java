@@ -25,12 +25,8 @@ public class VersionNamer {
      */
     public FixVersion nextVersion(MavenProject project) throws ValidationException {
 
-        final Optional<ModuleVersion> previousVersion = previousRelease.versionForModule(project.getArtifactId());
-        if (previousVersion.isPresent()) {
-            return followupVersion(previousVersion.get());
-        } else {
-            return initialVersion(project);
-        }
+        final Optional<ImmutableModuleVersion> previousVersion = previousRelease.versionForModule(project.getArtifactId());
+        return previousVersion.map(this::followupVersion).orElseGet(() -> initialVersion(project));
     }
 
     private FixVersion initialVersion(MavenProject project) {

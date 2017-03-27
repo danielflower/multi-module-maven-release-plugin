@@ -12,16 +12,23 @@ public interface ReleasableModule {
     @Nullable
     String getEquivalentVersion();
 
+    @Nullable
     String getNewVersion();
+
+    @Nullable
+    String getRelativePathToModule();
 
     String getArtifactId();
 
     String getGroupId();
 
+    @Nullable
     MavenProject getProject();
 
-    long getVersion();
+    @Nullable
+    Long getVersion();
 
+    @Nullable
     FixVersion versionInfo();
 
     default boolean willBeReleased() {
@@ -37,6 +44,4 @@ public interface ReleasableModule {
         builder.equivalentVersion(null);
         return builder.build();
     }
-
-    String getRelativePathToModule();
 }

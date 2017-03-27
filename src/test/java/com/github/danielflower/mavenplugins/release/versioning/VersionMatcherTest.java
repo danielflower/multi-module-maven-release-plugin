@@ -5,14 +5,16 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.ValidationException;
+
 public class VersionMatcherTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void illegalPatternFix() {
         fixVersion("hello");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void illegalPatternSnapshot() {
         snapshotVersion("hello");
     }
