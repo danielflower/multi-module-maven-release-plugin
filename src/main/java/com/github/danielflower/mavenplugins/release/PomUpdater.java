@@ -25,8 +25,8 @@ public class PomUpdater {
     }
 
     public UpdateResult updateVersion() {
-        List<File> changedPoms = new ArrayList<File>();
-        List<String> errors = new ArrayList<String>();
+        List<File> changedPoms = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
         for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
             try {
                 MavenProject project = module.getProject();
@@ -80,7 +80,8 @@ public class PomUpdater {
         MavenProject parent = project.getParent();
         if (parent != null && isSnapshot(parent.getVersion())) {
             try {
-                ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+                ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId(), parent.getVersion
+                                                                                                               ());
                 originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
                 log.debug(" Parent " + parentBeingReleased.getArtifactId() + " rewritten to version " + parentBeingReleased.getVersionToDependOn());
             } catch (UnresolvedSnapshotDependencyException e) {
@@ -93,7 +94,8 @@ public class PomUpdater {
             String version = dependency.getVersion();
             if (isSnapshot(resolveVersion(version, projectProperties))) {
                 try {
-                    ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(), version);
+                    ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(),
+                                                             version);
                     dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
                     log.debug(" Dependency on " + dependencyBeingReleased.getArtifactId() + " rewritten to version " + dependencyBeingReleased.getVersionToDependOn());
                 } catch (UnresolvedSnapshotDependencyException e) {

@@ -41,17 +41,17 @@ public class ReleaseInvokerTest {
 	private final static String SITE = "site";
 	private final Log log = mock(Log.class);
 	private final MavenProject project = mock(MavenProject.class);
-	private final InvocationRequest request = mock(InvocationRequest.class);
-	private final InvocationResult result = mock(InvocationResult.class);
-	private final Invoker invoker = mock(Invoker.class);
-	private final List<String> goals = new LinkedList<String>();
-	private final List<String> modulesToRelease = new LinkedList<String>();
-	private final List<String> releaseProfiles = new LinkedList<String>();
+	private final InvocationRequest      request             = mock(InvocationRequest.class);
+	private final InvocationResult       result              = mock(InvocationResult.class);
+	private final Invoker                invoker             = mock(Invoker.class);
+	private final List<String>           goals               = new LinkedList<String>();
+	private final List<String>           modulesToRelease    = new LinkedList<String>();
+	private final List<String>           releaseProfiles     = new LinkedList<String>();
 	private final List<ReleasableModule> modulesInBuildOrder = new LinkedList<ReleasableModule>();
-	private final Reactor reactor = mock(Reactor.class);
-	private final ReleasableModule module = mock(ReleasableModule.class);
-	private final Profile activeProfile = mock(Profile.class);
-	private final ReleaseInvoker releaseInvoker = new ReleaseInvoker(log, project, request, invoker);
+	private final Reactor                reactor             = mock(Reactor.class);
+	private final ReleasableModuleImpl   module              = mock(ReleasableModuleImpl.class);
+	private final Profile                activeProfile       = mock(Profile.class);
+	private final ReleaseInvoker         releaseInvoker      = new ReleaseInvoker(log, project, request, invoker);
 
 	@Before
 	public void setup() throws Exception {

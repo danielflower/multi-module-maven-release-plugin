@@ -100,7 +100,7 @@ class ReleaseInvoker {
 		request.setProfiles(profiles);
 
 		request.setAlsoMake(true);
-		final List<String> changedModules = new ArrayList<String>();
+		final List<String> changedModules = new ArrayList<>();
 		final List<String> modulesToRelease = getModulesToRelease();
 		for (final ReleasableModule releasableModule : reactor.getModulesInBuildOrder()) {
 			final String modulePath = releasableModule.getRelativePathToModule();

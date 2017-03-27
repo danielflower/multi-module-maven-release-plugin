@@ -164,8 +164,8 @@ public class LocalGitRepo {
         return getRemoteTags(tagNames);
     }
 
-    public List<String> getRemoteTags(List<String> tagNamesToSearchFor) throws GitAPIException {
-        List<String> results = new ArrayList<String>();
+    private List<String> getRemoteTags(List<String> tagNamesToSearchFor) throws GitAPIException {
+        List<String> results = new ArrayList<>();
         Collection<Ref> remoteTags = allRemoteTags();
         for (Ref remoteTag : remoteTags) {
             for (String proposedTag : tagNamesToSearchFor) {
@@ -177,7 +177,7 @@ public class LocalGitRepo {
         return results;
     }
 
-    public Collection<Ref> allRemoteTags() throws GitAPIException {
+    private Collection<Ref> allRemoteTags() throws GitAPIException {
         if (remoteTags == null) {
             LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
             if (remoteUrl != null) {

@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface Version {
+public interface FixVersion {
     /**
      * @return Major version as used in maven dependencies.
      */
@@ -20,5 +20,10 @@ public interface Version {
      * @return Bugfix version as used in maven dependencies.
      */
     Optional<Long> getBugfixVersion();
+
+    default String versionAsString() {
+        return getBugfixVersion().map(bugfix -> getMajorVersion() + "." + getMinorVersion() + "." + bugfix)
+                                 .orElseGet(() -> getMajorVersion() + "." + getMinorVersion());
+    }
 
 }

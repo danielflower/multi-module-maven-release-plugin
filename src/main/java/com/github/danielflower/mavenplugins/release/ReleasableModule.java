@@ -1,79 +1,42 @@
 package com.github.danielflower.mavenplugins.release;
 
-import java.util.List;
+import javax.annotation.Nullable;
 
 import org.apache.maven.project.MavenProject;
+import org.immutables.value.Value;
 
-import com.github.danielflower.mavenplugins.release.versioning.VersionInfo;
-import com.github.danielflower.mavenplugins.release.versioning.VersionName;
+import com.github.danielflower.mavenplugins.release.versioning.FixVersion;
 
-public class ReleasableModule {
+@Value.Immutable
+public interface ReleasableModule {
+    @Nullable
+    String getEquivalentVersion();
 
-    private final MavenProject project;
-    private final VersionName  version;
-    private final String       tagName;
-    private final String       equivalentVersion;
-    private final String       relativePathToModule;
+    String getNewVersion();
 
-    public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule) {
-        this.project = project;
-        this.version = version;
-        this.equivalentVersion = equivalentVersion;
-        this.relativePathToModule = relativePathToModule;
-        this.tagName = project.getArtifactId() + "-" + version.releaseVersion();
+    String getArtifactId();
+
+    String getGroupId();
+
+    MavenProject getProject();
+
+    long getVersion();
+
+    FixVersion versionInfo();
+
+    default boolean willBeReleased() {
+        return getEquivalentVersion() == null;
     }
 
-    public String getTagName() {
-        return tagName;
+    default String getVersionToDependOn() {
+        return willBeReleased() ? versionInfo().versionAsString() : getEquivalentVersion();
     }
 
-    public String getNewVersion() {
-        return version.releaseVersion();
+    default ImmutableReleasableModule createReleasableVersion() {
+        final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder().from(this);
+        builder.equivalentVersion(null);
+        return builder.build();
     }
 
-    public String getArtifactId() {
-        return project.getArtifactId();
-    }
-
-    public String getGroupId() {
-        return project.getGroupId();
-    }
-
-    public MavenProject getProject() {
-        return project;
-    }
-
-    public String getVersion() {
-        return version.businessVersion();
-    }
-
-    public VersionInfo versionInfo() {
-        return version.buildNumber();
-    }
-
-    public boolean isOneOf(List<String> moduleNames) {
-        String modulePath = project.getBasedir().getName();
-        for (String moduleName : moduleNames) {
-            if (modulePath.equals(moduleName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean willBeReleased() {
-        return equivalentVersion == null;
-    }
-
-    public String getVersionToDependOn() {
-        return willBeReleased() ? version.releaseVersion() : equivalentVersion;
-    }
-
-    public String getRelativePathToModule() {
-        return relativePathToModule;
-    }
-
-    public ReleasableModule createReleasableVersion() {
-        return new ReleasableModule(project, version, null, relativePathToModule);
-    }
+    String getRelativePathToModule();
 }

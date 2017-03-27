@@ -24,12 +24,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
+import com.github.danielflower.mavenplugins.release.TestUtils;
 
 public class SingleModuleTest {
 
-    final String buildNumber = String.valueOf(System.currentTimeMillis());
-    final String expected = "1." + buildNumber;
+    final String      buildNumber = String.valueOf(System.currentTimeMillis());
+    final String      expected    = "1." + buildNumber;
     final TestProject testProject = TestProject.singleModuleProject();
 
     @BeforeClass
@@ -43,31 +43,38 @@ public class SingleModuleTest {
         assertThat(outputLines, oneOf(containsString("Going to release single-module " + expected)));
         assertThat(outputLines, oneOf(containsString("Hello from version " + expected + "!")));
 
-        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
+        MvnRunner
+            .assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
 
-        assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(), is(true));
+        assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(),
+                   is(true));
     }
 
     @Test
-    public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags() throws IOException, GitAPIException {
+    public void theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags() throws
+                                                                                                             IOException,
+                                                                                                             GitAPIException {
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0"));
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.1"));
 
-        AnnotatedTag.create("single-module-1.2", "1", new VersionInfoImpl(2L)).saveAtHEAD(testProject.local);
+        new AnnotatedTag(null, "single-module-1.2", TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
+            .saveAtHEAD(testProject.local);
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.3"));
 
-        AnnotatedTag.create("single-module-1.4", "1", new VersionInfoImpl(4L)).saveAtHEAD(testProject.origin);
-        AnnotatedTag.create("unrelated-module-1.5", "1", new VersionInfoImpl(5L)).saveAtHEAD(testProject.origin);
+        new AnnotatedTag(null, "single-module-1.4", TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
+            .saveAtHEAD(testProject.origin);
+        new AnnotatedTag(null, "unrelated-module-1.5",TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
+            .saveAtHEAD(testProject.origin);
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.5"));
-
     }
 
     @Test
-    public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
+    public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException,
+                                                                                       InterruptedException {
         testProject.mvnRelease(buildNumber);
         String expectedTag = "single-module-" + expected;
         assertThat(testProject.local, hasTag(expectedTag));
@@ -75,10 +82,9 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush() throws IOException, InterruptedException {
-        testProject.mvn("-DbuildNumber=" + buildNumber,
-                "-Dpush=false",
-                "releaser:release");
+    public void onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush() throws IOException,
+                                                                                        InterruptedException {
+        testProject.mvn("-DbuildNumber=" + buildNumber, "-Dpush=false", "releaser:release");
         String expectedTag = "single-module-" + expected;
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, not(hasTag(expectedTag)));
@@ -98,5 +104,4 @@ public class SingleModuleTest {
     private ObjectId head(Git git) throws IOException {
         return git.getRepository().getRef("HEAD").getObjectId();
     }
-
 }

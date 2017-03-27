@@ -3,7 +3,6 @@ package com.github.danielflower.mavenplugins.release;
 import static java.util.Arrays.asList;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -15,8 +14,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.settings.io.DefaultSettingsWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
+import com.github.danielflower.mavenplugins.release.versioning.ModuleVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**
  * Releases the project.
@@ -72,26 +75,6 @@ public class ReleaseMojo extends BaseMojo {
     @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
     private boolean skipTests;
     
-	/**
-	 * Specifies a custom, user specific Maven settings file to be used during the release build.
-     *
-     * @deprecated In versions prior to 2.1, if the plugin was run with custom user settings the settings were ignored
-     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
-     * Please use the '-s' command line parameter to set custom user settings.
-	 */
-	@Parameter(alias = "userSettings")
-	private File userSettings;
-
-	/**
-	 * Specifies a custom, global Maven settings file to be used during the release build.
-     *
-     * @deprecated In versions prior to 2.1, if the plugin was run with custom global settings the settings were ignored
-     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
-     * Please use the '-gs' command line parameter to set custom global settings.
-     */
-	@Parameter(alias = "globalSettings")
-	private File globalSettings;
-        
     /**
      * Push tags to remote repository as they are created.
      */
@@ -105,18 +88,21 @@ public class ReleaseMojo extends BaseMojo {
 
         try {
             configureJsch(log);
+            ReleaseInfo previousRelease = new ReleaseInfoLoader(project).invoke();
 
 
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             repo.errorIfNotClean();
 
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease,
-                                                   noChangesAction, bugfixRelease);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, modulesToForceRelease,
+                                                   noChangesAction, bugfixRelease, previousRelease);
             if (reactor == null) {
                 return;
             }
 
-            List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
+            List<ModuleVersion> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(),
+                                                                                        repo,
+                                                                                        modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
 
@@ -127,15 +113,6 @@ public class ReleaseMojo extends BaseMojo {
 
             try {
             	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
-            	invoker.setGlobalSettings(globalSettings);
-                if (userSettings != null) {
-                    invoker.setUserSettings(userSettings);
-                } else if (getSettings() != null) {
-                    File settingsFile = File.createTempFile("tmp", ".xml");
-                    settingsFile.deleteOnExit();
-                    new DefaultSettingsWriter().write(settingsFile, null, getSettings());
-                    invoker.setUserSettings(settingsFile);
-                }
             	invoker.setGoals(goals);
             	invoker.setModulesToRelease(modulesToRelease);
             	invoker.setReleaseProfiles(releaseProfiles);
@@ -158,24 +135,21 @@ public class ReleaseMojo extends BaseMojo {
             printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
                 asList("There was an error while accessing the Git repository. The error returned from git was:",
                     gae.getMessage(), "Stack trace:", exceptionAsString));
-        } catch (IOException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-
-            printBigErrorMessageAndThrow(log, e.getMessage(),
-                    asList("There was an error while creating temporary settings file. The error was:", e.getMessage(), "Stack trace:", exceptionAsString));
         }
     }
 
-    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<AnnotatedTag> proposedTags) throws GitAPIException {
-        for (AnnotatedTag proposedTag : proposedTags) {
-            log.info("About to tag the repository with " + proposedTag.name());
-            if (pushTags) {
-                repo.tagRepoAndPush(proposedTag);
-            } else {
-                repo.tagRepo(proposedTag);
-            }
+    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ModuleVersion> versions) throws GitAPIException {
+        final ImmutableReleaseInfo.Builder builder = ImmutableReleaseInfo.builder();
+        builder.tagName(project.getArtifactId() + "irgendwas");
+        builder.addAllModules(versions);
+        final ImmutableReleaseInfo releaseInfo = builder.build();
+        final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
+
+        log.info("About to tag the repository with " + releaseInfo.toString());
+        if (pushTags) {
+            repo.tagRepoAndPush(tag);
+        } else {
+            repo.tagRepo(tag);
         }
     }
 
@@ -229,27 +203,24 @@ public class ReleaseMojo extends BaseMojo {
         return result.alteredPoms;
     }
 
-    static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
+    static List<ModuleVersion> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git,
+                                                            List<String> modulesToRelease) throws GitAPIException, ValidationException {
+        List<ModuleVersion> tags = new ArrayList<>();
         for (ReleasableModule module : modules) {
             if (!module.willBeReleased()) {
+                // TODO add version anyway
                 continue;
             }
-            if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
-                String tag = module.getTagName();
-                if (git.hasLocalTag(tag)) {
-                    String summary = "There is already a tag named " + tag + " in this repository.";
-                    throw new ValidationException(summary, asList(
-                        summary,
-                        "It is likely that this version has been released before.",
-                        "Please try incrementing the build number and trying again."
-                    ));
-                }
-
-                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.versionInfo());
-                tags.add(annotatedTag);
+            if (modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(module
+                                                                                                          .getProject().getArtifactId())) {
+                final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
+                builder.version(module.versionInfo());
+                builder.name(module.getArtifactId());
+                tags.add(builder.build());
             }
         }
+        // TODO check for single tag.
+        /*
         List<String> matchingRemoteTags = git.remoteTagsFrom(tags);
         if (matchingRemoteTags.size() > 0) {
             String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
@@ -261,6 +232,7 @@ public class ReleaseMojo extends BaseMojo {
             messages.add("Please try releasing again with a new build number.");
             throw new ValidationException(summary, messages);
         }
+        */
         return tags;
     }
 

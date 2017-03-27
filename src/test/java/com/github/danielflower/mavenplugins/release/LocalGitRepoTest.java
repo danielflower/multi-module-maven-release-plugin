@@ -17,8 +17,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.versioning.VersionInfoImpl;
-
 public class LocalGitRepoTest {
 
     TestProject project = TestProject.singleModuleProject();
@@ -70,7 +68,7 @@ public class LocalGitRepoTest {
     private static List<AnnotatedTag> tags(String... tagNames) {
         List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
         for (String tagName : tagNames) {
-            tags.add(AnnotatedTag.create(tagName, "1", new VersionInfoImpl(0L)));
+            tags.add(new AnnotatedTag(null, tagName, TestUtils.releaseInfo(2, 4, tagName, tagName)));
         }
         return tags;
     }
