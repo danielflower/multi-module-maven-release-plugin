@@ -47,7 +47,7 @@ public class AnnotatedTag {
         return new AnnotatedTag(gitTag, stripRefPrefix(gitTag.getName()), releaseInfo);
     }
 
-    static String stripRefPrefix(String refName) {
+    private static String stripRefPrefix(String refName) {
         return refName.substring("refs/tags/".length());
     }
 

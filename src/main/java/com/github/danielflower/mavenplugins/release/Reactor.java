@@ -35,6 +35,11 @@ public class Reactor {
                                        NoChangesAction actionWhenNoChangesDetected, boolean bugfixRelease,
                                        ReleaseInfo previousRelease)
             throws ValidationException, GitAPIException, MojoExecutionException {
+        if (previousRelease.isEmpty()) {
+            log.warn("no info file for previous releases found, assuming initial release");
+        } else {
+            log.info("previous release: " + previousRelease.toString());
+        }
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<>();
         VersionNamer versionNamer = new VersionNamer(bugfixRelease, previousRelease);
@@ -95,7 +100,7 @@ public class Reactor {
                     throw new MojoExecutionException("No module changes have been detected");
                 default:
                     log.warn("No changes have been detected in any modules so will re-release them all");
-                    List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
+                    List<ReleasableModule> newList = new ArrayList<>();
                     for (ReleasableModule module : modules) {
                         newList.add(module.createReleasableVersion());
                     }

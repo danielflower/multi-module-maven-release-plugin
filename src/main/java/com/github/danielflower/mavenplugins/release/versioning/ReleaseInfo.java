@@ -6,16 +6,30 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface ReleaseInfo {
+public abstract class ReleaseInfo {
 
     /**
      * @return name of the tag corresponding to this info. empty if no release exists.
      */
-    Optional<String> getTagName();
+    public abstract Optional<String> getTagName();
 
-    List<ImmutableModuleVersion> getModules();
+    public abstract List<ImmutableModuleVersion> getModules();
 
-    default Optional<ImmutableModuleVersion> versionForModule(String moduleName) {
+    public Optional<ImmutableModuleVersion> versionForModule(String moduleName) {
         return getModules().stream().filter(mv -> mv.getName().equals(moduleName)).findFirst();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(getTagName()).append(" ");
+        for (ImmutableModuleVersion moduleVersion : getModules()) {
+            builder.append(moduleVersion.toString());
+        }
+        return builder.toString();
+    }
+
+    public boolean isEmpty() {
+        return getModules().isEmpty();
     }
 }

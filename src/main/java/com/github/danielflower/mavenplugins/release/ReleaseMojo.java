@@ -193,7 +193,7 @@ public class ReleaseMojo extends BaseMojo {
                 throw new ValidationException("Unexpected exception while setting the release versions in the pom", result.unexpectedException);
             } else {
                 String summary = "Cannot release with references to snapshot dependencies";
-                List<String> messages = new ArrayList<String>();
+                List<String> messages = new ArrayList<>();
                 messages.add(summary);
                 messages.add("The following dependency errors were found:");
                 for (String dependencyError : result.dependencyErrors) {

@@ -97,18 +97,16 @@ public class MvnRunner {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
-        if(true==false) {
-            request.setDebug(true);
-            request.setShowErrors(true);
-        }
+        request.setDebug(false);
+        request.setShowErrors(true);
 
         Invoker invoker = new DefaultInvoker();
 
         invoker.setMavenHome(mvnHome);
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
-        invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-        invoker.setErrorHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
+        //invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
+        //invoker.setErrorHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
 
         int exitCode;
         try {
