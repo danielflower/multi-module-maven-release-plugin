@@ -1,10 +1,7 @@
 package scaffolding;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.InitCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -13,8 +10,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
-import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.InitCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class TestProject {
 
@@ -43,8 +43,8 @@ public class TestProject {
         return mvnRunner.runMaven(localDir, arguments);
     }
 
-    public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:release", buildNumber, arguments);
+    public List<String> mvnRelease(String... arguments) throws IOException, InterruptedException {
+        return mvnRun("releaser:release", arguments);
     }
 
     public List<String> mvnReleaseBugfix() throws IOException, InterruptedException {
@@ -52,7 +52,7 @@ public class TestProject {
     }
 
     public List<String> mvnReleaserNext(String buildNumber, String...arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:next", buildNumber, arguments);
+        return mvnRun("releaser:next", arguments);
     }
 
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
@@ -72,11 +72,10 @@ public class TestProject {
         local.push().call();
     }
 
-    private List<String> mvnRun(String goal, String buildNumber, String[] arguments) {
-        String[] args = new String[arguments.length + 2];
-        args[0] = "-DbuildNumber=" + buildNumber;
+    private List<String> mvnRun(String goal, String[] arguments) {
+        String[] args = new String[arguments.length + 1];
         System.arraycopy(arguments, 0, args, 1, arguments.length);
-        args[args.length-1] = goal;
+        args[0] = goal;
         return mvnRunner.runMaven(localDir, args);
     }
 

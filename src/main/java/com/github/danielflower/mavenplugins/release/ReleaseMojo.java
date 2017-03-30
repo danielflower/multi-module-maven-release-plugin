@@ -18,6 +18,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**
@@ -79,7 +80,8 @@ public class ReleaseMojo extends BaseMojo {
      */
     @Parameter(alias = "pushTags", defaultValue="true", property="push")
     private boolean pushTags;
-    
+
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -139,7 +141,8 @@ public class ReleaseMojo extends BaseMojo {
 
     private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ImmutableModuleVersion> versions) throws GitAPIException {
         final ImmutableReleaseInfo.Builder builder = ImmutableReleaseInfo.builder();
-        builder.tagName(project.getArtifactId() + "irgendwas");
+        final ReleaseDateSingleton releaseDate = ReleaseDateSingleton.getInstance();
+        builder.tagName(project.getArtifactId() + "-" + releaseDate.asFileSuffix());
         builder.addAllModules(versions);
         final ImmutableReleaseInfo releaseInfo = builder.build();
         final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
@@ -215,23 +218,11 @@ public class ReleaseMojo extends BaseMojo {
                 final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
                 builder.version(module.versionInfo());
                 builder.name(module.getArtifactId());
+                builder.releaseDate(ReleaseDateSingleton.getInstance().getDate());
                 tags.add(builder.build());
             }
         }
         // TODO check for single tag.
-        /*
-        List<String> matchingRemoteTags = git.remoteTagsFrom(tags);
-        if (matchingRemoteTags.size() > 0) {
-            String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
-            List<String> messages = new ArrayList<String>();
-            messages.add(summary);
-            for (String matchingRemoteTag : matchingRemoteTags) {
-                messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
-            }
-            messages.add("Please try releasing again with a new build number.");
-            throw new ValidationException(summary, messages);
-        }
-        */
         return tags;
     }
 

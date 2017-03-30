@@ -28,7 +28,7 @@ public class NextMojoTest {
     @Test
     public void changesInTheRootAreDetected() throws Exception {
         TestProject simple = TestProject.singleModuleProject();
-        simple.mvnRelease("1");
+        simple.mvnRelease();
         simple.commitRandomFile(".");
         List<String> output = simple.mvnReleaserNext("2");
         assertThat(output, oneOf(containsString("Will use version 1.2 for single-module as it has changed since the last release.")));
@@ -36,7 +36,7 @@ public class NextMojoTest {
 
     @Test
     public void doesNotReReleaseAModuleThatHasNotChanged() throws Exception {
-        testProject.mvnRelease("1");
+        testProject.mvnRelease();
 
         testProject.commitRandomFile("console-app").pushIt();
         List<String> output = testProject.mvnReleaserNext("2");
@@ -55,7 +55,7 @@ public class NextMojoTest {
 
     @Test
     public void ifThereHaveBeenNoChangesThenReReleaseAllModules() throws Exception {
-        List<String> firstBuildOutput = testProject.mvnRelease("1");
+        List<String> firstBuildOutput = testProject.mvnRelease();
         assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
         List<String> output = testProject.mvnReleaserNext("2");
 
@@ -75,7 +75,7 @@ public class NextMojoTest {
 
     @Test
     public void ifThereHaveBeenNoChangesCanOptToReleaseNoModules() throws Exception {
-        List<String> firstBuildOutput = testProject.mvnRelease("1");
+        List<String> firstBuildOutput = testProject.mvnRelease();
         assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
         assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
         List<String> output = testProject.mvnReleaserNext("2", "-DnoChangesAction=ReleaseNone");
@@ -96,7 +96,7 @@ public class NextMojoTest {
 
     @Test
     public void ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased() throws Exception {
-        testProject.mvnRelease("1");
+        testProject.mvnRelease();
         testProject.commitRandomFile("more-utilities").pushIt();
         List<String> output = testProject.mvnReleaserNext("2");
 

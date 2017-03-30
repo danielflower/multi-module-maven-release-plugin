@@ -29,10 +29,10 @@ public class ValidationTest {
     @Test
     public void ifTheSameVersionIsReleasedTwiceItErrorsLoudly() throws Exception {
         TestProject testProject = TestProject.singleModuleProject();
-        testProject.mvnRelease("1");
+        testProject.mvnRelease();
         testProject.commitRandomFile(".").pushIt();
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("Should not have completed running");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output,
@@ -50,7 +50,7 @@ public class ValidationTest {
         testProject.origin.tag()
             .setAnnotated(true).setName("single-module-1.1").setMessage("Simulating remote tag").call();
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("Should not have completed running");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release because there is already a tag with the same build number on the remote Git repo.")));
@@ -66,7 +66,7 @@ public class ValidationTest {
         new File(testProject.localDir, "someFolder").mkdir();
         new File(testProject.localDir, "someFolder/anotherUntracked.txt").createNewFile();
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("Should not have worked the second time");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with uncommitted changes")));
@@ -81,7 +81,7 @@ public class ValidationTest {
         new File(testProject.localDir, "uncommitted.txt").createNewFile();
         testProject.local.add().addFilepattern("uncommitted.txt").call();
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("Should not have worked as there are uncommitted files");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with uncommitted changes")));
@@ -95,7 +95,7 @@ public class ValidationTest {
         File pom = new File(testProject.localDir, "console-app/pom.xml");
         pom.setWritable(false); // this should cause an IO exception when writing the pom
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("It was expected that this would fail due to a pom being readonly.");
         } catch (MavenExecutionException e) {
             assertThat(e.output, twoOf(containsString("Unexpected exception while setting the release versions in the pom")));
@@ -115,7 +115,7 @@ public class ValidationTest {
         badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
 
         try {
-            badOne.mvnRelease("1");
+            badOne.mvnRelease();
             Assert.fail("Should not have worked as there are snapshot dependencies");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
@@ -141,7 +141,7 @@ public class ValidationTest {
         badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
 
         try {
-            badOne.mvnRelease("1");
+            badOne.mvnRelease();
             Assert.fail("Should not have worked as there are snapshot dependencies");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));

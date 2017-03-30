@@ -39,7 +39,7 @@ public class PartialReleaseTest {
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
-        List<String> commandOutput = testProject.mvnRelease(buildNumber, "-DmodulesToRelease=core-utils");
+        List<String> commandOutput = testProject.mvnRelease("-DmodulesToRelease=core-utils");
         buildsEachProjectOnceAndOnlyOnce(commandOutput);
         installsAllModulesIntoTheRepoWithTheBuildNumber();
         theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
@@ -47,8 +47,8 @@ public class PartialReleaseTest {
 
     @Test
     public void whenNoChangesHaveBeenDetectedTheRequestedModuleIsBuiltAnyway() throws IOException, InterruptedException {
-        testProject.mvnRelease("1", "-DmodulesToRelease=core-utils");
-        testProject.mvnRelease(buildNumber, "-DmodulesToRelease=core-utils");
+        testProject.mvnRelease("-DmodulesToRelease=core-utils");
+        testProject.mvnRelease("-DmodulesToRelease=core-utils");
     }
 
     private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {
@@ -97,7 +97,7 @@ public class PartialReleaseTest {
         ObjectId originHeadAtStart = head(testProject.origin);
         ObjectId localHeadAtStart = head(testProject.local);
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
-        testProject.mvnRelease(buildNumber);
+        testProject.mvnRelease();
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());

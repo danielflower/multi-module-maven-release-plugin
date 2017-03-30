@@ -26,7 +26,7 @@ public class ExecutionTest {
 
     @Test
     public void profilesNotPassedToTheReleaseExecutionAreNotPassedOnToTheDeploymentButConfiguredProfilesAre() throws Exception {
-        List<String> consoleOutput = testProject.mvnRelease("1");
+        List<String> consoleOutput = testProject.mvnRelease();
         assertThat(consoleOutput, noneOf(containsString("The module-with-profiles test has run")));
         assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
     }

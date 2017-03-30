@@ -49,7 +49,7 @@ public class MavenCompatibilityTest {
         String buildNumber = mavenVersionToTest.replace(".", "") + String.valueOf(System.currentTimeMillis());
         String expected = "1." + buildNumber;
         testProject.setMvnRunner(MvnRunner.mvn(mavenVersionToTest));
-        testProject.mvnRelease(buildNumber);
+        testProject.mvnRelease();
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
         assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(), is(true));
     }

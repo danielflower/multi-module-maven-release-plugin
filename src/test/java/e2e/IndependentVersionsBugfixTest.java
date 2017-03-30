@@ -27,7 +27,7 @@ public class IndependentVersionsBugfixTest {
 
     @Before
     public void releaseProject() throws Exception {
-        testProject.mvnRelease(buildNumber);
+        testProject.mvnRelease();
         testProject.origin.branchCreate().setName(branchName).call();
     }
 

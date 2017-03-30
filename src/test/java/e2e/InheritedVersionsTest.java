@@ -36,7 +36,7 @@ public class InheritedVersionsTest {
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
-        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease(buildNumber));
+        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease());
         installsAllModulesIntoTheRepoWithTheBuildNumber();
         theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
     }
@@ -73,7 +73,7 @@ public class InheritedVersionsTest {
         ObjectId originHeadAtStart = head(testProject.origin);
         ObjectId localHeadAtStart = head(testProject.local);
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
-        testProject.mvnRelease(buildNumber);
+        testProject.mvnRelease();
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());

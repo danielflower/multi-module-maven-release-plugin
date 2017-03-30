@@ -5,11 +5,16 @@ import java.time.ZonedDateTime;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface ModuleVersion {
+public abstract class ModuleVersion {
 
-    ZonedDateTime getReleaseDate();
+    public abstract ZonedDateTime getReleaseDate();
 
-    String getName();
+    public abstract String getName();
 
-    ImmutableFixVersion getVersion();
+    public abstract ImmutableFixVersion getVersion();
+
+    @Override
+    public String toString() {
+        return getName() + "-"  + getVersion().toString();
+    }
 }

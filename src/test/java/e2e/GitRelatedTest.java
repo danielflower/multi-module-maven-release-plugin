@@ -50,7 +50,7 @@ public class GitRelatedTest {
         config.save();
 
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
             assertThat(e.output, oneOf(containsString("[ERROR] origin: not found.")));
@@ -68,7 +68,7 @@ public class GitRelatedTest {
         testProject.local.commit().setMessage("Changing pom for test").call();
 
         try {
-            testProject.mvnRelease("1");
+            testProject.mvnRelease();
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
             assertThat(e.output, twoOf(containsString("Cannot run the release plugin with a non-Git version control system")));
@@ -84,7 +84,7 @@ public class GitRelatedTest {
         config.unsetSection("remote", "origin");
         config.save();
 
-        testProject.mvnRelease("1");
+        testProject.mvnRelease();
     }
 
 }

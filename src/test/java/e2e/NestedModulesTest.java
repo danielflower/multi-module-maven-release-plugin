@@ -43,7 +43,7 @@ public class NestedModulesTest {
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
-        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease("1"));
+        buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease());
         installsAllModulesIntoTheRepoWithTheBuildNumber();
 
         assertBothReposTagged("nested-project", expectedAggregatorVersion, "1");
@@ -79,7 +79,7 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-b", expectedServerModuleBVersion, "3");
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, "3");
 
-        testProject.mvnRelease("4");
+        testProject.mvnRelease();
         assertBothReposTagged("nested-project", expectedAggregatorVersion, "4");
         assertBothReposTagged("core-utils", expectedCoreVersion, "4");
         assertBothReposTagged("console-app", expectedAppVersion, "4");
@@ -135,7 +135,7 @@ public class NestedModulesTest {
         ObjectId originHeadAtStart = head(testProject.origin);
         ObjectId localHeadAtStart = head(testProject.local);
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
-        testProject.mvnRelease("1");
+        testProject.mvnRelease();
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());

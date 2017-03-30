@@ -11,6 +11,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
+import static scaffolding.GitMatchers.hasTagWithModuleVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,11 +26,11 @@ import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
 import com.github.danielflower.mavenplugins.release.TestUtils;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 
 public class SingleModuleTest {
 
-    final String      buildNumber = String.valueOf(System.currentTimeMillis());
-    final String      expected    = "1." + buildNumber;
+    final String      expected    = "1.0";
     final TestProject testProject = TestProject.singleModuleProject();
 
     @BeforeClass
@@ -39,7 +40,7 @@ public class SingleModuleTest {
 
     @Test
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
-        List<String> outputLines = testProject.mvnRelease(buildNumber);
+        List<String> outputLines = testProject.mvnRelease();
         assertThat(outputLines, oneOf(containsString("Going to release single-module " + expected)));
         assertThat(outputLines, oneOf(containsString("Hello from version " + expected + "!")));
 
@@ -55,9 +56,9 @@ public class SingleModuleTest {
                                                                                                              IOException,
                                                                                                              GitAPIException {
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.0"));
+        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.0"));
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.1"));
+        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.1"));
 
         new AnnotatedTag(null, "single-module-1.2", TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
             .saveAtHEAD(testProject.local);
@@ -75,8 +76,8 @@ public class SingleModuleTest {
     @Test
     public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException,
                                                                                        InterruptedException {
-        testProject.mvnRelease(buildNumber);
-        String expectedTag = "single-module-" + expected;
+        testProject.mvnRelease();
+        String expectedTag = "single-module-" + ReleaseDateSingleton.getInstance().asFileSuffix();
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, hasTag(expectedTag));
     }
@@ -84,8 +85,8 @@ public class SingleModuleTest {
     @Test
     public void onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush() throws IOException,
                                                                                         InterruptedException {
-        testProject.mvn("-DbuildNumber=" + buildNumber, "-Dpush=false", "releaser:release");
-        String expectedTag = "single-module-" + expected;
+        testProject.mvn("-Dpush=false", "releaser:release");
+        String expectedTag = "single-module-" + ReleaseDateSingleton.getInstance().asFileSuffix();
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, not(hasTag(expectedTag)));
     }
@@ -95,7 +96,7 @@ public class SingleModuleTest {
         ObjectId originHeadAtStart = head(testProject.origin);
         ObjectId localHeadAtStart = head(testProject.local);
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
-        testProject.mvnRelease(buildNumber);
+        testProject.mvnRelease();
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());
