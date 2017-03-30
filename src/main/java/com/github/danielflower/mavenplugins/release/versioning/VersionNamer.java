@@ -24,9 +24,16 @@ public class VersionNamer {
      * @throws ValidationException
      */
     public FixVersion nextVersion(MavenProject project) throws ValidationException {
-
         final Optional<ImmutableModuleVersion> previousVersion = previousRelease.versionForModule(project.getArtifactId());
+        checkProjectVersion(project.getVersion(), previousVersion);
         return previousVersion.map(this::followupVersion).orElseGet(() -> initialVersion(project));
+    }
+
+    private void checkProjectVersion(String version, Optional<ImmutableModuleVersion> previousVersion) {
+        final SnapshotVersion snapshotVersion = new VersionMatcher(version).snapshotVersion();
+        if (previousVersion.isPresent() && previousVersion.get().getVersion().getMajorVersion() > snapshotVersion.getMajorVersion()) {
+            throw new ValidationException("snapshot version is older than stored previous version");
+        }
     }
 
     private FixVersion initialVersion(MavenProject project) {
@@ -38,7 +45,6 @@ public class VersionNamer {
     }
 
     private FixVersion followupVersion(ModuleVersion previousModule) {
-
         final ImmutableFixVersion.Builder builder = ImmutableFixVersion.builder();
         FixVersion previousVersion = previousModule.getVersion();
         builder.from(previousVersion);

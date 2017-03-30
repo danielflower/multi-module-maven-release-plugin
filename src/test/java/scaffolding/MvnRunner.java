@@ -76,7 +76,7 @@ public class MvnRunner {
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-        //invoker.setErrorHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
+        invoker.setErrorHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
 
         int exitCode;
         try {

@@ -36,7 +36,7 @@ public interface ReleasableModule {
     }
 
     default String getVersionToDependOn() {
-        return willBeReleased() ? versionInfo().versionAsString() : getEquivalentVersion();
+        return willBeReleased() ? versionInfo().toString() : getEquivalentVersion();
     }
 
     default ImmutableReleasableModule createReleasableVersion() {

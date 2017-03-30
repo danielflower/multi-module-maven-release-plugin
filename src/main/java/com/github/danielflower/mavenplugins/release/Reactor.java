@@ -70,15 +70,15 @@ public class Reactor {
             String equivalentVersion = null;
 
             if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
-                log.info("Releasing " + artifactId + " " + newVersion.versionAsString() + " as we was asked to forced release.");
+                log.info("Releasing " + artifactId + " " + newVersion.toString() + " as we was asked to forced release.");
             }else if (oneOfTheDependenciesHasChanged) {
-                log.info("Releasing " + artifactId + " " + newVersion.versionAsString() + " as " + changedDependency + " has changed.");
+                log.info("Releasing " + artifactId + " " + newVersion.toString() + " as " + changedDependency + " has changed.");
             } else {
                 // Hier passiert ein Wunder
                 if (1 > 2) {
                     log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
                 } else {
-                    log.info("Will use version " + newVersion.versionAsString() + " for " + artifactId + " as it has changed since the last release.");
+                    log.info("Will use version " + newVersion.toString() + " for " + artifactId + " as it has changed since the last release.");
                 }
             }
             ReleasableModule module = new ReleasableModuleImpl(project, newVersion, equivalentVersion,

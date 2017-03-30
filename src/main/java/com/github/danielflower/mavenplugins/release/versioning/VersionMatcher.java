@@ -41,7 +41,7 @@ public class VersionMatcher {
             }
             return builder.build();
         } else {
-            throw new IllegalArgumentException("Fix version must match "  + FIX_PATTERN.pattern());
+            throw new ValidationException("Fix version must match "  + FIX_PATTERN.pattern());
         }
 
     }

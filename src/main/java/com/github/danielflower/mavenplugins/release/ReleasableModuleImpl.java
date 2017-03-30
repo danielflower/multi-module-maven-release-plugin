@@ -26,7 +26,7 @@ public class ReleasableModuleImpl implements ReleasableModule {
 
     @Override
     public String getNewVersion() {
-        return version.versionAsString();
+        return version.toString();
     }
 
     @Override

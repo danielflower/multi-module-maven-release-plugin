@@ -5,23 +5,24 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface FixVersion {
+public abstract class FixVersion {
     /**
      * @return Major version as used in maven dependencies.
      */
-    long getMajorVersion();
+    public abstract long getMajorVersion();
 
     /**
      * @return Minor version as used in maven dependencies.
      */
-    long getMinorVersion();
+    public abstract long getMinorVersion();
 
     /**
      * @return Bugfix version as used in maven dependencies.
      */
-    Optional<Long> getBugfixVersion();
+    public abstract Optional<Long> getBugfixVersion();
 
-    default String versionAsString() {
+    @Override
+    public String toString() {
         return getBugfixVersion().map(bugfix -> getMajorVersion() + "." + getMinorVersion() + "." + bugfix)
                                  .orElseGet(() -> getMajorVersion() + "." + getMinorVersion());
     }

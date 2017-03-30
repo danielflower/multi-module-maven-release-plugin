@@ -47,7 +47,7 @@ public class VersionNamerTest {
 
     @Test
     public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
-        assertThat(namer.nextVersion(testProject).versionAsString(), is(equalTo("1.6")));
+        assertThat(namer.nextVersion(testProject).toString(), is(equalTo("1.6")));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class VersionNamerTest {
     @Test
     public void ifTheBuildNumberIsNullButThereIsAPreviousBuildNumbersThenThatValueIsIncrementedSecondBugfixRelease() throws
                                                                                                                      Exception {
-        assertThat(bugfixNamer.nextVersion(testProject).versionAsString(), is(equalTo("1.5.1")));
+        assertThat(bugfixNamer.nextVersion(testProject).toString(), is(equalTo("1.5.1")));
     }
 
     @Test
