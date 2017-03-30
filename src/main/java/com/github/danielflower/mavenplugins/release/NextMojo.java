@@ -11,6 +11,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoLoader;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**

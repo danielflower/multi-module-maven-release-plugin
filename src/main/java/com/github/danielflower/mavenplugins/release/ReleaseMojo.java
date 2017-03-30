@@ -16,6 +16,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoLoader;
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoWriter;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
@@ -101,16 +103,29 @@ public class ReleaseMojo extends BaseMojo {
                 return;
             }
 
-            List<ImmutableModuleVersion> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(),
+            List<ImmutableModuleVersion> newVersions = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(),
                                                                                         repo,
                                                                                         modulesToRelease);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
 
+            final ImmutableReleaseInfo.Builder currentRelease = ImmutableReleaseInfo.builder();
+            currentRelease.tagName(project.getArtifactId() + "-" + ReleaseDateSingleton.getInstance().asFileSuffix());
+
+            for (ImmutableModuleVersion oldVersion : previousRelease.getModules()) {
+                if(newVersions.stream().noneMatch(version -> oldVersion.getVersion().equals(version.getVersion()))) {
+                    currentRelease.addModules(oldVersion);
+                }
+            }
+            for (ImmutableModuleVersion newVersion : newVersions) {
+                currentRelease.addModules(newVersion);
+            }
+            new ReleaseInfoWriter(project, currentRelease.build()).invoke();
+
             // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
             // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
             // and so fail. The downside is that failed builds result in tags being pushed.
-            tagAndPushRepo(log, repo, proposedTags);
+            tagAndPushRepo(log, repo, newVersions);
 
             try {
             	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
