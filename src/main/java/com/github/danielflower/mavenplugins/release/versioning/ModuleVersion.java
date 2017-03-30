@@ -11,5 +11,5 @@ public interface ModuleVersion {
 
     String getName();
 
-    FixVersion getVersion();
+    ImmutableFixVersion getVersion();
 }

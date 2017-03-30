@@ -30,7 +30,7 @@ public class VersionMatcher {
         return Long.parseLong(matcher.group(group));
     }
 
-    public FixVersion fixVersion() {
+    public ImmutableFixVersion fixVersion() {
         Matcher matcher = FIX_PATTERN.matcher(version);
         if (matcher.matches()) {
             final ImmutableFixVersion.Builder builder = ImmutableFixVersion.builder();

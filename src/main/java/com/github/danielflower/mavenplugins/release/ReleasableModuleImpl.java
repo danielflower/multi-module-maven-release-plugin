@@ -2,12 +2,12 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.project.MavenProject;
 
-import com.github.danielflower.mavenplugins.release.versioning.FixVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 
 public class ReleasableModuleImpl implements ReleasableModule {
 
     private final MavenProject project;
-    private final FixVersion   version;
+    private final ImmutableFixVersion   version;
 
     @Override
     public String getEquivalentVersion() {
@@ -17,7 +17,7 @@ public class ReleasableModuleImpl implements ReleasableModule {
     private final String equivalentVersion;
     private final String relativePathToModule;
 
-    public ReleasableModuleImpl(MavenProject project, FixVersion version, String equivalentVersion, String relativePathToModule) {
+    public ReleasableModuleImpl(MavenProject project, ImmutableFixVersion version, String equivalentVersion, String relativePathToModule) {
         this.project = project;
         this.version = version;
         this.equivalentVersion = equivalentVersion;
@@ -50,7 +50,7 @@ public class ReleasableModuleImpl implements ReleasableModule {
     }
 
     @Override
-    public FixVersion versionInfo() {
+    public ImmutableFixVersion versionInfo() {
         return version;
     }
 

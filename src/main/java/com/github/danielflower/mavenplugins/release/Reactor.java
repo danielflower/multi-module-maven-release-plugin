@@ -12,8 +12,8 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
-import com.github.danielflower.mavenplugins.release.versioning.FixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;
 
 public class Reactor {
@@ -37,13 +37,12 @@ public class Reactor {
             throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<>();
-        AnnotatedTagFinder tagFinder = new AnnotatedTagFinder(bugfixRelease);
         VersionNamer versionNamer = new VersionNamer(bugfixRelease, previousRelease);
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();
 
-            FixVersion newVersion = versionNamer.nextVersion(project);
+            ImmutableFixVersion newVersion = ImmutableFixVersion.copyOf(versionNamer.nextVersion(project));
 
             boolean oneOfTheDependenciesHasChanged = false;
             String changedDependency = null;

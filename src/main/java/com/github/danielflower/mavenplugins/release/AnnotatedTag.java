@@ -11,12 +11,12 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevTag;
 import org.eclipse.jgit.revwalk.RevWalk;
 
+import com.github.danielflower.mavenplugins.release.versioning.GsonFactory;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class AnnotatedTag {
+    private static final GsonFactory GSON_FACTORY = new GsonFactory();
 
     private final String name;
 
@@ -40,7 +40,7 @@ public class AnnotatedTag {
         try {
             ObjectId tagId = gitTag.getObjectId();
             RevTag tag = walk.parseTag(tagId);
-            releaseInfo = new Gson().fromJson(tag.getFullMessage(), ImmutableReleaseInfo.class);
+            releaseInfo = GSON_FACTORY.createGson().fromJson(tag.getFullMessage(), ImmutableReleaseInfo.class);
         } finally {
             walk.dispose();
         }
@@ -52,7 +52,7 @@ public class AnnotatedTag {
     }
 
     public Ref saveAtHEAD(Git git) throws GitAPIException {
-        final String message = new GsonBuilder().setPrettyPrinting().create().toJson(releaseInfo);
+        final String message = GSON_FACTORY.createGson().toJson(releaseInfo);
         ref = git.tag().setName(name).setAnnotated(true).setMessage(message).call();
         return ref;
     }

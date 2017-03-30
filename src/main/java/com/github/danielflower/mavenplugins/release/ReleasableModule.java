@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import org.apache.maven.project.MavenProject;
 import org.immutables.value.Value;
 
-import com.github.danielflower.mavenplugins.release.versioning.FixVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 
 @Value.Immutable
 public interface ReleasableModule {
@@ -29,7 +29,7 @@ public interface ReleasableModule {
     Long getVersion();
 
     @Nullable
-    FixVersion versionInfo();
+    ImmutableFixVersion versionInfo();
 
     default boolean willBeReleased() {
         return getEquivalentVersion() == null;
