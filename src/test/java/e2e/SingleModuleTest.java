@@ -136,8 +136,8 @@ public class SingleModuleTest {
         assertThat(originHeadAtStart, equalTo(localHeadAtStart));
         testProject.mvnRelease();
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
-        assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());
+        assertThat(head(testProject.local), equalTo(localHeadAtStart));
     }
 
     private ObjectId head(Git git) throws IOException {

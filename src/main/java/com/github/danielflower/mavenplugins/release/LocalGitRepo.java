@@ -1,5 +1,15 @@
 package com.github.danielflower.mavenplugins.release;
 
+import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.Git;
@@ -10,12 +20,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 public class LocalGitRepo {
 
@@ -96,7 +101,8 @@ public class LocalGitRepo {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
-    public void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException {
+    public void tagRepoAndPush(AnnotatedTag tag, RevCommit releaseCommit) throws GitAPIException {
+        git.push().setPushAll().call();
         Ref tagRef = tagRepo(tag);
         pushTag(tagRef);
     }

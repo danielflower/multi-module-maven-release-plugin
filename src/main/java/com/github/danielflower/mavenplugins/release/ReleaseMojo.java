@@ -126,7 +126,7 @@ public class ReleaseMojo extends BaseMojo {
             // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
             // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
             // and so fail. The downside is that failed builds result in tags being pushed.
-            tagAndPushRepo(log, repo, newVersions);
+            tagAndPushRepo(log, repo, newVersions, releaseCommit);
 
             try {
             	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
@@ -155,7 +155,8 @@ public class ReleaseMojo extends BaseMojo {
         }
     }
 
-    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ImmutableModuleVersion> versions) throws GitAPIException {
+    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ImmutableModuleVersion> versions,
+                                RevCommit releaseCommit) throws GitAPIException {
         final ImmutableReleaseInfo.Builder builder = ImmutableReleaseInfo.builder();
         builder.tagName(tagName());
         builder.addAllModules(versions);
@@ -164,7 +165,7 @@ public class ReleaseMojo extends BaseMojo {
 
         log.info("About to tag the repository with " + releaseInfo.toString());
         if (pushTags) {
-            repo.tagRepoAndPush(tag);
+            repo.tagRepoAndPush(tag, releaseCommit);
         } else {
             repo.tagRepo(tag);
         }
