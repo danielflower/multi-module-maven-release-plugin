@@ -18,6 +18,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
+import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
@@ -163,11 +164,11 @@ public class ReleaseMojo extends BaseMojo {
         final ImmutableReleaseInfo releaseInfo = builder.build();
         final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
 
-        log.info("About to tag the repository with " + releaseInfo.toString());
+        log.info("About to tag repository with " + releaseInfo.toString());
+        repo.tagRepo(tag);
         if (pushTags) {
-            repo.tagRepoAndPush(tag, releaseCommit);
-        } else {
-            repo.tagRepo(tag);
+            log.info("About to push tags and release-info " + releaseInfo.toString());
+            repo.pushAll();
         }
     }
 

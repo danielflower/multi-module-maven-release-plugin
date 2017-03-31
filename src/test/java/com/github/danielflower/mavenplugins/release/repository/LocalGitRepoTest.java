@@ -1,12 +1,9 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.repository;
 
 import scaffolding.TestProject;
 
 import static com.github.danielflower.mavenplugins.release.GitHelper.scmUrlToRemote;
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.TestProject.dirToGitScmReference;
 
 import java.util.ArrayList;
@@ -15,27 +12,33 @@ import java.util.List;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.TestUtils;
 
 public class LocalGitRepoTest {
 
     TestProject project = TestProject.singleModuleProject();
 
+
     @Test
     public void canDetectLocalTags() throws GitAPIException {
         LocalGitRepo repo = new LocalGitRepo(project.local, null);
         tag(project.local, "some-tag");
-        assertThat(repo.hasLocalTag("some-tag"), is(true));
-        assertThat(repo.hasLocalTag("some-ta"), is(false));
-        assertThat(repo.hasLocalTag("some-tagyo"), is(false));
+        MatcherAssert.assertThat(repo.hasLocalTag("some-tag"), CoreMatchers.is(true));
+        MatcherAssert.assertThat(repo.hasLocalTag("some-ta"), CoreMatchers.is(false));
+        MatcherAssert.assertThat(repo.hasLocalTag("some-tagyo"), CoreMatchers.is(false));
     }
 
     @Test
     public void canDetectRemoteTags() throws Exception {
         LocalGitRepo repo = new LocalGitRepo(project.local, null);
         tag(project.origin, "some-tag");
-        assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
-        assertThat(repo.remoteTagsFrom(tags("blah", "some-taggart")), equalTo(emptyList()));
+        MatcherAssert.assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), CoreMatchers.equalTo(asList("some-tag")));
+        MatcherAssert.assertThat(repo.remoteTagsFrom(tags("blah", "some-taggart")), CoreMatchers.equalTo(emptyList()));
     }
 
     @Test
@@ -47,7 +50,7 @@ public class LocalGitRepoTest {
         config.unsetSection("remote", "origin");
         config.save();
 
-        assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
+        MatcherAssert.assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), CoreMatchers.equalTo(asList("some-tag")));
     }
 
     @Test
@@ -60,8 +63,8 @@ public class LocalGitRepoTest {
         LocalGitRepo repo = new LocalGitRepo(project.local, null);
         for (int i = 0; i < numberOfTags; i++) {
             String tagName = "this-is-a-tag-" + i;
-            assertThat(repo.hasLocalTag(tagName), is(true));
-            assertThat(repo.remoteTagsFrom(tags(tagName)).size(), is(1));
+            MatcherAssert.assertThat(repo.hasLocalTag(tagName), CoreMatchers.is(true));
+            MatcherAssert.assertThat(repo.remoteTagsFrom(tags(tagName)).size(), CoreMatchers.is(1));
         }
     }
 

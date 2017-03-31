@@ -15,6 +15,7 @@ import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 
+import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;

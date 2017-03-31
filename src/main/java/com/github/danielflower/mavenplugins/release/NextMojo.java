@@ -12,6 +12,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
+import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**

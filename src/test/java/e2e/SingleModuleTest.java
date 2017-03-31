@@ -3,7 +3,7 @@ package e2e;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -63,20 +63,6 @@ public class SingleModuleTest {
         assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.1"));
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.2"));
-
-        /*
-        new AnnotatedTag(null, "single-module-1.2", TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
-            .saveAtHEAD(testProject.local);
-        testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.3"));
-
-        new AnnotatedTag(null, "single-module-1.4", TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
-            .saveAtHEAD(testProject.origin);
-        new AnnotatedTag(null, "unrelated-module-1.5",TestUtils.releaseInfo(1L, 4L, "tag", "single-module"))
-            .saveAtHEAD(testProject.origin);
-        testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTag("single-module-1.5"));
-        */
     }
 
     @Test
@@ -92,7 +78,7 @@ public class SingleModuleTest {
         final ImmutableModuleVersion.Builder moduleInfo = ImmutableModuleVersion.builder().from(currentModuleVersion);
         final ImmutableFixVersion.Builder versionBuilder = ImmutableFixVersion.builder()
                                                                               .from(currentModuleVersion.getVersion());
-        releaseBuilder.modules(asList(moduleInfo.version(versionBuilder.minorVersion(5L).build()).build()));
+        releaseBuilder.modules(singletonList(moduleInfo.version(versionBuilder.minorVersion(5L).build()).build()));
         infoStorage.store(releaseBuilder.build());
 
         testProject.mvn("releaser:release");

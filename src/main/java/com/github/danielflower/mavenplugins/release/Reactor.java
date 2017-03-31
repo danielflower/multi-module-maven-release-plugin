@@ -12,6 +12,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
+import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;

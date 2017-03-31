@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.repository;
 
 import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 
@@ -20,7 +20,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
+
+import com.github.danielflower.mavenplugins.release.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.GitHelper;
+import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public class LocalGitRepo {
 
@@ -101,22 +104,16 @@ public class LocalGitRepo {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
-    public void tagRepoAndPush(AnnotatedTag tag, RevCommit releaseCommit) throws GitAPIException {
-        Ref tagRef = tagRepo(tag);
-        pushTagAndReleaseInfo(tagRef, releaseCommit);
+    public void tagRepo(AnnotatedTag tag) throws GitAPIException {
+        Ref tagRef = tag.saveAtHEAD(git);
     }
 
-    private void pushTagAndReleaseInfo(Ref tagRef, RevCommit releaseCommit) throws GitAPIException {
-        PushCommand pushCommand = git.push().add(tagRef).add(releaseCommit.name());
+    public void pushAll() throws GitAPIException {
+        PushCommand pushCommand = git.push().setPushAll();
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }
         pushCommand.call();
-    }
-
-    public Ref tagRepo(AnnotatedTag tag) throws GitAPIException {
-        Ref tagRef = tag.saveAtHEAD(git);
-        return tagRef;
     }
 
     /**
