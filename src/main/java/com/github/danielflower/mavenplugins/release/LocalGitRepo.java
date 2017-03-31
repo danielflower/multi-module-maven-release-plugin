@@ -102,13 +102,12 @@ public class LocalGitRepo {
     }
 
     public void tagRepoAndPush(AnnotatedTag tag, RevCommit releaseCommit) throws GitAPIException {
-        git.push().setPushAll().call();
         Ref tagRef = tagRepo(tag);
-        pushTag(tagRef);
+        pushTagAndReleaseInfo(tagRef, releaseCommit);
     }
 
-    private void pushTag(Ref tagRef) throws GitAPIException {
-        PushCommand pushCommand = git.push().add(tagRef);
+    private void pushTagAndReleaseInfo(Ref tagRef, RevCommit releaseCommit) throws GitAPIException {
+        PushCommand pushCommand = git.push().add(tagRef).add(releaseCommit.name());
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }
@@ -163,7 +162,7 @@ public class LocalGitRepo {
     }
 
     public List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws GitAPIException {
-        List<String> tagNames = new ArrayList<String>();
+        List<String> tagNames = new ArrayList<>();
         for (AnnotatedTag annotatedTag : annotatedTags) {
             tagNames.add(annotatedTag.name());
         }
