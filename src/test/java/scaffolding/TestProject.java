@@ -20,6 +20,7 @@ public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
     private static final String PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
+    private final String name;
     public final File originDir;
     public final Git origin;
 
@@ -29,11 +30,12 @@ public class TestProject {
     private final AtomicInteger commitCounter = new AtomicInteger(1);
     private MvnRunner mvnRunner = defaultRunner;
 
-    private TestProject(File originDir, Git origin, File localDir, Git local) {
+    private TestProject(File originDir, Git origin, File localDir, Git local, String name) {
         this.originDir = originDir;
         this.origin = origin;
         this.localDir = localDir;
         this.local = local;
+        this.name = name;
     }
 
     /**
@@ -98,7 +100,7 @@ public class TestProject {
                 .setURI(originDir.toURI().toString())
                 .call();
 
-            return new TestProject(originDir, origin, localDir, local);
+            return new TestProject(originDir, origin, localDir, local, name);
         } catch (Exception e) {
             throw new RuntimeException("Error while creating copies of the test project", e);
         }
@@ -170,5 +172,9 @@ public class TestProject {
 
     public void setMvnRunner(MvnRunner mvnRunner) {
         this.mvnRunner = mvnRunner;
+    }
+
+    public String getArtifactId() {
+        return name;
     }
 }

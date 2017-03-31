@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.TestUtils;
 import com.google.gson.Gson;
 
 public class ReleaseInfoTest {
@@ -42,7 +43,10 @@ public class ReleaseInfoTest {
         infoBuilder = ImmutableReleaseInfo.builder();
         infoBuilder.tagName("sampletag");
         modulerBuilder = ImmutableModuleVersion.builder();
-        modulerBuilder.name("module-1");
+        final ImmutableQualifiedArtifact.Builder artifactBuilder = ImmutableQualifiedArtifact.builder();
+        artifactBuilder.artifactId("module-1");
+        artifactBuilder.groupId(TestUtils.TEST_GROUP_ID);
+        modulerBuilder.artifact(artifactBuilder.build());
         modulerBuilder.releaseDate(REFERENCE_DATE);
         versionBuilder = ImmutableFixVersion.builder();
         versionBuilder.majorVersion(3);

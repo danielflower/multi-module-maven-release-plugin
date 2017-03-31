@@ -9,12 +9,12 @@ public abstract class ModuleVersion {
 
     public abstract ZonedDateTime getReleaseDate();
 
-    public abstract String getName();
+    public abstract ImmutableQualifiedArtifact getArtifact();
 
     public abstract ImmutableFixVersion getVersion();
 
     @Override
     public String toString() {
-        return getName() + "-"  + getVersion().toString();
+        return getArtifact() + "-"  + getVersion().toString();
     }
 }

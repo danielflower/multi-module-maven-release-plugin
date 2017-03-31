@@ -11,7 +11,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoLoader;
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**
@@ -34,10 +34,10 @@ public class NextMojo extends BaseMojo {
 
         try {
             configureJsch(log);
-            ReleaseInfo previousRelease = new ReleaseInfoLoader(project).invoke();
 
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(ReleaseMojo.getRemoteUrlOrNullIfNoneSet(
                 project.getOriginalModel().getScm(), project.getModel().getScm()));
+            ReleaseInfo previousRelease = new ReleaseInfoStorage(project.getBasedir(), repo.git).load();
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, modulesToForceRelease, noChangesAction,
                                                    bugfixRelease, previousRelease);
             if (reactor == null) {

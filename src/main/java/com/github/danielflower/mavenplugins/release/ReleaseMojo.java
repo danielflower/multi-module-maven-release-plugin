@@ -16,9 +16,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoLoader;
-import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoWriter;
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
@@ -91,11 +91,13 @@ public class ReleaseMojo extends BaseMojo {
 
         try {
             configureJsch(log);
-            ReleaseInfo previousRelease = new ReleaseInfoLoader(project).invoke();
 
 
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             repo.errorIfNotClean();
+
+            final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(project.getBasedir(), repo.git);
+            ReleaseInfo previousRelease = infoStorage.load();
 
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, modulesToForceRelease,
                                                    noChangesAction, bugfixRelease, previousRelease);
@@ -113,14 +115,14 @@ public class ReleaseMojo extends BaseMojo {
             currentRelease.tagName(project.getArtifactId() + "-" + ReleaseDateSingleton.getInstance().asFileSuffix());
 
             for (ImmutableModuleVersion oldVersion : previousRelease.getModules()) {
-                if(newVersions.stream().noneMatch(version -> oldVersion.getVersion().equals(version.getVersion()))) {
+                if(newVersions.stream().noneMatch(version -> oldVersion.getArtifact().equals(version.getArtifact()))) {
                     currentRelease.addModules(oldVersion);
                 }
             }
             for (ImmutableModuleVersion newVersion : newVersions) {
                 currentRelease.addModules(newVersion);
             }
-            new ReleaseInfoWriter(project, currentRelease.build()).invoke();
+            infoStorage.store(currentRelease.build());
 
             // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
             // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
@@ -232,7 +234,10 @@ public class ReleaseMojo extends BaseMojo {
                                                                                                           .getProject().getArtifactId())) {
                 final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
                 builder.version(module.versionInfo());
-                builder.name(module.getArtifactId());
+                final ImmutableQualifiedArtifact.Builder artifactBuilder = ImmutableQualifiedArtifact.builder();
+                artifactBuilder.groupId(module.getGroupId());
+                artifactBuilder.artifactId(module.getArtifactId());
+                builder.artifact(artifactBuilder.build());
                 builder.releaseDate(ReleaseDateSingleton.getInstance().getDate());
                 tags.add(builder.build());
             }

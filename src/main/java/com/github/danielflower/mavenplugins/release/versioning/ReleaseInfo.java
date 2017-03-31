@@ -16,7 +16,7 @@ public abstract class ReleaseInfo {
     public abstract List<ImmutableModuleVersion> getModules();
 
     public Optional<ImmutableModuleVersion> versionForModule(String moduleName) {
-        return getModules().stream().filter(mv -> mv.getName().equals(moduleName)).findFirst();
+        return getModules().stream().filter(mv -> mv.getArtifact().equals(moduleName)).findFirst();
     }
 
     @Override
