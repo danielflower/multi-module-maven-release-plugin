@@ -52,6 +52,7 @@ public class ReleaseInfoTest {
         versionBuilder.majorVersion(3);
         versionBuilder.minorVersion(2);
         modulerBuilder.version(versionBuilder.build());
+        modulerBuilder.releaseTag("test-tag");
     }
 
     @Test

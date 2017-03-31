@@ -3,7 +3,11 @@
   "modules": [
     {
       "releaseDate": "2002-08-22T20:46:40+02:00[Europe/Berlin]",
-      "name": "module-1",
+      "releaseTag": "test-tag",
+      "artifact": {
+        "groupId": "com.github.danielflower.mavenplugins.testprojects",
+        "artifactId": "module-1"
+      },
       "version": {
         "majorVersion": 3,
         "minorVersion": 2

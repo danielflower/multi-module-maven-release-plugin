@@ -26,6 +26,7 @@ public class VersionNamerTest {
     public void setUp() {
         testProject = new MavenProject();
         testProject.setVersion("1-SNAPSHOT");
+        testProject.setGroupId(TestUtils.TEST_GROUP_ID);
         testProject.setArtifactId(MODULE_NAME);
         final ReleaseInfo previousRelease = TestUtils.releaseInfo(1, 5, "test", MODULE_NAME);
         namer = new VersionNamer(false, previousRelease);
@@ -33,7 +34,7 @@ public class VersionNamerTest {
     }
 
     @Test
-    public void removesTheSnapshotAndCreatesZeroForInitialRelease() throws Exception {
+    public void removesTheSnapshotAndChoosesNextMinorForNextRelease() throws Exception {
         final FixVersion next = namer.nextVersion(testProject);
         assertThat(next.getMajorVersion(), is(1L));
         assertThat(next.getMinorVersion(), is(6L));
