@@ -19,7 +19,8 @@ public class AnnotatedTagTest {
     public void gettersReturnValuesPassedIn() throws Exception {
         AnnotatedTag tag = new AnnotatedTag(null, "my-name", TestUtils.releaseInfo(4L, 2134L, "test", "my-name"));
         assertThat(tag.name(), equalTo("my-name"));
-        final ModuleVersion moduleVersion = tag.getReleaseInfo().versionForModule("my-name").get();
+        final ModuleVersion moduleVersion = tag.getReleaseInfo().versionForArtifact(TestUtils.artifactIdForModule
+                                                                                                ("my-name")).get();
         assertThat(moduleVersion.getVersion().getMajorVersion(), equalTo(4L));
         assertThat(moduleVersion.getVersion().getMinorVersion(), equalTo(2134L));
     }
@@ -32,7 +33,8 @@ public class AnnotatedTagTest {
 
         Ref ref = project.local.tagList().call().get(0);
         AnnotatedTag inflatedTag = AnnotatedTag.fromRef(project.local.getRepository(), ref);
-        final ModuleVersion moduleVersion = tag.getReleaseInfo().versionForModule("my-name").get();
+        final ModuleVersion moduleVersion = tag.getReleaseInfo().versionForArtifact(TestUtils.artifactIdForModule
+                                                                                                  ("my-name")).get();
         assertThat(moduleVersion.getVersion().getMajorVersion(), equalTo(4L));
         assertThat(moduleVersion.getVersion().getMinorVersion(), equalTo(2134L));
     }

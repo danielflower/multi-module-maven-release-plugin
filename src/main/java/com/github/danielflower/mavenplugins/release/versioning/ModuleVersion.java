@@ -9,6 +9,8 @@ public abstract class ModuleVersion {
 
     public abstract ZonedDateTime getReleaseDate();
 
+    public abstract String getReleaseTag();
+
     public abstract ImmutableQualifiedArtifact getArtifact();
 
     public abstract ImmutableFixVersion getVersion();

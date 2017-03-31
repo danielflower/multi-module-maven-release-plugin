@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.github.danielflower.mavenplugins.release.versioning.GsonFactory;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
@@ -42,13 +43,13 @@ public class ReleaseInfoStorage {
         return previousRelease;
     }
 
-    public void store(ImmutableReleaseInfo releaseInfo) {
+    public RevCommit store(ImmutableReleaseInfo releaseInfo) {
         final File releaseInfoFile = new File(baseDir, RELEASE_INFO_FILE);
         try {
             final Gson gson = new GsonFactory().createGson();
             FileUtils.write(releaseInfoFile, gson.toJson(releaseInfo), StandardCharsets.UTF_8);
             git.add().addFilepattern(RELEASE_INFO_FILE).call();
-            git.commit().setMessage("updating release versions").call();
+            return git.commit().setMessage("updating release versions").call();
         } catch (IOException | GitAPIException e) {
             throw new RuntimeException("unable to store and commit release info", e);
         }

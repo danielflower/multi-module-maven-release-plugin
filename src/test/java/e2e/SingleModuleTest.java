@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -29,7 +30,6 @@ import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStora
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
-import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 public class SingleModuleTest {
@@ -100,21 +100,33 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException,
-                                                                                       InterruptedException {
+    public void theTagNameIsActuallyStoredInReleaseInfo() throws Exception {
         testProject.mvnRelease();
-        String expectedTag = "single-module-" + ReleaseDateSingleton.getInstance().asFileSuffix();
+        final ReleaseInfo currentInfo = currentReleaseInfo();
+        String expectedTag = expectedTag();
         assertThat(testProject.local, hasTag(expectedTag));
         assertThat(testProject.origin, hasTag(expectedTag));
     }
 
+    public String expectedTag() {
+        return currentReleaseInfo().getTagName().get();
+    }
+
+    public ReleaseInfo currentReleaseInfo()  {
+        final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(testProject.localDir, testProject.local);
+        try {
+            return infoStorage.load();
+        } catch (MojoExecutionException e) {
+            throw new RuntimeException("info access failed");
+        }
+    }
+
     @Test
-    public void onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush() throws IOException,
+    public void onlyLocalGitRepoIsTaggedWithoutPush() throws IOException,
                                                                                         InterruptedException {
         testProject.mvn("-Dpush=false", "releaser:release");
-        String expectedTag = "single-module-" + ReleaseDateSingleton.getInstance().asFileSuffix();
-        assertThat(testProject.local, hasTag(expectedTag));
-        assertThat(testProject.origin, not(hasTag(expectedTag)));
+        assertThat(testProject.local, hasTag(expectedTag()));
+        assertThat(testProject.origin, not(hasTag(expectedTag())));
     }
 
     @Test

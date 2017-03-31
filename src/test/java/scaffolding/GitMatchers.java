@@ -14,8 +14,10 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
 import com.github.danielflower.mavenplugins.release.GitHelper;
+import com.github.danielflower.mavenplugins.release.TestUtils;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
 import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
 
 public class GitMatchers {
@@ -41,6 +43,8 @@ public class GitMatchers {
 
     public static Matcher<Git> hasTagWithModuleVersion(final String moduleName, String version) {
         final ImmutableFixVersion expectedVersion = new VersionMatcher(version).fixVersion();
+        final ImmutableQualifiedArtifact artifact = ImmutableQualifiedArtifact.builder().groupId(TestUtils.TEST_GROUP_ID)
+                                                                           .artifactId(moduleName).build();
         return new TypeSafeDiagnosingMatcher<Git>() {
             @Override
             protected boolean matchesSafely(Git repo, Description mismatchDescription) {
@@ -49,8 +53,8 @@ public class GitMatchers {
                     for (Ref ref : repo.tagList().call()) {
                         final AnnotatedTag tag = AnnotatedTag.fromRef(repo.getRepository(), ref);
                         final Optional<ImmutableModuleVersion> version = tag.getReleaseInfo()
-                                                                                           .versionForModule(
-                                                                                               moduleName);
+                                                                                           .versionForArtifact(
+                                                                                               artifact);
                         if (version.isPresent()) {
                             final ImmutableModuleVersion moduleVersion = version.get();
                             if(moduleVersion.getVersion().equals(expectedVersion)) {

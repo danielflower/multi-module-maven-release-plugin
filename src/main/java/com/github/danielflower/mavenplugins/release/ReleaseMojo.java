@@ -15,12 +15,11 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
-import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**
@@ -106,23 +105,23 @@ public class ReleaseMojo extends BaseMojo {
             }
 
             List<ImmutableModuleVersion> newVersions = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(),
-                                                                                        repo,
-                                                                                        modulesToRelease);
+                                                                                        repo);
 
             List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
 
             final ImmutableReleaseInfo.Builder currentRelease = ImmutableReleaseInfo.builder();
-            currentRelease.tagName(project.getArtifactId() + "-" + ReleaseDateSingleton.getInstance().asFileSuffix());
+            currentRelease.tagName(tagName());
 
             for (ImmutableModuleVersion oldVersion : previousRelease.getModules()) {
                 if(newVersions.stream().noneMatch(version -> oldVersion.getArtifact().equals(version.getArtifact()))) {
+                    log.info("not being released: " + oldVersion.getArtifact());
                     currentRelease.addModules(oldVersion);
                 }
             }
             for (ImmutableModuleVersion newVersion : newVersions) {
                 currentRelease.addModules(newVersion);
             }
-            infoStorage.store(currentRelease.build());
+            final RevCommit releaseCommit = infoStorage.store(currentRelease.build());
 
             // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
             // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
@@ -158,8 +157,7 @@ public class ReleaseMojo extends BaseMojo {
 
     private void tagAndPushRepo(Log log, LocalGitRepo repo, List<ImmutableModuleVersion> versions) throws GitAPIException {
         final ImmutableReleaseInfo.Builder builder = ImmutableReleaseInfo.builder();
-        final ReleaseDateSingleton releaseDate = ReleaseDateSingleton.getInstance();
-        builder.tagName(project.getArtifactId() + "-" + releaseDate.asFileSuffix());
+        builder.tagName(tagName());
         builder.addAllModules(versions);
         final ImmutableReleaseInfo releaseInfo = builder.build();
         final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
@@ -221,29 +219,4 @@ public class ReleaseMojo extends BaseMojo {
         }
         return result.alteredPoms;
     }
-
-    static List<ImmutableModuleVersion> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git,
-                                                            List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<ImmutableModuleVersion> tags = new ArrayList<>();
-        for (ReleasableModule module : modules) {
-            if (!module.willBeReleased()) {
-                // TODO add version anyway
-                continue;
-            }
-            if (modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(module
-                                                                                                          .getProject().getArtifactId())) {
-                final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
-                builder.version(module.versionInfo());
-                final ImmutableQualifiedArtifact.Builder artifactBuilder = ImmutableQualifiedArtifact.builder();
-                artifactBuilder.groupId(module.getGroupId());
-                artifactBuilder.artifactId(module.getArtifactId());
-                builder.artifact(artifactBuilder.build());
-                builder.releaseDate(ReleaseDateSingleton.getInstance().getDate());
-                tags.add(builder.build());
-            }
-        }
-        // TODO check for single tag.
-        return tags;
-    }
-
 }

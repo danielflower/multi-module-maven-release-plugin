@@ -11,6 +11,7 @@ import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVe
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
+import com.github.danielflower.mavenplugins.release.versioning.QualifiedArtifact;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
 
@@ -39,6 +40,10 @@ public class TestUtils {
         project.commitRandomFile(moduleName);
         String nameForTag = moduleName.equals(".") ? "root" : moduleName;
         return tagLocalRepo(project, nameForTag + "-" + version , version);
+    }
+
+    public static QualifiedArtifact artifactIdForModule(String module) {
+        return ImmutableQualifiedArtifact.builder().groupId(TEST_GROUP_ID).artifactId(module).build();
     }
 
     private static AnnotatedTag tagLocalRepo(TestProject project, String tagName, String version) throws GitAPIException {

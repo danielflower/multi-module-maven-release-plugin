@@ -17,4 +17,5 @@ public abstract class QualifiedArtifact {
     public String toString() {
         return getGroupId() + ":" + getArtifactId();
     }
+
 }
