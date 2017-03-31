@@ -98,7 +98,7 @@ public class MvnRunner {
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
         request.setDebug(false);
-        request.setShowErrors(true);
+        request.setShowErrors(false);
 
         Invoker invoker = new DefaultInvoker();
 
