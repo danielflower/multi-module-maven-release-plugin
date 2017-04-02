@@ -83,7 +83,7 @@ public class TestProject {
 
     private static TestProject project(String name) {
         try {
-            File originDir = copyTestProjectToTemporaryLocation(name);
+            File originDir = copyTestProjectToTemporaryLocation(name, "origin-" + UUID.randomUUID().toString());
             performPomSubstitution(originDir);
 
             InitCommand initCommand = Git.init();
@@ -93,7 +93,7 @@ public class TestProject {
             origin.add().addFilepattern(".").call();
             origin.commit().setMessage("Initial commit").call();
 
-            File localDir = Photocopier.folderForSampleProject(name);
+            File localDir = Photocopier.folderForSampleProject(name, "workdir-"  + UUID.randomUUID().toString());
             Git local = Git.cloneRepository()
                 .setBare(false)
                 .setDirectory(localDir)

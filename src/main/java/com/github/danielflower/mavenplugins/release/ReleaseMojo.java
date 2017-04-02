@@ -15,6 +15,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
@@ -165,10 +166,13 @@ public class ReleaseMojo extends BaseMojo {
         final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
 
         log.info("About to tag repository with " + releaseInfo.toString());
-        repo.tagRepo(tag);
+        if (false) {
+            return;
+        }
+        final Ref ref = repo.tagRepo(tag);
         if (pushTags) {
             log.info("About to push tags and release-info " + releaseInfo.toString());
-            repo.pushAll();
+            repo.pushAll(ref);
         }
     }
 

@@ -14,7 +14,6 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
 import com.github.danielflower.mavenplugins.release.GitHelper;
-import com.github.danielflower.mavenplugins.release.TestUtils;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
@@ -41,9 +40,9 @@ public class GitMatchers {
         };
     }
 
-    public static Matcher<Git> hasTagWithModuleVersion(final String moduleName, String version) {
+    public static Matcher<Git> hasTagWithModuleVersion(String groupId, final String moduleName, String version) {
         final ImmutableFixVersion expectedVersion = new VersionMatcher(version).fixVersion();
-        final ImmutableQualifiedArtifact artifact = ImmutableQualifiedArtifact.builder().groupId(TestUtils.TEST_GROUP_ID)
+        final ImmutableQualifiedArtifact artifact = ImmutableQualifiedArtifact.builder().groupId(groupId)
                                                                            .artifactId(moduleName).build();
         return new TypeSafeDiagnosingMatcher<Git>() {
             @Override

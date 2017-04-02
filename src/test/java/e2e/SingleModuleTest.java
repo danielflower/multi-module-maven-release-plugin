@@ -26,6 +26,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.TestUtils;
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
@@ -58,18 +59,18 @@ public class SingleModuleTest {
     @Test
     public void theReleaseNumbersWillStartAt0AndThenIncrement() throws IOException, GitAPIException {
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.0"));
+        assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.0"));
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.1"));
+        assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.1"));
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.2"));
+        assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.2"));
     }
 
     @Test
     public void theReleaseNumbersWillStartAt0AndThenIncrementTakingIntoAccountManuallyUpdatedReleaseInfoFiles() throws
                                                                                                                 Exception {
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.0"));
+        assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.0"));
 
         final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(testProject.localDir, testProject.local);
         final ReleaseInfo currentInfo = infoStorage.load();
@@ -82,7 +83,7 @@ public class SingleModuleTest {
         infoStorage.store(releaseBuilder.build());
 
         testProject.mvn("releaser:release");
-        assertThat(testProject.local, hasTagWithModuleVersion("single-module", "1.6"));
+        assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.6"));
     }
 
     @Test

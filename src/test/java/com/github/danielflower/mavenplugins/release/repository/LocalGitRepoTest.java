@@ -69,14 +69,14 @@ public class LocalGitRepoTest {
     }
 
     private static List<AnnotatedTag> tags(String... tagNames) {
-        List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
+        List<AnnotatedTag> tags = new ArrayList<>();
         for (String tagName : tagNames) {
             tags.add(new AnnotatedTag(null, tagName, TestUtils.releaseInfo(2, 4, tagName, tagName)));
         }
         return tags;
     }
     private static List<String> emptyList() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     private static void tag(Git repo, String name) throws GitAPIException {

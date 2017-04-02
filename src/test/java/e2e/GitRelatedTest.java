@@ -14,6 +14,7 @@ import scaffolding.TestProject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,7 +31,7 @@ public class GitRelatedTest {
 
     @Test
     public void ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed() throws IOException {
-        File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module");
+        File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module", UUID.randomUUID().toString());
         TestProject.performPomSubstitution(projectRoot);
         try {
             new MvnRunner().runMaven(projectRoot, "releaser:release");

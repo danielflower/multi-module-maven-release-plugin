@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
-import static scaffolding.GitMatchers.hasTag;
+import static scaffolding.GitMatchers.hasTagWithModuleVersion;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
 import java.io.File;
@@ -27,11 +27,11 @@ import org.junit.Test;
 
 public class IndependentVersionsTest {
 
-    final String buildNumber = String.valueOf(System.currentTimeMillis());
-    final String expectedParentVersion = "1." + buildNumber;
-    final String expectedCoreVersion = "2." + buildNumber;
-    final String expectedAppVersion = "3." + buildNumber;
+    private static final String INDEPENDENT_VERSIONS_GROUPID = "com.github.danielflower.mavenplugins.testprojects.independentversions";
     final TestProject testProject = TestProject.independentVersionsProject();
+    private final String      expectedParentVersion = "1.0";
+    private final String      expectedCoreVersion   = "2.0";
+    private final String      expectedAppVersion    = "3.0";
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
@@ -46,33 +46,32 @@ public class IndependentVersionsTest {
     }
 
     private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {
-        assertThat(
-            commandOutput,
-            allOf(
-                oneOf(containsString("Going to release independent-versions " + expectedParentVersion)),
-                twoOf(containsString("Building independent-versions")), // once for initial build; once for release build
-                oneOf(containsString("Building core-utils")),
-                oneOf(containsString("Building console-app")),
-                oneOf(containsString("The Calculator Test has run"))
-            )
-        );
+        assertThat(commandOutput,
+                   allOf(oneOf(containsString("Going to release independent-versions " + expectedParentVersion)),
+                         twoOf(containsString("Building independent-versions")),
+                         // once for initial build; once for release build
+                         oneOf(containsString("Building core-utils")), oneOf(containsString("Building console-app")),
+                         oneOf(containsString("The Calculator Test has run"))));
     }
 
     private void installsAllModulesIntoTheRepoWithTheBuildNumber() throws Exception {
-        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "independent-versions", expectedParentVersion);
-        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "core-utils", expectedCoreVersion);
-        assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects.independentversions", "console-app", expectedAppVersion);
+        assertArtifactInLocalRepo(INDEPENDENT_VERSIONS_GROUPID,
+                                  "independent-versions", expectedParentVersion);
+        assertArtifactInLocalRepo(INDEPENDENT_VERSIONS_GROUPID, "core-utils",
+                                  expectedCoreVersion);
+        assertArtifactInLocalRepo(INDEPENDENT_VERSIONS_GROUPID,
+                                  "console-app", expectedAppVersion);
     }
 
-    private void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException, InterruptedException {
-        assertThat(testProject.local, hasTag("independent-versions-" + expectedParentVersion));
-        assertThat(testProject.origin, hasTag("independent-versions-" + expectedParentVersion));
+    private void theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion() throws IOException,
+                                                                                        InterruptedException {
+        assertThat(testProject.local, hasTagWithModuleVersion(INDEPENDENT_VERSIONS_GROUPID, "independent-versions", expectedParentVersion));
+        assertThat(testProject.local, hasTagWithModuleVersion(INDEPENDENT_VERSIONS_GROUPID, "core-utils", expectedCoreVersion));
+        assertThat(testProject.local, hasTagWithModuleVersion(INDEPENDENT_VERSIONS_GROUPID, "console-app", expectedAppVersion));
 
-        assertThat(testProject.local, hasTag("core-utils-" + expectedCoreVersion));
-        assertThat(testProject.origin, hasTag("core-utils-" + expectedCoreVersion));
-
-        assertThat(testProject.local, hasTag("console-app-" + expectedAppVersion));
-        assertThat(testProject.origin, hasTag("console-app-" + expectedAppVersion));
+        assertThat(testProject.origin, hasTagWithModuleVersion(INDEPENDENT_VERSIONS_GROUPID, "independent-versions", expectedParentVersion));
+        assertThat(testProject.origin, hasTagWithModuleVersion(INDEPENDENT_VERSIONS_GROUPID, "core-utils", expectedCoreVersion));
+        assertThat(testProject.origin, hasTagWithModuleVersion(INDEPENDENT_VERSIONS_GROUPID, "console-app", expectedAppVersion));
     }
 
     @Test
@@ -89,20 +88,15 @@ public class IndependentVersionsTest {
     @Test
     public void whenRunFromASubFolderItShowsAnError() throws IOException, InterruptedException {
         try {
-            new MvnRunner().runMaven(new File(testProject.localDir, "console-app"),
-                "-DbuildNumber=" + buildNumber,
-                "releaser:release");
+            new MvnRunner().runMaven(new File(testProject.localDir, "console-app"), "releaser:release");
             Assert.fail("Should not have worked");
         } catch (MavenExecutionException e) {
-            assertThat(e.output, twoOf(containsString("The release plugin can only be run from the root folder of your Git repository")));
-            assertThat(e.output, oneOf(containsString("Try running the release plugin from " + testProject.localDir.getCanonicalPath())));
+            assertThat(e.output, twoOf(
+                containsString("The release plugin can only be run from the root folder of your Git repository")));
+            assertThat(e.output, oneOf(
+                containsString("Try running the release plugin from " + testProject.localDir.getCanonicalPath())));
         }
     }
-
-//    @Test
-//    public void whenOneModuleDependsOnAnotherThenWhenReleasingThisDependencyHasTheRelaseVersion() {
-//        // TODO: implement this
-//    }
 
     private ObjectId head(Git git) throws IOException {
         return git.getRepository().getRef("HEAD").getObjectId();
