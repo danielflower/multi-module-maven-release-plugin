@@ -6,6 +6,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,17 +19,15 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class TestProject {
 
-    private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
-    private final String name;
-    public final File originDir;
-    public final Git origin;
-
+    private static final MvnRunner defaultRunner            = new MvnRunner(null);
+    private static final String    PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
+    public final  File   originDir;
+    public final  Git    origin;
     public final File localDir;
-    public final Git local;
-
+    public final Git  local;
+    private final String name;
     private final AtomicInteger commitCounter = new AtomicInteger(1);
-    private MvnRunner mvnRunner = defaultRunner;
+    private       MvnRunner     mvnRunner     = defaultRunner;
 
     private TestProject(File originDir, Git origin, File localDir, Git local, String name) {
         this.originDir = originDir;
@@ -36,49 +35,6 @@ public class TestProject {
         this.localDir = localDir;
         this.local = local;
         this.name = name;
-    }
-
-    /**
-     * Runs a mvn command against the local repo and returns the console output.
-     */
-    public List<String> mvn(String... arguments) throws IOException {
-        return mvnRunner.runMaven(localDir, arguments);
-    }
-
-    public List<String> mvnRelease(String... arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:release", arguments);
-    }
-
-    public List<String> mvnReleaseBugfix() throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir, "-DperformBugfixRelease=true", "releaser:release");
-    }
-
-    public List<String> mvnReleaserNext(String buildNumber, String...arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:next", arguments);
-    }
-
-    public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
-        File moduleDir = new File(localDir, module);
-        if (!moduleDir.isDirectory()) {
-            throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
-        }
-        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
-        random.createNewFile();
-        String modulePath = module.equals(".") ? "" : module + "/";
-        local.add().addFilepattern(modulePath + random.getName()).call();
-        local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + random.getName()).call();
-        return this;
-    }
-
-    public void pushIt() throws GitAPIException {
-        local.push().call();
-    }
-
-    private List<String> mvnRun(String goal, String[] arguments) {
-        String[] args = new String[arguments.length + 1];
-        System.arraycopy(arguments, 0, args, 1, arguments.length);
-        args[0] = goal;
-        return mvnRunner.runMaven(localDir, args);
     }
 
     private static TestProject project(String name) {
@@ -93,12 +49,9 @@ public class TestProject {
             origin.add().addFilepattern(".").call();
             origin.commit().setMessage("Initial commit").call();
 
-            File localDir = Photocopier.folderForSampleProject(name, "workdir-"  + UUID.randomUUID().toString());
-            Git local = Git.cloneRepository()
-                .setBare(false)
-                .setDirectory(localDir)
-                .setURI(originDir.toURI().toString())
-                .call();
+            File localDir = Photocopier.folderForSampleProject(name, "workdir-" + UUID.randomUUID().toString());
+            Git local = Git.cloneRepository().setBare(false).setDirectory(localDir).setURI(originDir.toURI().toString())
+                           .call();
 
             return new TestProject(originDir, origin, localDir, local, name);
         } catch (Exception e) {
@@ -116,7 +69,7 @@ public class TestProject {
             xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
             FileUtils.writeStringToFile(pom, xml, "UTF-8");
         }
-        for (File child : sourceDir.listFiles((FileFilter)FileFilterUtils.directoryFileFilter())) {
+        for (File child : sourceDir.listFiles((FileFilter) FileFilterUtils.directoryFileFilter())) {
             performPomSubstitution(child);
         }
     }
@@ -156,6 +109,7 @@ public class TestProject {
     public static TestProject parentAsSibilngProject() {
         return project("parent-as-sibling");
     }
+
     public static TestProject deepDependenciesProject() {
         return project("deep-dependencies");
     }
@@ -163,11 +117,77 @@ public class TestProject {
     public static TestProject moduleWithTestFailure() {
         return project("module-with-test-failure");
     }
+
     public static TestProject moduleWithSnapshotDependencies() {
         return project("snapshot-dependencies");
     }
+
     public static TestProject moduleWithSnapshotDependenciesWithVersionProperties() {
         return project("snapshot-dependencies-with-version-properties");
+    }
+
+    /**
+     * Runs a mvn command against the local repo and returns the console output.
+     */
+    public List<String> mvn(String... arguments) throws IOException {
+        return mvnRunner.runMaven(localDir, arguments);
+    }
+
+    public List<String> mvnRelease(String... arguments) throws IOException, InterruptedException {
+        return mvnRun("releaser:release", arguments);
+    }
+
+    public List<String> mvnReleaseBugfix() throws IOException, InterruptedException {
+        return mvnRunner.runMaven(localDir, "-DperformBugfixRelease=true", "releaser:release");
+    }
+
+    public List<String> mvnReleaserNext(String buildNumber, String... arguments) throws IOException,
+                                                                                        InterruptedException {
+        return mvnRun("releaser:next", arguments);
+    }
+
+    public TestProject commitFile(String module, String fileName, String fileContent) throws IOException, GitAPIException {
+        File moduleDir = new File(localDir, module);
+        if (!moduleDir.isDirectory()) {
+            throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
+        }
+        File file = new File(moduleDir, fileName);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        FileUtils.write(file, fileContent, StandardCharsets.UTF_8);
+        String modulePath = module.equals(".")
+                            ? ""
+                            : module + "/";
+        local.add().addFilepattern(modulePath + file.getName()).call();
+        local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + file.getName()).call();
+        return this;
+    }
+
+    public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+        File moduleDir = new File(localDir, module);
+        if (!moduleDir.isDirectory()) {
+            throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
+        }
+        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
+        random.createNewFile();
+        String modulePath = module.equals(".")
+                            ? ""
+                            : module + "/";
+        local.add().addFilepattern(modulePath + random.getName()).call();
+        local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + random.getName()).call();
+        return this;
+    }
+
+    public void pushIt() throws GitAPIException {
+        local.push().call();
+    }
+
+    private List<String> mvnRun(String goal, String[] arguments) {
+        String[] args = new String[arguments.length + 1];
+        System.arraycopy(arguments, 0, args, 1, arguments.length);
+        args[0] = goal;
+        return mvnRunner.runMaven(localDir, args);
     }
 
     public void setMvnRunner(MvnRunner mvnRunner) {

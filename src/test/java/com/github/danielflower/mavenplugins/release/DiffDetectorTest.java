@@ -43,6 +43,18 @@ public class DiffDetectorTest {
     }
 
     @Test
+    public void ignoreReleaseInfoInTheRoot() throws IOException, GitAPIException {
+        TestProject simple = TestProject.singleModuleProject();
+        AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0.1");
+        simple.commitFile(".", ".release-info.json", "any-content");
+        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
+        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(false));
+
+        AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0.2");
+        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag2)), is(false));
+    }
+
+    @Test
     public void canDetectChangesAfterTheLastTag() throws IOException, GitAPIException {
         TestProject project = TestProject.independentVersionsProject();
 
