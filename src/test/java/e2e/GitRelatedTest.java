@@ -1,5 +1,19 @@
 package e2e;
 
+import scaffolding.MavenExecutionException;
+import scaffolding.MvnRunner;
+import scaffolding.Photocopier;
+import scaffolding.TestProject;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.ExactCountMatcher.twoOf;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -7,19 +21,6 @@ import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
-import scaffolding.Photocopier;
-import scaffolding.TestProject;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.oneOf;
-import static scaffolding.ExactCountMatcher.twoOf;
 
 public class GitRelatedTest {
 
@@ -54,7 +55,7 @@ public class GitRelatedTest {
             testProject.mvnRelease();
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
-            assertThat(e.output, oneOf(containsString("[ERROR] origin: not found.")));
+            assertThat(e.output, oneOf(containsString("[ERROR] unable to list tags: origin: not found.")));
         }
     }
 

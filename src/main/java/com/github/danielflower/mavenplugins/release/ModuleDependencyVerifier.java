@@ -76,22 +76,21 @@ class ModuleDependencyVerifier {
                     if (detector.hasChangedSince(relativePathToModule, moduleList(), gitTag)) {
                         toBeReleased = true;
                         equivalentVersion = newVersion;
-                        log.info("using " + equivalentVersion + " for " + artifactId + " as it has changed since the last " +
-                                     "release.");
+                        log.info(
+                            "using " + equivalentVersion + " for " + artifactId + " as it has changed since the last " + "release.");
                     } else {
                         toBeReleased = false;
                         equivalentVersion = previousVersion.get().getVersion();
                         log.info(
-                            "using " + equivalentVersion + " for " + artifactId + " as it has not been changed" +
-                                " since that release.");
+                            "using " + equivalentVersion + " for " + artifactId + " as it has not been changed" + " since that release.");
                     }
                 } else {
                     toBeReleased = true;
                     equivalentVersion = newVersion;
-                    log.info(
-                        "using " + equivalentVersion + " for " + artifactId + " as it has not been released yet.");
+                    log.info("using " + equivalentVersion + " for " + artifactId + " as it has not been released yet.");
                 }
-            } catch (GitAPIException | IOException e) {
+            } catch (GitAPIException|IOException e) {
+                log.error("unable to list tags: " + e.getMessage());
                 throw new MojoExecutionException("unable to list tags", e);
             }
         }
