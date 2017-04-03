@@ -23,18 +23,19 @@ public class TestProject {
     private static final String    PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
     public final  File   originDir;
     public final  Git    origin;
-    public final File localDir;
-    public final Git  local;
-    private final String name;
+    public final File    localDir;
+    public final Git     local;
+    private final String artifactId;
     private final AtomicInteger commitCounter = new AtomicInteger(1);
     private       MvnRunner     mvnRunner     = defaultRunner;
+    private String groupId;
 
-    private TestProject(File originDir, Git origin, File localDir, Git local, String name) {
+    private TestProject(File originDir, Git origin, File localDir, Git local, String artifactId) {
         this.originDir = originDir;
         this.origin = origin;
         this.localDir = localDir;
         this.local = local;
-        this.name = name;
+        this.artifactId = artifactId;
     }
 
     private static TestProject project(String name) {
@@ -141,8 +142,8 @@ public class TestProject {
         return mvnRunner.runMaven(localDir, "-DperformBugfixRelease=true", "releaser:release");
     }
 
-    public List<String> mvnReleaserNext(String buildNumber, String... arguments) throws IOException,
-                                                                                        InterruptedException {
+    public List<String> mvnReleaserNext(String... arguments) throws IOException,
+                                                                    InterruptedException {
         return mvnRun("releaser:next", arguments);
     }
 
@@ -195,6 +196,11 @@ public class TestProject {
     }
 
     public String getArtifactId() {
-        return name;
+        return artifactId;
     }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
 }

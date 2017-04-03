@@ -13,12 +13,11 @@ import org.junit.Test;
 public class IndependentVersionsBugfixTest {
 
     private static final String GROUP_ID = "com.github.danielflower.mavenplugins.testprojects.independentversions";
-    final String buildNumber = String.valueOf(System.currentTimeMillis());
-    final String expectedParentVersion = "1." + buildNumber;
-    final String expectedCoreVersion = "2." + buildNumber;
-    final String expectedAppVersion = "3." + buildNumber;
+    final String expectedParentVersion = "1.0";
+    final String expectedCoreVersion = "2.0";
+    final String expectedAppVersion = "3.0";
     final TestProject testProject = TestProject.independentVersionsBugfixProject();
-    private String branchName = "bugfix-" + buildNumber;
+    private String branchName = "bugfix-test";
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {

@@ -30,8 +30,9 @@ public class NextMojoTest {
         TestProject simple = TestProject.singleModuleProject();
         simple.mvnRelease();
         simple.commitRandomFile(".");
-        List<String> output = simple.mvnReleaserNext("2");
-        assertThat(output, oneOf(containsString("Will use version 1.2 for single-module as it has changed since the last release.")));
+        List<String> output = simple.mvnReleaserNext();
+        assertThat(output,
+                   oneOf(containsString("using 1.1 for single-module as it has changed since the " + "last release.")));
     }
 
     @Test
@@ -39,66 +40,70 @@ public class NextMojoTest {
         testProject.mvnRelease();
 
         testProject.commitRandomFile("console-app").pushIt();
-        List<String> output = testProject.mvnReleaserNext("2");
-        assertTagDoesNotExist("console-app-3.2.2");
-        assertTagDoesNotExist("parent-module-1.2.3.2");
-        assertTagDoesNotExist("core-utils-2.0.2");
-        assertTagDoesNotExist("more-utils-10.0.2");
-        assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
+        List<String> output = testProject.mvnReleaserNext();
 
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for parent-module as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 10.1 for more-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 2.1 for core-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 3.2 for console-app as it has changed since the last release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
+        assertThat(output, oneOf(
+            containsString("[INFO] using 1.0 for parent-module as it has not been changed since that release.")));
+        assertThat(output, oneOf(
+            containsString("[INFO] using 10.0 for more-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(
+            containsString("[INFO] using 2.0 for core-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(
+            containsString("[INFO] using 3.1 for console-app as it has changed since the last release.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.0 for deep-dependencies-aggregator as it has not been changed since that release.")));
     }
 
     @Test
     public void ifThereHaveBeenNoChangesThenReReleaseAllModules() throws Exception {
         List<String> firstBuildOutput = testProject.mvnRelease();
-        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
-        List<String> output = testProject.mvnReleaserNext("2");
+        assertThat(firstBuildOutput,
+                   noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
+        List<String> output = testProject.mvnReleaserNext();
 
-        assertTagDoesNotExist("console-app-3.2");
-        assertTagDoesNotExist("parent-module-1.2");
-        assertTagDoesNotExist("core-utils-2.2");
-        assertTagDoesNotExist("more-utils-10.2");
-        assertTagDoesNotExist("deep-dependencies-aggregator-1.2");
-
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for parent-module as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 10.1 for more-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 2.1 for core-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 3.1 for console-app as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[WARNING] No changes have been detected in any modules so will re-release them all")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.1 for parent-module for rerelease.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 10.1 for more-utils for rerelease.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 2.1 for core-utils for rerelease.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 3.1 for console-app for rerelease.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.1 for deep-dependencies-aggregator for rerelease.")));
+        assertThat(output, oneOf(
+            containsString("[WARNING] No changes have been detected in any modules so will re-release them all")));
     }
 
     @Test
     public void ifThereHaveBeenNoChangesCanOptToReleaseNoModules() throws Exception {
         List<String> firstBuildOutput = testProject.mvnRelease();
-        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
-        assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will not perform release")));
-        List<String> output = testProject.mvnReleaserNext("2", "-DnoChangesAction=ReleaseNone");
+        assertThat(firstBuildOutput,
+                   noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
+        assertThat(firstBuildOutput,
+                   noneOf(containsString("No changes have been detected in any modules so will not perform release")));
+        List<String> output = testProject.mvnReleaserNext("-DnoChangesAction=ReleaseNone");
 
-        assertTagDoesNotExist("console-app-3.2");
-        assertTagDoesNotExist("parent-module-1.2");
-        assertTagDoesNotExist("core-utils-2.2");
-        assertTagDoesNotExist("more-utils-10.2");
-        assertTagDoesNotExist("deep-dependencies-aggregator-1.2");
-
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for parent-module as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 10.1 for more-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 2.1 for core-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 3.1 for console-app as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[WARNING] No changes have been detected in any modules so will not perform release")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.0 for parent-module as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 10.0 for more-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 2.0 for core-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 3.0 for console-app as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.0 for deep-dependencies-aggregator as it has not been changed since that release.")));
+        assertThat(output, oneOf(
+            containsString("[WARNING] No changes have been detected in any modules so will not perform release")));
     }
 
     @Test
-    public void ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased() throws Exception {
+    public void ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased() throws
+                                                                                                           Exception {
         testProject.mvnRelease();
         testProject.commitRandomFile("more-utilities").pushIt();
-        List<String> output = testProject.mvnReleaserNext("2");
+        List<String> output = testProject.mvnReleaserNext();
 
         assertTagDoesNotExist("console-app-3.2");
         assertTagDoesNotExist("parent-module-1.2");
@@ -106,16 +111,19 @@ public class NextMojoTest {
         assertTagDoesNotExist("more-utils-10.2");
         assertTagDoesNotExist("deep-dependencies-aggregator-1.2");
 
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for parent-module as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 10.2 for more-utils as it has changed since the last release.")));
-        assertThat(output, oneOf(containsString("[INFO] Releasing core-utils 2.2 as more-utils has changed.")));
-        assertThat(output, oneOf(containsString("[INFO] Releasing console-app 3.2 as core-utils has changed.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.0 for parent-module as it has not been changed since that release.")));
+        assertThat(output, oneOf(
+            containsString("[INFO] using 10.1 for more-utils as it has changed since the last release.")));
+        assertThat(output, oneOf(containsString("[INFO] Releasing core-utils 2.1 as at least one dependency has changed.")));
+        assertThat(output, oneOf(containsString("[INFO] Releasing console-app 3.1 as at least one dependency has changed.")));
+        assertThat(output, oneOf(containsString(
+            "[INFO] using 1.0 for deep-dependencies-aggregator as it has not been changed since that " +
+                "release.")));
     }
 
     private void assertTagDoesNotExist(String tagName) {
         assertThat(testProject.local, not(hasTag(tagName)));
         assertThat(testProject.origin, not(hasTag(tagName)));
     }
-
 }

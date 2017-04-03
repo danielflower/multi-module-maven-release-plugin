@@ -21,6 +21,7 @@ import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
 
 public class GitMatchers {
 
+
     public static Matcher<Git> hasTag(final String tag) {
         return new TypeSafeDiagnosingMatcher<Git>() {
             @Override

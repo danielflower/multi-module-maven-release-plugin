@@ -1,8 +1,10 @@
 package com.github.danielflower.mavenplugins.release;
 
 import java.io.IOException;
-import java.util.Collection;
+
+import org.eclipse.jgit.lib.Ref;
 
 public interface DiffDetector {
-    boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Collection<AnnotatedTag> tags) throws IOException;
+
+    boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Ref tagReference) throws IOException;
 }

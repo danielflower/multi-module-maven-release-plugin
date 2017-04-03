@@ -46,8 +46,7 @@ public class MavenCompatibilityTest {
     }
 
     private void buildProjectWithMavenVersion(String mavenVersionToTest) throws IOException, InterruptedException, MavenInvocationException {
-        String buildNumber = mavenVersionToTest.replace(".", "") + String.valueOf(System.currentTimeMillis());
-        String expected = "1." + buildNumber;
+        String expected = "1.0";
         testProject.setMvnRunner(MvnRunner.mvn(mavenVersionToTest));
         testProject.mvnRelease();
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);

@@ -30,11 +30,11 @@ public class PomUpdater {
         for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
             try {
                 MavenProject project = module.getProject();
-                if (module.willBeReleased()) {
-                    log.info("Going to release " + module.getArtifactId() + " " + module.getNewVersion());
+                if (module.isToBeReleased()) {
+                    log.info("Going to release " + module.getProject().getArtifactId() + " " + module.getVersion().toString());
                 }
 
-                List<String> errorsForCurrentPom = alterModel(project, module.getNewVersion());
+                List<String> errorsForCurrentPom = alterModel(project, module.getVersion().toString());
                 errors.addAll(errorsForCurrentPom);
 
                 File pom = project.getFile().getCanonicalFile();
@@ -80,12 +80,13 @@ public class PomUpdater {
         MavenProject parent = project.getParent();
         if (parent != null && isSnapshot(parent.getVersion())) {
             try {
-                ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId(), parent.getVersion
-                                                                                                               ());
-                originalModel.getParent().setVersion(parentBeingReleased.getVersionToDependOn());
-                log.debug(" Parent " + parentBeingReleased.getArtifactId() + " rewritten to version " + parentBeingReleased.getVersionToDependOn());
+                ReleasableModule parentBeingReleased = reactor.find(parent.getGroupId(), parent.getArtifactId());
+                originalModel.getParent().setVersion(parentBeingReleased.getVersion().toString());
+                log.debug(" Parent " + parentBeingReleased.getProject().getArtifactId() + " rewritten to version " + parentBeingReleased
+                                                                                                            .getVersion()
+                                                                                                            .toString());
             } catch (UnresolvedSnapshotDependencyException e) {
-                errors.add("The parent of " + searchingFrom + " is " + e.artifactId + " " + e.version);
+                errors.add("The parent of " + searchingFrom + " is " + e.artifactId);
             }
         }
 
@@ -94,12 +95,13 @@ public class PomUpdater {
             String version = dependency.getVersion();
             if (isSnapshot(resolveVersion(version, projectProperties))) {
                 try {
-                    ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId(),
-                                                             version);
-                    dependency.setVersion(dependencyBeingReleased.getVersionToDependOn());
-                    log.debug(" Dependency on " + dependencyBeingReleased.getArtifactId() + " rewritten to version " + dependencyBeingReleased.getVersionToDependOn());
+                    ReleasableModule dependencyBeingReleased = reactor.find(dependency.getGroupId(), dependency.getArtifactId());
+                    dependency.setVersion(dependencyBeingReleased.getVersion().toString());
+                    log.debug(" Dependency on " + dependencyBeingReleased.getProject().getArtifactId() + " rewritten to version " + dependencyBeingReleased
+                                                                                                                           .getVersion()
+                                                                                                                           .toString());
                 } catch (UnresolvedSnapshotDependencyException e) {
-                    errors.add(searchingFrom + " references dependency " + e.artifactId + " " + e.version);
+                    errors.add(searchingFrom + " references dependency " + e.artifactId);
                 }
             }else
                 log.debug(" Dependency on " + dependency.getArtifactId() + " kept at version " + dependency.getVersion());

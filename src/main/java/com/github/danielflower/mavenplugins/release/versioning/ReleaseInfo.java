@@ -22,7 +22,11 @@ public abstract class ReleaseInfo {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(getTagName()).append(" ");
+        if (getTagName().isPresent()) {
+            builder.append("tag '").append(getTagName().get()).append("' ");
+        } else {
+            builder.append("(no tag yet) ");
+        }
         for (ImmutableModuleVersion moduleVersion : getModules()) {
             builder.append(moduleVersion.toString());
         }

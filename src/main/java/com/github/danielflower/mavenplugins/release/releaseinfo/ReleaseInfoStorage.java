@@ -16,7 +16,7 @@ import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 import com.google.gson.Gson;
 
 public class ReleaseInfoStorage {
-    private static final String RELEASE_INFO_FILE = ".release-info.json";
+    public static final String RELEASE_INFO_FILE = ".release-info.json";
     private final Git          git;
     private       File         baseDir;
 

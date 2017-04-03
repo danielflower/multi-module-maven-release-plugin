@@ -3,15 +3,17 @@ package com.github.danielflower.mavenplugins.release;
 import scaffolding.TestProject;
 
 import static com.github.danielflower.mavenplugins.release.TestUtils.saveFileInModule;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 
 public class DiffDetectorTest {
 
@@ -25,9 +27,9 @@ public class DiffDetectorTest {
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
 
-        assertThat(detector.hasChangedSince("core-utils", noChildModules(), asList(tag2)), is(false));
-        assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag2)), is(true));
-        assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(false));
+        assertThat(detector.hasChangedSince("core-utils", Collections.emptyList(), tag2.ref()), is(false));
+        assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag2.ref()), is(true));
+        assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag3.ref()), is(false));
     }
 
     @Test
@@ -35,23 +37,24 @@ public class DiffDetectorTest {
         TestProject simple = TestProject.singleModuleProject();
         AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0.1");
         simple.commitRandomFile(".");
-        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
-        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(true));
-
         AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0.2");
-        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag2)), is(false));
+
+        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
+
+        assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag1.ref()), is(true));
+        assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag2.ref()), is(false));
     }
 
     @Test
     public void ignoreReleaseInfoInTheRoot() throws IOException, GitAPIException {
         TestProject simple = TestProject.singleModuleProject();
         AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0.1");
-        simple.commitFile(".", ".release-info.json", "any-content");
+        simple.commitFile(".", ReleaseInfoStorage.RELEASE_INFO_FILE, "any-content");
         DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
-        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(false));
+        assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag1.ref()), is(false));
 
         AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0.2");
-        assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag2)), is(false));
+        assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag2.ref()), is(false));
     }
 
     @Test
@@ -64,7 +67,7 @@ public class DiffDetectorTest {
         project.commitRandomFile("console-app");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
-        assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(true));
+        assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag3.ref()), is(true));
     }
 
     @Test
@@ -77,11 +80,6 @@ public class DiffDetectorTest {
         project.commitRandomFile("console-app");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
-        assertThat(detector.hasChangedSince("console-app", asList("console-app"), asList(tag3)), is(false));
-    }
-
-
-    private static java.util.List<String> noChildModules() {
-        return new ArrayList<String>();
+        assertThat(detector.hasChangedSince("console-app", singletonList("console-app"), tag3.ref()), is(false));
     }
 }

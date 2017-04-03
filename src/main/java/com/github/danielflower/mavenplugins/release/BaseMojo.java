@@ -158,18 +158,20 @@ public abstract class BaseMojo extends AbstractMojo {
                                                                                                          ValidationException {
         List<ImmutableModuleVersion> tags = new ArrayList<>();
         for (ReleasableModule module : modules) {
-            if (!module.willBeReleased()) {
+            /*
+            if (!module.()) {
                 // TODO add version anyway
                 continue;
             }
+            */
             if (modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(
                 module.getProject().getArtifactId())) {
                 final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
-                builder.version(module.versionInfo());
+                builder.version(module.getVersion());
                 builder.releaseTag(tagName());
                 final ImmutableQualifiedArtifact.Builder artifactBuilder = ImmutableQualifiedArtifact.builder();
-                artifactBuilder.groupId(module.getGroupId());
-                artifactBuilder.artifactId(module.getArtifactId());
+                artifactBuilder.groupId(module.getProject().getGroupId());
+                artifactBuilder.artifactId(module.getProject().getArtifactId());
                 builder.artifact(artifactBuilder.build());
                 builder.releaseDate(ReleaseDateSingleton.getInstance().getDate());
                 tags.add(builder.build());
