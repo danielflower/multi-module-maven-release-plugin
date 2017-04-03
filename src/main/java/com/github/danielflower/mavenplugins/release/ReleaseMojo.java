@@ -93,7 +93,6 @@ public class ReleaseMojo extends BaseMojo {
         try {
             configureJsch(log);
 
-
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             repo.errorIfNotClean();
 
@@ -141,12 +140,9 @@ public class ReleaseMojo extends BaseMojo {
             } finally {
                 revertChanges(log, repo, changedFiles, false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
             }
-
-
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         } catch (GitAPIException gae) {
-
             StringWriter sw = new StringWriter();
             gae.printStackTrace(new PrintWriter(sw));
             String exceptionAsString = sw.toString();
@@ -166,9 +162,6 @@ public class ReleaseMojo extends BaseMojo {
         final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
 
         log.info("About to tag repository with " + releaseInfo.toString());
-        if (false) {
-            return;
-        }
         final Ref ref = repo.tagRepo(tag);
         if (pushTags) {
             log.info("About to push tags and release-info " + releaseInfo.toString());

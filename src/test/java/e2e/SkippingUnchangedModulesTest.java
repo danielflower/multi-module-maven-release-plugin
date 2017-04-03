@@ -49,9 +49,8 @@ public class SkippingUnchangedModulesTest {
         assertTagExists("console-app", "3.0");
         assertTagExists("more-utils", "10.0");
 
-        assertThat(initialBuildOutput, oneOf(containsString("Releasing core-utils 2.0 as parent-module has changed")));
-        assertThat(initialBuildOutput, oneOf(containsString("Releasing console-app 3.0 as parent-module has " +
-                                                                "changed")));
+        assertThat(initialBuildOutput, oneOf(containsString("Releasing core-utils 2.0 as at least one dependency has changed")));
+        assertThat(initialBuildOutput, oneOf(containsString("Releasing console-app 3.0 as at least one dependency has changed")));
 
         testProject.commitRandomFile("console-app").pushIt();
         List<String> output = testProject.mvnRelease();
@@ -75,11 +74,11 @@ public class SkippingUnchangedModulesTest {
         List<String> secondBuildOutput = testProject.mvnRelease();
         assertThat(secondBuildOutput, oneOf(containsString("No changes have been detected in any modules so will re-release them all")));
 
-        assertTagExists("console-app", "3.2");
-        assertTagExists("parent-module", "1.2");
-        assertTagExists("core-utils", "2.2");
-        assertTagExists("more-utils", "10.2");
-        assertTagExists("deep-dependencies-aggregator", "1.2");
+        assertTagExists("console-app", "3.1");
+        assertTagExists("parent-module", "1.1");
+        assertTagExists("core-utils", "2.1");
+        assertTagExists("more-utils", "10.1");
+        assertTagExists("deep-dependencies-aggregator", "1.1");
     }
 
     @Test
@@ -89,11 +88,11 @@ public class SkippingUnchangedModulesTest {
         List<String> secondBuildOutput = testProject.mvnRelease("-DnoChangesAction=ReleaseNone");
         assertThat(secondBuildOutput, oneOf(containsString("No changes have been detected in any modules so will not perform release")));
 
-        assertTagExists("console-app", "3.1");
-        assertTagExists("parent-module", "1.1");
-        assertTagExists("core-utils", "2.1");
-        assertTagExists("more-utils", "10.1");
-        assertTagExists("deep-dependencies-aggregator", "1.1");
+        assertTagExists("console-app", "3.0");
+        assertTagExists("parent-module", "1.0");
+        assertTagExists("core-utils", "2.0");
+        assertTagExists("more-utils", "10.0");
+        assertTagExists("deep-dependencies-aggregator", "1.0");
     }
 
     @Test

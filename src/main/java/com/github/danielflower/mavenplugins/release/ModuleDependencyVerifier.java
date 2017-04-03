@@ -14,7 +14,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
 import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
-import com.github.danielflower.mavenplugins.release.versioning.FixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
@@ -52,20 +51,22 @@ class ModuleDependencyVerifier {
 
         boolean dependencyChanged = modules.stream().filter(ReleasableModule::isToBeReleased)
                                            .anyMatch(this::dependencyOrParentChanged);
-        FixVersion equivalentVersion = null;
+        ImmutableFixVersion equivalentVersion;
         boolean toBeReleased;
 
+        final Optional<ImmutableModuleVersion> previousVersion = previousRelease.getModules().stream()
+                                                                                .filter(m -> m.getArtifact().equals(artifact()))
+                                                                                .findAny();
         if (modulesToForceRelease.contains(artifactId)) {
             toBeReleased = true;
+            equivalentVersion = newVersion;
             log.info("Releasing " + artifactId + " " + newVersion.toString() + " as we was asked to forced release.");
         } else if (dependencyChanged) {
             toBeReleased = true;
+            equivalentVersion = newVersion;
             log.info(
                 "Releasing " + artifactId + " " + newVersion.toString() + " as at least one dependency has changed.");
         } else {
-            final Optional<ImmutableModuleVersion> previousVersion = previousRelease.getModules().stream()
-                                                                        .filter(m -> m.getArtifact().equals(artifact()))
-                                                                        .findAny();
             final String tagName = previousVersion.map(ImmutableModuleVersion::getReleaseTag).orElse("");
             try {
                 log.info("looking for tag with name '" + tagName + "'");
@@ -96,7 +97,7 @@ class ModuleDependencyVerifier {
         }
         final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder();
         builder.project(project);
-        builder.version(newVersion);
+        builder.version(equivalentVersion);
         builder.isToBeReleased(toBeReleased);
         builder.relativePathToModule(relativePathToModule);
         return builder.build();

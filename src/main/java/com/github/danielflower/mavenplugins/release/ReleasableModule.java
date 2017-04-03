@@ -14,9 +14,4 @@ public interface ReleasableModule {
     ImmutableFixVersion getVersion();
 
     boolean isToBeReleased();
-
-    default ImmutableReleasableModule createReleasableVersion() {
-        final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder().from(this);
-        return builder.build();
-    }
 }
