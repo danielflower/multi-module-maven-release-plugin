@@ -4,7 +4,7 @@ import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
@@ -14,6 +14,8 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 
 public class TestRunningTest {
     final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
@@ -29,18 +31,21 @@ public class TestRunningTest {
             projectWithTestsThatFail.mvnRelease();
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
-
         }
         assertThat(projectWithTestsThatFail.local, hasCleanWorkingDirectory());
-        assertThat(projectWithTestsThatFail.local.tagList().call().get(0).getName(), is("refs/tags/module-with-test-failure-1.1"));
-        assertThat(projectWithTestsThatFail.origin.tagList().call().get(0).getName(), is("refs/tags/module-with-test-failure-1.1"));
+        String expectedTagName = expectedTagName();
+        assertThat(projectWithTestsThatFail.local.tagList().call().get(0).getName(), startsWith(expectedTagName));
+        assertThat(projectWithTestsThatFail.origin.tagList().call().get(0).getName(), startsWith(expectedTagName));
+    }
+
+    public String expectedTagName() {
+        final String fullTag = "refs/tags/module-with-test-failure-" + ReleaseDateSingleton.getInstance()
+                                                                                           .asFileSuffix();
+        return fullTag.substring(0, fullTag.length() - 2);
     }
 
     @Test
     public void ifTestsAreSkippedYouCanReleaseWithoutRunningThem() throws IOException {
-        projectWithTestsThatFail.mvn(
-            "-DbuildNumber=1", "-DskipTests",
-            "releaser:release");
+        projectWithTestsThatFail.mvn("-DbuildNumber=1", "-DskipTests", "releaser:release");
     }
-
 }

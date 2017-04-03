@@ -113,13 +113,13 @@ public class SkippingUnchangedModulesTest {
         testProject.commitRandomFile("more-utilities").pushIt();
         List<String> output = testProject.mvnRelease();
 
-        assertTagExists("console-app", "3.2");
-        assertTagDoesNotExist("parent-module", "1.2");
-        assertTagExists("core-utils", "2.2");
-        assertTagExists("more-utils", "10.2");
-        assertTagDoesNotExist("deep-dependencies-aggregator", "1.2");
+        assertTagExists("console-app", "3.1");
+        assertTagDoesNotExist("parent-module", "1.1");
+        assertTagExists("core-utils", "2.1");
+        assertTagExists("more-utils", "10.1");
+        assertTagDoesNotExist("deep-dependencies-aggregator", "1.1");
 
-        assertThat(output, oneOf(containsString("Going to release console-app 3.2")));
+        assertThat(output, oneOf(containsString("Going to release console-app 3.1")));
         assertThat(output, noneOf(containsString("Going to release parent-module")));
         assertThat(output, oneOf(containsString("Going to release core-utils")));
         assertThat(output, oneOf(containsString("Going to release more-utils")));
