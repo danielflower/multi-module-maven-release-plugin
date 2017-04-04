@@ -42,7 +42,7 @@ public class NestedModulesTest {
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
         buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease());
-        installsAllModulesIntoTheRepoWithTheBuildNumber();
+        hasInstalledAllModulesIntoTheRepoWithTheBuildNumber();
 
         assertBothReposTagged("nested-project", expectedAggregatorVersion, "");
         assertBothReposTagged("core-utils", expectedCoreVersion, "");
@@ -71,21 +71,21 @@ public class NestedModulesTest {
         assertBothReposNotTagged("nested-project", minor(expectedAggregatorVersion, 1));
         assertBothReposTagged("core-utils", minor(expectedCoreVersion, 1), "");
         assertBothReposTagged("console-app", minor(expectedAppVersion, 2), "");
+        assertBothReposTagged("parent-module", minor(expectedParentVersion, 1), "");
+        assertBothReposNotTagged("server-modules", minor(expectedServerModulesVersion, 1));
+        assertBothReposTagged("server-module-a", minor(expectedServerModuleAVersion, 1), "");
+        assertBothReposTagged("server-module-b", minor(expectedServerModuleBVersion, 1), "");
+        assertBothReposTagged("server-module-c", minor(expectedServerModuleCVersion, 1), ".misnamed");
+
+        testProject.mvnRelease();
+        assertBothReposTagged("nested-project", minor(expectedAggregatorVersion, 1), "");
+        assertBothReposTagged("core-utils", minor(expectedCoreVersion, 2), "");
+        assertBothReposTagged("console-app", minor(expectedAppVersion, 3), "");
         assertBothReposTagged("parent-module", minor(expectedParentVersion, 2), "");
-        assertBothReposNotTagged("server-modules", minor(expectedServerModulesVersion, 2));
+        assertBothReposTagged("server-modules", minor(expectedServerModulesVersion, 1), "");
         assertBothReposTagged("server-module-a", minor(expectedServerModuleAVersion, 2), "");
         assertBothReposTagged("server-module-b", minor(expectedServerModuleBVersion, 2), "");
         assertBothReposTagged("server-module-c", minor(expectedServerModuleCVersion, 2), ".misnamed");
-
-        testProject.mvnRelease();
-        assertBothReposTagged("nested-project", expectedAggregatorVersion, "");
-        assertBothReposTagged("core-utils", expectedCoreVersion, "");
-        assertBothReposTagged("console-app", expectedAppVersion, "");
-        assertBothReposTagged("parent-module", expectedParentVersion, "");
-        assertBothReposTagged("server-modules", expectedServerModulesVersion, "");
-        assertBothReposTagged("server-module-a", expectedServerModuleAVersion, "");
-        assertBothReposTagged("server-module-b", expectedServerModuleBVersion, "");
-        assertBothReposTagged("server-module-c", expectedServerModuleCVersion, ".misnamed");
     }
 
     private String minor(String expectedCoreVersion, int newMinor) {
@@ -104,7 +104,7 @@ public class NestedModulesTest {
                                         oneOf(containsString("Building server-module-c"))));
     }
 
-    private void installsAllModulesIntoTheRepoWithTheBuildNumber() throws Exception {
+    private void hasInstalledAllModulesIntoTheRepoWithTheBuildNumber() throws Exception {
         assertArtifactInLocalRepo(GROUP_ID, "nested-project", expectedAggregatorVersion);
         assertArtifactInLocalRepo(GROUP_ID, "core-utils", expectedCoreVersion);
         assertArtifactInLocalRepo(GROUP_ID, "console-app", expectedAppVersion);
