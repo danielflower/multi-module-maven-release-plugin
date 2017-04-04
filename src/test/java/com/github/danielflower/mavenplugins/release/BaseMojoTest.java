@@ -33,7 +33,8 @@ public class BaseMojoTest {
 		when(server.getPrivateKey()).thenReturn(SETTINGS_IDENTITY_FILE);
 		when(server.getPassphrase()).thenReturn(SETTINGS_PASSPHRASE);
 		when(settings.getServer(SERVER_ID)).thenReturn(server);
-		mojo.setSettings(settings);
+        when(mojo.getLog()).thenReturn(log);
+        mojo.setSettings(settings);
 		JschConfigSessionFactory.setInstance(null);
 	}
 
