@@ -1,6 +1,5 @@
 package e2e;
 
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -13,26 +12,21 @@ import static scaffolding.GitMatchers.hasTagWithModuleVersion;
 
 import java.util.List;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.TestUtils;
 
 public class SkippingUnchangedModulesTest {
 
-    final TestProject testProject = TestProject.deepDependenciesProject();
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.DEEP_DEPENDENCIES);
 
     private static final String GROUP_ID= TestUtils.TEST_GROUP_ID + ".deepdependencies";
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
-
     @Test
     public void changesInTheRootAreDetected() throws Exception {
-        TestProject simple = TestProject.singleModuleProject();
+        TestProject simple = TestProject.project(ProjectType.SINGLE);
         simple.mvnRelease();
         simple.commitRandomFile(".");
         List<String> output = simple.mvnRelease();

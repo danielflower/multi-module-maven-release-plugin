@@ -1,7 +1,6 @@
 package e2e;
 
 import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -10,20 +9,15 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
 import java.io.IOException;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 
 public class TestRunningTest {
-    final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject projectWithTestsThatFail = new TestProject(ProjectType.MODULE_WITH_TEST_FAILURE);
 
     @Test
     public void doesNotReleaseIfThereAreTestFailuresButTagsAreStillWritten() throws Exception {

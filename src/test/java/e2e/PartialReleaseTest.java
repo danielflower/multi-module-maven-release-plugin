@@ -1,6 +1,5 @@
 package e2e;
 
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.allOf;
@@ -17,11 +16,10 @@ import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class PartialReleaseTest {
@@ -31,12 +29,9 @@ public class PartialReleaseTest {
     final               String      expectedParentVersion     = "1.0";
     final               String      expectedCoreVersion       = "2.0";
     final               String      expectedAppVersion        = "3.0";
-    final               TestProject testProject               = TestProject.parentAsSibilngProject();
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.PARENT_AS_SIBLING);
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {

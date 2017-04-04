@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import e2e.ProjectType;
 import scaffolding.TestProject;
 
 import static com.github.danielflower.mavenplugins.release.TestUtils.saveFileInModule;
@@ -11,15 +12,19 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 
 public class DiffDetectorTest {
 
+    @Rule
+    public TestProject singleProject = new TestProject(ProjectType.SINGLE);
+
     @Test
     public void canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag() throws Exception {
-        TestProject project = TestProject.independentVersionsProject();
+        TestProject project = TestProject.project(ProjectType.INDEPENDENT_VERSIONS);
 
         AnnotatedTag tag1 = saveFileInModule(project, "console-app", "1.2.3");
         AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2.0");
@@ -34,12 +39,11 @@ public class DiffDetectorTest {
 
     @Test
     public void canDetectThingsInTheRoot() throws IOException, GitAPIException {
-        TestProject simple = TestProject.singleModuleProject();
-        AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0.1");
-        simple.commitRandomFile(".");
-        AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0.2");
+        AnnotatedTag tag1 = saveFileInModule(singleProject, ".", "1.0.1");
+        singleProject.commitRandomFile(".");
+        AnnotatedTag tag2 = saveFileInModule(singleProject, ".", "1.0.2");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(singleProject.local.getRepository());
 
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag1.ref()), is(true));
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag2.ref()), is(false));
@@ -47,19 +51,18 @@ public class DiffDetectorTest {
 
     @Test
     public void ignoreReleaseInfoInTheRoot() throws IOException, GitAPIException {
-        TestProject simple = TestProject.singleModuleProject();
-        AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0.1");
-        simple.commitFile(".", ReleaseInfoStorage.RELEASE_INFO_FILE, "any-content");
-        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
+        AnnotatedTag tag1 = saveFileInModule(singleProject, ".", "1.0.1");
+        singleProject.commitFile(".", ReleaseInfoStorage.RELEASE_INFO_FILE, "any-content");
+        DiffDetector detector = new TreeWalkingDiffDetector(singleProject.local.getRepository());
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag1.ref()), is(false));
 
-        AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0.2");
+        AnnotatedTag tag2 = saveFileInModule(singleProject, ".", "1.0.2");
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag2.ref()), is(false));
     }
 
     @Test
     public void canDetectChangesAfterTheLastTag() throws IOException, GitAPIException {
-        TestProject project = TestProject.independentVersionsProject();
+        TestProject project = TestProject.project(ProjectType.INDEPENDENT_VERSIONS);
 
         saveFileInModule(project, "console-app", "1.2.3");
         saveFileInModule(project, "core-utils", "2.0");
@@ -72,7 +75,7 @@ public class DiffDetectorTest {
 
     @Test
     public void canIgnoreModuleFolders() throws IOException, GitAPIException {
-        TestProject project = TestProject.independentVersionsProject();
+        TestProject project = TestProject.project(ProjectType.INDEPENDENT_VERSIONS);
 
         saveFileInModule(project, "console-app", "1.2.3");
         saveFileInModule(project, "core-utils", "2.0");

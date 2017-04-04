@@ -18,26 +18,22 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class IndependentVersionsTest {
 
     private static final String INDEPENDENT_VERSIONS_GROUPID = "com.github.danielflower.mavenplugins.testprojects.independentversions";
-    final TestProject testProject = TestProject.independentVersionsProject();
     private final String      expectedParentVersion = "1.0";
     private final String      expectedCoreVersion   = "2.0";
     private final String      expectedAppVersion    = "3.0";
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.INDEPENDENT_VERSIONS);
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {

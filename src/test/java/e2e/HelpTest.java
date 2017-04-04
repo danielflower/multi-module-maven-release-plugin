@@ -11,23 +11,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HelpTest {
 
-    private static final String multi_module_release_help = "releaser:help";
-    private static TestProject someProject;
+    @Rule
+    public TestProject singleProject = new TestProject(ProjectType.SINGLE);
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException, IOException, GitAPIException {
-        MvnRunner.installReleasePluginToLocalRepo();
-        someProject = TestProject.singleModuleProject();
-    }
+    private static final String multi_module_release_help = "releaser:help";
 
     private static Matcher<Iterable<? super String>> containsStrings(String... strings) {
         List<Matcher<Iterable<? super String>>> matchers = new ArrayList<>();
@@ -46,7 +40,7 @@ public class HelpTest {
     }
 
     private List<String> mvn(String... commands) throws IOException {
-        return new MvnRunner().runMaven(someProject.localDir, commands);
+        return new MvnRunner().runMaven(singleProject.localDir, commands);
     }
 
     @Test

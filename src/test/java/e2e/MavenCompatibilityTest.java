@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -18,12 +18,8 @@ import org.junit.Test;
  */
 public class MavenCompatibilityTest {
 
-    final TestProject testProject = TestProject.singleModuleProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.SINGLE);
 
     @Test
     public void maven_3_0_1() throws Exception {

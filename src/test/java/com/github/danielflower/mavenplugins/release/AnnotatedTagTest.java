@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import e2e.ProjectType;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -9,12 +10,17 @@ import java.io.IOException;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.versioning.ModuleVersion;
 import com.google.gson.JsonSyntaxException;
 
 public class AnnotatedTagTest {
+
+    @Rule
+    public TestProject project = new TestProject(ProjectType.SINGLE);
+
     @Test
     public void gettersReturnValuesPassedIn() throws Exception {
         AnnotatedTag tag = new AnnotatedTag(null, "my-name", TestUtils.releaseInfo(4L, 2134L, "test", "my-name"));
@@ -27,7 +33,6 @@ public class AnnotatedTagTest {
 
     @Test
     public void aTagCanBeCreatedFromAGitTag() throws GitAPIException, IOException {
-        TestProject project = TestProject.singleModuleProject();
         AnnotatedTag tag = new AnnotatedTag(null, "my-name", TestUtils.releaseInfo(4L, 2134L, "test", "my-name"));
         tag.saveAtHEAD(project.local);
 
@@ -41,7 +46,6 @@ public class AnnotatedTagTest {
 
     @Test(expected = JsonSyntaxException.class)
     public void ifATagIsSavedWithoutJsonThenAnExceptionIsThrown() throws GitAPIException, IOException {
-        TestProject project = TestProject.singleModuleProject();
         project.local.tag().setName("my-name-1.0.2").setAnnotated(true).setMessage("This is not json").call();
 
         Ref ref = project.local.tagList().call().get(0);

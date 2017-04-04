@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 public class Photocopier {
-    public static File copyTestProjectToTemporaryLocation(String moduleName, String subfolder) throws IOException {
+    public static File copyTestProjectToTemporaryLocation(String moduleName, String subfolder)  {
         File source = new File("test-projects", moduleName);
         if (!source.isDirectory()) {
             source = new File(FilenameUtils.separatorsToSystem("../test-projects/" + moduleName));
@@ -17,7 +17,11 @@ public class Photocopier {
         }
 
         File target = folderForSampleProject(moduleName, subfolder);
-        FileUtils.copyDirectory(source, target);
+        try {
+            FileUtils.copyDirectory(source, target);
+        } catch (IOException e) {
+            throw new RuntimeException("unable to copy project", e);
+        }
         return target;
     }
 

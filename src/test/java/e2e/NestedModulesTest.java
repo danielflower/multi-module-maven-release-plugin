@@ -1,6 +1,5 @@
 package e2e;
 
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.allOf;
@@ -17,32 +16,28 @@ import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
 
 public class NestedModulesTest {
 
-    public static final String      GROUP_ID                     = "com.github.danielflower.mavenplugins.testprojects.nested";
-    final               TestProject testProject                  = TestProject.nestedProject();
-    private final       String      expectedAggregatorVersion    = "0.0";
-    private final       String      expectedParentVersion        = "1.0";
-    private final       String      expectedCoreVersion          = "2.0";
-    private final       String      expectedAppVersion           = "3.0";
-    private final       String      expectedServerModulesVersion = "1.0";
-    private final       String      expectedServerModuleAVersion = "3.0";
-    private final       String      expectedServerModuleBVersion = "3.0";
-    private final       String      expectedServerModuleCVersion = "3.0";
+    private static final String      GROUP_ID                     = "com.github.danielflower.mavenplugins.testprojects.nested";
+    private final        String      expectedAggregatorVersion    = "0.0";
+    private final        String      expectedParentVersion        = "1.0";
+    private final        String      expectedCoreVersion          = "2.0";
+    private final        String      expectedAppVersion           = "3.0";
+    private final        String      expectedServerModulesVersion = "1.0";
+    private final        String      expectedServerModuleAVersion = "3.0";
+    private final        String      expectedServerModuleBVersion = "3.0";
+    private final        String      expectedServerModuleCVersion = "3.0";
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.NESTED);
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
@@ -66,7 +61,7 @@ public class NestedModulesTest {
         assertBothReposTagged("console-app", minor(expectedAppVersion, 1), "");
         assertBothReposNotTagged("parent-module", minor(expectedParentVersion, 1));
         assertBothReposNotTagged("server-modules", minor(expectedServerModulesVersion, 1));
-        assertBothReposNotTagged("server-module-a", minor(expectedServerModuleAVersion,1 ));
+        assertBothReposNotTagged("server-module-a", minor(expectedServerModuleAVersion, 1));
         assertBothReposTagged("server-module-b", expectedServerModuleBVersion, "");
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, ".misnamed");
 
@@ -78,9 +73,9 @@ public class NestedModulesTest {
         assertBothReposTagged("console-app", minor(expectedAppVersion, 2), "");
         assertBothReposTagged("parent-module", minor(expectedParentVersion, 2), "");
         assertBothReposNotTagged("server-modules", minor(expectedServerModulesVersion, 2));
-        assertBothReposTagged("server-module-a", minor(expectedServerModuleAVersion,2 ), "");
+        assertBothReposTagged("server-module-a", minor(expectedServerModuleAVersion, 2), "");
         assertBothReposTagged("server-module-b", minor(expectedServerModuleBVersion, 2), "");
-        assertBothReposTagged("server-module-c", minor(expectedServerModuleCVersion, 2),  ".misnamed");
+        assertBothReposTagged("server-module-c", minor(expectedServerModuleCVersion, 2), ".misnamed");
 
         testProject.mvnRelease();
         assertBothReposTagged("nested-project", expectedAggregatorVersion, "");

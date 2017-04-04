@@ -1,28 +1,23 @@
 package e2e;
 
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class IndependentVersionsBugfixTest {
 
-    private static final String GROUP_ID = "com.github.danielflower.mavenplugins.testprojects.independentversions";
-    final String expectedParentVersion = "1.0";
-    final String expectedCoreVersion = "2.0";
-    final String expectedAppVersion = "3.0";
-    final TestProject testProject = TestProject.independentVersionsBugfixProject();
-    private String branchName = "bugfix-test";
+    private static final String GROUP_ID              = "com.github.danielflower.mavenplugins.testprojects.independentversions";
+    private final        String expectedParentVersion = "1.0";
+    private final        String expectedCoreVersion   = "2.0";
+    private final        String expectedAppVersion    = "3.0";
+    private              String branchName            = "bugfix-test";
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.INDEPENDENT_VERSIONS_BUGFIX);
 
     @Before
     public void releaseProject() throws Exception {

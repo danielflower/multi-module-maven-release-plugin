@@ -1,6 +1,5 @@
 package e2e;
 
-import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -12,22 +11,17 @@ import static scaffolding.GitMatchers.hasTag;
 
 import java.util.List;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class NextMojoTest {
 
-    final TestProject testProject = TestProject.deepDependenciesProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject dependenciesProject = new TestProject(ProjectType.DEEP_DEPENDENCIES);
 
     @Test
     public void changesInTheRootAreDetected() throws Exception {
-        TestProject simple = TestProject.singleModuleProject();
+        TestProject simple = TestProject.project(ProjectType.SINGLE);
         simple.mvnRelease();
         simple.commitRandomFile(".");
         List<String> output = simple.mvnReleaserNext();
@@ -37,10 +31,10 @@ public class NextMojoTest {
 
     @Test
     public void doesNotReReleaseAModuleThatHasNotChanged() throws Exception {
-        testProject.mvnRelease();
+        dependenciesProject.mvnRelease();
 
-        testProject.commitRandomFile("console-app").pushIt();
-        List<String> output = testProject.mvnReleaserNext();
+        dependenciesProject.commitRandomFile("console-app").pushIt();
+        List<String> output = dependenciesProject.mvnReleaserNext();
 
         assertThat(output, oneOf(
             containsString("[INFO] using 1.0 for parent-module as it has not been changed since that release.")));
@@ -56,10 +50,10 @@ public class NextMojoTest {
 
     @Test
     public void ifThereHaveBeenNoChangesThenReReleaseAllModules() throws Exception {
-        List<String> firstBuildOutput = testProject.mvnRelease();
+        List<String> firstBuildOutput = dependenciesProject.mvnRelease();
         assertThat(firstBuildOutput,
                    noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
-        List<String> output = testProject.mvnReleaserNext();
+        List<String> output = dependenciesProject.mvnReleaserNext();
 
         assertThat(output, oneOf(containsString(
             "[INFO] using 1.1 for parent-module for rerelease.")));
@@ -77,12 +71,12 @@ public class NextMojoTest {
 
     @Test
     public void ifThereHaveBeenNoChangesCanOptToReleaseNoModules() throws Exception {
-        List<String> firstBuildOutput = testProject.mvnRelease();
+        List<String> firstBuildOutput = dependenciesProject.mvnRelease();
         assertThat(firstBuildOutput,
                    noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
         assertThat(firstBuildOutput,
                    noneOf(containsString("No changes have been detected in any modules so will not perform release")));
-        List<String> output = testProject.mvnReleaserNext("-DnoChangesAction=ReleaseNone");
+        List<String> output = dependenciesProject.mvnReleaserNext("-DnoChangesAction=ReleaseNone");
 
         assertThat(output, oneOf(containsString(
             "[INFO] using 1.0 for parent-module as it has not been changed since that release.")));
@@ -101,9 +95,9 @@ public class NextMojoTest {
     @Test
     public void ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased() throws
                                                                                                            Exception {
-        testProject.mvnRelease();
-        testProject.commitRandomFile("more-utilities").pushIt();
-        List<String> output = testProject.mvnReleaserNext();
+        dependenciesProject.mvnRelease();
+        dependenciesProject.commitRandomFile("more-utilities").pushIt();
+        List<String> output = dependenciesProject.mvnReleaserNext();
 
         assertTagDoesNotExist("console-app-3.2");
         assertTagDoesNotExist("parent-module-1.2");
@@ -123,7 +117,7 @@ public class NextMojoTest {
     }
 
     private void assertTagDoesNotExist(String tagName) {
-        assertThat(testProject.local, not(hasTag(tagName)));
-        assertThat(testProject.origin, not(hasTag(tagName)));
+        assertThat(dependenciesProject.local, not(hasTag(tagName)));
+        assertThat(dependenciesProject.origin, not(hasTag(tagName)));
     }
 }

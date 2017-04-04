@@ -19,12 +19,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.github.danielflower.mavenplugins.release.TestUtils;
@@ -36,13 +35,10 @@ import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 public class SingleModuleTest {
 
-    final String      expected    = "1.0";
-    final TestProject testProject = TestProject.singleModuleProject();
+    private static final String expected = "1.0";
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.SINGLE);
 
     @Test
     public void canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo() throws Exception {
@@ -100,7 +96,7 @@ public class SingleModuleTest {
         return currentReleaseInfo().getTagName().get();
     }
 
-    public ReleaseInfo currentReleaseInfo()  {
+    public ReleaseInfo currentReleaseInfo() {
         final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(testProject.localDir, testProject.local);
         try {
             return infoStorage.load();
@@ -110,8 +106,7 @@ public class SingleModuleTest {
     }
 
     @Test
-    public void onlyLocalGitRepoIsTaggedWithoutPush() throws IOException,
-                                                                                        InterruptedException {
+    public void onlyLocalGitRepoIsTaggedWithoutPush() throws IOException, InterruptedException {
         testProject.mvn("-Dpush=false", "releaser:release");
         assertThat(testProject.local, hasTag(expectedTag()));
         assertThat(testProject.origin, not(hasTag(expectedTag())));
