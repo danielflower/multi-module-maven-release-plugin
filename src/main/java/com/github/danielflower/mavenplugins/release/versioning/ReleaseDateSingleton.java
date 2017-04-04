@@ -5,9 +5,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public final class ReleaseDateSingleton {
+    public static final String            TAG_PREFIX            = "MULTI_MODULE_RELEASE-";
+    public static final DateTimeFormatter FILE_SUFFIX_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss");
+    public static final ZoneId            RELEASE_DATE_TIMEZONE = ZoneId.of("UTC");
+
     private static final ReleaseDateSingleton INSTANCE;
-    private static final DateTimeFormatter FILE_SUFFIX_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss");
-    private static final ZoneId UTC = ZoneId.of("UTC");
 
     static {
         INSTANCE = new ReleaseDateSingleton();
@@ -27,6 +29,6 @@ public final class ReleaseDateSingleton {
     }
 
     public String tagName() {
-        return "MULTI_MODULE_RELEASE-" + RELEASE_DATE.withZoneSameInstant(UTC).format(FILE_SUFFIX_FORMATTER);
+        return TAG_PREFIX + RELEASE_DATE.withZoneSameInstant(RELEASE_DATE_TIMEZONE).format(FILE_SUFFIX_FORMATTER);
     }
 }

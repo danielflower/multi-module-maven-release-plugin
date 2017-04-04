@@ -10,14 +10,22 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
+import com.github.danielflower.mavenplugins.release.TestUtils;
 
 public class TestRunningTest {
+
     @Rule
     public TestProject projectWithTestsThatFail = new TestProject(ProjectType.MODULE_WITH_TEST_FAILURE);
+    private String     expectedTagName          = "";
+
+    @Before
+    public void setUp() {
+        expectedTagName = TestUtils.tagNameStart();
+    }
 
     @Test
     public void doesNotReleaseIfThereAreTestFailuresButTagsAreStillWritten() throws Exception {
@@ -27,14 +35,8 @@ public class TestRunningTest {
         } catch (MavenExecutionException e) {
         }
         assertThat(projectWithTestsThatFail.local, hasCleanWorkingDirectory());
-        String expectedTagName = expectedTagName();
         assertThat(projectWithTestsThatFail.local.tagList().call().get(0).getName(), startsWith(expectedTagName));
         assertThat(projectWithTestsThatFail.origin.tagList().call().get(0).getName(), startsWith(expectedTagName));
-    }
-
-    private String expectedTagName() {
-        final String fullTag = "refs/tags/" + ReleaseDateSingleton.getInstance().tagName();
-        return fullTag.substring(0, fullTag.length() - 2);
     }
 
     @Test

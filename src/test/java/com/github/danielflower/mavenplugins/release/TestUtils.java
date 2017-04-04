@@ -12,10 +12,14 @@ import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifie
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.QualifiedArtifact;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
 
-public class TestUtils {
+public final class TestUtils {
+
+    private TestUtils() {
+    }
 
     public static final String TEST_GROUP_ID = "com.github.danielflower.mavenplugins.testprojects";
     private static final String TEST_TAG_NAME = "test-tag";
@@ -69,5 +73,11 @@ public class TestUtils {
 
     public static ImmutableFixVersion fixVersion(int majorVersion, int minorVersion) {
         return ImmutableFixVersion.builder().majorVersion(majorVersion).minorVersion(minorVersion).build();
+    }
+
+    public static String tagNameStart() {
+        final String tagName = "refs/tags/" + ReleaseDateSingleton.TAG_PREFIX + ZonedDateTime.now().withZoneSameInstant(
+            ReleaseDateSingleton.RELEASE_DATE_TIMEZONE).format(ReleaseDateSingleton.FILE_SUFFIX_FORMATTER);
+        return tagName.substring(0, tagName.length() - 3);
     }
 }
