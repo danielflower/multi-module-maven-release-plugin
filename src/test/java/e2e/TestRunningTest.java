@@ -32,9 +32,8 @@ public class TestRunningTest {
         assertThat(projectWithTestsThatFail.origin.tagList().call().get(0).getName(), startsWith(expectedTagName));
     }
 
-    public String expectedTagName() {
-        final String fullTag = "refs/tags/MULTI_MODULE_RELEASE-" + ReleaseDateSingleton.getInstance()
-                                                                                           .tagName();
+    private String expectedTagName() {
+        final String fullTag = "refs/tags/" + ReleaseDateSingleton.getInstance().tagName();
         return fullTag.substring(0, fullTag.length() - 2);
     }
 

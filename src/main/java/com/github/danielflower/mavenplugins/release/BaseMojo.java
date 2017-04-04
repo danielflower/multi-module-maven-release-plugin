@@ -27,17 +27,6 @@ public abstract class BaseMojo extends AbstractMojo {
     protected List<MavenProject> projects;
 
     /**
-     * The modules to release, or no value to to release the project from the
-     * root pom, which is the default. The selected module plus any other
-     * modules it needs will be built and released also. When run from the
-     * command line, this can be a comma-separated list of module names.
-     */
-    /*
-    @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
-    protected List<String> modulesToRelease;
-    */
-
-    /**
      * A module to force release on, even if no changes has been detected.
      */
     @Parameter(alias = "forceRelease", property = "forceRelease")
@@ -147,26 +136,4 @@ public abstract class BaseMojo extends AbstractMojo {
         }
     }
 
-    /*
-    List<ImmutableModuleVersion> versionsForModulesToRelease(List<ReleasableModule> modules, LocalGitRepo git) throws
-                                                                                                               GitAPIException,
-                                                                                                               ValidationException {
-        List<ImmutableModuleVersion> moduleVersions = new ArrayList<>();
-        for (ReleasableModule module : modules) {
-            if (modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(
-                module.getProject().getArtifactId())) {
-                final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
-                builder.version(module.getVersion());
-                builder.releaseTag(tagName());
-                final ImmutableQualifiedArtifact.Builder artifactBuilder = ImmutableQualifiedArtifact.builder();
-                artifactBuilder.groupId(module.getProject().getGroupId());
-                artifactBuilder.artifactId(module.getProject().getArtifactId());
-                builder.artifact(artifactBuilder.build());
-                builder.releaseDate(ReleaseDateSingleton.getInstance().getDate());
-                moduleVersions.add(builder.build());
-            }
-        }
-        return moduleVersions;
-    }
-    */
 }
