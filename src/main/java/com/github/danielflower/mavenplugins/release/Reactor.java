@@ -42,7 +42,7 @@ public class Reactor {
         } else {
             log.info("previous release: " + previousRelease.toString());
         }
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<>();
         for (MavenProject project : projects) {
             modules.add(new ModuleDependencyVerifier(project, rootProject, gitRepo, previousRelease,

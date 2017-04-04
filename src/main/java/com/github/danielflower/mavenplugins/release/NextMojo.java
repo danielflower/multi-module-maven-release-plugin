@@ -1,13 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -30,31 +24,13 @@ import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 public class NextMojo extends BaseMojo {
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        Log log = getLog();
+    public void executeConcreteMojo() throws MojoExecutionException, MojoFailureException, GitAPIException {
+        configureJsch();
 
-        try {
-            configureJsch(log);
-
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(ReleaseMojo.getRemoteUrlOrNullIfNoneSet(
-                project.getOriginalModel().getScm(), project.getModel().getScm()));
-            ReleaseInfo previousRelease = new ReleaseInfoStorage(project.getBasedir(), repo.git).load();
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, modulesToForceRelease, noChangesAction,
-                                                   bugfixRelease, previousRelease);
-            if (reactor == null) {
-                return;
-            }
-        } catch (ValidationException e) {
-            printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
-        } catch (GitAPIException gae) {
-
-            StringWriter sw = new StringWriter();
-            gae.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-
-            printBigErrorMessageAndThrow(log, "Could not release due to a Git error", asList(
-                "There was an error while accessing the Git repository. The error returned from git was:",
-                gae.getMessage(), "Stack trace:", exceptionAsString));
-        }
+        LocalGitRepo repo = LocalGitRepo.fromCurrentDir(
+            ReleaseMojo.getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
+        ReleaseInfo previousRelease = new ReleaseInfoStorage(project.getBasedir(), repo.git).load();
+        Reactor.fromProjects(getLog(), repo, project, projects, modulesToForceRelease, noChangesAction, bugfixRelease,
+                             previousRelease);
     }
 }

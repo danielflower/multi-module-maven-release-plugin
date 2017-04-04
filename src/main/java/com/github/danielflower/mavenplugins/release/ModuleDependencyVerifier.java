@@ -180,9 +180,9 @@ class ModuleDependencyVerifier {
 
     private boolean isThisProjectsParentModule(ReleasableModule module) {
         final MavenProject parent = project.getParent();
-        return parent != null && (parent.getGroupId().equals(module.getProject().getGroupId()) && parent.getArtifactId()
-                                                                                                        .equals(module
-                                                                                                                    .getProject()
-                                                                                                                    .getArtifactId()));
+        final MavenProject moduleProject = module.getProject();
+        return parent != null && (parent.getGroupId().equals(moduleProject.getGroupId()) && parent.getArtifactId()
+                                                                                                  .equals(moduleProject
+                                                                                                              .getArtifactId()));
     }
 }

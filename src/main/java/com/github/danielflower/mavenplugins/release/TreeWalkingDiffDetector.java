@@ -16,7 +16,7 @@ import org.eclipse.jgit.treewalk.filter.TreeFilter;
 
 import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
 
-public class TreeWalkingDiffDetector implements DiffDetector {
+public class TreeWalkingDiffDetector {
 
     private final Repository repo;
 
@@ -30,7 +30,6 @@ public class TreeWalkingDiffDetector implements DiffDetector {
         walk.markUninteresting(revCommit);
     }
 
-    @Override
     public boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Ref tagReference) throws
                                                                                                              IOException {
         RevWalk walk = new RevWalk(repo);

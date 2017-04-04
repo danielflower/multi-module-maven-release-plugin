@@ -1,10 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,71 +122,60 @@ public class ReleaseMojo extends BaseMojo {
     }
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void executeConcreteMojo() throws MojoExecutionException, MojoFailureException, GitAPIException {
+
+        configureJsch();
+
+        LocalGitRepo repo = LocalGitRepo.fromCurrentDir(
+            getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
+        repo.errorIfNotClean();
+
+        final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(project.getBasedir(), repo.git);
+        ReleaseInfo previousRelease = infoStorage.load();
+        getLog().info("previous release: " + previousRelease);
+
+        Reactor reactor = Reactor
+                              .fromProjects(getLog(), repo, project, projects, modulesToForceRelease, noChangesAction,
+                                            bugfixRelease, previousRelease);
+        if (reactor == null) {
+            return;
+        }
+
+        final List<ReleasableModule> releasableModules = reactor.getModulesInBuildOrder();
+
+        final ImmutableReleaseInfo.Builder releaseBuilder = ImmutableReleaseInfo.builder().tagName(
+            ReleaseDateSingleton.getInstance().tagName());
+
+        List<String> modulesToRelease = new ArrayList<>();
+        for (ReleasableModule releasableModule : releasableModules) {
+            releaseBuilder.addModules(releasableModule.getImmutableModule());
+            if (releasableModule.isToBeReleased()) {
+                modulesToRelease.add(releasableModule.getRelativePathToModule());
+            }
+        }
+
+        final ImmutableReleaseInfo currentRelease = releaseBuilder.build();
+        getLog().info("current release: " + currentRelease);
+        infoStorage.store(currentRelease);
+
+        List<File> changedFiles = updatePomsAndReturnChangedFiles(getLog(), repo, reactor);
+
+        // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
+        // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
+        // and so fail. The downside is that failed builds result in tags being pushed.
+        tagAndPushRepo(repo, currentRelease);
 
         try {
-            configureJsch(getLog());
-
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(
-                getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
-            repo.errorIfNotClean();
-
-            final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(project.getBasedir(), repo.git);
-            ReleaseInfo previousRelease = infoStorage.load();
-            getLog().info("previous release: " + previousRelease);
-
-            Reactor reactor = Reactor.fromProjects(getLog(), repo, project, projects, modulesToForceRelease,
-                                                   noChangesAction, bugfixRelease, previousRelease);
-            if (reactor == null) {
-                return;
-            }
-
-            final List<ReleasableModule> releasableModules = reactor.getModulesInBuildOrder();
-
-            final ImmutableReleaseInfo.Builder releaseBuilder = ImmutableReleaseInfo.builder().tagName(
-                ReleaseDateSingleton.getInstance().tagName());
-
-            List<String> modulesToRelease = new ArrayList<>();
-            for (ReleasableModule releasableModule : releasableModules) {
-                releaseBuilder.addModules(releasableModule.getImmutableModule());
-                if (releasableModule.isToBeReleased()) {
-                    modulesToRelease.add(releasableModule.getRelativePathToModule());
-                }
-            }
-
-            final ImmutableReleaseInfo currentRelease = releaseBuilder.build();
-            getLog().info("current release: " + currentRelease);
-            infoStorage.store(currentRelease);
-
-            List<File> changedFiles = updatePomsAndReturnChangedFiles(getLog(), repo, reactor);
-
-            // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
-            // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
-            // and so fail. The downside is that failed builds result in tags being pushed.
-            tagAndPushRepo(repo, currentRelease);
-
-            try {
-                final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
-                invoker.setGoals(goals);
-                invoker.setModulesToRelease(modulesToRelease);
-                invoker.setReleaseProfiles(releaseProfiles);
-                invoker.setSkipTests(skipTests);
-                invoker.runMavenBuild(reactor);
-                revertChanges(repo, changedFiles, true); // throw if you can't revert as that is the root problem
-            } finally {
-                revertChanges(repo, changedFiles,
-                              false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
-            }
-        } catch (ValidationException e) {
-            printBigErrorMessageAndThrow(getLog(), e.getMessage(), e.getMessages());
-        } catch (GitAPIException gae) {
-            StringWriter sw = new StringWriter();
-            gae.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-
-            printBigErrorMessageAndThrow(getLog(), "Could not release due to a Git error", asList(
-                "There was an error while accessing the Git repository. The error returned from git was:",
-                gae.getMessage(), "Stack trace:", exceptionAsString));
+            final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
+            invoker.setGoals(goals);
+            invoker.setModulesToRelease(modulesToRelease);
+            invoker.setReleaseProfiles(releaseProfiles);
+            invoker.setSkipTests(skipTests);
+            invoker.runMavenBuild(reactor);
+            revertChanges(repo, changedFiles, true); // throw if you can't revert as that is the root problem
+        } finally {
+            revertChanges(repo, changedFiles,
+                          false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
         }
     }
 

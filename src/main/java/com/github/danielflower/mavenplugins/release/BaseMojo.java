@@ -6,20 +6,20 @@ import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
+
+import com.github.danielflower.mavenplugins.release.utils.ErrorUtils;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
  */
 public abstract class BaseMojo extends AbstractMojo {
-    /**
-     * The Maven Project.
-     */
     @Parameter(property = "project", required = true, readonly = true, defaultValue = "${project}")
     protected MavenProject project;
 
@@ -70,23 +70,19 @@ public abstract class BaseMojo extends AbstractMojo {
     @Parameter(property = "passphrase")
     private String passphrase;
 
-    static void printBigErrorMessageAndThrow(Log log, String terseMessage, List<String> linesToLog) throws
-                                                                                                    MojoExecutionException {
-        log.error("");
-        log.error("");
-        log.error("");
-        log.error("************************************");
-        log.error("Could not execute the release plugin");
-        log.error("************************************");
-        log.error("");
-        log.error("");
-        for (String line : linesToLog) {
-            log.error(line);
+    @Override
+    public final void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            executeConcreteMojo();
+        } catch (ValidationException e) {
+            ErrorUtils.printBigErrorMessageAndThrow(getLog(), e.getMessage(), e.getMessages());
+        } catch (GitAPIException gae) {
+            ErrorUtils.printBigGitErrorExceptionAndThrow(getLog(), gae);
         }
-        log.error("");
-        log.error("");
-        throw new MojoExecutionException(terseMessage);
     }
+
+    protected abstract void executeConcreteMojo() throws MojoExecutionException, MojoFailureException,
+                                                         GitAPIException, ValidationException;
 
     final Settings getSettings() {
         return settings;
@@ -116,7 +112,7 @@ public abstract class BaseMojo extends AbstractMojo {
         disableSshAgent = true;
     }
 
-    protected final void configureJsch(final Log log) {
+    protected final void configureJsch() {
         if (!disableSshAgent) {
             if (serverId != null) {
                 final Server server = settings.getServer(serverId);
@@ -128,12 +124,12 @@ public abstract class BaseMojo extends AbstractMojo {
                                  ? server.getPassphrase()
                                  : passphrase;
                 } else {
-                    log.warn(format("No server configuration in Maven settings found with id %s", serverId));
+                    getLog().warn(format("No server configuration in Maven settings found with id %s", serverId));
                 }
             }
 
-            JschConfigSessionFactory.setInstance(new SshAgentSessionFactory(log, knownHosts, privateKey, passphrase));
+            JschConfigSessionFactory
+                .setInstance(new SshAgentSessionFactory(getLog(), knownHosts, privateKey, passphrase));
         }
     }
-
 }

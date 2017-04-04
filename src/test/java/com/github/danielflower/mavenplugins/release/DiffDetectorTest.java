@@ -30,7 +30,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2.0");
         AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2.4");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
 
         assertThat(detector.hasChangedSince("core-utils", Collections.emptyList(), tag2.ref()), is(false));
         assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag2.ref()), is(true));
@@ -43,7 +43,7 @@ public class DiffDetectorTest {
         singleProject.commitRandomFile(".");
         AnnotatedTag tag2 = saveFileInModule(singleProject, ".", "1.0.2");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(singleProject.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(singleProject.local.getRepository());
 
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag1.ref()), is(true));
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag2.ref()), is(false));
@@ -53,7 +53,7 @@ public class DiffDetectorTest {
     public void ignoreReleaseInfoInTheRoot() throws IOException, GitAPIException {
         AnnotatedTag tag1 = saveFileInModule(singleProject, ".", "1.0.1");
         singleProject.commitFile(".", ReleaseInfoStorage.RELEASE_INFO_FILE, "any-content");
-        DiffDetector detector = new TreeWalkingDiffDetector(singleProject.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(singleProject.local.getRepository());
         assertThat(detector.hasChangedSince(".", Collections.emptyList(), tag1.ref()), is(false));
 
         AnnotatedTag tag2 = saveFileInModule(singleProject, ".", "1.0.2");
@@ -69,7 +69,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2.4");
         project.commitRandomFile("console-app");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
         assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag3.ref()), is(true));
     }
 
@@ -82,7 +82,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2.4");
         project.commitRandomFile("console-app");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
         assertThat(detector.hasChangedSince("console-app", singletonList("console-app"), tag3.ref()), is(false));
     }
 }
