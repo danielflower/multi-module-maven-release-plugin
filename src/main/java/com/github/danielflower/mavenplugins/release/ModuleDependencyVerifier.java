@@ -17,6 +17,7 @@ import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 import com.github.danielflower.mavenplugins.release.versioning.VersionNamer;
 
@@ -43,7 +44,25 @@ class ModuleDependencyVerifier {
         this.project = project;
     }
 
-    public ReleasableModule releaseInfo() throws MojoExecutionException {
+    private static String calculateModulePath(MavenProject rootProject, MavenProject project) throws
+                                                                                              MojoExecutionException {
+        // Getting canonical files because on Windows, it's possible one returns "C:\..." and the other "c:\..." which is rather amazing
+        File projectRoot;
+        File moduleRoot;
+        try {
+            projectRoot = rootProject.getBasedir().getCanonicalFile();
+            moduleRoot = project.getBasedir().getCanonicalFile();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not find directory paths for maven project", e);
+        }
+        String relativePathToModule = Repository.stripWorkDir(projectRoot, moduleRoot);
+        if (relativePathToModule.length() == 0) {
+            relativePathToModule = ".";
+        }
+        return relativePathToModule;
+    }
+
+    public ImmutableReleasableModule releaseInfo() throws MojoExecutionException {
         String relativePathToModule = calculateModulePath(rootProject, project);
         String artifactId = project.getArtifactId();
 
@@ -54,9 +73,8 @@ class ModuleDependencyVerifier {
         ImmutableFixVersion equivalentVersion;
         boolean toBeReleased;
 
-        final Optional<ImmutableModuleVersion> previousVersion = previousRelease.getModules().stream()
-                                                                                .filter(m -> m.getArtifact().equals(artifact()))
-                                                                                .findAny();
+        final Optional<ImmutableModuleVersion> previousVersion = previousRelease.getModules().stream().filter(
+            m -> m.getArtifact().equals(artifact())).findAny();
         if (modulesToForceRelease.contains(artifactId)) {
             toBeReleased = true;
             equivalentVersion = newVersion;
@@ -90,17 +108,36 @@ class ModuleDependencyVerifier {
                     equivalentVersion = newVersion;
                     log.info("using " + equivalentVersion + " for " + artifactId + " as it has not been released yet.");
                 }
-            } catch (GitAPIException|IOException e) {
+            } catch (GitAPIException | IOException e) {
                 log.error("unable to list tags: " + e.getMessage());
                 throw new MojoExecutionException("unable to list tags", e);
             }
         }
         final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder();
         builder.project(project);
-        builder.version(equivalentVersion);
         builder.isToBeReleased(toBeReleased);
         builder.relativePathToModule(relativePathToModule);
+        builder.immutableModule(moduleVersion(equivalentVersion, previousVersion, toBeReleased).build());
         return builder.build();
+    }
+
+    private ImmutableModuleVersion.Builder moduleVersion(ImmutableFixVersion equivalentVersion,
+                                                         Optional<ImmutableModuleVersion> previousVersion,
+                                                         boolean toBeReleased) {
+        final ImmutableModuleVersion.Builder moduleBuilder = ImmutableModuleVersion.builder();
+        if (previousVersion.isPresent()) {
+            moduleBuilder.from(previousVersion.get());
+        } else {
+            final ImmutableQualifiedArtifact.Builder artifactBuilder = ImmutableQualifiedArtifact.builder();
+            artifactBuilder.groupId(project.getGroupId()).artifactId(project.getArtifactId());
+            moduleBuilder.artifact(artifactBuilder.build());
+        }
+        if (toBeReleased) {
+            moduleBuilder.releaseTag(ReleaseDateSingleton.getInstance().tagName());
+            moduleBuilder.releaseDate(ReleaseDateSingleton.getInstance().releaseDate());
+        }
+        moduleBuilder.version(equivalentVersion);
+        return moduleBuilder;
     }
 
     public ReleasableModule rereleaseModule() throws MojoExecutionException {
@@ -109,16 +146,14 @@ class ModuleDependencyVerifier {
 
         ImmutableFixVersion newVersion = ImmutableFixVersion.copyOf(versionNamer.nextVersion(project));
 
-        log.info(
-            "using " + newVersion + " for " + artifactId + " for rerelease.");
+        log.info("using " + newVersion + " for " + artifactId + " for rerelease.");
         final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder();
         builder.project(project);
-        builder.version(newVersion);
+        builder.immutableModule(moduleVersion(newVersion, Optional.empty(), true).build());
         builder.isToBeReleased(true);
         builder.relativePathToModule(relativePathToModule);
         return builder.build();
     }
-
 
     private List<String> moduleList() {
         return project.getModules();
@@ -139,34 +174,15 @@ class ModuleDependencyVerifier {
     }
 
     private boolean moduleIsADependency(ReleasableModule module, Dependency dependency) {
-        return dependency.getGroupId().equals(module.getProject().getGroupId()) && dependency.getArtifactId()
-                                                                                             .equals(
-                                                                                    module.getProject().getArtifactId());
+        return dependency.getGroupId().equals(module.getProject().getGroupId()) && dependency.getArtifactId().equals(
+            module.getProject().getArtifactId());
     }
 
     private boolean isThisProjectsParentModule(ReleasableModule module) {
         final MavenProject parent = project.getParent();
-        return parent != null && (parent.getGroupId().equals(module.getProject().getGroupId()) && parent.getArtifactId().equals(
-            module.getProject().getArtifactId()));
+        return parent != null && (parent.getGroupId().equals(module.getProject().getGroupId()) && parent.getArtifactId()
+                                                                                                        .equals(module
+                                                                                                                    .getProject()
+                                                                                                                    .getArtifactId()));
     }
-
-    private static String calculateModulePath(MavenProject rootProject, MavenProject project) throws
-                                                                                              MojoExecutionException {
-        // Getting canonical files because on Windows, it's possible one returns "C:\..." and the other "c:\..." which is rather amazing
-        File projectRoot;
-        File moduleRoot;
-        try {
-            projectRoot = rootProject.getBasedir().getCanonicalFile();
-            moduleRoot = project.getBasedir().getCanonicalFile();
-        } catch (IOException e) {
-            throw new MojoExecutionException("Could not find directory paths for maven project", e);
-        }
-        String relativePathToModule = Repository.stripWorkDir(projectRoot, moduleRoot);
-        if (relativePathToModule.length() == 0) {
-            relativePathToModule = ".";
-        }
-        return relativePathToModule;
-    }
-
-
 }

@@ -66,4 +66,8 @@ public class TestUtils {
         tag.saveAtHEAD(project.local);
         return tag;
     }
+
+    public static ImmutableFixVersion fixVersion(int majorVersion, int minorVersion) {
+        return ImmutableFixVersion.builder().majorVersion(majorVersion).minorVersion(minorVersion).build();
+    }
 }

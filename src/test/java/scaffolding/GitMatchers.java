@@ -60,7 +60,7 @@ public class GitMatchers {
                             if(moduleVersion.getVersion().equals(expectedVersion)) {
                                 return true;
                             } else {
-                                foundVersions.add(moduleVersion.toString());
+                                foundVersions.add(moduleVersion.getVersion().toString());
                             }
                         }
                     }

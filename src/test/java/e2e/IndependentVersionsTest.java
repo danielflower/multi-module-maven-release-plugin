@@ -6,6 +6,7 @@ import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static scaffolding.ExactCountMatcher.oneOf;
@@ -25,6 +26,10 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
+
 public class IndependentVersionsTest {
 
     private static final String INDEPENDENT_VERSIONS_GROUPID = "com.github.danielflower.mavenplugins.testprojects.independentversions";
@@ -34,12 +39,31 @@ public class IndependentVersionsTest {
 
     @Rule
     public TestProject testProject = new TestProject(ProjectType.INDEPENDENT_VERSIONS);
+    private ImmutableQualifiedArtifact.Builder builder;
 
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
         buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease());
         installsAllModulesIntoTheRepoWithTheBuildNumber();
         theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
+    }
+
+    @Test
+    public void referCorrectTagIfModuleNotReleased() throws Exception {
+        testProject.mvnRelease();
+        final ReleaseInfoStorage releaseInfoStorage = new ReleaseInfoStorage(testProject.localDir, testProject.local);
+        final ReleaseInfo beforeRelease = releaseInfoStorage.load();
+        testProject.commitRandomFile("console-app");
+        testProject.mvnRelease();
+        final ReleaseInfo afterRelease = releaseInfoStorage.load();
+        builder = ImmutableQualifiedArtifact.builder().groupId(
+            INDEPENDENT_VERSIONS_GROUPID);
+        final ImmutableQualifiedArtifact consoleApp = builder.artifactId("console-app").build();
+        assertThat(afterRelease.versionForArtifact(consoleApp).get().getReleaseTag(), not(equalTo(beforeRelease.versionForArtifact
+                                                                                              (consoleApp).get().getReleaseTag())));
+        final ImmutableQualifiedArtifact coreUtils = builder.artifactId("core-utils").build();
+        assertThat(afterRelease.versionForArtifact(coreUtils).get(), equalTo(beforeRelease.versionForArtifact
+                                                                                              (coreUtils).get()));
     }
 
     private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {

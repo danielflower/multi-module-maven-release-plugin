@@ -17,6 +17,6 @@ public abstract class ModuleVersion {
 
     @Override
     public String toString() {
-        return getArtifact() + "-"  + getVersion().toString();
+        return getArtifact() + "-"  + getVersion().toString() + "-" + getReleaseTag();
     }
 }

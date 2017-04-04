@@ -33,13 +33,13 @@ public class TestRunningTest {
     }
 
     public String expectedTagName() {
-        final String fullTag = "refs/tags/module-with-test-failure-" + ReleaseDateSingleton.getInstance()
-                                                                                           .asFileSuffix();
+        final String fullTag = "refs/tags/MULTI_MODULE_RELEASE-" + ReleaseDateSingleton.getInstance()
+                                                                                           .tagName();
         return fullTag.substring(0, fullTag.length() - 2);
     }
 
     @Test
     public void ifTestsAreSkippedYouCanReleaseWithoutRunningThem() throws IOException {
-        projectWithTestsThatFail.mvn("-DbuildNumber=1", "-DskipTests", "releaser:release");
+        projectWithTestsThatFail.mvn("-DskipTests", "releaser:release");
     }
 }

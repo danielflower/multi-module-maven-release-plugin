@@ -2,7 +2,6 @@ package com.github.danielflower.mavenplugins.release;
 
 import static java.lang.String.format;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -12,13 +11,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
-
-import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
-import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -39,8 +32,10 @@ public abstract class BaseMojo extends AbstractMojo {
      * modules it needs will be built and released also. When run from the
      * command line, this can be a comma-separated list of module names.
      */
+    /*
     @Parameter(alias = "modulesToRelease", property = "modulesToRelease")
     protected List<String> modulesToRelease;
+    */
 
     /**
      * A module to force release on, even if no changes has been detected.
@@ -55,17 +50,17 @@ public abstract class BaseMojo extends AbstractMojo {
     @Parameter(alias = "noChangesAction", defaultValue = "ReleaseAll", property = "noChangesAction")
     protected NoChangesAction noChangesAction;
     @Parameter(defaultValue = "false", alias = "performBugfixRelease", property = "performBugfixRelease")
-    protected boolean bugfixRelease;
+    protected boolean         bugfixRelease;
     @Parameter(property = "disableSshAgent")
-    private boolean disableSshAgent;
+    private   boolean         disableSshAgent;
     @Parameter(defaultValue = "${settings}", readonly = true, required = true)
-    private Settings settings;
+    private   Settings        settings;
     /**
      * If set, the identityFile and passphrase will be read from the Maven
      * settings file.
      */
     @Parameter(property = "serverId")
-    private String serverId;
+    private   String          serverId;
 
     /**
      * If set, this file will be used to specify the known_hosts. This will
@@ -152,18 +147,12 @@ public abstract class BaseMojo extends AbstractMojo {
         }
     }
 
-    List<ImmutableModuleVersion> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules,
-                                                                          LocalGitRepo git) throws
-                                                                                                         GitAPIException,
-                                                                                                         ValidationException {
-        List<ImmutableModuleVersion> tags = new ArrayList<>();
+    /*
+    List<ImmutableModuleVersion> versionsForModulesToRelease(List<ReleasableModule> modules, LocalGitRepo git) throws
+                                                                                                               GitAPIException,
+                                                                                                               ValidationException {
+        List<ImmutableModuleVersion> moduleVersions = new ArrayList<>();
         for (ReleasableModule module : modules) {
-            /*
-            if (!module.()) {
-                // TODO add version anyway
-                continue;
-            }
-            */
             if (modulesToRelease == null || modulesToRelease.size() == 0 || modulesToRelease.contains(
                 module.getProject().getArtifactId())) {
                 final ImmutableModuleVersion.Builder builder = ImmutableModuleVersion.builder();
@@ -174,15 +163,10 @@ public abstract class BaseMojo extends AbstractMojo {
                 artifactBuilder.artifactId(module.getProject().getArtifactId());
                 builder.artifact(artifactBuilder.build());
                 builder.releaseDate(ReleaseDateSingleton.getInstance().getDate());
-                tags.add(builder.build());
+                moduleVersions.add(builder.build());
             }
         }
-        // TODO check for single tag.
-        return tags;
+        return moduleVersions;
     }
-
-    protected String tagName() {
-        final ReleaseDateSingleton releaseDate = ReleaseDateSingleton.getInstance();
-        return project.getArtifactId() + "-" + releaseDate.asFileSuffix();
-    }
+    */
 }

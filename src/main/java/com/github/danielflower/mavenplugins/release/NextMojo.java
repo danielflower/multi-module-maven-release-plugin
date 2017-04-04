@@ -44,7 +44,6 @@ public class NextMojo extends BaseMojo {
             if (reactor == null) {
                 return;
             }
-            figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo);
         } catch (ValidationException e) {
             printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
         } catch (GitAPIException gae) {

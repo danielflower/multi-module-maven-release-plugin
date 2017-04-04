@@ -10,7 +10,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
 import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 public class ReactorTest {
@@ -45,7 +47,12 @@ public class ReactorTest {
         builder.project(project);
         builder.isToBeReleased(false);
         builder.relativePathToModule("..");
-        builder.version(ImmutableFixVersion.builder().majorVersion(1).minorVersion(0).build());
+        final ImmutableModuleVersion.Builder moduleBuilder = ImmutableModuleVersion.builder();
+        moduleBuilder.version(TestUtils.fixVersion(1, 0));
+        moduleBuilder.releaseTag(ReleaseDateSingleton.getInstance().tagName());
+        moduleBuilder.releaseDate(ReleaseDateSingleton.getInstance().releaseDate());
+        moduleBuilder.artifact(ImmutableQualifiedArtifact.builder().groupId(GROUP_ID).artifactId(ARTIFACT_ID).build());
+        builder.immutableModule(moduleBuilder.build());
         return builder;
     }
 

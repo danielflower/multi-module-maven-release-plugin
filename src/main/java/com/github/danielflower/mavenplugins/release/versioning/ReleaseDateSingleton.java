@@ -22,11 +22,11 @@ public final class ReleaseDateSingleton {
         return INSTANCE;
     }
 
-    public ZonedDateTime getDate() {
+    public ZonedDateTime releaseDate() {
         return RELEASE_DATE;
     }
 
-    public String asFileSuffix() {
-        return RELEASE_DATE.withZoneSameInstant(UTC).format(FILE_SUFFIX_FORMATTER);
+    public String tagName() {
+        return "MULTI_MODULE_RELEASE-" + RELEASE_DATE.withZoneSameInstant(UTC).format(FILE_SUFFIX_FORMATTER);
     }
 }
