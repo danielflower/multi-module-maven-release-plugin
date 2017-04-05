@@ -2,7 +2,13 @@ package e2e;
 
 import scaffolding.TestProject;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.ExactCountMatcher.noneOf;
+import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,13 +50,26 @@ public class IndependentVersionsBugfixTest {
     }
 
     @Test
-    public void createBugfixAppChanged() throws Exception {
+    public void releaseOnlyModulesThatHaveChanged() throws Exception {
         testProject.origin.checkout().setName(branchName).call();
         testProject.commitRandomFile("console-app");
         testProject.mvnReleaseBugfix();
-        assertArtifactInLocalRepo(GROUP_ID, "independent-versions", expectedParentVersion);
-        assertArtifactInLocalRepo(GROUP_ID, "core-utils", expectedCoreVersion);
+        // TODO purge repository, then check?
+        /*
+        assertArtifactNotInLocalRepo(GROUP_ID, "independent-versions", expectedParentVersion + ".1");
+        assertArtifactNotInLocalRepo(GROUP_ID, "core-utils", expectedCoreVersion + ".1");
+         */
         assertArtifactInLocalRepo(GROUP_ID, "console-app", expectedAppVersion + ".1");
+    }
+
+    @Test
+    public void buildOnlyModulesThatHaveChanged() throws Exception {
+        testProject.origin.checkout().setName(branchName).call();
+        testProject.commitRandomFile("console-app");
+        final List<String> outputLines = testProject.mvnReleaseBugfix();
+        assertThat(outputLines, oneOf(containsString("Building console-app 3.0.1")));
+        assertThat(outputLines, noneOf(containsString("Building core-utils")));
+        assertThat(outputLines, noneOf(containsString("Building independent-versions")));
     }
 
     @Test

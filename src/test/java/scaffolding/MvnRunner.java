@@ -3,6 +3,7 @@ package scaffolding;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -68,6 +69,19 @@ public class MvnRunner {
 
     public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException,
                                                                                                            MavenInvocationException {
+        assertThat("Could not find artifact " + artifactId + " in repository",
+                   artifactInLocalRepo(groupId, artifactId, version), is(0));
+    }
+
+    public static void assertArtifactNotInLocalRepo(String groupId, String artifactId, String version) throws
+                                                                                                      IOException,
+                                                                                                           MavenInvocationException {
+        assertThat("Found artifact " + artifactId + " in repository",
+                   artifactInLocalRepo(groupId, artifactId, version), not(is(0)));
+    }
+
+    private static int artifactInLocalRepo(String groupId, String artifactId, String version) throws IOException,
+                                                                                                     MavenInvocationException {
         String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
         File temp = new File("target/downloads/" + UUID.randomUUID());
 
@@ -94,7 +108,7 @@ public class MvnRunner {
             }
         }
 
-        assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
+        return result.getExitCode();
     }
 
     public List<String> runMaven(File workingDir, String... arguments) {

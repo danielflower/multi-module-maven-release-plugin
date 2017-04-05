@@ -6,7 +6,7 @@ Documentation, download, and usage instructions
 This is fork of Daniel Flowers great 
 [multi-module-maven-release-plugin](http://danielflower.github.io/multi-module-maven-release-plugin/index.html).
 
-This plugin 
+This plugin adds bugfix release feature.
 
 Development
 ===========
