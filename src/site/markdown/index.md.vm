@@ -49,4 +49,4 @@ version of a module was released
 Prerequisites
 -------------
 
-The plugin requires **Maven ${project.prerequisites.maven}** or later and **Java 7** or later. If you need Java 6 support, then use version `1.4.6`.
+The plugin requires **Maven ${project.prerequisites.maven}** or later and **Java 8** or later.

@@ -24,7 +24,7 @@ import org.junit.rules.ExternalResource;
 public class TestProject extends ExternalResource {
 
     private static final MvnRunner DEFAULT_RUNNER;
-    private static final String    PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
+    private static final String    PLUGIN_VERSION_FOR_TESTS = "3-SNAPSHOT";
     public  File   originDir;
     public  Git    origin;
     public  File   localDir;

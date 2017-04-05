@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+
+### 3.0 smart-release-plugin
+
+* Partial rewrite to obtain robust bugfix releases.
+
 ### 2.1.2
 
 * Adding ability to control the behavior when no changes are detected. New property noChangesAction can be set

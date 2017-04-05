@@ -25,23 +25,6 @@ And then call the plugin:
 
 	mvn releaser:release
 
-You can also optionally supply your own build numbers if you do not want an automatically incrementing number:
-
-    mvn releaser:release -DbuildNumber=1234
-
-Running a partial release
--------------------------
-
-It is possible to release a single module (and any modules it depends on) by using the `modulesToRelease` parameter.
-For example:
-
-	mvn releaser:release -DmodulesToRelease=MyApp
-
-In this case the `MyApp` module will be built, released and tagged. If MyApp depends on another module, than that module will
-also be built and released (but there will be no Git tag for this).
-
-Note that this is not generally required as the plugin will only deploy changed modules by default anyway.
-
 Forcing a release
 -----------------
 It is possible to force the release of one or more specified modules, for example if the changes have not been picked up due to some issue.
