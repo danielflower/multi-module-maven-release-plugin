@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.testproject.singlepom;
+package de.hilling.maven.release.testproject.singlepom;
 
 import org.junit.Assert;
 

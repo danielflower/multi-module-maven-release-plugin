@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins.testprojects.deepdependencies</groupId>
+    <groupId>de.hilling.maven.release.testprojects.deepdependencies</groupId>
     <artifactId>parent-module</artifactId>
     <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -17,8 +17,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
                 <version>${current.plugin.version}</version>
             </plugin>
         </plugins>

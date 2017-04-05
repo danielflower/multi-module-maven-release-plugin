@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>independent-versions</artifactId>
-        <groupId>com.github.danielflower.mavenplugins.testprojects.independentversions</groupId>
+        <groupId>de.hilling.maven.release.testprojects.independentversions</groupId>
         <version>1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.danielflower.mavenplugins.testprojects.independentversions</groupId>
+            <groupId>de.hilling.maven.release.testprojects.independentversions</groupId>
             <artifactId>core-utils</artifactId>
             <version>2-SNAPSHOT</version>
         </dependency>

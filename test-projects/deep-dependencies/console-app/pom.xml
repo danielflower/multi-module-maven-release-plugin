@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent-module</artifactId>
-        <groupId>com.github.danielflower.mavenplugins.testprojects.deepdependencies</groupId>
+        <groupId>de.hilling.maven.release.testprojects.deepdependencies</groupId>
         <version>1-SNAPSHOT</version>
         <relativePath>../parent-module/pom.xml</relativePath>
     </parent>
@@ -15,7 +15,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.danielflower.mavenplugins.testprojects.deepdependencies</groupId>
+            <groupId>de.hilling.maven.release.testprojects.deepdependencies</groupId>
             <artifactId>core-utils</artifactId>
             <version>2-SNAPSHOT</version>
         </dependency>

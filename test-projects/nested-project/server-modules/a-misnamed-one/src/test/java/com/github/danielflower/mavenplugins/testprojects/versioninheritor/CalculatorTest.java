@@ -1,4 +1,4 @@
-package com.github.danielflower.mavenplugins.testprojects.versioninheritor;
+package de.hilling.maven.release.testprojects.versioninheritor;
 
 
 import org.junit.Assert;
