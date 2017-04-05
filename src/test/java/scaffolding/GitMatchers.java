@@ -12,12 +12,12 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-import com.github.danielflower.mavenplugins.release.AnnotatedTag;
-import com.github.danielflower.mavenplugins.release.GitHelper;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
-import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
+import de.hilling.maven.release.AnnotatedTag;
+import de.hilling.maven.release.GitHelper;
+import de.hilling.maven.release.versioning.ImmutableFixVersion;
+import de.hilling.maven.release.versioning.ImmutableModuleVersion;
+import de.hilling.maven.release.versioning.ImmutableQualifiedArtifact;
+import de.hilling.maven.release.versioning.VersionMatcher;
 
 public class GitMatchers {
 

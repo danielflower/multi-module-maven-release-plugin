@@ -13,6 +13,8 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.hilling.maven.release.TestUtils;
+
 /**
  * This test actually downloads multiple versions of maven and runs the plugin against them.
  */
@@ -45,7 +47,7 @@ public class MavenCompatibilityTest {
         String expected = "1.0";
         testProject.setMvnRunner(MvnRunner.mvn(mavenVersionToTest));
         testProject.mvnRelease();
-        MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
+        MvnRunner.assertArtifactInLocalRepo(TestUtils.TEST_GROUP_ID, "single-module", expected);
         assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(), is(true));
     }
 

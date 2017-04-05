@@ -2,7 +2,7 @@ package scaffolding;
 
 import e2e.ProjectType;
 
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+import static de.hilling.maven.release.FileUtils.pathOf;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 import java.io.File;

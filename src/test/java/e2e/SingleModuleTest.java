@@ -26,12 +26,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.TestUtils;
-import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableFixVersion;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
-import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
+import de.hilling.maven.release.TestUtils;
+import de.hilling.maven.release.releaseinfo.ReleaseInfoStorage;
+import de.hilling.maven.release.versioning.ImmutableFixVersion;
+import de.hilling.maven.release.versioning.ImmutableModuleVersion;
+import de.hilling.maven.release.versioning.ImmutableReleaseInfo;
+import de.hilling.maven.release.versioning.ReleaseInfo;
 
 public class SingleModuleTest {
 
@@ -47,7 +47,7 @@ public class SingleModuleTest {
         assertThat(outputLines, oneOf(containsString("Hello from version " + expected + "!")));
 
         MvnRunner
-            .assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
+            .assertArtifactInLocalRepo(TestUtils.TEST_GROUP_ID, "single-module", expected);
 
         assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(),
                    is(true));

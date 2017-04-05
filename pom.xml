@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins</groupId>
-    <artifactId>multi-module-maven-release-plugin</artifactId>
+    <groupId>de.hilling.maven.release</groupId>
+    <artifactId>smart-release-plugin</artifactId>
     <version>2.1-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
 
     <name>The Multi Module Maven Release Plugin</name>
@@ -46,10 +46,6 @@
     </licenses>
 
     <developers>
-        <developer>
-            <name>Daniel Flower</name>
-            <organizationUrl>https://github.com/danielflower</organizationUrl>
-        </developer>
         <developer>
             <name>Gunnar Hilling</name>
             <organizationUrl>https://github.com/guhilling</organizationUrl>
@@ -342,7 +338,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>

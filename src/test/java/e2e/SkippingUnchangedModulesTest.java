@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.TestUtils;
+import de.hilling.maven.release.TestUtils;
 
 public class SkippingUnchangedModulesTest {
 

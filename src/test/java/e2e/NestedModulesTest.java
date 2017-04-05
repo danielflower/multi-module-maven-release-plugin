@@ -22,11 +22,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
+import de.hilling.maven.release.TestUtils;
+import de.hilling.maven.release.versioning.VersionMatcher;
 
 public class NestedModulesTest {
 
-    private static final String      GROUP_ID                     = "com.github.danielflower.mavenplugins.testprojects.nested";
+    private static final String      GROUP_ID                     = TestUtils.TEST_GROUP_ID + ".nested";
     private final        String      expectedAggregatorVersion    = "0.0";
     private final        String      expectedParentVersion        = "1.0";
     private final        String      expectedCoreVersion          = "2.0";

@@ -26,13 +26,14 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
-import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
-import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
+import de.hilling.maven.release.TestUtils;
+import de.hilling.maven.release.releaseinfo.ReleaseInfoStorage;
+import de.hilling.maven.release.versioning.ImmutableQualifiedArtifact;
+import de.hilling.maven.release.versioning.ReleaseInfo;
 
 public class IndependentVersionsTest {
 
-    private static final String INDEPENDENT_VERSIONS_GROUPID = "com.github.danielflower.mavenplugins.testprojects.independentversions";
+    private static final String INDEPENDENT_VERSIONS_GROUPID = TestUtils.TEST_GROUP_ID + ".independentversions";
     private final String      expectedParentVersion = "1.0";
     private final String      expectedCoreVersion   = "2.0";
     private final String      expectedAppVersion    = "3.0";

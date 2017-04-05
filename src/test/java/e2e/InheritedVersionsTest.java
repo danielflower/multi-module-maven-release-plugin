@@ -21,11 +21,13 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.hilling.maven.release.TestUtils;
+
 public class InheritedVersionsTest {
 
     private static final String[] ARTIFACT_IDS = new String[]{"inherited-versions-from-parent", "core-utils",
                                                               "console-app"};
-    private static final String   GROUP_ID     = "com.github.danielflower.mavenplugins.testprojects.versioninheritor";
+    private static final String   GROUP_ID     = TestUtils.TEST_GROUP_ID + ".versioninheritor";
     private final        String   expected     = "1.0";
 
     @Rule
