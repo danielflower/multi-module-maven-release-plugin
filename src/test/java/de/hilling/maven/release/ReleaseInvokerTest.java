@@ -168,28 +168,6 @@ public class ReleaseInvokerTest {
     }
 
     @Test
-    public void runMavenBuild_UserExplicitlyWantsThisToBeReleased() throws Exception {
-        when(reactor.getModulesInBuildOrder()).thenReturn(modulesInBuildOrder);
-        modulesToRelease.add(MODULE_PATH);
-        releaseInvoker.setModulesToRelease(modulesToRelease);
-        releaseInvoker.runMavenBuild(reactor);
-        verify(request).setProjects(Mockito.argThat(new BaseMatcher<List<String>>() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public boolean matches(final Object item) {
-                final List<String> modules = (List<String>) item;
-                return modules.size() == 1 && modules.contains(MODULE_PATH);
-            }
-
-            @Override
-            public void describeTo(final Description description) {
-                description.appendText("projects");
-            }
-        }));
-    }
-
-    @Test
     public void runMavenBuild_UserImplicitlyWantsThisToBeReleased() throws Exception {
         when(reactor.getModulesInBuildOrder()).thenReturn(modulesInBuildOrder);
         when(module.isToBeReleased()).thenReturn(true);
