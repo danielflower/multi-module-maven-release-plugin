@@ -11,7 +11,7 @@
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
     </description>
-    <url>https://github.com/danielflower/maven-multi-module-releaser</url>
+    <url>https://github.com/guhilling/smart-release-plugin</url>
     <packaging>maven-plugin</packaging>
     <prerequisites>
         <!-- if this changes, please update the MavenCompatibilityTest -->
@@ -202,8 +202,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
                 <version>${project.version}</version>
                 <configuration>
                     <releaseGoals>
