@@ -23,14 +23,14 @@ Add the plugin to your pom:
 
 And then call the plugin:
 
-	mvn releaser:release
+	mvn smart-release:release
 
 Forcing a release
 -----------------
 It is possible to force the release of one or more specified modules, for example if the changes have not been picked up due to some issue.
 To do this, use the `forceRelease` parameter. For example:
 
-	mvn releaser:release -DforceRelease=MyApp
+	mvn smart-release:release -DforceRelease=MyApp
 
 In this case the `MyApp` module will be built, even if there where no changes found.
 
@@ -40,7 +40,7 @@ Specify custom global/user Maven settings for release build
 Sometimes it's necessary to specify custom Maven settings for the release build. This can be done with the following
 standard maven command line parameters:
 
-	mvn releaser:release -s /path/to/custom/user/settings.xml -gs /path/to/custom/global/settings.xml
+	mvn smart-release:release -s /path/to/custom/user/settings.xml -gs /path/to/custom/global/settings.xml
 
 SSH authentication
 ------------------

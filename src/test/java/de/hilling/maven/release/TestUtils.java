@@ -18,6 +18,10 @@ import de.hilling.maven.release.versioning.VersionMatcher;
 
 public final class TestUtils {
 
+    public static final String RELEASE_GOAL = "smart-release:release";
+    public static final String NEXT_GOAL = "smart-release:next";
+    public static final String HELP_GOAL = "smart-release:help";
+
     private TestUtils() {
     }
 

@@ -32,7 +32,7 @@ Add the following to your plugins section:
 		<version>${project.version}</version>
 	</plugin>
 
-Release your project by running `mvn releaser:release`
+Release your project by running `mvn smart-release:release`
 
 See [usage](usage.html) for more details.
 

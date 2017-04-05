@@ -3,6 +3,7 @@ package e2e;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
+import static de.hilling.maven.release.TestUtils.RELEASE_GOAL;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -55,18 +56,18 @@ public class SingleModuleTest {
 
     @Test
     public void theReleaseNumbersWillStartAt0AndThenIncrement() throws IOException, GitAPIException {
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
         assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.0"));
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
         assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.1"));
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
         assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.2"));
     }
 
     @Test
     public void theReleaseNumbersWillStartAt0AndThenIncrementTakingIntoAccountManuallyUpdatedReleaseInfoFiles() throws
                                                                                                                 Exception {
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
         assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.0"));
 
         final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(testProject.localDir, testProject.local);
@@ -79,7 +80,7 @@ public class SingleModuleTest {
         releaseBuilder.modules(singletonList(moduleInfo.version(versionBuilder.minorVersion(5L).build()).build()));
         infoStorage.store(releaseBuilder.build());
 
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
         assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.6"));
     }
 
@@ -107,7 +108,7 @@ public class SingleModuleTest {
 
     @Test
     public void onlyLocalGitRepoIsTaggedWithoutPush() throws IOException, InterruptedException {
-        testProject.mvn("-Dpush=false", "releaser:release");
+        testProject.mvn("-Dpush=false", RELEASE_GOAL);
         assertThat(testProject.local, hasTag(expectedTag()));
         assertThat(testProject.origin, not(hasTag(expectedTag())));
     }

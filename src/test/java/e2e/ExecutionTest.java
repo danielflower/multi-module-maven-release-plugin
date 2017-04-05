@@ -13,6 +13,8 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.hilling.maven.release.TestUtils;
+
 public class ExecutionTest {
 
     private static final String ECHO_PLUGIN_OUTPUT = "echo-maven-plugin running because profileActivatedByReleasePlugin" + " is " + "activated";
@@ -30,7 +32,7 @@ public class ExecutionTest {
 
     @Test
     public void profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment() throws Exception {
-        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", "releaser:release", "-P runTestsProfile");
+        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", TestUtils.RELEASE_GOAL, "-P runTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("The module-with-profiles test has run")));
         assertThat(consoleOutput, oneOf(containsString(ECHO_PLUGIN_OUTPUT)));
     }
@@ -38,7 +40,7 @@ public class ExecutionTest {
     @Test
     public void userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters() throws Exception {
         File globalSettings = new File("test-projects/module-with-profiles/custom-settings.xml");
-        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", "releaser:release", "-gs",
+        List<String> consoleOutput = testProject.mvn("-DbuildNumber=1", TestUtils.RELEASE_GOAL, "-gs",
                                                      globalSettings.getCanonicalPath());
         assertThat(consoleOutput, oneOf(containsString(ECHO_PLUGIN_OUTPUT)));
     }

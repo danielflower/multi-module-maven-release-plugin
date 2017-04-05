@@ -16,12 +16,12 @@ import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.hilling.maven.release.TestUtils;
+
 public class HelpTest {
 
     @Rule
     public TestProject singleProject = new TestProject(ProjectType.SINGLE);
-
-    private static final String multi_module_release_help = "releaser:help";
 
     private static Matcher<Iterable<? super String>> containsStrings(String... strings) {
         List<Matcher<Iterable<? super String>>> matchers = new ArrayList<>();
@@ -34,9 +34,9 @@ public class HelpTest {
 
     @Test
     public void runningTheHelpMojoTellsYouAboutThePlugin() throws IOException {
-        assertThat(mvn(multi_module_release_help),
-                   containsStrings("This plugin has 3 goals:", "releaser:release", "releaser:help",
-                                   multi_module_release_help));
+        assertThat(mvn(TestUtils.HELP_GOAL),
+                   containsStrings("This plugin has 3 goals:", TestUtils.RELEASE_GOAL, TestUtils.NEXT_GOAL,
+                                   TestUtils.HELP_GOAL));
     }
 
     private List<String> mvn(String... commands) throws IOException {
@@ -45,7 +45,7 @@ public class HelpTest {
 
     @Test
     public void canShowInformationAboutTheReleaseGoal() throws IOException {
-        assertThat(mvn(multi_module_release_help, "-Dgoal=release", "-Ddetail=true"),
+        assertThat(mvn(TestUtils.HELP_GOAL, "-Dgoal=release", "-Ddetail=true"),
                    containsStrings("The goals to run against the project during a release"));
     }
 }

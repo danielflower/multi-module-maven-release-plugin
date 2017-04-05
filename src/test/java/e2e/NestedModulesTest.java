@@ -2,6 +2,7 @@ package e2e;
 
 import scaffolding.TestProject;
 
+import static de.hilling.maven.release.TestUtils.RELEASE_GOAL;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -55,7 +56,7 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, ".misnamed");
 
         testProject.commitRandomFile("server-modules/server-module-b");
-        testProject.mvn("releaser:release");
+        testProject.mvn(TestUtils.RELEASE_GOAL);
 
         assertBothReposNotTagged("nested-project", minor(expectedAggregatorVersion, 1));
         assertBothReposNotTagged("core-utils", minor(expectedCoreVersion, 1));
@@ -67,7 +68,7 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, ".misnamed");
 
         testProject.commitRandomFile("parent-module");
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
 
         assertBothReposNotTagged("nested-project", minor(expectedAggregatorVersion, 1));
         assertBothReposTagged("core-utils", minor(expectedCoreVersion, 1), "");
