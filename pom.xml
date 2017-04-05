@@ -27,12 +27,12 @@
 
     <ciManagement>
         <system>travis-ci</system>
-        <url>https://travis-ci.org/guhilling/multi-module-maven-release-plugin</url>
+        <url>https://travis-ci.org/guhilling/smart-release-plugin</url>
     </ciManagement>
 
     <scm>
-        <url>https://github.com/guhilling/multi-module-maven-release-plugin</url>
-        <connection>scm:git:git@github.com:guhilling/multi-module-maven-release-plugin.git</connection>
+        <url>https://github.com/guhilling/smart-release-plugin</url>
+        <connection>scm:git:git@github.com:guhilling/smart-release-plugin.git</connection>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
