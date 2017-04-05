@@ -54,12 +54,16 @@ public class MvnRunner {
         }
         long start = System.currentTimeMillis();
         System.out.println("Installing the plugin into the local repo");
-        assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
+        assertThat("Environment variable M2_HOME must be set", systemMavenHome() != null);
         MvnRunner mvnRunner = new MvnRunner();
         mvnRunner.runMaven(new File("."), "-DskipTests=true", "install");
         System.out.println(
             "Finished installing the plugin into the local repo in " + (System.currentTimeMillis() - start) + "ms");
         haveInstalledPlugin = true;
+    }
+
+    public static String systemMavenHome() {
+        return System.getenv("M2_HOME");
     }
 
     public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException,
@@ -102,6 +106,11 @@ public class MvnRunner {
 
         Invoker invoker = new DefaultInvoker();
 
+        if (mvnHome == null) {
+            System.out.println("Maven Home: " + systemMavenHome());
+        } else {
+            System.out.println("Maven Home: " + mvnHome);
+        }
         invoker.setMavenHome(mvnHome);
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);

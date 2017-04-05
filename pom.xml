@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins</groupId>
-    <artifactId>multi-module-maven-release-plugin</artifactId>
-    <version>2.1-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
+    <groupId>de.hilling.maven.release</groupId>
+    <artifactId>smart-release-plugin</artifactId>
+    <version>3-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
 
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
     </description>
-    <url>https://github.com/danielflower/maven-multi-module-releaser</url>
+    <url>https://github.com/guhilling/smart-release-plugin</url>
     <packaging>maven-plugin</packaging>
     <prerequisites>
         <!-- if this changes, please update the MavenCompatibilityTest -->
@@ -27,15 +27,15 @@
 
     <ciManagement>
         <system>travis-ci</system>
-        <url>https://travis-ci.org/guhilling/multi-module-maven-release-plugin</url>
+        <url>https://travis-ci.org/guhilling/smart-release-plugin</url>
     </ciManagement>
 
     <scm>
-        <url>https://github.com/guhilling/multi-module-maven-release-plugin</url>
-        <connection>scm:git:git@github.com:guhilling/multi-module-maven-release-plugin.git</connection>
+        <url>https://github.com/guhilling/smart-release-plugin</url>
+        <connection>scm:git:git@github.com:guhilling/smart-release-plugin.git</connection>
     </scm>
 
-    <inceptionYear>2015</inceptionYear>
+    <inceptionYear>2017</inceptionYear>
 
     <licenses>
         <license>
@@ -46,10 +46,6 @@
     </licenses>
 
     <developers>
-        <developer>
-            <name>Daniel Flower</name>
-            <organizationUrl>https://github.com/danielflower</organizationUrl>
-        </developer>
         <developer>
             <name>Gunnar Hilling</name>
             <organizationUrl>https://github.com/guhilling</organizationUrl>
@@ -206,8 +202,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
                 <version>${project.version}</version>
                 <configuration>
                     <releaseGoals>
@@ -226,7 +222,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.5</version>
                 <configuration>
-                    <goalPrefix>releaser</goalPrefix>
+                    <goalPrefix>smart-release</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
@@ -252,6 +248,24 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.5.201505241946</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -342,7 +356,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>

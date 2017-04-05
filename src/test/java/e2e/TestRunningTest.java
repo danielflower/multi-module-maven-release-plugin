@@ -3,6 +3,7 @@ package e2e;
 import scaffolding.MavenExecutionException;
 import scaffolding.TestProject;
 
+import static de.hilling.maven.release.TestUtils.RELEASE_GOAL;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
@@ -14,7 +15,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.TestUtils;
+import de.hilling.maven.release.TestUtils;
 
 public class TestRunningTest {
 
@@ -41,6 +42,6 @@ public class TestRunningTest {
 
     @Test
     public void ifTestsAreSkippedYouCanReleaseWithoutRunningThem() throws IOException {
-        projectWithTestsThatFail.mvn("-DskipTests", "releaser:release");
+        projectWithTestsThatFail.mvn("-DskipTests", RELEASE_GOAL);
     }
 }

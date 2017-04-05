@@ -21,6 +21,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.hilling.maven.release.TestUtils;
+
 public class GitRelatedTest {
 
     @Rule
@@ -33,7 +35,7 @@ public class GitRelatedTest {
         File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module", UUID.randomUUID().toString());
         TestProject.performPomSubstitution(projectRoot);
         try {
-            new MvnRunner().runMaven(projectRoot, "releaser:release");
+            new MvnRunner().runMaven(projectRoot, TestUtils.RELEASE_GOAL);
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
             assertThat(e.output, twoOf(containsString("Releases can only be performed from Git repositories.")));

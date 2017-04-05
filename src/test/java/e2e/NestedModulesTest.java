@@ -2,6 +2,7 @@ package e2e;
 
 import scaffolding.TestProject;
 
+import static de.hilling.maven.release.TestUtils.RELEASE_GOAL;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -22,11 +23,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.github.danielflower.mavenplugins.release.versioning.VersionMatcher;
+import de.hilling.maven.release.TestUtils;
+import de.hilling.maven.release.versioning.VersionMatcher;
 
 public class NestedModulesTest {
 
-    private static final String      GROUP_ID                     = "com.github.danielflower.mavenplugins.testprojects.nested";
+    private static final String      GROUP_ID                     = TestUtils.TEST_GROUP_ID + ".nested";
     private final        String      expectedAggregatorVersion    = "0.0";
     private final        String      expectedParentVersion        = "1.0";
     private final        String      expectedCoreVersion          = "2.0";
@@ -54,7 +56,7 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, ".misnamed");
 
         testProject.commitRandomFile("server-modules/server-module-b");
-        testProject.mvn("releaser:release");
+        testProject.mvn(TestUtils.RELEASE_GOAL);
 
         assertBothReposNotTagged("nested-project", minor(expectedAggregatorVersion, 1));
         assertBothReposNotTagged("core-utils", minor(expectedCoreVersion, 1));
@@ -66,7 +68,7 @@ public class NestedModulesTest {
         assertBothReposTagged("server-module-c", expectedServerModuleCVersion, ".misnamed");
 
         testProject.commitRandomFile("parent-module");
-        testProject.mvn("releaser:release");
+        testProject.mvn(RELEASE_GOAL);
 
         assertBothReposNotTagged("nested-project", minor(expectedAggregatorVersion, 1));
         assertBothReposTagged("core-utils", minor(expectedCoreVersion, 1), "");

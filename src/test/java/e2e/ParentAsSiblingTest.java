@@ -21,13 +21,15 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.hilling.maven.release.TestUtils;
+
 public class ParentAsSiblingTest {
 
-    public static final String GROUP_ID = "com.github.danielflower.mavenplugins.testprojects.parentassibling";
-    final String expectedAggregatorVersion = "1.0";
-    final String expectedParentVersion = "1.0";
-    final String expectedCoreVersion = "2.0";
-    final String expectedAppVersion = "3.0";
+    private static final String GROUP_ID                  = TestUtils.TEST_GROUP_ID + ".parentassibling";
+    final                String expectedAggregatorVersion = "1.0";
+    final                String expectedParentVersion     = "1.0";
+    final                String expectedCoreVersion       = "2.0";
+    final                String expectedAppVersion        = "3.0";
 
     @Rule
     public TestProject testProject = new TestProject(ProjectType.PARENT_AS_SIBLING);

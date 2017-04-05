@@ -2,7 +2,7 @@ package scaffolding;
 
 import e2e.ProjectType;
 
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+import static de.hilling.maven.release.FileUtils.pathOf;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 import java.io.File;
@@ -21,10 +21,12 @@ import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.rules.ExternalResource;
 
+import de.hilling.maven.release.TestUtils;
+
 public class TestProject extends ExternalResource {
 
     private static final MvnRunner DEFAULT_RUNNER;
-    private static final String    PLUGIN_VERSION_FOR_TESTS = "2.1-SNAPSHOT";
+    private static final String    PLUGIN_VERSION_FOR_TESTS = "3-SNAPSHOT";
     public  File   originDir;
     public  Git    origin;
     public  File   localDir;
@@ -112,15 +114,15 @@ public class TestProject extends ExternalResource {
     }
 
     public List<String> mvnRelease(String... arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:release", arguments);
+        return mvnRun(TestUtils.RELEASE_GOAL, arguments);
     }
 
     public List<String> mvnReleaseBugfix() throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir, "-DperformBugfixRelease=true", "releaser:release");
+        return mvnRunner.runMaven(localDir, "-DperformBugfixRelease=true", TestUtils.RELEASE_GOAL);
     }
 
     public List<String> mvnReleaserNext(String... arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:next", arguments);
+        return mvnRun(TestUtils.NEXT_GOAL, arguments);
     }
 
     public TestProject commitFile(String module, String fileName, String fileContent) throws IOException,
