@@ -1,11 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.util.Arrays.asList;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,19 +10,24 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.settings.io.DefaultSettingsWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
+
+import com.github.danielflower.mavenplugins.release.releaseinfo.ReleaseInfoStorage;
+import com.github.danielflower.mavenplugins.release.repository.LocalGitRepo;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 /**
  * Releases the project.
  */
-@Mojo(
-    name = "release",
-    requiresDirectInvocation = true, // this should not be bound to a phase as this plugin starts a phase itself
-    inheritByDefault = true, // so you can configure this in a shared parent pom
-    requiresProject = true, // this can only run against a maven project
-    aggregator = true // the plugin should only run once against the aggregator pom
-)
+@Mojo(name = "release", requiresDirectInvocation = true,
+      // this should not be bound to a phase as this plugin starts a phase itself
+      inheritByDefault = true, // so you can configure this in a shared parent pom
+      requiresProject = true, // this can only run against a maven project
+      aggregator = true // the plugin should only run once against the aggregator pom
+      )
 public class ReleaseMojo extends BaseMojo {
 
     /**
@@ -54,12 +54,13 @@ public class ReleaseMojo extends BaseMojo {
 
     /**
      * <p>
-     *     Profiles to activate during the release.
+     * Profiles to activate during the release.
      * </p>
      * <p>
-     *     Note that if any profiles are activated during the build using the `-P` or `--activate-profiles` will also be activated during release.
-     *     This gives two options for running releases: either configure it in the plugin configuration, or activate profiles from the command line.
+     * Note that if any profiles are activated during the build using the `-P` or `--activate-profiles` will also be activated during release.
+     * This gives two options for running releases: either configure it in the plugin configuration, or activate profiles from the command line.
      * </p>
+     *
      * @since 1.0.1
      */
     @Parameter(alias = "releaseProfiles")
@@ -71,113 +72,12 @@ public class ReleaseMojo extends BaseMojo {
      */
     @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
     private boolean skipTests;
-    
-	/**
-	 * Specifies a custom, user specific Maven settings file to be used during the release build.
-     *
-     * @deprecated In versions prior to 2.1, if the plugin was run with custom user settings the settings were ignored
-     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
-     * Please use the '-s' command line parameter to set custom user settings.
-	 */
-	@Parameter(alias = "userSettings")
-	private File userSettings;
 
-	/**
-	 * Specifies a custom, global Maven settings file to be used during the release build.
-     *
-     * @deprecated In versions prior to 2.1, if the plugin was run with custom global settings the settings were ignored
-     * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
-     * Please use the '-gs' command line parameter to set custom global settings.
-     */
-	@Parameter(alias = "globalSettings")
-	private File globalSettings;
-        
     /**
      * Push tags to remote repository as they are created.
      */
-    @Parameter(alias = "pushTags", defaultValue="true", property="push")
+    @Parameter(alias = "pushTags", defaultValue = "true", property = "push")
     private boolean pushTags;
-    
-
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        Log log = getLog();
-
-        try {
-            configureJsch(log);
-
-
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
-            repo.errorIfNotClean();
-
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease,
-                                                   noChangesAction, bugfixRelease);
-            if (reactor == null) {
-                return;
-            }
-
-            List<AnnotatedTag> proposedTags = figureOutTagNamesAndThrowIfAlreadyExists(reactor.getModulesInBuildOrder(), repo, modulesToRelease);
-
-            List<File> changedFiles = updatePomsAndReturnChangedFiles(log, repo, reactor);
-
-            // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
-            // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
-            // and so fail. The downside is that failed builds result in tags being pushed.
-            tagAndPushRepo(log, repo, proposedTags);
-
-            try {
-            	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
-            	invoker.setGlobalSettings(globalSettings);
-                if (userSettings != null) {
-                    invoker.setUserSettings(userSettings);
-                } else if (getSettings() != null) {
-                    File settingsFile = File.createTempFile("tmp", ".xml");
-                    settingsFile.deleteOnExit();
-                    new DefaultSettingsWriter().write(settingsFile, null, getSettings());
-                    invoker.setUserSettings(settingsFile);
-                }
-            	invoker.setGoals(goals);
-            	invoker.setModulesToRelease(modulesToRelease);
-            	invoker.setReleaseProfiles(releaseProfiles);
-            	invoker.setSkipTests(skipTests);
-                invoker.runMavenBuild(reactor);
-                revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
-            } finally {
-                revertChanges(log, repo, changedFiles, false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
-            }
-
-
-        } catch (ValidationException e) {
-            printBigErrorMessageAndThrow(log, e.getMessage(), e.getMessages());
-        } catch (GitAPIException gae) {
-
-            StringWriter sw = new StringWriter();
-            gae.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-
-            printBigErrorMessageAndThrow(log, "Could not release due to a Git error",
-                asList("There was an error while accessing the Git repository. The error returned from git was:",
-                    gae.getMessage(), "Stack trace:", exceptionAsString));
-        } catch (IOException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-
-            printBigErrorMessageAndThrow(log, e.getMessage(),
-                    asList("There was an error while creating temporary settings file. The error was:", e.getMessage(), "Stack trace:", exceptionAsString));
-        }
-    }
-
-    private void tagAndPushRepo(Log log, LocalGitRepo repo, List<AnnotatedTag> proposedTags) throws GitAPIException {
-        for (AnnotatedTag proposedTag : proposedTags) {
-            log.info("About to tag the repository with " + proposedTag.name());
-            if (pushTags) {
-                repo.tagRepoAndPush(proposedTag);
-            } else {
-                repo.tagRepo(proposedTag);
-            }
-        }
-    }
 
     static String getRemoteUrlOrNullIfNoneSet(Scm originalScm, Scm actualScm) throws ValidationException {
         if (originalScm == null) {
@@ -196,28 +96,20 @@ public class ReleaseMojo extends BaseMojo {
         return GitHelper.scmUrlToRemote(remote);
     }
 
-    private static void revertChanges(Log log, LocalGitRepo repo, List<File> changedFiles, boolean throwIfError) throws MojoExecutionException {
-        if (!repo.revertChanges(log, changedFiles)) {
-            String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
-            if (throwIfError) {
-                throw new MojoExecutionException(message);
-            } else {
-                log.warn(message);
-            }
-        }
-    }
-
-    private static List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor) throws MojoExecutionException, ValidationException {
+    private static List<File> updatePomsAndReturnChangedFiles(Log log, LocalGitRepo repo, Reactor reactor) throws
+                                                                                                           MojoExecutionException,
+                                                                                                           ValidationException {
         PomUpdater pomUpdater = new PomUpdater(log, reactor);
         PomUpdater.UpdateResult result = pomUpdater.updateVersion();
         if (!result.success()) {
             log.info("Going to revert changes because there was an error.");
             repo.revertChanges(log, result.alteredPoms);
             if (result.unexpectedException != null) {
-                throw new ValidationException("Unexpected exception while setting the release versions in the pom", result.unexpectedException);
+                throw new ValidationException("Unexpected exception while setting the release versions in the pom",
+                                              result.unexpectedException);
             } else {
                 String summary = "Cannot release with references to snapshot dependencies";
-                List<String> messages = new ArrayList<String>();
+                List<String> messages = new ArrayList<>();
                 messages.add(summary);
                 messages.add("The following dependency errors were found:");
                 for (String dependencyError : result.dependencyErrors) {
@@ -229,39 +121,84 @@ public class ReleaseMojo extends BaseMojo {
         return result.alteredPoms;
     }
 
-    static List<AnnotatedTag> figureOutTagNamesAndThrowIfAlreadyExists(List<ReleasableModule> modules, LocalGitRepo git, List<String> modulesToRelease) throws GitAPIException, ValidationException {
-        List<AnnotatedTag> tags = new ArrayList<AnnotatedTag>();
-        for (ReleasableModule module : modules) {
-            if (!module.willBeReleased()) {
-                continue;
-            }
-            if (modulesToRelease == null || modulesToRelease.size() == 0 || module.isOneOf(modulesToRelease)) {
-                String tag = module.getTagName();
-                if (git.hasLocalTag(tag)) {
-                    String summary = "There is already a tag named " + tag + " in this repository.";
-                    throw new ValidationException(summary, asList(
-                        summary,
-                        "It is likely that this version has been released before.",
-                        "Please try incrementing the build number and trying again."
-                    ));
-                }
+    @Override
+    public void executeConcreteMojo() throws MojoExecutionException, MojoFailureException, GitAPIException {
 
-                AnnotatedTag annotatedTag = AnnotatedTag.create(tag, module.getVersion(), module.versionInfo());
-                tags.add(annotatedTag);
+        configureJsch();
+
+        LocalGitRepo repo = LocalGitRepo.fromCurrentDir(
+            getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
+        repo.errorIfNotClean();
+
+        final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(project.getBasedir(), repo.git);
+        ReleaseInfo previousRelease = infoStorage.load();
+        getLog().info("previous release: " + previousRelease);
+
+        Reactor reactor = Reactor
+                              .fromProjects(getLog(), repo, project, projects, modulesToForceRelease, noChangesAction,
+                                            bugfixRelease, previousRelease);
+        if (reactor == null) {
+            return;
+        }
+
+        final List<ReleasableModule> releasableModules = reactor.getModulesInBuildOrder();
+
+        final ImmutableReleaseInfo.Builder releaseBuilder = ImmutableReleaseInfo.builder().tagName(
+            ReleaseDateSingleton.getInstance().tagName());
+
+        List<String> modulesToRelease = new ArrayList<>();
+        for (ReleasableModule releasableModule : releasableModules) {
+            releaseBuilder.addModules(releasableModule.getImmutableModule());
+            if (releasableModule.isToBeReleased()) {
+                modulesToRelease.add(releasableModule.getRelativePathToModule());
             }
         }
-        List<String> matchingRemoteTags = git.remoteTagsFrom(tags);
-        if (matchingRemoteTags.size() > 0) {
-            String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
-            List<String> messages = new ArrayList<String>();
-            messages.add(summary);
-            for (String matchingRemoteTag : matchingRemoteTags) {
-                messages.add(" * There is already a tag named " + matchingRemoteTag + " in the remote repo.");
-            }
-            messages.add("Please try releasing again with a new build number.");
-            throw new ValidationException(summary, messages);
+
+        final ImmutableReleaseInfo currentRelease = releaseBuilder.build();
+        getLog().info("current release: " + currentRelease);
+        infoStorage.store(currentRelease);
+
+        List<File> changedFiles = updatePomsAndReturnChangedFiles(getLog(), repo, reactor);
+
+        // Do this before running the maven build in case the build uploads some artifacts and then fails. If it is
+        // not tagged in a half-failed build, then subsequent releases will re-use a version that is already in Nexus
+        // and so fail. The downside is that failed builds result in tags being pushed.
+        tagAndPushRepo(repo, currentRelease);
+
+        try {
+            final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
+            invoker.setGoals(goals);
+            invoker.setModulesToRelease(modulesToRelease);
+            invoker.setReleaseProfiles(releaseProfiles);
+            invoker.setSkipTests(skipTests);
+            invoker.runMavenBuild(reactor);
+            revertChanges(repo, changedFiles, true); // throw if you can't revert as that is the root problem
+        } finally {
+            revertChanges(repo, changedFiles,
+                          false); // warn if you can't revert but keep throwing the original exception so the root cause isn't lost
         }
-        return tags;
     }
 
+    private void tagAndPushRepo(LocalGitRepo repo, ImmutableReleaseInfo releaseInfo) throws GitAPIException {
+        final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
+
+        getLog().info("About to tag repository with " + releaseInfo.toString());
+        final Ref ref = repo.tagRepo(tag);
+        if (pushTags) {
+            getLog().info("About to push tags and release-info " + releaseInfo.toString());
+            repo.pushAll(ref);
+        }
+    }
+
+    private void revertChanges(LocalGitRepo repo, List<File> changedFiles, boolean throwIfError) throws
+                                                                                                 MojoExecutionException {
+        if (!repo.revertChanges(getLog(), changedFiles)) {
+            String message = "Could not revert changes - working directory is no longer clean. Please revert changes manually";
+            if (throwIfError) {
+                throw new MojoExecutionException(message);
+            } else {
+                getLog().warn(message);
+            }
+        }
+    }
 }

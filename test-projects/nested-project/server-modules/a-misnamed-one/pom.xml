@@ -5,14 +5,14 @@
     <parent>
         <artifactId>parent-module</artifactId>
         <groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
-        <version>1.2.3-SNAPSHOT</version>
+        <version>1-SNAPSHOT</version>
         <relativePath>../../parent-module/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.danielflower.mavenplugins.testprojects.nested.misnamed</groupId>
     <artifactId>server-module-c</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
             <artifactId>server-module-b</artifactId>
-            <version>3.1-SNAPSHOT</version>
+            <version>3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

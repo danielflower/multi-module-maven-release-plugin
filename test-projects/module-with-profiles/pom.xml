@@ -7,7 +7,7 @@
 
     <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
     <artifactId>module-with-profiles</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>

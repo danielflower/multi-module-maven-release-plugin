@@ -1,76 +1,17 @@
 package com.github.danielflower.mavenplugins.release;
 
-import java.util.List;
-
 import org.apache.maven.project.MavenProject;
+import org.immutables.value.Value;
 
-public class ReleasableModule {
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
 
-    private final MavenProject project;
-    private final VersionName version;
-    private final String tagName;
-    private final String equivalentVersion;
-    private final String relativePathToModule;
+@Value.Immutable
+public interface ReleasableModule {
+    String getRelativePathToModule();
 
-    public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule) {
-        this.project = project;
-        this.version = version;
-        this.equivalentVersion = equivalentVersion;
-        this.relativePathToModule = relativePathToModule;
-        this.tagName = project.getArtifactId() + "-" + version.releaseVersion();
-    }
+    MavenProject getProject();
 
-    public String getTagName() {
-        return tagName;
-    }
+    ImmutableModuleVersion getImmutableModule();
 
-    public String getNewVersion() {
-        return version.releaseVersion();
-    }
-
-    public String getArtifactId() {
-        return project.getArtifactId();
-    }
-
-    public String getGroupId() {
-        return project.getGroupId();
-    }
-
-    public MavenProject getProject() {
-        return project;
-    }
-
-    public String getVersion() {
-        return version.businessVersion();
-    }
-
-    public VersionInfo versionInfo() {
-        return version.buildNumber();
-    }
-
-    public boolean isOneOf(List<String> moduleNames) {
-        String modulePath = project.getBasedir().getName();
-        for (String moduleName : moduleNames) {
-            if (modulePath.equals(moduleName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean willBeReleased() {
-        return equivalentVersion == null;
-    }
-
-    public String getVersionToDependOn() {
-        return willBeReleased() ? version.releaseVersion() : equivalentVersion;
-    }
-
-    public String getRelativePathToModule() {
-        return relativePathToModule;
-    }
-
-    public ReleasableModule createReleasableVersion() {
-        return new ReleasableModule(project, version, null, relativePathToModule);
-    }
+    boolean isToBeReleased();
 }

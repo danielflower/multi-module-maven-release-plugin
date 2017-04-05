@@ -41,11 +41,8 @@ public class MvnRunner {
         MvnRunner mvnRunner = new MvnRunner();
         String dirWithMavens = "target/mavens/" + version;
         mvnRunner.runMaven(new File("."), "-Dartifact=org.apache.maven:apache-maven:" + version + ":zip:bin",
-            "-DmarkersDirectory=" + dirWithMavens,
-            "-DoutputDirectory=" + dirWithMavens,
-            "-X",
-            "-e",
-            "org.apache.maven.plugins:maven-dependency-plugin:2.10:unpack");
+                           "-DmarkersDirectory=" + dirWithMavens, "-DoutputDirectory=" + dirWithMavens,
+                           "org.apache.maven.plugins:maven-dependency-plugin:2.10:unpack");
         File mvnHome = new File(dirWithMavens).listFiles((FileFilter) DirectoryFileFilter.INSTANCE)[0];
         System.out.println("Maven " + version + " available at " + mvnHome.getAbsolutePath());
         return new MvnRunner(mvnHome);
@@ -60,8 +57,40 @@ public class MvnRunner {
         assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
         MvnRunner mvnRunner = new MvnRunner();
         mvnRunner.runMaven(new File("."), "-DskipTests=true", "install");
-        System.out.println("Finished installing the plugin into the local repo in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println(
+            "Finished installing the plugin into the local repo in " + (System.currentTimeMillis() - start) + "ms");
         haveInstalledPlugin = true;
+    }
+
+    public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException,
+                                                                                                           MavenInvocationException {
+        String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
+        File temp = new File("target/downloads/" + UUID.randomUUID());
+
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.8:copy"));
+
+        Properties props = new Properties();
+        props.setProperty("artifact", artifact);
+        props.setProperty("outputDirectory", temp.getCanonicalPath());
+
+        request.setProperties(props);
+        Invoker invoker = new DefaultInvoker();
+        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
+        invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
+        InvocationResult result = invoker.execute(request);
+
+        if (result.getExitCode() != 0) {
+            System.out.println();
+            System.out.println(
+                "There was a problem checking for the existence of the artifact. Here is the output of the mvn command:");
+            System.out.println();
+            for (String line : logOutput.getLines()) {
+                System.out.println(line);
+            }
+        }
+
+        assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
     }
 
     public List<String> runMaven(File workingDir, String... arguments) {
@@ -69,6 +98,7 @@ public class MvnRunner {
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
         request.setDebug(false);
+        request.setShowErrors(false);
 
         Invoker invoker = new DefaultInvoker();
 
@@ -93,34 +123,4 @@ public class MvnRunner {
 
         return output;
     }
-
-    public static void assertArtifactInLocalRepo(String groupId, String artifactId, String version) throws IOException, MavenInvocationException {
-        String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
-        File temp = new File("target/downloads/" + UUID.randomUUID());
-
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.8:copy"));
-
-        Properties props = new Properties();
-        props.setProperty("artifact", artifact);
-        props.setProperty("outputDirectory", temp.getCanonicalPath());
-
-        request.setProperties(props);
-        Invoker invoker = new DefaultInvoker();
-        CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
-        invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-        InvocationResult result = invoker.execute(request);
-
-        if (result.getExitCode() != 0) {
-            System.out.println();
-            System.out.println("There was a problem checking for the existence of the artifact. Here is the output of the mvn command:");
-            System.out.println();
-            for (String line : logOutput.getLines()) {
-                System.out.println(line);
-            }
-        }
-
-        assertThat("Could not find artifact " + artifact + " in repository", result.getExitCode(), is(0));
-    }
-
 }

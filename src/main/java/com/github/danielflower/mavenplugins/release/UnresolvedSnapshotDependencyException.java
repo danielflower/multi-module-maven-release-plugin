@@ -3,12 +3,10 @@ package com.github.danielflower.mavenplugins.release;
 public class UnresolvedSnapshotDependencyException extends Exception {
     public final String groupId;
     public final String artifactId;
-    public final String version;
 
-    public UnresolvedSnapshotDependencyException(String groupId, String artifactId, String version) {
-        super("Could not find " + groupId + ":" + artifactId + ":" + version);
+    public UnresolvedSnapshotDependencyException(String groupId, String artifactId) {
+        super("Could not find " + groupId + ":" + artifactId);
         this.groupId = groupId;
         this.artifactId = artifactId;
-        this.version = version;
     }
 }

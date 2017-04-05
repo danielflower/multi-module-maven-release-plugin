@@ -1,4 +1,15 @@
-package com.github.danielflower.mavenplugins.release;
+package com.github.danielflower.mavenplugins.release.repository;
+
+import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -11,15 +22,13 @@ import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
+import com.github.danielflower.mavenplugins.release.AnnotatedTag;
+import com.github.danielflower.mavenplugins.release.GitHelper;
+import com.github.danielflower.mavenplugins.release.ValidationException;
 
 public class LocalGitRepo {
 
-    public final Git git;
+    public final  Git    git;
     private final String remoteUrl;
     private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
     private Collection<Ref> remoteTags;
@@ -29,12 +38,58 @@ public class LocalGitRepo {
         this.remoteUrl = remoteUrl;
     }
 
+    /**
+     * Uses the current working dir to open the Git repository.
+     *
+     * @param remoteUrl The value in pom.scm.connection or null if none specified, in which case the default remote is used.
+     *
+     * @throws ValidationException if anything goes wrong
+     */
+    public static LocalGitRepo fromCurrentDir(String remoteUrl) throws ValidationException {
+        Git git;
+        File gitDir = new File(".");
+        try {
+            git = Git.open(gitDir);
+        } catch (RepositoryNotFoundException rnfe) {
+            String fullPathOfCurrentDir = pathOf(gitDir);
+            File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
+            String summary;
+            List<String> messages = new ArrayList<String>();
+            if (gitRoot == null) {
+                summary = "Releases can only be performed from Git repositories.";
+                messages.add(summary);
+                messages.add(fullPathOfCurrentDir + " is not a Git repository.");
+            } else {
+                summary = "The release plugin can only be run from the root folder of your Git repository";
+                messages.add(summary);
+                messages.add(fullPathOfCurrentDir + " is not the root of a Gir repository");
+                messages.add("Try running the release plugin from " + pathOf(gitRoot));
+            }
+            throw new ValidationException(summary, messages);
+        } catch (Exception e) {
+            throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?",
+                                          Arrays
+                                              .asList("Exception returned when accessing the git repo:", e.toString()));
+        }
+        return new LocalGitRepo(git, remoteUrl);
+    }
+
+    private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
+        while (candidateDir != null && /* HACK ATTACK! Maybe.... */ !candidateDir.getName().equals("target")) {
+            if (new File(candidateDir, ".git").isDirectory()) {
+                return candidateDir;
+            }
+            candidateDir = candidateDir.getParentFile();
+        }
+        return null;
+    }
+
     public void errorIfNotClean() throws ValidationException {
         Status status = currentStatus();
         boolean isClean = status.isClean();
         if (!isClean) {
             String summary = "Cannot release with uncommitted changes. Please check the following files:";
-            List<String> message = new ArrayList<String>();
+            List<String> message = new ArrayList<>();
             message.add(summary);
             Set<String> uncommittedChanges = status.getUncommittedChanges();
             if (uncommittedChanges.size() > 0) {
@@ -77,7 +132,8 @@ public class LocalGitRepo {
                 git.checkout().addPath(pathRelativeToWorkingTree).call();
             } catch (Exception e) {
                 hasErrors = true;
-                log.error("Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
+                log.error(
+                    "Unable to revert changes to " + changedFile + " - you may need to manually revert this file. Error was: " + e.getMessage());
             }
         }
         hasReverted = true;
@@ -96,88 +152,30 @@ public class LocalGitRepo {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
-    public void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException {
-        Ref tagRef = tagRepo(tag);
-        pushTag(tagRef);
+    public Ref tagRepo(AnnotatedTag tag) throws GitAPIException {
+        return tag.saveAtHEAD(git);
     }
 
-    private void pushTag(Ref tagRef) throws GitAPIException {
-        PushCommand pushCommand = git.push().add(tagRef);
+    public void pushAll(Ref ref) throws GitAPIException {
+        PushCommand pushCommand = git.push().setPushAll().add(ref);
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }
         pushCommand.call();
     }
 
-    public Ref tagRepo(AnnotatedTag tag) throws GitAPIException {
-        Ref tagRef = tag.saveAtHEAD(git);
-        return tagRef;
-    }
-
-    /**
-     * Uses the current working dir to open the Git repository.
-     * @param remoteUrl The value in pom.scm.connection or null if none specified, in which case the default remote is used.
-     * @throws ValidationException if anything goes wrong
-     */
-    public static LocalGitRepo fromCurrentDir(String remoteUrl) throws ValidationException {
-        Git git;
-        File gitDir = new File(".");
-        try {
-            git = Git.open(gitDir);
-        } catch (RepositoryNotFoundException rnfe) {
-            String fullPathOfCurrentDir = pathOf(gitDir);
-            File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
-            String summary;
-            List<String> messages = new ArrayList<String>();
-            if (gitRoot == null) {
-                summary = "Releases can only be performed from Git repositories.";
-                messages.add(summary);
-                messages.add(fullPathOfCurrentDir + " is not a Git repository.");
-            } else {
-                summary = "The release plugin can only be run from the root folder of your Git repository";
-                messages.add(summary);
-                messages.add(fullPathOfCurrentDir + " is not the root of a Gir repository");
-                messages.add("Try running the release plugin from " + pathOf(gitRoot));
-            }
-            throw new ValidationException(summary, messages);
-        } catch (Exception e) {
-            throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
-        }
-        return new LocalGitRepo(git, remoteUrl);
-    }
-
-    private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
-        while (candidateDir != null && /* HACK ATTACK! Maybe.... */ !candidateDir.getName().equals("target") ) {
-            if (new File(candidateDir, ".git").isDirectory()) {
-                return candidateDir;
-            }
-            candidateDir = candidateDir.getParentFile();
-        }
-        return null;
-    }
-
-    public List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws GitAPIException {
-        List<String> tagNames = new ArrayList<String>();
-        for (AnnotatedTag annotatedTag : annotatedTags) {
-            tagNames.add(annotatedTag.name());
-        }
-        return getRemoteTags(tagNames);
-    }
-
-    public List<String> getRemoteTags(List<String> tagNamesToSearchFor) throws GitAPIException {
-        List<String> results = new ArrayList<String>();
+    public Optional<Ref> getRemoteTag(String tagName) throws GitAPIException {
+        List<String> results = new ArrayList<>();
         Collection<Ref> remoteTags = allRemoteTags();
         for (Ref remoteTag : remoteTags) {
-            for (String proposedTag : tagNamesToSearchFor) {
-                if (remoteTag.getName().equals("refs/tags/" + proposedTag)) {
-                    results.add(proposedTag);
-                }
+            if (remoteTag.getName().equals("refs/tags/" + tagName)) {
+                return Optional.of(remoteTag);
             }
         }
-        return results;
+        return Optional.empty();
     }
 
-    public Collection<Ref> allRemoteTags() throws GitAPIException {
+    private Collection<Ref> allRemoteTags() throws GitAPIException {
         if (remoteTags == null) {
             LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
             if (remoteUrl != null) {

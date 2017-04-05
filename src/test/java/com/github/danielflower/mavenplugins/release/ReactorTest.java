@@ -3,64 +3,73 @@ package com.github.danielflower.mavenplugins.release;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ReleasableModuleBuilder.aModule;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableModuleVersion;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableQualifiedArtifact;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseDateSingleton;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 public class ReactorTest {
 
-    @Test
-    public void canFindModulesByGroupAndArtifactName() throws Exception {
-        ReleasableModule arty = aModule().withGroupId("my.great.group").withArtifactId("some-arty").build();
-        Reactor reactor = new Reactor(asList(
-            aModule().build(), arty, aModule().build()
-        ));
-        assertThat(reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT"), is(arty));
-        assertThat(reactor.findByLabel("my.great.group:some-arty"), is(arty));
+    public static final String GROUP_ID = "my.great.group";
+    public static final String ARTIFACT_ID = "some-arty";
+    private ReleaseInfo previousRelease;
+    private int         number;
+
+    @Before
+    public void setUp() {
+        number = 0;
+        previousRelease = TestUtils.releaseInfo(2, 4, "testtag", ARTIFACT_ID);
     }
 
     @Test
-    public void findOrReturnNullReturnsNullIfNotFound() throws Exception {
-        Reactor reactor = new Reactor(asList(
-            aModule().build(), aModule().build()
-        ));
-        assertThat(reactor.findByLabel("my.great.group:some-arty"), is(nullValue()));
+    public void canFindModulesByGroupAndArtifactName() throws Exception {
+        final MavenProject project = new MavenProject();
+        project.setGroupId(GROUP_ID);
+        project.setArtifactId(ARTIFACT_ID);
+        ReleasableModule arty = createModule().build();
+        Reactor reactor = new Reactor(asList(createModule().build(), arty, createModule().build()));
+        assertThat(reactor.find(GROUP_ID, "some-arty-0"), is(arty));
+        assertThat(reactor.find(GROUP_ID, "some-arty-0"), is(arty));
+    }
+
+    private ImmutableReleasableModule.Builder createModule() {
+        final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder();
+        final MavenProject project = new MavenProject();
+        project.setGroupId(GROUP_ID);
+        project.setArtifactId("some-arty-" + number++);
+        builder.project(project);
+        builder.isToBeReleased(false);
+        builder.relativePathToModule("..");
+        final ImmutableModuleVersion.Builder moduleBuilder = ImmutableModuleVersion.builder();
+        moduleBuilder.version(TestUtils.fixVersion(1, 0));
+        moduleBuilder.releaseTag(ReleaseDateSingleton.getInstance().tagName());
+        moduleBuilder.releaseDate(ReleaseDateSingleton.getInstance().releaseDate());
+        moduleBuilder.artifact(ImmutableQualifiedArtifact.builder().groupId(GROUP_ID).artifactId(ARTIFACT_ID).build());
+        builder.immutableModule(moduleBuilder.build());
+        return builder;
+    }
+
+    @Test(expected = UnresolvedSnapshotDependencyException.class)
+    public void throwExceptionIfNotFound() throws Exception {
+        Reactor reactor = new Reactor(asList(createModule().build(), createModule().build()));
+        reactor.find(GROUP_ID, "no-such-artifact");
     }
 
     @Test
     public void ifNotFoundThenAUnresolvedSnapshotDependencyExceptionIsThrown() throws Exception {
-        Reactor reactor = new Reactor(asList(
-            aModule().build(), aModule().build()
-        ));
+        Reactor reactor = new Reactor(asList(createModule().build(), createModule().build()));
         try {
-            reactor.find("my.great.group", "some-arty", "1.0-SNAPSHOT");
+            reactor.find(GROUP_ID, ARTIFACT_ID);
             Assert.fail("Should have thrown");
         } catch (UnresolvedSnapshotDependencyException e) {
-            assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty:1.0-SNAPSHOT"));
-        }
-    }
-
-    @Test
-    public void returnsTheLatestTagIfThereAreChanges() throws MojoExecutionException {
-        AnnotatedTag onePointNine = AnnotatedTag.create("whatever-1.1.9", "1.1", new VersionInfo(9L));
-        AnnotatedTag onePointTen = AnnotatedTag.create("whatever-1.1.10", "1.1", new VersionInfo(10L));
-        assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointNine, onePointTen), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
-        assertThat(Reactor.hasChangedSinceLastRelease(asList(onePointTen, onePointNine), new NeverChanged(), new MavenProject(), "whatever"), is(onePointTen));
-    }
-
-    private static class NeverChanged implements DiffDetector {
-        @Override
-        public boolean hasChangedSince(String modulePath, List<String> childModules, Collection<AnnotatedTag> tags) throws IOException {
-            return false;
+            assertThat(e.getMessage(), equalTo("Could not find my.great.group:some-arty"));
         }
     }
 }

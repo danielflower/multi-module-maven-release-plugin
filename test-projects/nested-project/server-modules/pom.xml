@@ -7,7 +7,7 @@
 
     <groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
     <artifactId>server-modules</artifactId>
-    <version>1.0.2.4-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <modules>
         <module>server-module-a</module>
         <module>server-module-b</module>

@@ -1,28 +1,25 @@
 package e2e;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * This test actually downloads multiple versions of maven and runs the plugin against them.
  */
 public class MavenCompatibilityTest {
 
-    final TestProject testProject = TestProject.singleModuleProject();
-
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
+    @Rule
+    public TestProject testProject = new TestProject(ProjectType.SINGLE);
 
     @Test
     public void maven_3_0_1() throws Exception {
@@ -45,10 +42,9 @@ public class MavenCompatibilityTest {
     }
 
     private void buildProjectWithMavenVersion(String mavenVersionToTest) throws IOException, InterruptedException, MavenInvocationException {
-        String buildNumber = mavenVersionToTest.replace(".", "") + String.valueOf(System.currentTimeMillis());
-        String expected = "1.0." + buildNumber;
+        String expected = "1.0";
         testProject.setMvnRunner(MvnRunner.mvn(mavenVersionToTest));
-        testProject.mvnRelease(buildNumber);
+        testProject.mvnRelease();
         MvnRunner.assertArtifactInLocalRepo("com.github.danielflower.mavenplugins.testprojects", "single-module", expected);
         assertThat(new File(testProject.localDir, "target/single-module-" + expected + "-package.jar").exists(), is(true));
     }

@@ -33,7 +33,8 @@ public class BaseMojoTest {
 		when(server.getPrivateKey()).thenReturn(SETTINGS_IDENTITY_FILE);
 		when(server.getPassphrase()).thenReturn(SETTINGS_PASSPHRASE);
 		when(settings.getServer(SERVER_ID)).thenReturn(server);
-		mojo.setSettings(settings);
+        when(mojo.getLog()).thenReturn(log);
+        mojo.setSettings(settings);
 		JschConfigSessionFactory.setInstance(null);
 	}
 
@@ -41,14 +42,14 @@ public class BaseMojoTest {
 	public void configureJsch_ServerIdDoesNotExist() {
 		when(settings.getServer(SERVER_ID)).thenReturn(null);
 		mojo.setServerId(SERVER_ID);
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		verify(log).warn("No server configuration in Maven settings found with id anyServerId");
 	}
 	
 	@Test
 	public void configureJsch_SshAgentDisabled() {
 		mojo.disableSshAgent();
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		assertEquals("org.eclipse.jgit.transport.DefaultSshSessionFactory",
 				JschConfigSessionFactory.getInstance().getClass().getName());
 	}
@@ -63,14 +64,14 @@ public class BaseMojoTest {
 	public void configureJsch_PomIdentityFile() {
 		mojo.setPrivateKey(POM_IDENTITY_FILE);
 		mojo.setPassphrase(POM_PASSPHRASE);
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		assertIdentity(POM_IDENTITY_FILE, POM_PASSPHRASE);
 	}
 	
 	@Test
 	public void configureJsch_SettingsIdentityFile() {
 		mojo.setServerId(SERVER_ID);
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		assertIdentity(SETTINGS_IDENTITY_FILE, SETTINGS_PASSPHRASE);
 	}
 	
@@ -78,7 +79,7 @@ public class BaseMojoTest {
 	public void configureJsch_CustomIdentityOverridesPom() {
 		mojo.setServerId(SERVER_ID);
 		mojo.setPrivateKey(POM_IDENTITY_FILE);
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		assertIdentity(POM_IDENTITY_FILE, SETTINGS_PASSPHRASE);
 	}
 	
@@ -86,14 +87,14 @@ public class BaseMojoTest {
 	public void configureJsch_CustomPassphraseOverridesPom() {
 		mojo.setServerId(SERVER_ID);
 		mojo.setPassphrase(POM_PASSPHRASE);
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		assertIdentity(SETTINGS_IDENTITY_FILE, POM_PASSPHRASE);
 	}
 	
 	@Test
 	public void configureJsch_CustomKnownHosts() {
 		mojo.setKnownHosts(KNOWN_HOSTS);
-		mojo.configureJsch(log);
+		mojo.configureJsch();
 		final SshAgentSessionFactory factory = (SshAgentSessionFactory) JschConfigSessionFactory.getInstance();
 		assertEquals(KNOWN_HOSTS, factory.getKnownHostsOrNull());
 	}

@@ -1,9 +1,10 @@
 package com.github.danielflower.mavenplugins.release;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
+
 import java.util.List;
 
-public class ValidationException extends Exception {
+public class ValidationException extends RuntimeException {
     private final List<String> messages;
 
     public ValidationException(String summary, List<String> messages) {
@@ -13,7 +14,11 @@ public class ValidationException extends Exception {
 
     public ValidationException(String summary, Throwable error) {
         super(summary);
-        this.messages = Arrays.asList(summary, "" + error);
+        this.messages = asList(summary, "" + error);
+    }
+
+    public ValidationException(String message) {
+        this(message, asList(message));
     }
 
     public List<String> getMessages() {

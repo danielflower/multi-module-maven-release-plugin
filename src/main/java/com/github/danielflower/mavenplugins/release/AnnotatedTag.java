@@ -4,114 +4,65 @@ import java.io.IOException;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevTag;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+
+import com.github.danielflower.mavenplugins.release.versioning.GsonFactory;
+import com.github.danielflower.mavenplugins.release.versioning.ImmutableReleaseInfo;
+import com.github.danielflower.mavenplugins.release.versioning.ReleaseInfo;
 
 public class AnnotatedTag {
-    public static final String VERSION = "version";
-    public static final String BUILD_NUMBER = "buildNumber";
-    public static final String BUGFIX_BRANCH_NUMBER = "bugfixBranchNumber";
+    private static final GsonFactory GSON_FACTORY = new GsonFactory();
 
     private final String name;
-    private final JSONObject message;
-    private Ref ref;
+    private final ReleaseInfo releaseInfo;
+    private       Ref         ref;
 
-    private AnnotatedTag(Ref ref, String name, JSONObject message) {
+    public AnnotatedTag(Ref ref, String name, ReleaseInfo releaseInfo) {
         Guard.notBlank("tag name", name);
-        Guard.notNull("tag message", message);
+        Guard.notNull("tag message", releaseInfo);
         this.ref = ref;
         this.name = name;
-        this.message = message;
+        this.releaseInfo = releaseInfo;
     }
 
-    public static AnnotatedTag create(String name, String version, VersionInfo buildNumber) {
-        JSONObject message = new JSONObject();
-        message.put(VERSION, version);
-        message.put(BUILD_NUMBER, String.valueOf(buildNumber.getBuildNumber()));
-        final Long bugfixBranchNumber = buildNumber.getBugfixBranchNumber();
-        if (bugfixBranchNumber != null) {
-            message.put(BUGFIX_BRANCH_NUMBER, String.valueOf(bugfixBranchNumber));
-        }
-        return new AnnotatedTag(null, name, message);
-    }
-
-    public static AnnotatedTag fromRef(Repository repository, Ref gitTag) throws IOException, IncorrectObjectTypeException {
+    public static AnnotatedTag fromRef(Repository repository, Ref gitTag) throws IOException {
         Guard.notNull("gitTag", gitTag);
 
         RevWalk walk = new RevWalk(repository);
-        JSONObject message;
+        ImmutableReleaseInfo releaseInfo;
         try {
             ObjectId tagId = gitTag.getObjectId();
             RevTag tag = walk.parseTag(tagId);
-            message = (JSONObject) JSONValue.parse(tag.getFullMessage());
+            releaseInfo = GSON_FACTORY.createGson().fromJson(tag.getFullMessage(), ImmutableReleaseInfo.class);
         } finally {
             walk.dispose();
         }
-        if (message == null) {
-            message = new JSONObject();
-            message.put(VERSION, "0");
-            message.put(BUILD_NUMBER, "0");
-        }
-        return new AnnotatedTag(gitTag, stripRefPrefix(gitTag.getName()), message);
+        return new AnnotatedTag(gitTag, stripRefPrefix(gitTag.getName()), releaseInfo);
     }
 
-    static String stripRefPrefix(String refName) {
+    private static String stripRefPrefix(String refName) {
         return refName.substring("refs/tags/".length());
     }
 
-    public String name() {
-        return name;
-    }
-
-    public String version() {
-        return String.valueOf(message.get(VERSION));
-    }
-
-    public VersionInfo versionInfo() {
-        final long buildNumber = Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
-        final Object branchNumber = message.get(BUGFIX_BRANCH_NUMBER);
-        if (branchNumber == null) {
-            return new VersionInfo(null, buildNumber);
-        } else {
-            return new VersionInfo(Long.parseLong(String.valueOf(branchNumber)), buildNumber);
-        }
-    }
-
     public Ref saveAtHEAD(Git git) throws GitAPIException {
-        String json = message.toJSONString();
-        ref = git.tag().setName(name()).setAnnotated(true).setMessage(json).call();
+        final String message = GSON_FACTORY.createGson().toJson(releaseInfo);
+        ref = git.tag().setName(name).setAnnotated(true).setMessage(message).call();
         return ref;
-    }
-
-    @Override
-    public String toString() {
-        return "AnnotatedTag{" +
-            "name='" + name + '\'' +
-            ", version=" + version() +
-            ", buildNumber=" + versionInfo() +
-            '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AnnotatedTag that = (AnnotatedTag) o;
-        return name.equals(that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
     }
 
     public Ref ref() {
         return ref;
+    }
+
+    public ReleaseInfo getReleaseInfo() {
+        return releaseInfo;
+    }
+
+    public String name() {
+        return name;
     }
 }

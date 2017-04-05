@@ -1,5 +1,8 @@
 package e2e;
 
+import scaffolding.MavenExecutionException;
+import scaffolding.TestProject;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
@@ -9,64 +12,25 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-
-import scaffolding.MavenExecutionException;
-import scaffolding.MvnRunner;
-import scaffolding.TestProject;
 
 public class ValidationTest {
 
-    @BeforeClass
-    public static void installPluginToLocalRepo() throws MavenInvocationException {
-        MvnRunner.installReleasePluginToLocalRepo();
-    }
-
-    @Test
-    public void ifTheSameVersionIsReleasedTwiceItErrorsLoudly() throws Exception {
-        TestProject testProject = TestProject.singleModuleProject();
-        testProject.mvnRelease("1");
-        testProject.commitRandomFile(".").pushIt();
-        try {
-            testProject.mvnRelease("1");
-            Assert.fail("Should not have completed running");
-        } catch (MavenExecutionException mee) {
-            assertThat(mee.output,
-                twoOf(containsString("There is already a tag named single-module-1.0.1 in this repository.")));
-            assertThat(mee.output,
-                oneOf(containsString("It is likely that this version has been released before.")));
-            assertThat(mee.output,
-                oneOf(containsString("Please try incrementing the build number and trying again.")));
-        }
-    }
-
-    @Test
-    public void ifAReleaseTagAlreadyExistsInTheRemoteRepoThenItErrorsEarly() throws Exception {
-        TestProject testProject = TestProject.singleModuleProject();
-        testProject.origin.tag()
-            .setAnnotated(true).setName("single-module-1.0.1").setMessage("Simulating remote tag").call();
-        try {
-            testProject.mvnRelease("1");
-            Assert.fail("Should not have completed running");
-        } catch (MavenExecutionException mee) {
-            assertThat(mee.output, twoOf(containsString("Cannot release because there is already a tag with the same build number on the remote Git repo.")));
-            assertThat(mee.output, oneOf(containsString("* There is already a tag named single-module-1.0.1 in the remote repo.")));
-            assertThat(mee.output, oneOf(containsString("Please try releasing again with a new build number.")));
-        }
-    }
+    @Rule
+    public TestProject singleProject              = new TestProject(ProjectType.SINGLE);
+    @Rule
+    public TestProject independentVersionsProject = new TestProject(ProjectType.INDEPENDENT_VERSIONS);
 
     @Test
     public void failsIfThereAreUntrackedFiles() throws IOException, InterruptedException {
-        TestProject testProject = TestProject.singleModuleProject();
-        new File(testProject.localDir, "untracked.txt").createNewFile();
-        new File(testProject.localDir, "someFolder").mkdir();
-        new File(testProject.localDir, "someFolder/anotherUntracked.txt").createNewFile();
+        new File(singleProject.localDir, "untracked.txt").createNewFile();
+        new File(singleProject.localDir, "someFolder").mkdir();
+        new File(singleProject.localDir, "someFolder/anotherUntracked.txt").createNewFile();
         try {
-            testProject.mvnRelease("1");
+            singleProject.mvnRelease();
             Assert.fail("Should not have worked the second time");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with uncommitted changes")));
@@ -77,11 +41,10 @@ public class ValidationTest {
 
     @Test
     public void failsIfThereAreUncommittedFiles() throws IOException, InterruptedException, GitAPIException {
-        TestProject testProject = TestProject.singleModuleProject();
-        new File(testProject.localDir, "uncommitted.txt").createNewFile();
-        testProject.local.add().addFilepattern("uncommitted.txt").call();
+        new File(singleProject.localDir, "uncommitted.txt").createNewFile();
+        singleProject.local.add().addFilepattern("uncommitted.txt").call();
         try {
-            testProject.mvnRelease("1");
+            singleProject.mvnRelease();
             Assert.fail("Should not have worked as there are uncommitted files");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with uncommitted changes")));
@@ -91,62 +54,63 @@ public class ValidationTest {
 
     @Test
     public void ifIOErrorOccursWhileUpdatingPomsThenThisIsReported() throws IOException, InterruptedException {
-        TestProject testProject = TestProject.independentVersionsProject();
-        File pom = new File(testProject.localDir, "console-app/pom.xml");
+        File pom = new File(independentVersionsProject.localDir, "console-app/pom.xml");
         pom.setWritable(false); // this should cause an IO exception when writing the pom
         try {
-            testProject.mvnRelease("1");
+            independentVersionsProject.mvnRelease();
             Assert.fail("It was expected that this would fail due to a pom being readonly.");
         } catch (MavenExecutionException e) {
-            assertThat(e.output, twoOf(containsString("Unexpected exception while setting the release versions in the pom")));
+            assertThat(e.output,
+                       twoOf(containsString("Unexpected exception while setting the release versions in the pom")));
             assertThat(e.output, oneOf(containsString("Going to revert changes because there was an error")));
         }
-        assertThat(testProject.local, hasCleanWorkingDirectory());
+        assertThat(independentVersionsProject.local, hasCleanWorkingDirectory());
     }
 
     @Test
     public void failsIfThereAreDependenciesOnSnapshotVersionsThatAreNotPartOfTheReactor() throws Exception {
         // Install the snapshot dependency so that it can be built
-        TestProject dependency = TestProject.independentVersionsProject();
-        dependency.mvn("install");
+        independentVersionsProject.mvn("install");
 
-        TestProject badOne = TestProject.moduleWithSnapshotDependencies();
+        TestProject badOne = TestProject.project(ProjectType.SNAPSHOT_DEPENDENCIES);
 
         badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
 
         try {
-            badOne.mvnRelease("1");
+            badOne.mvnRelease();
             Assert.fail("Should not have worked as there are snapshot dependencies");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
             assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
-            assertThat(mee.output, oneOf(containsString(" * The parent of snapshot-dependencies is independent-versions 1.0-SNAPSHOT")));
-            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils 2.0-SNAPSHOT")));
+            assertThat(mee.output,
+                       oneOf(containsString(" * The parent of snapshot-dependencies is independent-versions")));
+            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references dependency core-utils")));
 
             // commented out because this plugin is allowed to be a snapshot for testing purposes only
-//            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references plugin multi-module-maven-release-plugin 0.2-SNAPSHOT")));
+            //            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies references plugin multi-module-maven-release-plugin 0.2-SNAPSHOT")));
         }
 
         assertThat(badOne.local, hasCleanWorkingDirectory());
     }
 
     @Test
-    public void failsIfThereAreDependenciesOnSnapshotVersionsWithVersionPropertiesThatAreNotPartOfTheReactor() throws Exception {
+    public void failsIfThereAreDependenciesOnSnapshotVersionsWithVersionPropertiesThatAreNotPartOfTheReactor() throws
+                                                                                                               Exception {
         // Install the snapshot dependency so that it can be built
-        TestProject dependency = TestProject.independentVersionsProject();
-        dependency.mvn("install");
-    	
-        TestProject badOne = TestProject.moduleWithSnapshotDependenciesWithVersionProperties();
+        independentVersionsProject.mvn("install");
+
+        TestProject badOne = TestProject.project(ProjectType.SNAPSHOT_DEPENDENCIES_VIA_PROPERTIES);
 
         badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
 
         try {
-            badOne.mvnRelease("1");
+            badOne.mvnRelease();
             Assert.fail("Should not have worked as there are snapshot dependencies");
         } catch (MavenExecutionException mee) {
             assertThat(mee.output, twoOf(containsString("Cannot release with references to snapshot dependencies")));
             assertThat(mee.output, oneOf(containsString("The following dependency errors were found:")));
-            assertThat(mee.output, oneOf(containsString(" * snapshot-dependencies-with-version-properties references dependency core-utils ${core-utils.version}")));
+            assertThat(mee.output, oneOf(
+                containsString(" * snapshot-dependencies-with-version-properties references dependency core-utils")));
         }
 
         assertThat(badOne.local, hasCleanWorkingDirectory());

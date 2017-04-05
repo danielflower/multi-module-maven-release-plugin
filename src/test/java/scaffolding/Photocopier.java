@@ -1,14 +1,13 @@
 package scaffolding;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
 public class Photocopier {
-    public static File copyTestProjectToTemporaryLocation(String moduleName) throws IOException {
+    public static File copyTestProjectToTemporaryLocation(String moduleName, String subfolder)  {
         File source = new File("test-projects", moduleName);
         if (!source.isDirectory()) {
             source = new File(FilenameUtils.separatorsToSystem("../test-projects/" + moduleName));
@@ -17,12 +16,16 @@ public class Photocopier {
             throw new RuntimeException("Could not find module " + moduleName);
         }
 
-        File target = folderForSampleProject(moduleName);
-        FileUtils.copyDirectory(source, target);
+        File target = folderForSampleProject(moduleName, subfolder);
+        try {
+            FileUtils.copyDirectory(source, target);
+        } catch (IOException e) {
+            throw new RuntimeException("unable to copy project", e);
+        }
         return target;
     }
 
-    public static File folderForSampleProject(String moduleName) {
-        return new File(FilenameUtils.separatorsToSystem("target/samples/" + moduleName + "/" + UUID.randomUUID()));
+    public static File folderForSampleProject(String moduleName, String subfolder) {
+        return new File(FilenameUtils.separatorsToSystem("target/samples/" + moduleName + "/" + subfolder));
     }
 }
