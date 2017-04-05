@@ -69,7 +69,7 @@ public class IndependentVersionsBugfixTest {
         final List<String> outputLines = testProject.mvnReleaseBugfix();
         assertThat(outputLines, oneOf(containsString("Building console-app 3.0.1")));
         assertThat(outputLines, noneOf(containsString("Building core-utils")));
-        assertThat(outputLines, noneOf(containsString("Building independent-versions")));
+        assertThat(outputLines, noneOf(containsString("Building independent-versions 1.0")));
     }
 
     @Test

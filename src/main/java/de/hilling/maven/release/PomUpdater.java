@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -34,13 +35,15 @@ public class PomUpdater {
     public UpdateResult updateVersion() {
         List<File> changedPoms = new ArrayList<>();
         List<String> errors = new ArrayList<>();
-        for (ReleasableModule module : reactor.getModulesInBuildOrder()) {
+
+        final List<ReleasableModule> modulesToRelease = reactor.getModulesInBuildOrder().stream()
+                                                      .filter(ReleasableModule::isToBeReleased)
+                                                      .collect(Collectors.toList());
+        for (ReleasableModule module : modulesToRelease) {
             try {
                 MavenProject project = module.getProject();
                 final ImmutableFixVersion version = module.getImmutableModule().getVersion();
-                if (module.isToBeReleased()) {
-                    log.info("Going to release " + module.getProject().getArtifactId() + " " + version.toString());
-                }
+                log.info("Going to release " + module.getProject().getArtifactId() + " " + version.toString());
 
                 List<String> errorsForCurrentPom = alterModel(project, version.toString());
                 errors.addAll(errorsForCurrentPom);
