@@ -32,7 +32,7 @@ public class ExecutionTest {
 
     @Test
     public void profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment() throws Exception {
-        List<String> consoleOutput = testProject.mvn(TestUtils.RELEASE_GOAL, "-PrunTestsProfile");
+        List<String> consoleOutput = testProject.mvnRelease( "-PrunTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("The module-with-profiles test has run")));
         assertThat(consoleOutput, oneOf(containsString(ECHO_PLUGIN_OUTPUT)));
     }
