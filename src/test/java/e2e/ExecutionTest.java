@@ -4,8 +4,8 @@ import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.noneOf;
-import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.CountMatcher.noneOf;
+import static scaffolding.CountMatcher.oneOf;
 
 import java.io.File;
 import java.util.List;

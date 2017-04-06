@@ -5,8 +5,8 @@ import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.oneOf;
-import static scaffolding.ExactCountMatcher.twoOf;
+import static scaffolding.CountMatcher.oneOf;
+import static scaffolding.CountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
 import java.io.File;
@@ -69,10 +69,10 @@ public class ValidationTest {
 
     @Test
     public void failsIfThereAreDependenciesOnSnapshotVersionsThatAreNotPartOfTheReactor() throws Exception {
+        TestProject badOne = TestProject.project(ProjectType.SNAPSHOT_DEPENDENCIES);
         // Install the snapshot dependency so that it can be built
         independentVersionsProject.mvn("install");
 
-        TestProject badOne = TestProject.project(ProjectType.SNAPSHOT_DEPENDENCIES);
 
         badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
 
@@ -97,9 +97,9 @@ public class ValidationTest {
     public void failsIfThereAreDependenciesOnSnapshotVersionsWithVersionPropertiesThatAreNotPartOfTheReactor() throws
                                                                                                                Exception {
         // Install the snapshot dependency so that it can be built
+        TestProject badOne = TestProject.project(ProjectType.SNAPSHOT_DEPENDENCIES_VIA_PROPERTIES);
         independentVersionsProject.mvn("install");
 
-        TestProject badOne = TestProject.project(ProjectType.SNAPSHOT_DEPENDENCIES_VIA_PROPERTIES);
 
         badOne.mvn("install"); // this should work as the snapshot dependency is in the local repo
 

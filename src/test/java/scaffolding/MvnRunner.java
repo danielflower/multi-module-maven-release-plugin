@@ -96,19 +96,8 @@ public class MvnRunner {
         Invoker invoker = new DefaultInvoker();
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(false);
         invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(logOutput), true));
-        InvocationResult result = invoker.execute(request);
 
-        if (result.getExitCode() != 0) {
-            System.out.println();
-            System.out.println(
-                "There was a problem checking for the existence of the artifact. Here is the output of the mvn command:");
-            System.out.println();
-            for (String line : logOutput.getLines()) {
-                System.out.println(line);
-            }
-        }
-
-        return result.getExitCode();
+        return invoker.execute(request).getExitCode();
     }
 
     public List<String> runMaven(File workingDir, String... arguments) {
@@ -120,11 +109,6 @@ public class MvnRunner {
 
         Invoker invoker = new DefaultInvoker();
 
-        if (mvnHome == null) {
-            System.out.println("Maven Home: " + systemMavenHome());
-        } else {
-            System.out.println("Maven Home: " + mvnHome);
-        }
         invoker.setMavenHome(mvnHome);
 
         CollectingLogOutputStream logOutput = new CollectingLogOutputStream(logToStandardOut);

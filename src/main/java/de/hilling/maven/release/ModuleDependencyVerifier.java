@@ -85,32 +85,39 @@ class ModuleDependencyVerifier {
             log.info(
                 "Releasing " + artifactId + " " + newVersion.toString() + " as at least one dependency has changed.");
         } else {
-            final String tagName = previousVersion.map(ImmutableModuleVersion::getReleaseTag).orElse("");
-            try {
-                log.info("looking for tag with name '" + tagName + "'");
-                final Optional<Ref> tagRef = gitRepo.getRemoteTag(tagName);
-                if (tagRef.isPresent()) {
-                    final Ref gitTag = tagRef.get();
-                    final TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
-                    if (detector.hasChangedSince(relativePathToModule, moduleList(), gitTag)) {
-                        toBeReleased = true;
-                        equivalentVersion = newVersion;
-                        log.info(
-                            "using " + equivalentVersion + " for " + artifactId + " as it has changed since the last " + "release.");
+            final Optional<String> tagInfo = previousVersion.map(ImmutableModuleVersion::getReleaseTag);
+            if (tagInfo.isPresent()) {
+                try {
+                    final String tagName = tagInfo.get();
+                    log.info("looking for tag with name '" + tagName + "'");
+                    final Optional<Ref> tagRef = gitRepo.getRemoteTag(tagName);
+                    if (tagRef.isPresent()) {
+                        final Ref gitTag = tagRef.get();
+                        final TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+                        if (detector.hasChangedSince(relativePathToModule, moduleList(), gitTag)) {
+                            toBeReleased = true;
+                            equivalentVersion = newVersion;
+                            log.info(
+                                "using " + equivalentVersion + " for " + artifactId + " as it has changed since the last " + "release.");
+                        } else {
+                            toBeReleased = false;
+                            equivalentVersion = previousVersion.get().getVersion();
+                            log.info(
+                                "using " + equivalentVersion + " for " + artifactId + " as it has not been changed" + " since that release.");
+                        }
                     } else {
-                        toBeReleased = false;
-                        equivalentVersion = previousVersion.get().getVersion();
-                        log.info(
-                            "using " + equivalentVersion + " for " + artifactId + " as it has not been changed" + " since that release.");
+                        final String message = "unable to find remote tag " + tagName;
+                        log.error(message);
+                        throw new MojoExecutionException(message);
                     }
-                } else {
-                    toBeReleased = true;
-                    equivalentVersion = newVersion;
-                    log.info("using " + equivalentVersion + " for " + artifactId + " as it has not been released yet.");
+                } catch (GitAPIException | IOException e) {
+                    log.error("unable to list tags: " + e.getMessage());
+                    throw new MojoExecutionException("unable to list tags", e);
                 }
-            } catch (GitAPIException | IOException e) {
-                log.error("unable to list tags: " + e.getMessage());
-                throw new MojoExecutionException("unable to list tags", e);
+            } else {
+                toBeReleased = true;
+                equivalentVersion = newVersion;
+                log.info("using " + equivalentVersion + " for " + artifactId + " as it has not been released yet.");
             }
         }
         final ImmutableReleasableModule.Builder builder = ImmutableReleasableModule.builder();
