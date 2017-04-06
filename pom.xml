@@ -208,7 +208,6 @@
                 <configuration>
                     <releaseGoals>
                         <releaseGoal>clean</releaseGoal>
-                        <releaseGoal>site</releaseGoal>
                         <releaseGoal>deploy</releaseGoal>
                     </releaseGoals>
                     <releaseProfiles>
@@ -357,6 +356,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!--
                     <plugin>
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>
@@ -373,6 +373,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    -->
                 </plugins>
             </build>
         </profile>
