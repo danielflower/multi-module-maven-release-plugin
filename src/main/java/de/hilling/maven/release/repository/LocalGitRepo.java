@@ -147,7 +147,7 @@ public class LocalGitRepo {
         }
     }
 
-    public boolean hasLocalTag(String tagName) throws GitAPIException {
+    boolean hasLocalTag(String tagName) throws GitAPIException {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
@@ -155,8 +155,8 @@ public class LocalGitRepo {
         return tag.saveAtHEAD(git);
     }
 
-    public void pushAll(Ref ref) throws GitAPIException {
-        PushCommand pushCommand = git.push().setPushAll().add(ref);
+    public void pushAll() throws GitAPIException {
+        PushCommand pushCommand = git.push().setPushAll();
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }

@@ -30,7 +30,7 @@ public class IndependentVersionsBugfixTest {
     @Before
     public void releaseProject() throws Exception {
         testProject.mvnRelease();
-        testProject.origin.branchCreate().setName(branchName).call();
+        testProject.local.branchCreate().setName(branchName).call();
     }
 
     @Test
@@ -42,7 +42,18 @@ public class IndependentVersionsBugfixTest {
 
     @Test
     public void createBugfixReleaseAll() throws Exception {
-        testProject.origin.checkout().setName(branchName).call();
+        testProject.local.checkout().setName(branchName).call();
+        testProject.mvnReleaseBugfix();
+        assertArtifactInLocalRepo(GROUP_ID, "independent-versions", expectedParentVersion + ".1");
+        assertArtifactInLocalRepo(GROUP_ID, "core-utils", expectedCoreVersion + ".1");
+        assertArtifactInLocalRepo(GROUP_ID, "console-app", expectedAppVersion + ".1");
+    }
+
+    @Test
+    public void createBugfixReleaseAllAndIgnoreNextMasterRelease() throws Exception {
+        testProject.mvnRelease();
+        testProject.local.pull();
+        testProject.local.checkout().setName(branchName).call();
         testProject.mvnReleaseBugfix();
         assertArtifactInLocalRepo(GROUP_ID, "independent-versions", expectedParentVersion + ".1");
         assertArtifactInLocalRepo(GROUP_ID, "core-utils", expectedCoreVersion + ".1");
@@ -51,7 +62,7 @@ public class IndependentVersionsBugfixTest {
 
     @Test
     public void releaseOnlyModulesThatHaveChanged() throws Exception {
-        testProject.origin.checkout().setName(branchName).call();
+        testProject.local.checkout().setName(branchName).call();
         testProject.commitRandomFile("console-app");
         testProject.mvnReleaseBugfix();
         // TODO purge repository, then check?
@@ -64,7 +75,7 @@ public class IndependentVersionsBugfixTest {
 
     @Test
     public void buildOnlyModulesThatHaveChanged() throws Exception {
-        testProject.origin.checkout().setName(branchName).call();
+        testProject.local.checkout().setName(branchName).call();
         testProject.commitRandomFile("console-app");
         final List<String> outputLines = testProject.mvnReleaseBugfix();
         assertThat(outputLines, oneOf(containsString("Building console-app 3.0.1")));
@@ -74,7 +85,7 @@ public class IndependentVersionsBugfixTest {
 
     @Test
     public void createBugfixCoreChanged() throws Exception {
-        testProject.origin.checkout().setName(branchName).call();
+        testProject.local.checkout().setName(branchName).call();
         testProject.commitRandomFile("core-utils");
         testProject.mvnReleaseBugfix();
         assertArtifactInLocalRepo(GROUP_ID, "independent-versions", expectedParentVersion);
@@ -84,7 +95,7 @@ public class IndependentVersionsBugfixTest {
 
     @Test
     public void createSecondBugfixReleaseAll() throws Exception {
-        testProject.origin.checkout().setName(branchName).call();
+        testProject.local.checkout().setName(branchName).call();
         testProject.mvnReleaseBugfix();
         testProject.mvnReleaseBugfix();
         assertArtifactInLocalRepo(GROUP_ID, "independent-versions", expectedParentVersion + ".2");
