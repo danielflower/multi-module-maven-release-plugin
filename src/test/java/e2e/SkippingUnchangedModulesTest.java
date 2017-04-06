@@ -6,8 +6,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static scaffolding.ExactCountMatcher.noneOf;
-import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.CountMatcher.noneOf;
+import static scaffolding.CountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasTagWithModuleVersion;
 
 import java.util.List;

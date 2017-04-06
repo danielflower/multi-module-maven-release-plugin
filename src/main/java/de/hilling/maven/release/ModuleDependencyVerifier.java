@@ -106,7 +106,9 @@ class ModuleDependencyVerifier {
                                 "using " + equivalentVersion + " for " + artifactId + " as it has not been changed" + " since that release.");
                         }
                     } else {
-                        throw new MojoExecutionException("unable to find remote tag " + tagName);
+                        final String message = "unable to find remote tag " + tagName;
+                        log.error(message);
+                        throw new MojoExecutionException(message);
                     }
                 } catch (GitAPIException | IOException e) {
                     log.error("unable to list tags: " + e.getMessage());

@@ -7,8 +7,9 @@ import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static scaffolding.ExactCountMatcher.oneOf;
-import static scaffolding.ExactCountMatcher.twoOf;
+import static scaffolding.CountMatcher.atLeastOneOf;
+import static scaffolding.CountMatcher.oneOf;
+import static scaffolding.CountMatcher.twoOf;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class GitRelatedTest {
             testProject.mvnRelease();
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {
-            assertThat(e.output, oneOf(containsString("[ERROR] unable to list tags: origin: not found.")));
+            assertThat(e.output, atLeastOneOf(containsString("origin: not found.")));
         }
     }
 

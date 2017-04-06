@@ -26,15 +26,7 @@ import de.hilling.maven.release.TestUtils;
 public class TestProject extends ExternalResource {
 
     private static final MvnRunner DEFAULT_RUNNER;
-    private static final String    PLUGIN_VERSION_FOR_TESTS = "3-SNAPSHOT";
-    public  File   originDir;
-    public  Git    origin;
-    public  File   localDir;
-    public  Git    local;
-    private final String artifactId;
-    private AtomicInteger commitCounter = new AtomicInteger(1);
-    private ProjectType type;
-    private MvnRunner mvnRunner;
+    private static final String PLUGIN_VERSION_FOR_TESTS = "3-SNAPSHOT";
 
     static {
         DEFAULT_RUNNER = new MvnRunner(null);
@@ -45,14 +37,35 @@ public class TestProject extends ExternalResource {
         }
     }
 
+    private final String artifactId;
+    public        File   originDir;
+    public        Git    origin;
+    public        File   localDir;
+    public        Git    local;
+    private AtomicInteger commitCounter = new AtomicInteger(1);
+    private ProjectType type;
+    private MvnRunner   mvnRunner;
+    private boolean     purge = true;
+
     public TestProject(ProjectType type) {
         this.type = type;
         artifactId = type.getSubmoduleName();
         mvnRunner = DEFAULT_RUNNER;
     }
 
+    /**
+     * Create initialized and usable project.
+     *
+     * @param type project test type
+     *
+     * @return fresh, usable project.
+     *
+     * @deprecated use with Role to prevent cleaning local repo in the middle of test.
+     */
+    @Deprecated
     public static TestProject project(ProjectType type) {
         final TestProject testProject = new TestProject(type);
+        testProject.purge = false;
         testProject.before();
         return testProject;
     }
@@ -100,9 +113,11 @@ public class TestProject extends ExternalResource {
         } catch (GitAPIException e) {
             throw new RuntimeException("error accessing/creating git repo", e);
         }
-        mvnRun("dependency:purge-local-repository",
-               "-DmanualInclude=de.hilling.maven.release.testprojects:,de.hilling.maven.release.testproject",
-               "-DactTransitively=false");
+        if (purge) {
+            mvnRun("dependency:purge-local-repository",
+                   "-DmanualInclude=de.hilling.maven.release.testprojects:,de.hilling.maven.release.testproject",
+                   "-DactTransitively=false");
+        }
     }
 
     @Override
@@ -166,7 +181,7 @@ public class TestProject extends ExternalResource {
         local.push().call();
     }
 
-    private List<String> mvnRun(String goal, String ...arguments) {
+    private List<String> mvnRun(String goal, String... arguments) {
         String[] args = new String[arguments.length + 1];
         System.arraycopy(arguments, 0, args, 1, arguments.length);
         args[0] = goal;
