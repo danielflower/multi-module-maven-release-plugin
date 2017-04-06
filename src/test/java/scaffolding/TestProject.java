@@ -100,6 +100,9 @@ public class TestProject extends ExternalResource {
         } catch (GitAPIException e) {
             throw new RuntimeException("error accessing/creating git repo", e);
         }
+        mvnRun("dependency:purge-local-repository",
+               "-DmanualInclude=de.hilling.maven.release.testprojects:,de.hilling.maven.release.testproject",
+               "-DactTransitively=false");
     }
 
     @Override
@@ -163,7 +166,7 @@ public class TestProject extends ExternalResource {
         local.push().call();
     }
 
-    private List<String> mvnRun(String goal, String[] arguments) {
+    private List<String> mvnRun(String goal, String ...arguments) {
         String[] args = new String[arguments.length + 1];
         System.arraycopy(arguments, 0, args, 1, arguments.length);
         args[0] = goal;

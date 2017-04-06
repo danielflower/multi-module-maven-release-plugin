@@ -151,12 +151,12 @@ public class LocalGitRepo {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
-    public Ref tagRepo(AnnotatedTag tag) throws GitAPIException {
-        return tag.saveAtHEAD(git);
+    public void tagRepo(AnnotatedTag tag) throws GitAPIException {
+        tag.saveAtHEAD(git);
     }
 
     public void pushAll() throws GitAPIException {
-        PushCommand pushCommand = git.push().setPushAll();
+        PushCommand pushCommand = git.push().setPushAll().setPushTags();
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }
