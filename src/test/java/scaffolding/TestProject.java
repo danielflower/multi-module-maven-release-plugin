@@ -5,6 +5,7 @@ import e2e.ProjectType;
 import static de.hilling.maven.release.FileUtils.pathOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
+import static scaffolding.GitMatchers.isInSynchWithOrigin;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 import java.io.File;
@@ -17,9 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.rules.ExternalResource;
 
@@ -44,11 +47,11 @@ public class TestProject extends ExternalResource {
     public        Git    origin;
     public        File   localDir;
     public        Git    local;
+    public  boolean checkClean = true;
     private AtomicInteger commitCounter = new AtomicInteger(1);
     private ProjectType type;
     private MvnRunner   mvnRunner;
-    private boolean     purge = true;
-    public boolean     checkClean = true;
+    private boolean purge      = true;
 
     public TestProject(ProjectType type) {
         this.type = type;
@@ -99,7 +102,8 @@ public class TestProject extends ExternalResource {
     @Override
     protected void before() {
         final String submoduleName = type.getSubmoduleName();
-        originDir = copyTestProjectToTemporaryLocation(submoduleName, "origin-" + UUID.randomUUID().toString());
+        final String subfolderName = RandomStringUtils.randomAlphanumeric(10);
+        originDir = copyTestProjectToTemporaryLocation(submoduleName, subfolderName);
         performPomSubstitution(originDir);
 
         InitCommand initCommand = Git.init();
@@ -110,7 +114,7 @@ public class TestProject extends ExternalResource {
             origin.add().addFilepattern(".").call();
             origin.commit().setMessage("Initial commit").call();
 
-            localDir = Photocopier.folderForSampleProject(submoduleName, "workdir-" + UUID.randomUUID().toString());
+            localDir = Photocopier.folderForSampleProject(submoduleName, subfolderName + "-workdir");
             local = Git.cloneRepository().setBare(false).setDirectory(localDir).setURI(originDir.toURI().toString())
                        .call();
         } catch (GitAPIException e) {
@@ -126,7 +130,13 @@ public class TestProject extends ExternalResource {
     @Override
     protected void after() {
         if (checkClean) {
+            try {
+                origin.reset().setMode(ResetCommand.ResetType.HARD).call();
+            } catch (GitAPIException e) {
+                throw new RuntimeException("resetting origin failed", e);
+            }
             assertThat(local, hasCleanWorkingDirectory());
+            assertThat(local, isInSynchWithOrigin());
         }
     }
 

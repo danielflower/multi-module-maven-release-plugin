@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -21,6 +22,11 @@ public class DiffDetectorTest {
 
     @Rule
     public TestProject singleProject = new TestProject(ProjectType.SINGLE);
+
+    @Before
+    public void setUp() {
+        singleProject.checkClean = false;
+    }
 
     @Test
     public void canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag() throws Exception {

@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -30,6 +31,12 @@ public class GitRelatedTest {
     public TestProject testProject = new TestProject(ProjectType.SINGLE);
     @Rule
     public TestProject scmTagProject = new TestProject(ProjectType.TAGGED_MODULE);
+
+    @Before
+    public void setUp() {
+        testProject.checkClean = false;
+        scmTagProject.checkClean = false;
+    }
 
     @Test
     public void ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed() throws IOException {
