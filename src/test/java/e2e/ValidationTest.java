@@ -30,6 +30,7 @@ public class ValidationTest {
         new File(singleProject.localDir, "someFolder").mkdir();
         new File(singleProject.localDir, "someFolder/anotherUntracked.txt").createNewFile();
         try {
+            singleProject.checkClean = false;
             singleProject.mvnRelease();
             Assert.fail("Should not have worked the second time");
         } catch (MavenExecutionException mee) {
@@ -44,6 +45,7 @@ public class ValidationTest {
         new File(singleProject.localDir, "uncommitted.txt").createNewFile();
         singleProject.local.add().addFilepattern("uncommitted.txt").call();
         try {
+            singleProject.checkClean = false;
             singleProject.mvnRelease();
             Assert.fail("Should not have worked as there are uncommitted files");
         } catch (MavenExecutionException mee) {
