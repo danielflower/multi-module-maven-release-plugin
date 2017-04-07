@@ -52,6 +52,7 @@ public class GitRelatedTest {
         config.save();
 
         try {
+            testProject.checkClean = false;
             testProject.mvnRelease();
             Assert.fail("Should have failed");
         } catch (MavenExecutionException e) {

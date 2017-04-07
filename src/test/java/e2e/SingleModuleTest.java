@@ -55,6 +55,12 @@ public class SingleModuleTest {
     }
 
     @Test
+    public void localRepoIsCleanAfterReleaseBuild() throws IOException, GitAPIException {
+        testProject.mvn(RELEASE_GOAL);
+        assertThat(testProject.local, hasCleanWorkingDirectory());
+    }
+
+    @Test
     public void theReleaseNumbersWillStartAt0AndThenIncrement() throws IOException, GitAPIException {
         testProject.mvn(RELEASE_GOAL);
         assertThat(testProject.local, hasTagWithModuleVersion(TestUtils.TEST_GROUP_ID, "single-module", "1.0"));

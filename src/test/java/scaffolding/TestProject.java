@@ -3,6 +3,8 @@ package scaffolding;
 import e2e.ProjectType;
 
 import static de.hilling.maven.release.FileUtils.pathOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 
 import java.io.File;
@@ -46,6 +48,7 @@ public class TestProject extends ExternalResource {
     private ProjectType type;
     private MvnRunner   mvnRunner;
     private boolean     purge = true;
+    public boolean     checkClean = true;
 
     public TestProject(ProjectType type) {
         this.type = type;
@@ -122,6 +125,9 @@ public class TestProject extends ExternalResource {
 
     @Override
     protected void after() {
+        if (checkClean) {
+            assertThat(local, hasCleanWorkingDirectory());
+        }
     }
 
     /**
