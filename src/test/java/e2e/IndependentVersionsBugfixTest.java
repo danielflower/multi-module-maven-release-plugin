@@ -36,6 +36,7 @@ public class IndependentVersionsBugfixTest {
         assertArtifactNotInLocalRepo(GROUP_ID, INDEPENDENT_VERSIONS_ARTIFACT, expectedParentVersion);
         assertArtifactNotInLocalRepo(GROUP_ID, CORE_UTILS_ARTIFACT, expectedCoreVersion);
         assertArtifactNotInLocalRepo(GROUP_ID, CONSOLE_APP_ARTIFACT, expectedAppVersion);
+        testProject.checkClean = false;
         testProject.mvnRelease();
         testProject.local.branchCreate().setName(branchName).call();
     }
