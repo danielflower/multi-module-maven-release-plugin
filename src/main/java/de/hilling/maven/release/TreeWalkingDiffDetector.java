@@ -2,6 +2,7 @@ package de.hilling.maven.release;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jgit.lib.ObjectId;
@@ -30,15 +31,30 @@ public class TreeWalkingDiffDetector {
         walk.markUninteresting(revCommit);
     }
 
-    public boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Ref tagReference) throws
+    /**
+     * Detect changes is given module
+     *
+     * @param moduleForChangeDetection module (directory) to run detection in.
+     * @param childModules child modules (directories) to ignore.
+     * @param tagReference reference tag to stop at.
+     * @return true if any change was detected.
+     * @throws IOException on git exception.
+     */
+    public boolean hasChangedSince(String moduleForChangeDetection, java.util.List<String> childModules, Ref tagReference) throws
                                                                                                              IOException {
         RevWalk walk = new RevWalk(repo);
         try {
             walk.setRetainBody(false);
             walk.markStart(walk.parseCommit(repo.getRef("HEAD").getObjectId()));
-            filterOutOtherModulesChanges(modulePath, childModules, walk);
+            filterOutOtherModulesChanges(moduleForChangeDetection, childModules, walk);
             stopWalkingWhenTheTagsAreHit(tagReference, walk);
-            return walk.iterator().hasNext();
+            boolean changed = false;
+            final Iterator<RevCommit> iterator = walk.iterator();
+            while (iterator.hasNext()) {
+                changed = true;
+                System.out.println("change detected: " + iterator.next());
+            }
+            return changed;
         } finally {
             walk.dispose();
         }

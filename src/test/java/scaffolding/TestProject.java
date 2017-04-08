@@ -13,12 +13,10 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
@@ -52,11 +50,13 @@ public class TestProject extends ExternalResource {
     private ProjectType type;
     private MvnRunner   mvnRunner;
     private boolean purge      = true;
+    private RandomNameGenerator nameGenerator;
 
     public TestProject(ProjectType type) {
         this.type = type;
         artifactId = type.getSubmoduleName();
         mvnRunner = DEFAULT_RUNNER;
+        nameGenerator = new RandomNameGenerator();
     }
 
     /**
@@ -90,6 +90,7 @@ public class TestProject extends ExternalResource {
                 throw new RuntimeException("unable to substitute poms");
             }
         }
+
         for (File child : sourceDir.listFiles((FileFilter) FileFilterUtils.directoryFileFilter())) {
             performPomSubstitution(child);
         }
@@ -102,8 +103,10 @@ public class TestProject extends ExternalResource {
     @Override
     protected void before() {
         final String submoduleName = type.getSubmoduleName();
-        final String subfolderName = RandomStringUtils.randomAlphanumeric(10);
-        originDir = copyTestProjectToTemporaryLocation(submoduleName, subfolderName);
+        final String subfolderName = nameGenerator.randomName();
+        final String subfolderOriginName = subfolderName + "/origin";
+        final String subfolderWorkingName = subfolderName + "/work";
+        originDir = copyTestProjectToTemporaryLocation(submoduleName, subfolderOriginName);
         performPomSubstitution(originDir);
 
         InitCommand initCommand = Git.init();
@@ -114,7 +117,7 @@ public class TestProject extends ExternalResource {
             origin.add().addFilepattern(".").call();
             origin.commit().setMessage("Initial commit").call();
 
-            localDir = Photocopier.folderForSampleProject(submoduleName, subfolderName + "-workdir");
+            localDir = Photocopier.folderForSampleProject(submoduleName, subfolderWorkingName);
             local = Git.cloneRepository().setBare(false).setDirectory(localDir).setURI(originDir.toURI().toString())
                        .call();
         } catch (GitAPIException e) {
@@ -183,8 +186,10 @@ public class TestProject extends ExternalResource {
         if (!moduleDir.isDirectory()) {
             throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
         }
-        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
-        random.createNewFile();
+        File random = new File(moduleDir, nameGenerator.randomName() + ".txt");
+        if(!random.createNewFile()) {
+            throw new RuntimeException("file alredy exists: " + random.getCanonicalPath());
+        }
         String modulePath = module.equals(".")
                             ? ""
                             : module + "/";
