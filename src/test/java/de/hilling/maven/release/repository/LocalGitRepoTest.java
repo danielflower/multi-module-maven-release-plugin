@@ -18,7 +18,7 @@ public class LocalGitRepoTest {
 
     @Test
     public void canDetectLocalTags() throws GitAPIException {
-        LocalGitRepo repo = new LocalGitRepo(project.local, null);
+        LocalGitRepo repo = new LocalGitRepo(project.local, null, null);
         tag(project.local, "some-tag");
         MatcherAssert.assertThat(repo.hasLocalTag("some-tag"), CoreMatchers.is(true));
         MatcherAssert.assertThat(repo.hasLocalTag("some-ta"), CoreMatchers.is(false));

@@ -56,7 +56,6 @@ public class SingleModuleTest {
 
     @Test
     public void localRepoIsCleanWithoutBuild() throws IOException, GitAPIException {
-        testProject.mvn(RELEASE_GOAL);
     }
 
     @Test

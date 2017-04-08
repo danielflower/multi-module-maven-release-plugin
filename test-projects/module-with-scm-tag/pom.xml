@@ -16,8 +16,8 @@
 
     <scm>
         <!-- The SCM URLs properties are replaced during the test by the TestProject class -->
-        <connection>${scm.url}</connection>
-        <developerConnection>${scm.url}</developerConnection>
+        <connection>scm:git:file:../origin</connection>
+        <developerConnection>scm:git:file:../origin</developerConnection>
     </scm>
 
     <build>

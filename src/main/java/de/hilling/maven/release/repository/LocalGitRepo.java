@@ -1,5 +1,7 @@
 package de.hilling.maven.release.repository;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,32 +21,37 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 
 import de.hilling.maven.release.AnnotatedTag;
+import de.hilling.maven.release.FileUtils;
 import de.hilling.maven.release.GitHelper;
 import de.hilling.maven.release.ValidationException;
-import de.hilling.maven.release.FileUtils;
 
 public class LocalGitRepo {
 
     public final  Git    git;
     private final String remoteUrl;
+    private final Log    log;
     private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
     private Collection<Ref> remoteTags;
 
-    LocalGitRepo(Git git, String remoteUrl) {
+    LocalGitRepo(Git git, String remoteUrl, Log log) {
         this.git = git;
         this.remoteUrl = remoteUrl;
+        this.log = log;
     }
 
     /**
      * Uses the current working dir to open the Git repository.
      *
      * @param remoteUrl The value in pom.scm.connection or null if none specified, in which case the default remote is used.
+     * @param log       maven logger
      *
      * @throws ValidationException if anything goes wrong
      */
-    public static LocalGitRepo fromCurrentDir(String remoteUrl) throws ValidationException {
+    public static LocalGitRepo fromCurrentDir(String remoteUrl, Log log) throws ValidationException {
         Git git;
         File gitDir = new File(".");
         try {
@@ -53,7 +60,7 @@ public class LocalGitRepo {
             String fullPathOfCurrentDir = FileUtils.pathOf(gitDir);
             File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
             String summary;
-            List<String> messages = new ArrayList<String>();
+            List<String> messages = new ArrayList<>();
             if (gitRoot == null) {
                 summary = "Releases can only be performed from Git repositories.";
                 messages.add(summary);
@@ -66,11 +73,11 @@ public class LocalGitRepo {
             }
             throw new ValidationException(summary, messages);
         } catch (Exception e) {
-            throw new ValidationException("Could not open git repository. Is " + FileUtils.pathOf(gitDir) + " a git repository?",
-                                          Arrays
-                                              .asList("Exception returned when accessing the git repo:", e.toString()));
+            throw new ValidationException("Could not open git repository. Is " + FileUtils.pathOf(
+                gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:",
+                                                              e.toString()));
         }
-        return new LocalGitRepo(git, remoteUrl);
+        return new LocalGitRepo(git, remoteUrl, log);
     }
 
     private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
@@ -156,14 +163,15 @@ public class LocalGitRepo {
     }
 
     public void pushAll() throws GitAPIException {
-        PushCommand pushAll = git.push().setPushAll();
-        PushCommand pushTags = git.push().setPushTags();
+        PushCommand pushAll = git.push().setPushAll().setPushTags();
         if (remoteUrl != null) {
             pushAll.setRemote(remoteUrl);
-            pushTags.setRemote(remoteUrl);
         }
-        pushAll.call();
-        pushTags.call();
+        pushAll.call().iterator().forEachRemaining(this::logResult);
+    }
+
+    private void logResult(PushResult m) {
+        log.debug("push: " + m.getRemoteUpdates().stream().map(RemoteRefUpdate::toString).collect(joining(",")));
     }
 
     public Optional<Ref> getRemoteTag(String tagName) throws GitAPIException {

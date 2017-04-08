@@ -1,5 +1,7 @@
 package de.hilling.maven.release;
 
+import static de.hilling.maven.release.Reactor.fromProjects;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,16 +127,16 @@ public class ReleaseMojo extends BaseMojo {
 
         configureJsch();
 
-        LocalGitRepo repo = LocalGitRepo.fromCurrentDir(
-            getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
+        final Scm originalScm = project.getOriginalModel().getScm();
+        final Scm scm = project.getModel().getScm();
+        LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(originalScm, scm), getLog());
         repo.errorIfNotClean();
 
         final ReleaseInfoStorage infoStorage = new ReleaseInfoStorage(project.getBasedir(), repo.git);
         ReleaseInfo previousRelease = infoStorage.load();
         getLog().info("previous release: " + previousRelease);
 
-        Reactor reactor = Reactor
-                              .fromProjects(getLog(), repo, project, projects, modulesToForceRelease, noChangesAction,
+        Reactor reactor = fromProjects(getLog(), repo, project, projects, modulesToForceRelease, noChangesAction,
                                             bugfixRelease, previousRelease);
         if (reactor == null) {
             return;
