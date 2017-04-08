@@ -1,0 +1,17 @@
+{
+  "tagName": "sampletag",
+  "modules": [
+    {
+      "releaseDate": "2002-08-22T20:46:40+02:00[Europe/Berlin]",
+      "releaseTag": "test-tag",
+      "artifact": {
+        "groupId": "de.hilling.maven.release.testprojects",
+        "artifactId": "module-1"
+      },
+      "version": {
+        "majorVersion": 3,
+        "minorVersion": 2
+      }
+    }
+  ]
+}

@@ -5,21 +5,21 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins.testprojects.snapshotdependencies</groupId>
+    <groupId>de.hilling.maven.release.testprojects.snapshotdependencies</groupId>
     <artifactId>snapshot-dependencies-with-version-properties</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Project with snapshot dependencies</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
-        <core-utils.version>2.0-SNAPSHOT</core-utils.version>
+        <core-utils.version>2-SNAPSHOT</core-utils.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.danielflower.mavenplugins.testprojects.independentversions</groupId>
+            <groupId>de.hilling.maven.release.testprojects.independentversions</groupId>
             <artifactId>core-utils</artifactId>
             <version>${core-utils.version}</version>
         </dependency>
@@ -28,8 +28,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
                 <version>${current.plugin.version}</version>
                 <configuration>
                     <releaseGoals>

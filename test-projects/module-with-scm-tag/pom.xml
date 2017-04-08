@@ -5,9 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
+    <groupId>de.hilling.maven.release.testprojects</groupId>
     <artifactId>scmtag</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -23,8 +23,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
                 <version>${current.plugin.version}</version>
                 <configuration>
                     <releaseGoals>

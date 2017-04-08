@@ -5,9 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+    <groupId>de.hilling.maven.release.testprojects.nested</groupId>
     <artifactId>nested-project</artifactId>
-    <version>0.0-SNAPSHOT</version>
+    <version>0-SNAPSHOT</version>
     <modules>
         <module>core-utils</module>
         <module>console-app</module>
@@ -19,8 +19,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
                 <version>${current.plugin.version}</version>
                 <configuration>
                     <releaseGoals>

@@ -32,7 +32,7 @@ Add the following to your plugins section:
 		<version>${project.version}</version>
 	</plugin>
 
-Release your project by running `mvn releaser:release`
+Release your project by running `mvn smart-release:release`
 
 See [usage](usage.html) for more details.
 
@@ -49,4 +49,4 @@ version of a module was released
 Prerequisites
 -------------
 
-The plugin requires **Maven ${project.prerequisites.maven}** or later and **Java 7** or later. If you need Java 6 support, then use version `1.4.6`.
+The plugin requires **Maven ${project.prerequisites.maven}** or later and **Java 8** or later.

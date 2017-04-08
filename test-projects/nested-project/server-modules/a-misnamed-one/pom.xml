@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent-module</artifactId>
-        <groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
-        <version>1.2.3-SNAPSHOT</version>
+        <groupId>de.hilling.maven.release.testprojects.nested</groupId>
+        <version>1-SNAPSHOT</version>
         <relativePath>../../parent-module/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.danielflower.mavenplugins.testprojects.nested.misnamed</groupId>
+    <groupId>de.hilling.maven.release.testprojects.nested.misnamed</groupId>
     <artifactId>server-module-c</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -22,9 +22,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.danielflower.mavenplugins.testprojects.nested</groupId>
+            <groupId>de.hilling.maven.release.testprojects.nested</groupId>
             <artifactId>server-module-b</artifactId>
-            <version>3.1-SNAPSHOT</version>
+            <version>3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
