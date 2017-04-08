@@ -87,6 +87,6 @@ public class DiffDetectorTest {
         independentVersions.commitRandomFile("console-app");
 
         TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(independentVersions.local.getRepository());
-        assertThat(detector.hasChangedSince(".", singletonList("console-app"), tag3.ref()), is(false));
+        assertThat(detector.hasChangedSince("console-app", singletonList("console-app"), tag3.ref()), is(false));
     }
 }
