@@ -23,6 +23,7 @@ import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.RemoteRefUpdate;
 
 import de.hilling.maven.release.AnnotatedTag;
@@ -163,7 +164,11 @@ public class LocalGitRepo {
 
     public void pushAll() throws GitAPIException {
         PushCommand pushAll = git.push().setPushAll().setPushTags();
-         FetchCommand fetchCommand = git.fetch();
+        FetchCommand fetchCommand = git.fetch();
+        fetchCommand.setRefSpecs(new RefSpec("+refs/heads/*:refs/remotes/origin/*"),
+            new RefSpec("+refs/tags/*:refs/tags/*"),
+            new RefSpec("+refs/notes/*:refs/notes/*"));
+
         if (remoteUrl != null) {
             pushAll.setRemote(remoteUrl);
             fetchCommand.setRemote(remoteUrl);
