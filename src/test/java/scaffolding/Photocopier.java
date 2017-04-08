@@ -7,16 +7,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 public class Photocopier {
-    public static File copyTestProjectToTemporaryLocation(String moduleName, String subfolder)  {
-        File source = new File("test-projects", moduleName);
+    public static File copyTestProjectToTemporaryLocation(String projectName, String testProjectName)  {
+        File source = new File("test-projects", projectName);
         if (!source.isDirectory()) {
-            source = new File(FilenameUtils.separatorsToSystem("../test-projects/" + moduleName));
+            source = new File(FilenameUtils.separatorsToSystem("../test-projects/" + projectName));
         }
         if (!source.isDirectory()) {
-            throw new RuntimeException("Could not find module " + moduleName);
+            throw new RuntimeException("Could not find module " + projectName);
         }
 
-        File target = folderForSampleProject(moduleName, subfolder);
+        File target = folderForSampleProject(projectName, testProjectName);
         try {
             FileUtils.copyDirectory(source, target);
         } catch (IOException e) {

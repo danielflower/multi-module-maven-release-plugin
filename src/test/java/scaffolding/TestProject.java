@@ -56,7 +56,7 @@ public class TestProject extends ExternalResource {
         this.type = type;
         artifactId = type.getSubmoduleName();
         mvnRunner = DEFAULT_RUNNER;
-        nameGenerator = new RandomNameGenerator();
+        nameGenerator = RandomNameGenerator.getInstance();
     }
 
     /**

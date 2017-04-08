@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
@@ -83,7 +82,7 @@ public class MvnRunner {
     private static int artifactInLocalRepo(String groupId, String artifactId, String version) throws IOException,
                                                                                                      MavenInvocationException {
         String artifact = groupId + ":" + artifactId + ":" + version + ":pom";
-        File temp = new File("target/downloads/" + UUID.randomUUID());
+        File temp = new File("target/downloads/" + RandomNameGenerator.getInstance().randomName());
 
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.8:copy"));

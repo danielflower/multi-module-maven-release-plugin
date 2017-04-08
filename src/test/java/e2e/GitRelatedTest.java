@@ -3,6 +3,7 @@ package e2e;
 import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.Photocopier;
+import scaffolding.RandomNameGenerator;
 import scaffolding.TestProject;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -13,7 +14,6 @@ import static scaffolding.CountMatcher.twoOf;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -40,7 +40,8 @@ public class GitRelatedTest {
 
     @Test
     public void ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed() throws IOException {
-        File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module", UUID.randomUUID().toString());
+        File projectRoot = Photocopier.copyTestProjectToTemporaryLocation("single-module", RandomNameGenerator
+                                                                                               .getInstance().randomName());
         TestProject.performPomSubstitution(projectRoot);
         try {
             new MvnRunner().runMaven(projectRoot, TestUtils.RELEASE_GOAL);
