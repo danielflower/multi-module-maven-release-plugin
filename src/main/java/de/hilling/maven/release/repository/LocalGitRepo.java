@@ -156,11 +156,14 @@ public class LocalGitRepo {
     }
 
     public void pushAll() throws GitAPIException {
-        PushCommand pushCommand = git.push().setPushAll().setPushTags();
+        PushCommand pushAll = git.push().setPushAll();
+        PushCommand pushTags = git.push().setPushTags();
         if (remoteUrl != null) {
-            pushCommand.setRemote(remoteUrl);
+            pushAll.setRemote(remoteUrl);
+            pushTags.setRemote(remoteUrl);
         }
-        pushCommand.call();
+        pushAll.call();
+        pushTags.call();
     }
 
     public Optional<Ref> getRemoteTag(String tagName) throws GitAPIException {

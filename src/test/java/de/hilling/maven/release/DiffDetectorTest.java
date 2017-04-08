@@ -22,21 +22,23 @@ public class DiffDetectorTest {
 
     @Rule
     public TestProject singleProject = new TestProject(ProjectType.SINGLE);
+    @Rule
+    public TestProject independentVersions = new TestProject(ProjectType.INDEPENDENT_VERSIONS);
 
     @Before
     public void setUp() {
         singleProject.checkClean = false;
+        independentVersions.checkClean = false;
     }
 
     @Test
     public void canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag() throws Exception {
-        TestProject project = TestProject.project(ProjectType.INDEPENDENT_VERSIONS);
 
-        AnnotatedTag tag1 = saveFileInModule(project, "console-app", "1.2.3");
-        AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2.0");
-        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2.4");
+        AnnotatedTag tag1 = saveFileInModule(independentVersions, "console-app", "1.2.3");
+        AnnotatedTag tag2 = saveFileInModule(independentVersions, "core-utils", "2.0");
+        AnnotatedTag tag3 = saveFileInModule(independentVersions, "console-app", "1.2.4");
 
-        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(independentVersions.local.getRepository());
 
         assertThat(detector.hasChangedSince("core-utils", Collections.emptyList(), tag2.ref()), is(false));
         assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag2.ref()), is(true));
@@ -68,27 +70,23 @@ public class DiffDetectorTest {
 
     @Test
     public void canDetectChangesAfterTheLastTag() throws IOException, GitAPIException {
-        TestProject project = TestProject.project(ProjectType.INDEPENDENT_VERSIONS);
+        saveFileInModule(independentVersions, "console-app", "1.2.3");
+        saveFileInModule(independentVersions, "core-utils", "2.0");
+        AnnotatedTag tag3 = saveFileInModule(independentVersions, "console-app", "1.2.4");
+        independentVersions.commitRandomFile("console-app");
 
-        saveFileInModule(project, "console-app", "1.2.3");
-        saveFileInModule(project, "core-utils", "2.0");
-        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2.4");
-        project.commitRandomFile("console-app");
-
-        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(independentVersions.local.getRepository());
         assertThat(detector.hasChangedSince("console-app", Collections.emptyList(), tag3.ref()), is(true));
     }
 
     @Test
     public void canIgnoreModuleFolders() throws IOException, GitAPIException {
-        TestProject project = TestProject.project(ProjectType.INDEPENDENT_VERSIONS);
+        saveFileInModule(independentVersions, "console-app", "1.2.3");
+        saveFileInModule(independentVersions, "core-utils", "2.0");
+        AnnotatedTag tag3 = saveFileInModule(independentVersions, "console-app", "1.2.4");
+        independentVersions.commitRandomFile("console-app");
 
-        saveFileInModule(project, "console-app", "1.2.3");
-        saveFileInModule(project, "core-utils", "2.0");
-        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2.4");
-        project.commitRandomFile("console-app");
-
-        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        TreeWalkingDiffDetector detector = new TreeWalkingDiffDetector(independentVersions.local.getRepository());
         assertThat(detector.hasChangedSince("console-app", singletonList("console-app"), tag3.ref()), is(false));
     }
 }
