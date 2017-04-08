@@ -75,10 +75,15 @@ public class ReleaseMojo extends BaseMojo {
     private boolean skipTests;
 
     /**
-     * Push tags to remote repository as they are created.
+     * Push changes to remote repository. This includes:
+     * <ul>
+     *     <li>The newly created tag for this release containing the release information</li>
+     *     <li>The release info file containing the same information. This will be used to find relevant older
+     *     releases to compare to during the following release.</li>
+     * </ul>
      */
-    @Parameter(alias = "pushTags", defaultValue = "true", property = "push")
-    private boolean pushTags;
+    @Parameter(alias = "push", defaultValue = "true", property = "push")
+    private boolean push;
 
     static String getRemoteUrlOrNullIfNoneSet(Scm originalScm, Scm actualScm) throws ValidationException {
         if (originalScm == null) {
@@ -185,7 +190,7 @@ public class ReleaseMojo extends BaseMojo {
 
         getLog().info("About to tag repository with " + releaseInfo.toString());
         repo.tagRepo(tag);
-        if (pushTags) {
+        if (push) {
             getLog().info("About to push tags " + tag.name());
             repo.pushAll();
         }
