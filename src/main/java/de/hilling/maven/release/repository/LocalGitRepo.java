@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.PushCommand;
@@ -162,10 +163,19 @@ public class LocalGitRepo {
 
     public void pushAll() throws GitAPIException {
         PushCommand pushAll = git.push().setPushAll().setPushTags();
+         FetchCommand fetchCommand = git.fetch();
         if (remoteUrl != null) {
             pushAll.setRemote(remoteUrl);
+            fetchCommand.setRemote(remoteUrl);
         }
         pushAll.call().iterator().forEachRemaining(this::logResult);
+        try {
+            fetchCommand.call();
+        } catch (GitAPIException gae) {
+            if (!gae.getMessage().contains("Nothing to fetch")) {
+                throw gae;
+            }
+        }
     }
 
     private void logResult(PushResult m) {
