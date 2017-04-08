@@ -197,6 +197,7 @@ public class ReleaseMojo extends BaseMojo {
                 getLog().info("About to push tags " + tag.name());
                 repo.pushAll();
             }
+            repo.git.fetch().call();
         } else {
             throw new ValidationException("internal error: no tag found on release info " + releaseInfo);
         }
