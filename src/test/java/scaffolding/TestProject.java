@@ -81,6 +81,9 @@ public class TestProject extends ExternalResource {
         if (pom.exists()) {
             try {
                 String xml = FileUtils.readFileToString(pom, "UTF-8");
+                if (xml.contains("${scm.url}")) {
+                    xml = xml.replace("${scm.url}", dirToGitScmReference(sourceDir));
+                }
                 xml = xml.replace("${current.plugin.version}", PLUGIN_VERSION_FOR_TESTS);
                 FileUtils.writeStringToFile(pom, xml, "UTF-8");
             } catch (IOException e) {

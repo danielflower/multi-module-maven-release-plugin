@@ -5,6 +5,7 @@ import static de.hilling.maven.release.Reactor.fromProjects;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -186,13 +187,18 @@ public class ReleaseMojo extends BaseMojo {
     }
 
     private void tagAndPushRepo(LocalGitRepo repo, ImmutableReleaseInfo releaseInfo) throws GitAPIException {
-        final AnnotatedTag tag = new AnnotatedTag(null, releaseInfo.getTagName().get(), releaseInfo);
+        final Optional<String> optionalTag = releaseInfo.getTagName();
+        if (optionalTag.isPresent()) {
+            final AnnotatedTag tag = new AnnotatedTag(null, optionalTag.get(), releaseInfo);
 
-        getLog().info("About to tag repository with " + releaseInfo.toString());
-        repo.tagRepo(tag);
-        if (push) {
-            getLog().info("About to push tags " + tag.name());
-            repo.pushAll();
+            getLog().info("About to tag repository with " + releaseInfo.toString());
+            repo.tagRepo(tag);
+            if (push) {
+                getLog().info("About to push tags " + tag.name());
+                repo.pushAll();
+            }
+        } else {
+            throw new ValidationException("internal error: no tag found on release info " + releaseInfo);
         }
     }
 

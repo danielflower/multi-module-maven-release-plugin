@@ -117,13 +117,11 @@ public class LocalGitRepo {
     }
 
     private Status currentStatus() throws ValidationException {
-        Status status;
         try {
-            status = git.status().call();
+            return git.status().call();
         } catch (GitAPIException e) {
             throw new ValidationException("Error while checking if the Git repo is clean", e);
         }
-        return status;
     }
 
     public boolean revertChanges(Log log, List<File> changedFiles) throws MojoExecutionException {
