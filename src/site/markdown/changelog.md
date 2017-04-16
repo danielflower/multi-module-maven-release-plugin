@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+### 2.1.3
+
+* Modules will be released if they cannot be resolved, even if it looks like it hasn't been changed before. See
+[this pull request for details](https://github.com/danielflower/multi-module-maven-release-plugin/pull/52)
+
 ### 2.1.2
 
 * Adding ability to control the behavior when no changes are detected. New property noChangesAction can be set
