@@ -1,6 +1,7 @@
 package e2e;
 
 import com.github.danielflower.mavenplugins.release.AnnotatedTag;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -12,6 +13,7 @@ import scaffolding.TestProject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -90,6 +92,8 @@ public class SingleModuleTest {
         assertThat(head(testProject.origin), equalTo(originHeadAtStart));
         assertThat(head(testProject.local), equalTo(localHeadAtStart));
         assertThat(testProject.local, hasCleanWorkingDirectory());
+        assertThat(FileUtils.readFileToString(new File(testProject.localDir, "pom.xml"), StandardCharsets.UTF_8),
+            containsString("<!-- This comment is here for a test that ensures comments are not deleted -->"));
     }
 
     private ObjectId head(Git git) throws IOException {

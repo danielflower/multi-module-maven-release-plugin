@@ -13,6 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <!-- This comment is here for a test that ensures comments are not deleted -->
 
     <build>
         <plugins>
