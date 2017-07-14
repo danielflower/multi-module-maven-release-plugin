@@ -40,6 +40,10 @@ public class VersionNamerTest {
         );
     }
 
+    @Test
+    public void addsTheBuildWithADash() throws Exception {
+        assertThat(new VersionNamer("-").name("1.0.0-SNAPSHOT", 123L, null).releaseVersion(), is(equalTo("1.0.0-123")));
+    }
 
     private List<String> errorMessageOf(String pomVersion, long buildNumber) {
         try {
