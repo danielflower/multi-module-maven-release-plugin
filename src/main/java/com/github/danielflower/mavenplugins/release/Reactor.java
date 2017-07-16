@@ -26,10 +26,9 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
-        VersionNamer versionNamer = new VersionNamer();
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();

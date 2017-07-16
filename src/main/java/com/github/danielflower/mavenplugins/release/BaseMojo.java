@@ -49,6 +49,15 @@ public abstract class BaseMojo extends AbstractMojo {
 	@Parameter(property = "buildNumber")
 	protected Long buildNumber;
 
+
+    /**
+     * <p>
+     * Configures the version naming.
+     * </p>
+     */
+    @Parameter(property = "versionNamer")
+    protected VersionNamer versionNamer = new VersionNamer(".");
+
 	/**
 	 * The modules to release, or no value to to release the project from the
 	 * root pom, which is the default. The selected module plus any other

@@ -34,7 +34,7 @@ public class NextMojo extends BaseMojo {
 
             LocalGitRepo repo = LocalGitRepo.fromCurrentDir(ReleaseMojo.getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer);
             if (reactor == null) {
                 return;
             }

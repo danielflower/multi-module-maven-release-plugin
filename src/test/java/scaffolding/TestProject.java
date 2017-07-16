@@ -161,6 +161,10 @@ public class TestProject {
         return project("snapshot-dependencies-with-version-properties");
     }
 
+    public static TestProject differentDelimiterProject() {
+        return project("different-delimiter");
+    }
+
     public void setMvnRunner(MvnRunner mvnRunner) {
         this.mvnRunner = mvnRunner;
     }
