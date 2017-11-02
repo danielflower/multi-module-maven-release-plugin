@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -14,7 +13,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 
@@ -106,8 +107,19 @@ public class ReleaseMojo extends BaseMojo {
         try {
             configureJsch(log);
 
+            Set<GitOperations> gitOperations = EnumSet.noneOf(GitOperations.class);
+            if (pullTags) {
+                gitOperations.add(GitOperations.PULL_TAGS);
+            }
+            if (pushTags) {
+                gitOperations.add(GitOperations.PUSH_TAGS);
+            }
 
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
+            LocalGitRepo repo = new LocalGitRepo.Builder()
+                .remoteGitOperationsAllowed(gitOperations)
+                .remoteGitUrl(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(),
+                                                          project.getModel().getScm()))
+                .buildFromCurrentDir();
             repo.errorIfNotClean();
 
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
@@ -171,29 +183,9 @@ public class ReleaseMojo extends BaseMojo {
     private void tagAndPushRepo(Log log, LocalGitRepo repo, List<AnnotatedTag> proposedTags) throws GitAPIException {
         for (AnnotatedTag proposedTag : proposedTags) {
             log.info("About to tag the repository with " + proposedTag.name());
-            if (pushTags) {
-                repo.tagRepoAndPush(proposedTag);
-            } else {
-                repo.tagRepo(proposedTag);
-            }
-        }
-    }
-
-    static String getRemoteUrlOrNullIfNoneSet(Scm originalScm, Scm actualScm) throws ValidationException {
-        if (originalScm == null) {
-            // No scm was specified, so don't inherit from any parent poms as they are probably used in different git repos
-            return null;
         }
 
-        // There is an SCM specified, so the actual SCM with derived values is used in case (so that variables etc are interpolated)
-        String remote = actualScm.getDeveloperConnection();
-        if (remote == null) {
-            remote = actualScm.getConnection();
-        }
-        if (remote == null) {
-            return null;
-        }
-        return GitHelper.scmUrlToRemote(remote);
+        repo.tagAndPushRepo(proposedTags);
     }
 
     private static void revertChanges(Log log, LocalGitRepo repo, List<File> changedFiles, boolean throwIfError) throws MojoExecutionException {
@@ -250,7 +242,7 @@ public class ReleaseMojo extends BaseMojo {
                 tags.add(annotatedTag);
             }
         }
-        List<String> matchingRemoteTags = git.remoteTagsFrom(tags);
+        List<String> matchingRemoteTags = git.tagsFrom(tags);
         if (matchingRemoteTags.size() > 0) {
             String summary = "Cannot release because there is already a tag with the same build number on the remote Git repo.";
             List<String> messages = new ArrayList<String>();

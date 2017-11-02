@@ -100,4 +100,18 @@ public class SingleModuleTest {
         return git.getRepository().getRef("HEAD").getObjectId();
     }
 
+    @Test
+    public void originTagsNotConsultedWithoutPull() throws Exception {
+        testProject.mvn("releaser:release");
+
+        AnnotatedTag.create("single-module-1.0.2", "1.0", 2).saveAtHEAD(testProject.local);
+        AnnotatedTag.create("single-module-1.0.5", "1.0", 5).saveAtHEAD(testProject.origin);
+
+        testProject.mvn("-Dpush=false",
+                        "-Dpull=false",
+                        "releaser:release");
+        assertThat(testProject.local, hasTag("single-module-1.0.3"));
+        assertThat(testProject.origin, not(hasTag("single-module-1.0.3")));
+    }
+
 }
