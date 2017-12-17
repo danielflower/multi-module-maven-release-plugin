@@ -117,7 +117,7 @@ public class Reactor {
     }
 
     private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber) throws GitAPIException {
-        Collection<Ref> remoteTagRefs = gitRepo.allRemoteTags();
+        Collection<Ref> remoteTagRefs = gitRepo.allTags();
         Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
         for (Ref remoteTagRef : remoteTagRefs) {
