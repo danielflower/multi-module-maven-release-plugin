@@ -70,7 +70,7 @@ public class LocalGitRepo {
                 } else {
                     summary = "The release plugin can only be run from the root folder of your Git repository";
                     messages.add(summary);
-                    messages.add(fullPathOfCurrentDir + " is not the root of a Gir repository");
+                    messages.add(fullPathOfCurrentDir + " is not the root of a Git repository");
                     messages.add("Try running the release plugin from " + pathOf(gitRoot));
                 }
                 throw new ValidationException(summary, messages);
