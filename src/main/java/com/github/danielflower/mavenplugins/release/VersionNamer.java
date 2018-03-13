@@ -2,6 +2,7 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 
@@ -21,26 +22,46 @@ public class VersionNamer {
      * dash ('-') is recommended to be in line with the maven versioning scheme.
      * </p>
      * <p>
-     * This can be specified using a command line parameter ("-Ddelimiter=2")
+     * This can be specified using a command line parameter ("-Ddelimiter=-")
      * or in this plugin's configuration.
      * </p>
      */
     @Parameter(property = "delimiter")
     private String delimiter;
 
-    public VersionNamer(String delimiter) {
+    /**
+     * <p>
+     * The initial build number.
+     * </p>
+     * <p>
+     * By default, it will use "0".
+     * </p>
+     * <p>
+     * This can be specified using a command line parameter ("-DinitialBuildNumber=1")
+     * or in this plugin's configuration.
+     * </p>
+     */
+    @Parameter(property = "initialBuildNumber")
+    private String initialBuildNumber;
+
+    public VersionNamer(String delimiter, String initialBuildNumber) {
         this.delimiter = delimiter;
+        this.initialBuildNumber = initialBuildNumber;
     }
 
     public VersionNamer() {
-        this(".");
+        this(".", "0");
     }
 
     public VersionName name(String pomVersion, Long buildNumber, Collection<Long> previousBuildNumbers) throws ValidationException {
 
         if (buildNumber == null) {
             if (previousBuildNumbers.size() == 0) {
-                buildNumber = 0L;
+                if (StringUtils.isNotBlank(initialBuildNumber)) {
+                    buildNumber = Long.parseLong(initialBuildNumber);
+                } else {
+                    buildNumber = 0L;
+                }
             } else {
                 buildNumber = nextBuildNumber(previousBuildNumbers);
             }
