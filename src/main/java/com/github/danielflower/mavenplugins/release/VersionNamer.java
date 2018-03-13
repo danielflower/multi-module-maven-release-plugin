@@ -1,9 +1,12 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -63,5 +66,13 @@ public class VersionNamer {
         }
         return max + 1;
     }
+
+   public List<AnnotatedTag> tagsForVersion(Git git, String artifactId, String versionWithoutBuildNumber) throws MojoExecutionException {
+      return AnnotatedTagFinder.tagsForVersion(git, artifactId, versionWithoutBuildNumber, delimiter);
+   }
+
+   public Long buildNumberOf(String tagWithoutBuildNumber, String remoteTagName) {
+      return AnnotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName, delimiter);
+   }
 
 }

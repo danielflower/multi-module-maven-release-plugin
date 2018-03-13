@@ -13,7 +13,7 @@ import java.util.List;
 
 public class AnnotatedTagFinder {
 
-    public static List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber) throws MojoExecutionException {
+    public static List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber, String delimiter) throws MojoExecutionException {
         ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
         List<Ref> tags;
         try {
@@ -24,7 +24,7 @@ public class AnnotatedTagFinder {
         Collections.reverse(tags);
         String tagWithoutBuildNumber = module + "-" + versionWithoutBuildNumber;
         for (Ref tag : tags) {
-            if (isPotentiallySameVersionIgnoringBuildNumber(tagWithoutBuildNumber, tag.getName())) {
+            if (isPotentiallySameVersionIgnoringBuildNumber(tagWithoutBuildNumber, tag.getName(), delimiter)) {
                 try {
                     results.add(AnnotatedTag.fromRef(git.getRepository(), tag));
                 } catch (IncorrectObjectTypeException ignored) {
@@ -37,13 +37,13 @@ public class AnnotatedTagFinder {
         return results;
     }
 
-    public static boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
-        return buildNumberOf(versionWithoutBuildNumber, refName) != null;
+    public static boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName, String delimiter) {
+        return buildNumberOf(versionWithoutBuildNumber, refName, delimiter) != null;
     }
 
-    public static Long buildNumberOf(String versionWithoutBuildNumber, String refName) {
+    public static Long buildNumberOf(String versionWithoutBuildNumber, String refName, String delimiter) {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
-        String prefix = versionWithoutBuildNumber + ".";
+        String prefix = versionWithoutBuildNumber + delimiter;
         if (tagName.startsWith(prefix)) {
             String end = tagName.substring(prefix.length());
             try {
