@@ -26,6 +26,11 @@ public class VersionNamerTest {
     }
 
     @Test
+    public void ifTheBuildNumberIsNullAndThePreviousBuildNumbersIsEmptyListThenInitialBuildNumberIsUsed() throws Exception {
+        assertThat(new VersionNamer(".", "2").name("2.0-SNAPSHOT", null, new ArrayList<Long>()).releaseVersion(), is(equalTo("2.0.2")));
+    }
+
+    @Test
     public void ifTheBuildNumberIsNullButThereIsAPreviousBuildNumbersThenThatValueIsIncremented() throws Exception {
         assertThat(namer.name("1.0-SNAPSHOT", null, asList(9L, 10L, 8L)).releaseVersion(), is(equalTo("1.0.11")));
     }
