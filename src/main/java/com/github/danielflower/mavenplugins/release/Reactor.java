@@ -27,7 +27,7 @@ public class Reactor {
     }
 
     public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(log, gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
@@ -89,7 +89,7 @@ public class Reactor {
                         equivalentVersion = null;
                     }
                 } else {
-                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
+                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " (" + relativePathToModule + ", " + previousBuildNumbers.size() + " previous builds) as it has changed since the last release.");
                 }
             }
             ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);

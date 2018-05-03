@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -11,14 +12,17 @@ import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public class TreeWalkingDiffDetector implements DiffDetector {
 
     private final Repository repo;
+    private final Log log;
 
-    public TreeWalkingDiffDetector(Repository repo) {
+    public TreeWalkingDiffDetector(Log log, Repository repo) {
         this.repo = repo;
+        this.log = log;
     }
 
     public boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Collection<AnnotatedTag> tags) throws IOException {
@@ -28,7 +32,13 @@ public class TreeWalkingDiffDetector implements DiffDetector {
             walk.markStart(walk.parseCommit(repo.getRef("HEAD").getObjectId()));
             filterOutOtherModulesChanges(modulePath, childModules, walk);
             stopWalkingWhenTheTagsAreHit(tags, walk);
-            return walk.iterator().hasNext();
+            Iterator<RevCommit> it = walk.iterator();
+            if (it.hasNext()) {
+               RevCommit commit = it.next();
+               log.info("Module " + modulePath + " changed at " + commit.getName());
+               return true;
+            }
+            return false;
         } finally {
             walk.dispose();
         }
