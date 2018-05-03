@@ -57,7 +57,7 @@ public abstract class BaseMojo extends AbstractMojo {
      * </p>
      */
     @Parameter(property = "versionNamer")
-    protected VersionNamer versionNamer = new VersionNamer(".");
+    protected VersionNamer versionNamer = new VersionNamer(".", "0");
 
 	/**
 	 * The modules to release, or no value to to release the project from the

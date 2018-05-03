@@ -27,13 +27,13 @@ public class Reactor {
     }
 
     public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(log, gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();
             String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-            List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
+            List<AnnotatedTag> previousTagsForThisModule = versionNamer.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
 
 
             Collection<Long> previousBuildNumbers = new ArrayList<Long>();
@@ -43,7 +43,7 @@ public class Reactor {
                 }
             }
 
-            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber);
+            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber, versionNamer);
             previousBuildNumbers.addAll(remoteBuildNumbers);
 
             VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
@@ -89,7 +89,7 @@ public class Reactor {
                         equivalentVersion = null;
                     }
                 } else {
-                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
+                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " (" + relativePathToModule + ", " + previousBuildNumbers.size() + " previous builds) as it has changed since the last release.");
                 }
             }
             ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);
@@ -116,13 +116,13 @@ public class Reactor {
         return new Reactor(modules);
     }
 
-    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber) throws GitAPIException {
+    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber, VersionNamer versionNamer) throws GitAPIException {
         Collection<Ref> remoteTagRefs = gitRepo.allTags();
         Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
         for (Ref remoteTagRef : remoteTagRefs) {
             String remoteTagName = remoteTagRef.getName();
-            Long buildNumber = AnnotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
+            Long buildNumber = versionNamer.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
             if (buildNumber != null) {
                 remoteBuildNumbers.add(buildNumber);
             }
