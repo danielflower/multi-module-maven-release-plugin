@@ -9,12 +9,12 @@ import scaffolding.TestProject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.danielflower.mavenplugins.release.GitHelper.scmUrlToRemote;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.TestProject.dirToGitScmReference;
-import static com.github.danielflower.mavenplugins.release.GitHelper.scmUrlToRemote;
 
 public class LocalGitRepoTest {
 
@@ -22,7 +22,8 @@ public class LocalGitRepoTest {
 
     @Test
     public void canDetectLocalTags() throws GitAPIException {
-        LocalGitRepo repo = new LocalGitRepo(project.local, null);
+        LocalGitRepo repo = new LocalGitRepo(project.local, new LocalTagFetcher(project.local),
+                                             new LocalTagPusher(project.local));
         tag(project.local, "some-tag");
         assertThat(repo.hasLocalTag("some-tag"), is(true));
         assertThat(repo.hasLocalTag("some-ta"), is(false));
@@ -31,22 +32,25 @@ public class LocalGitRepoTest {
 
     @Test
     public void canDetectRemoteTags() throws Exception {
-        LocalGitRepo repo = new LocalGitRepo(project.local, null);
+        LocalGitRepo repo = new LocalGitRepo(project.local, new RemoteTagFetcher(project.local, null),
+                                             new LocalTagPusher(project.local));
         tag(project.origin, "some-tag");
-        assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
-        assertThat(repo.remoteTagsFrom(tags("blah", "some-taggart")), equalTo(emptyList()));
+        assertThat(repo.tagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
+        assertThat(repo.tagsFrom(tags("blah", "some-taggart")), equalTo(emptyList()));
     }
 
     @Test
     public void usesThePassedInScmUrlToFindRemote() throws Exception {
-        LocalGitRepo repo = new LocalGitRepo(project.local, scmUrlToRemote(dirToGitScmReference(project.originDir)));
+        String remote = scmUrlToRemote(dirToGitScmReference(project.originDir));
+        LocalGitRepo repo = new LocalGitRepo(project.local, new RemoteTagFetcher(project.local, remote),
+                                             new LocalTagPusher(project.local));
         tag(project.origin, "some-tag");
 
         StoredConfig config = project.local.getRepository().getConfig();
         config.unsetSection("remote", "origin");
         config.save();
 
-        assertThat(repo.remoteTagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
+        assertThat(repo.tagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
     }
 
     @Test
@@ -56,11 +60,12 @@ public class LocalGitRepoTest {
             tag(project.local, "this-is-a-tag-" + i);
         }
         project.local.push().setPushTags().call();
-        LocalGitRepo repo = new LocalGitRepo(project.local, null);
+        LocalGitRepo repo = new LocalGitRepo(project.local, new LocalTagFetcher(project.local),
+                                             new LocalTagPusher(project.local));
         for (int i = 0; i < numberOfTags; i++) {
             String tagName = "this-is-a-tag-" + i;
             assertThat(repo.hasLocalTag(tagName), is(true));
-            assertThat(repo.remoteTagsFrom(tags(tagName)).size(), is(1));
+            assertThat(repo.tagsFrom(tags(tagName)).size(), is(1));
         }
     }
 

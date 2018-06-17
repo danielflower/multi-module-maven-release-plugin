@@ -8,6 +8,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.EnumSet;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 
@@ -32,9 +34,18 @@ public class NextMojo extends BaseMojo {
         try {
             configureJsch(log);
 
-            LocalGitRepo repo = LocalGitRepo.fromCurrentDir(ReleaseMojo.getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(), project.getModel().getScm()));
+            Set<GitOperations> gitOperations = EnumSet.noneOf(GitOperations.class);
+            if (pullTags) {
+                gitOperations.add(GitOperations.PULL_TAGS);
+            }
+
+            LocalGitRepo repo = new LocalGitRepo.Builder()
+                .remoteGitOperationsAllowed(gitOperations)
+                .remoteGitUrl(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(),
+                                                          project.getModel().getScm()))
+                .buildFromCurrentDir();
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer);
             if (reactor == null) {
                 return;
             }

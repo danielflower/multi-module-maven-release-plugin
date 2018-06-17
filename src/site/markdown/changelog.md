@@ -7,6 +7,11 @@ Changelog
   with sub-projects defined.
 * Changed minimum version of java to Java 8 (required by JGit)
 
+### 2.2.0
+
+* Can set `pullTags=false` to prevent tags being pulled, in environments where (e.g.) your build lacks
+remote access credentials. Ensure your local repository is already up to date with tags!
+
 ### 2.1.3
 
 * Modules will be released if they cannot be resolved, even if it looks like it hasn't been changed before. See

@@ -20,13 +20,88 @@ import static com.github.danielflower.mavenplugins.release.FileUtils.pathOf;
 public class LocalGitRepo {
 
     public final Git git;
-    private final String remoteUrl;
     private boolean hasReverted = false; // A premature optimisation? In the normal case, file reverting occurs twice, which this bool prevents
-    private Collection<Ref> remoteTags;
+    private Collection<Ref> tags;
 
-    LocalGitRepo(Git git, String remoteUrl) {
+    private final TagFetcher tagFetcher;
+    private final TagPusher tagPusher;
+
+    public static class Builder {
+
+        private Set<GitOperations> operationsAllowed = EnumSet.allOf(GitOperations.class);
+        private String remoteGitUrl;
+
+        /**
+         * Flag for which remote Git operations are permitted. Local values will
+         * be substituted if remote operations are forbidden; this means the
+         * local copy of the repository must be up to date!
+         */
+        public Builder remoteGitOperationsAllowed(Set<GitOperations> operationsAllowed) {
+            this.operationsAllowed = EnumSet.copyOf(operationsAllowed);
+            return this;
+        }
+
+        /**
+         * Overrides the URL of remote Git repository.
+         */
+        public Builder remoteGitUrl(String remoteUrl) {
+            this.remoteGitUrl = remoteUrl;
+            return this;
+        }
+
+        /**
+         * Uses the current working dir to open the Git repository.
+         * @throws ValidationException if anything goes wrong
+         */
+        public LocalGitRepo buildFromCurrentDir() throws ValidationException {
+            Git git;
+            File gitDir = new File(".");
+            try {
+                git = Git.open(gitDir);
+            } catch (RepositoryNotFoundException rnfe) {
+                String fullPathOfCurrentDir = pathOf(gitDir);
+                File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
+                String summary;
+                List<String> messages = new ArrayList<String>();
+                if (gitRoot == null) {
+                    summary = "Releases can only be performed from Git repositories.";
+                    messages.add(summary);
+                    messages.add(fullPathOfCurrentDir + " is not a Git repository.");
+                } else {
+                    summary = "The release plugin can only be run from the root folder of your Git repository";
+                    messages.add(summary);
+                    messages.add(fullPathOfCurrentDir + " is not the root of a Git repository");
+                    messages.add("Try running the release plugin from " + pathOf(gitRoot));
+                }
+                throw new ValidationException(summary, messages);
+            } catch (Exception e) {
+                throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
+            }
+
+            TagFetcher tagFetcher;
+            TagPusher tagPusher;
+
+            if (operationsAllowed.contains(GitOperations.PULL_TAGS)) {
+                tagFetcher = new RemoteTagFetcher(git, remoteGitUrl);
+            } else {
+                tagFetcher = new LocalTagFetcher(git);
+            }
+
+            if (operationsAllowed.contains(GitOperations.PUSH_TAGS)) {
+                tagPusher = new RemoteTagPusher(git, remoteGitUrl);
+            } else {
+                tagPusher = new LocalTagPusher(git);
+            }
+
+            return new LocalGitRepo(git, tagFetcher, tagPusher);
+        }
+
+    }
+
+    LocalGitRepo(Git git, TagFetcher tagFetcher, TagPusher tagPusher) {
         this.git = git;
-        this.remoteUrl = remoteUrl;
+        this.tagFetcher = tagFetcher;
+        this.tagPusher = tagPusher;
     }
 
     public void errorIfNotClean() throws ValidationException {
@@ -96,54 +171,8 @@ public class LocalGitRepo {
         return GitHelper.hasLocalTag(git, tagName);
     }
 
-    public void tagRepoAndPush(AnnotatedTag tag) throws GitAPIException {
-        Ref tagRef = tagRepo(tag);
-        pushTag(tagRef);
-    }
-
-    private void pushTag(Ref tagRef) throws GitAPIException {
-        PushCommand pushCommand = git.push().add(tagRef);
-        if (remoteUrl != null) {
-            pushCommand.setRemote(remoteUrl);
-        }
-        pushCommand.call();
-    }
-
-    public Ref tagRepo(AnnotatedTag tag) throws GitAPIException {
-        Ref tagRef = tag.saveAtHEAD(git);
-        return tagRef;
-    }
-
-    /**
-     * Uses the current working dir to open the Git repository.
-     * @param remoteUrl The value in pom.scm.connection or null if none specified, in which case the default remote is used.
-     * @throws ValidationException if anything goes wrong
-     */
-    public static LocalGitRepo fromCurrentDir(String remoteUrl) throws ValidationException {
-        Git git;
-        File gitDir = new File(".");
-        try {
-            git = Git.open(gitDir);
-        } catch (RepositoryNotFoundException rnfe) {
-            String fullPathOfCurrentDir = pathOf(gitDir);
-            File gitRoot = getGitRootIfItExistsInOneOfTheParentDirectories(new File(fullPathOfCurrentDir));
-            String summary;
-            List<String> messages = new ArrayList<String>();
-            if (gitRoot == null) {
-                summary = "Releases can only be performed from Git repositories.";
-                messages.add(summary);
-                messages.add(fullPathOfCurrentDir + " is not a Git repository.");
-            } else {
-                summary = "The release plugin can only be run from the root folder of your Git repository";
-                messages.add(summary);
-                messages.add(fullPathOfCurrentDir + " is not the root of a Gir repository");
-                messages.add("Try running the release plugin from " + pathOf(gitRoot));
-            }
-            throw new ValidationException(summary, messages);
-        } catch (Exception e) {
-            throw new ValidationException("Could not open git repository. Is " + pathOf(gitDir) + " a git repository?", Arrays.asList("Exception returned when accessing the git repo:", e.toString()));
-        }
-        return new LocalGitRepo(git, remoteUrl);
+    public void tagAndPushRepo(Collection<AnnotatedTag> tags) throws GitAPIException {
+        tagPusher.pushTags(tags);
     }
 
     private static File getGitRootIfItExistsInOneOfTheParentDirectories(File candidateDir) {
@@ -156,17 +185,17 @@ public class LocalGitRepo {
         return null;
     }
 
-    public List<String> remoteTagsFrom(List<AnnotatedTag> annotatedTags) throws GitAPIException {
+    public List<String> tagsFrom(List<AnnotatedTag> annotatedTags) throws GitAPIException {
         List<String> tagNames = new ArrayList<String>();
         for (AnnotatedTag annotatedTag : annotatedTags) {
             tagNames.add(annotatedTag.name());
         }
-        return getRemoteTags(tagNames);
+        return getTags(tagNames);
     }
 
-    public List<String> getRemoteTags(List<String> tagNamesToSearchFor) throws GitAPIException {
+    public List<String> getTags(List<String> tagNamesToSearchFor) throws GitAPIException {
         List<String> results = new ArrayList<String>();
-        Collection<Ref> remoteTags = allRemoteTags();
+        Collection<Ref> remoteTags = allTags();
         for (Ref remoteTag : remoteTags) {
             for (String proposedTag : tagNamesToSearchFor) {
                 if (remoteTag.getName().equals("refs/tags/" + proposedTag)) {
@@ -177,14 +206,103 @@ public class LocalGitRepo {
         return results;
     }
 
-    public Collection<Ref> allRemoteTags() throws GitAPIException {
-        if (remoteTags == null) {
-            LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
-            if (remoteUrl != null) {
-                lsRemoteCommand.setRemote(remoteUrl);
-            }
-            remoteTags = lsRemoteCommand.call();
+    public Collection<Ref> allTags() throws GitAPIException {
+        if (tags == null) {
+            tags = this.tagFetcher.getTags();
         }
-        return remoteTags;
+
+        return tags;
     }
+}
+
+interface TagFetcher {
+
+    public Collection<Ref> getTags() throws GitAPIException;
+
+}
+
+class RemoteTagFetcher implements TagFetcher {
+
+    private final Git git;
+    private final String remoteUrl;
+
+    public RemoteTagFetcher(Git git, String remoteUrl) {
+        this.git = git;
+        this.remoteUrl = remoteUrl;
+    }
+
+    @Override
+    public Collection<Ref> getTags() throws GitAPIException {
+        LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
+        if (remoteUrl != null) {
+            lsRemoteCommand.setRemote(remoteUrl);
+        }
+
+        return lsRemoteCommand.call();
+   }
+
+}
+
+class LocalTagFetcher implements TagFetcher {
+
+    private final Git git;
+
+    public LocalTagFetcher(Git git) {
+        this.git = git;
+    }
+
+    @Override
+    public Collection<Ref> getTags() throws GitAPIException {
+        return git.tagList().call();
+    }
+
+}
+
+interface TagPusher {
+
+    public void pushTags(Collection<AnnotatedTag> tags) throws GitAPIException;
+
+}
+
+class RemoteTagPusher implements TagPusher {
+
+    private final Git git;
+    private final String remoteUrl;
+
+    public RemoteTagPusher(Git git, String remoteUrl) {
+        this.git = git;
+        this.remoteUrl = remoteUrl;
+    }
+
+    @Override
+    public void pushTags(Collection<AnnotatedTag> tags) throws GitAPIException {
+        PushCommand pushCommand = git.push();
+        if (remoteUrl != null) {
+            pushCommand.setRemote(remoteUrl);
+        }
+
+        for (AnnotatedTag tag : tags) {
+            pushCommand.add(tag.saveAtHEAD(git));
+        }
+
+        pushCommand.call();
+    }
+
+}
+
+class LocalTagPusher implements TagPusher {
+
+    private final Git git;
+
+    public LocalTagPusher(Git git) {
+        this.git = git;
+    }
+
+    @Override
+    public void pushTags(Collection<AnnotatedTag> tags) throws GitAPIException {
+        for (AnnotatedTag tag : tags) {
+            tag.saveAtHEAD(git);
+        }
+    }
+
 }

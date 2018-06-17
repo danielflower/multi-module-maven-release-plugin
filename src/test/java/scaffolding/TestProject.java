@@ -20,6 +20,7 @@ public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
     private static final String PLUGIN_VERSION_FOR_TESTS = "3.0-SNAPSHOT";
+
     public final File originDir;
     public final Git origin;
 
@@ -159,6 +160,10 @@ public class TestProject {
     }
     public static TestProject moduleWithSnapshotDependenciesWithVersionProperties() {
         return project("snapshot-dependencies-with-version-properties");
+    }
+
+    public static TestProject differentDelimiterProject() {
+        return project("different-delimiter");
     }
 
     public void setMvnRunner(MvnRunner mvnRunner) {
