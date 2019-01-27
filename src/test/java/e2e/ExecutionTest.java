@@ -40,7 +40,7 @@ public class ExecutionTest {
 
     @Test
     public void argumentsCanBePassed() throws Exception {
-        List<String> consoleOutput = testProject.mvn("\"-Darguments='-Dprop.1=prop 1 value' -Dprop.2=prop2value\"", "releaser:release", "-P runTestsProfile");
+        List<String> consoleOutput = testProject.mvn("releaser:release", "-P runTestsProfile");
         assertThat(consoleOutput, oneOf(containsString("this is a system property: prop 1 value and prop2value")));
     }
 

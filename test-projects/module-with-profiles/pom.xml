@@ -36,6 +36,7 @@
                     <releaseProfiles>
                         <releaseProfile>profileActivatedByReleasePlugin</releaseProfile>
                     </releaseProfiles>
+                    <arguments>'-Dprop.1=prop 1 value' -Dprop.2=prop2value</arguments>
                 </configuration>
             </plugin>
             <plugin>
