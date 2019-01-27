@@ -32,7 +32,7 @@ public class LocalGitRepoTest {
 
     @Test
     public void canDetectRemoteTags() throws Exception {
-        LocalGitRepo repo = new LocalGitRepo(project.local, new RemoteTagFetcher(project.local, null),
+        LocalGitRepo repo = new LocalGitRepo(project.local, new RemoteTagFetcher(project.local, null, null),
                                              new LocalTagPusher(project.local));
         tag(project.origin, "some-tag");
         assertThat(repo.tagsFrom(tags("blah", "some-tag")), equalTo(asList("some-tag")));
@@ -42,7 +42,7 @@ public class LocalGitRepoTest {
     @Test
     public void usesThePassedInScmUrlToFindRemote() throws Exception {
         String remote = scmUrlToRemote(dirToGitScmReference(project.originDir));
-        LocalGitRepo repo = new LocalGitRepo(project.local, new RemoteTagFetcher(project.local, remote),
+        LocalGitRepo repo = new LocalGitRepo(project.local, new RemoteTagFetcher(project.local, remote, null),
                                              new LocalTagPusher(project.local));
         tag(project.origin, "some-tag");
 

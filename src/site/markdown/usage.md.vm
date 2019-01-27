@@ -59,62 +59,7 @@ standard maven command line parameters:
 
 	mvn releaser:release -s /path/to/custom/user/settings.xml -gs /path/to/custom/global/settings.xml
 
-SSH authentication
+Authentication
 ------------------
-Currently, only public key authentication is supported. By default, the plugin reads the private key from `~/.ssh/id_rsa`. 
-If it's required to use a private key file from another location, you have two opportunities to achieve this:
 
-$H$H$H Add server section to your Maven settings
-
-This is the preferred way. Firstly, add a server section to your Maven settings 
-like this (see <https://maven.apache.org/settings.html#Servers> for further information):
-
-	<settings>
-		<servers>
-			<server>
-				<id>my-server</id>
-				<privateKey>/path/to/your/private_key</privateKey>
-				<passphrase>optional_passphrase</passphrase> <!-- This is optional -->
-			</server>
-		</servers>
-	</settings>
-	
-If your key is password protected, specify the password within element **passphrase**. Tip: do _not confuse_ this with element **password**.
-
-Secondly, specify the `serverId` in the plugin configuration
-	
-	<plugin>
-		...
-		<configuration>
-			<serverId>my-server</serverId>
-		</configuration>
-	</plugin>	
-
-
-$H$H$H Specify private key and optional passphrase in your POM
-
-This is the insecure way to specify your custom private key. Add following properties to your plugin configuration:
-
-	<plugin>
-		...
-		<configuration>
-			<privateKey>/path/to/your/private_key</privateKey>
-			<passphrase>optional_passphrase</passphrase> <!-- This is optional -->
-		</configuration>
-	</plugin>
-
-Note: POM configuration has precedence over Maven settings.
-	
-Custom known_hosts
-------------------
-Per default, the plugin uses `~/.ssh/known_hosts`. You can override this with following property in
-your plugin configuration:
-
-	<plugin>
-		...
-		<configuration>
-			<knownHosts>/path/to/your/known_hosts</knownHosts>
-		</configuration>
-	</plugin>
-
-Note: Maven settings related to `known_hosts` will _not_ be considered by the plugin.
+Please see [SSH Authentication](ssh-authentication.html) or [HTTPS Authentication](https-authentication.html).

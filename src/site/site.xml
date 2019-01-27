@@ -25,6 +25,8 @@
             <item name="Goals" href="plugin-info.html"/>
             <item name="Usage" href="usage.html"/>
             <item name="FAQ" href="FAQ.html"/>
+            <item name="SSH Authentication" href="ssh-authentication.html"/>
+            <item name="HTTPS Authentication" href="https-authentication.html"/>
             <item name="Changelog" href="changelog.html"/>
         </menu>
         <menu ref="reports" inherit="top"/>

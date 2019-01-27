@@ -12,11 +12,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.util.List;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -113,8 +116,9 @@ public abstract class BaseMojo extends AbstractMojo {
 	private Settings settings;
 
 	/**
-	 * If set, the identityFile and passphrase will be read from the Maven
-	 * settings file.
+	 * <p>If set, the identityFile and passphrase will be read from the Maven settings file.</p>
+     * <p>See <a href="https://maven.apache.org/guides/mini/guide-deployment-security-settings.html">https://maven.apache.org/guides/mini/guide-deployment-security-settings.html</a>
+     * for more information on configuring servers in Maven.</p>
 	 */
 	@Parameter(property = "serverId")
 	private String serverId;
@@ -127,13 +131,15 @@ public abstract class BaseMojo extends AbstractMojo {
 	private String knownHosts;
 
 	/**
-	 * Specifies the private key to be used.
+	 * Specifies the private key to be used for SSH URLs. By default it will use <code>~/.ssh/id_rsa</code>
 	 */
 	@Parameter(property = "privateKey")
 	private String privateKey;
 
 	/**
-	 * Specifies the passphrase to be used with the identityFile specified.
+	 * <p>Specifies the passphrase to be used with the identityFile specified for SSH where the private key requires a pass phrase.</p>
+     * <p>To avoid specifying a passphrase in your pom, you could instead specify a <code>server</code> in your
+     * maven settings file and then set the <code>serverId</code> property.</p>
 	 */
 	@Parameter(property = "passphrase")
 	private String passphrase;
@@ -148,10 +154,10 @@ public abstract class BaseMojo extends AbstractMojo {
 
     /**
      * <p>Additional arguments to pass to Maven during a release.</p>
-     * <p>To pass multiple system properties with spaces from the command line,
-     * use <code>-Darguments="-Dprop.1='prop 1 value' -Dprop.2=prop2value"</code></p>
+     * <p>To pass multiple system properties from the command line,
+     * use <code>-Darguments="-Dprop.1=prop1value -Dprop.2=prop2value"</code></p>
      * <p>To configure arguments in your pom, in the <code>&lt;configuration&gt;</code> node add:
-     * <code>&lt;arguments&gt;-Dprop.1='prop 1 value' -Dprop.2=prop2value&lt;/arguments&gt;</code></p>
+     * <code>&lt;arguments&gt;'-Dprop.1=prop 1 value' -Dprop.2=prop2value&lt;/arguments&gt;</code></p>
      */
     @Parameter(property = "arguments")
     public String arguments;
@@ -183,6 +189,20 @@ public abstract class BaseMojo extends AbstractMojo {
 	final void disableSshAgent() {
 		disableSshAgent = true;
 	}
+
+	protected CredentialsProvider getCredentialsProvider() throws ValidationException {
+        if (serverId != null) {
+            Server server = settings.getServer(serverId);
+            if (server == null) {
+                throw new ValidationException("Could not find git credentials", asList("The serverId specified was "
+                    + serverId + " however no server with that ID could be found in the maven settings."));
+            }
+            if (server.getUsername() != null && server.getPassword() != null) {
+                return new UsernamePasswordCredentialsProvider(server.getUsername(), server.getPassword());
+            }
+        }
+        return null;
+    }
 
 	protected final void configureJsch(final Log log) {
 		if (!disableSshAgent) {

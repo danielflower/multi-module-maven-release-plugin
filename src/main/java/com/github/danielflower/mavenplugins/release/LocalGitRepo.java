@@ -10,6 +10,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.transport.CredentialsProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class LocalGitRepo {
 
         private Set<GitOperations> operationsAllowed = EnumSet.allOf(GitOperations.class);
         private String remoteGitUrl;
+        private CredentialsProvider credentialsProvider;
 
         /**
          * Flag for which remote Git operations are permitted. Local values will
@@ -46,6 +48,14 @@ public class LocalGitRepo {
          */
         public Builder remoteGitUrl(String remoteUrl) {
             this.remoteGitUrl = remoteUrl;
+            return this;
+        }
+
+        /**
+         * Sets the username/password pair for HTTPS URLs or SSH with passwordl
+         */
+        public Builder credentialsProvider(CredentialsProvider credentialsProvider) {
+            this.credentialsProvider = credentialsProvider;
             return this;
         }
 
@@ -82,13 +92,13 @@ public class LocalGitRepo {
             TagPusher tagPusher;
 
             if (operationsAllowed.contains(GitOperations.PULL_TAGS)) {
-                tagFetcher = new RemoteTagFetcher(git, remoteGitUrl);
+                tagFetcher = new RemoteTagFetcher(git, remoteGitUrl, credentialsProvider);
             } else {
                 tagFetcher = new LocalTagFetcher(git);
             }
 
             if (operationsAllowed.contains(GitOperations.PUSH_TAGS)) {
-                tagPusher = new RemoteTagPusher(git, remoteGitUrl);
+                tagPusher = new RemoteTagPusher(git, remoteGitUrl, credentialsProvider);
             } else {
                 tagPusher = new LocalTagPusher(git);
             }
@@ -217,7 +227,7 @@ public class LocalGitRepo {
 
 interface TagFetcher {
 
-    public Collection<Ref> getTags() throws GitAPIException;
+    Collection<Ref> getTags() throws GitAPIException;
 
 }
 
@@ -225,15 +235,19 @@ class RemoteTagFetcher implements TagFetcher {
 
     private final Git git;
     private final String remoteUrl;
+    private final CredentialsProvider credentialsProvider;
 
-    public RemoteTagFetcher(Git git, String remoteUrl) {
+    public RemoteTagFetcher(Git git, String remoteUrl, CredentialsProvider credentialsProvider) {
         this.git = git;
         this.remoteUrl = remoteUrl;
+        this.credentialsProvider = credentialsProvider;
     }
 
     @Override
     public Collection<Ref> getTags() throws GitAPIException {
-        LsRemoteCommand lsRemoteCommand = git.lsRemote().setTags(true).setHeads(false);
+        LsRemoteCommand lsRemoteCommand = git.lsRemote()
+            .setTags(true).setHeads(false)
+            .setCredentialsProvider(credentialsProvider);
         if (remoteUrl != null) {
             lsRemoteCommand.setRemote(remoteUrl);
         }
@@ -260,7 +274,7 @@ class LocalTagFetcher implements TagFetcher {
 
 interface TagPusher {
 
-    public void pushTags(Collection<AnnotatedTag> tags) throws GitAPIException;
+    void pushTags(Collection<AnnotatedTag> tags) throws GitAPIException;
 
 }
 
@@ -268,15 +282,18 @@ class RemoteTagPusher implements TagPusher {
 
     private final Git git;
     private final String remoteUrl;
+    private final CredentialsProvider credentialsProvider;
 
-    public RemoteTagPusher(Git git, String remoteUrl) {
+    public RemoteTagPusher(Git git, String remoteUrl, CredentialsProvider credentialsProvider) {
         this.git = git;
         this.remoteUrl = remoteUrl;
+        this.credentialsProvider = credentialsProvider;
     }
 
     @Override
     public void pushTags(Collection<AnnotatedTag> tags) throws GitAPIException {
-        PushCommand pushCommand = git.push();
+        PushCommand pushCommand = git.push()
+            .setCredentialsProvider(credentialsProvider);
         if (remoteUrl != null) {
             pushCommand.setRemote(remoteUrl);
         }

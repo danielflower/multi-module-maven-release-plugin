@@ -63,6 +63,7 @@ public class ExecutionTest {
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1",
             "releaser:release", "-gs", globalSettings.getCanonicalPath());
         assertThat(consoleOutput, oneOf(containsString(echoPluginOutput)));
+        assertThat(consoleOutput, oneOf(containsString("value-from-settings-file")));
     }
 
 

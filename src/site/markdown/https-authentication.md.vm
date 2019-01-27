@@ -1,0 +1,37 @@
+## Velocity treats double hashes as comments, which messes with markdown files. So $H can be used instead.
+#set( $H = '#' )
+
+HTTPS authentication
+--------------------
+
+To work with HTTPS authentication, you need to create a server entry in your machine's maven config, and
+then refer to this in the plugin config in your pom.
+
+$H$H$H Add server section to your Maven settings
+
+Add a server section to your Maven settings (normally in `~/.m2/settings.xml`) like this
+(see <https://maven.apache.org/settings.html#Servers> for further information):
+
+	<settings>
+		<servers>
+			<server>
+				<id>my-server</id>
+				<username>your-username</username>
+				<password>your-password</password>
+			</server>
+		</servers>
+	</settings>
+
+For example, if using Github, the server ID could be `github` and the username and password would
+be your Github username and password.
+
+$H$H$H Configure the plugin
+
+Secondly, specify the `serverId` in the plugin configuration.
+
+	<plugin>
+		...
+		<configuration>
+			<serverId>my-server</serverId>
+		</configuration>
+	</plugin>
