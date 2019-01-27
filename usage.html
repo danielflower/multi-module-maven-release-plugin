@@ -62,6 +62,12 @@
                       <li>      <a href="FAQ.html"  title="FAQ">FAQ</a>
 </li>
                   
+                      <li>      <a href="ssh-authentication.html"  title="SSH Authentication">SSH Authentication</a>
+</li>
+                  
+                      <li>      <a href="https-authentication.html"  title="HTTPS Authentication">HTTPS Authentication</a>
+</li>
+                  
                       <li>      <a href="changelog.html"  title="Changelog">Changelog</a>
 </li>
                           </ul>
@@ -124,7 +130,7 @@
                 
                     
                   <li id="publishDate">Last Published: 2019-01-27</li>
-                  <li class="divider">|</li> <li id="projectVersion">Version: 3.0.1</li>
+                  <li class="divider">|</li> <li id="projectVersion">Version: 3.0.2</li>
                       
                 
                     
@@ -165,6 +171,20 @@
                           <a href="FAQ.html" title="FAQ">
           <i class="none"></i>
         FAQ</a>
+            </li>
+                  
+      <li>
+    
+                          <a href="ssh-authentication.html" title="SSH Authentication">
+          <i class="none"></i>
+        SSH Authentication</a>
+            </li>
+                  
+      <li>
+    
+                          <a href="https-authentication.html" title="HTTPS Authentication">
+          <i class="none"></i>
+        HTTPS Authentication</a>
             </li>
                   
       <li>
@@ -219,7 +239,7 @@
         &lt;plugin&gt;
             &lt;groupId&gt;com.github.danielflower.mavenplugins&lt;/groupId&gt;
             &lt;artifactId&gt;multi-module-maven-release-plugin&lt;/artifactId&gt;
-            &lt;version&gt;3.0.1&lt;/version&gt;
+            &lt;version&gt;3.0.2&lt;/version&gt;
             &lt;configuration&gt;
                 &lt;releaseGoals&gt;
                     &lt;releaseGoal&gt;deploy&lt;/releaseGoal&gt;
@@ -269,65 +289,8 @@
 <pre>mvn releaser:release -s /path/to/custom/user/settings.xml -gs /path/to/custom/global/settings.xml
 </pre></div></div></div>
 <div class="section">
-<h2><a name="SSH_authentication"></a>SSH authentication</h2>
-<p>Currently, only public key authentication is supported. By default, the plugin reads the private key from <tt>~/.ssh/id_rsa</tt>. If it&#x2019;s required to use a private key file from another location, you have two opportunities to achieve this:</p>
-<div class="section">
-<h3><a name="Add_server_section_to_your_Maven_settings"></a>Add server section to your Maven settings</h3>
-<p>This is the preferred way. Firstly, add a server section to your Maven settings like this (see <a class="externalLink" href="https://maven.apache.org/settings.html#Servers">https://maven.apache.org/settings.html#Servers</a> for further information):</p>
-
-<div class="source">
-<div class="source">
-<pre>&lt;settings&gt;
-    &lt;servers&gt;
-       &lt;server&gt;
-         &lt;id&gt;my-server&lt;/id&gt;
-         &lt;privateKey&gt;/path/to/your/private_key&lt;/privateKey&gt;
-         &lt;passphrase&gt;optional_passphrase&lt;/passphrase&gt; &lt;!-- This is optional --&gt;
-       &lt;/server&gt;
-    &lt;/servers&gt;
-&lt;/settings&gt;
-</pre></div></div>
-<p>If your key is password protected, specify the password within element <b>passphrase</b>. Tip: do <i>not confuse</i> this with element <b>password</b>.</p>
-<p>Secondly, specify the <tt>serverId</tt> in the plugin configuration</p>
-
-<div class="source">
-<div class="source">
-<pre>&lt;plugin&gt;
-    ...
-    &lt;configuration&gt;
-       &lt;serverId&gt;my-server&lt;/serverId&gt;
-    &lt;/configuration&gt;
-&lt;/plugin&gt;   
-</pre></div></div></div>
-<div class="section">
-<h3><a name="Specify_private_key_and_optional_passphrase_in_your_POM"></a>Specify private key and optional passphrase in your POM</h3>
-<p>This is the insecure way to specify your custom private key. Add following properties to your plugin configuration:</p>
-
-<div class="source">
-<div class="source">
-<pre>&lt;plugin&gt;
-    ...
-    &lt;configuration&gt;
-       &lt;privateKey&gt;/path/to/your/private_key&lt;/privateKey&gt;
-       &lt;passphrase&gt;optional_passphrase&lt;/passphrase&gt; &lt;!-- This is optional --&gt;
-    &lt;/configuration&gt;
-&lt;/plugin&gt;
-</pre></div></div>
-<p>Note: POM configuration has precedence over Maven settings.</p></div></div>
-<div class="section">
-<h2><a name="Custom_known_hosts"></a>Custom known_hosts</h2>
-<p>Per default, the plugin uses <tt>~/.ssh/known_hosts</tt>. You can override this with following property in your plugin configuration:</p>
-
-<div class="source">
-<div class="source">
-<pre>&lt;plugin&gt;
-    ...
-    &lt;configuration&gt;
-       &lt;knownHosts&gt;/path/to/your/known_hosts&lt;/knownHosts&gt;
-    &lt;/configuration&gt;
-&lt;/plugin&gt;
-</pre></div></div>
-<p>Note: Maven settings related to <tt>known_hosts</tt> will <i>not</i> be considered by the plugin.</p></div>
+<h2><a name="Authentication"></a>Authentication</h2>
+<p>Please see <a href="ssh-authentication.html">SSH Authentication</a> or <a href="https-authentication.html">HTTPS Authentication</a>.</p></div>
                   </div>
             </div>
           </div>

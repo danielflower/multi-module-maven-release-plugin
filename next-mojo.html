@@ -62,6 +62,12 @@
                       <li>      <a href="FAQ.html"  title="FAQ">FAQ</a>
 </li>
                   
+                      <li>      <a href="ssh-authentication.html"  title="SSH Authentication">SSH Authentication</a>
+</li>
+                  
+                      <li>      <a href="https-authentication.html"  title="HTTPS Authentication">HTTPS Authentication</a>
+</li>
+                  
                       <li>      <a href="changelog.html"  title="Changelog">Changelog</a>
 </li>
                           </ul>
@@ -124,7 +130,7 @@
                 
                     
                   <li id="publishDate">Last Published: 2019-01-27</li>
-                  <li class="divider">|</li> <li id="projectVersion">Version: 3.0.1</li>
+                  <li class="divider">|</li> <li id="projectVersion">Version: 3.0.2</li>
                       
                 
                     
@@ -167,6 +173,20 @@
                           <a href="FAQ.html" title="FAQ">
           <i class="none"></i>
         FAQ</a>
+            </li>
+                  
+      <li>
+    
+                          <a href="ssh-authentication.html" title="SSH Authentication">
+          <i class="none"></i>
+        SSH Authentication</a>
+            </li>
+                  
+      <li>
+    
+                          <a href="https-authentication.html" title="HTTPS Authentication">
+          <i class="none"></i>
+        HTTPS Authentication</a>
             </li>
                   
       <li>
@@ -217,7 +237,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>com.github.danielflower.mavenplugins:multi-module-maven-release-plugin:3.0.1:next</p>
+<p>com.github.danielflower.mavenplugins:multi-module-maven-release-plugin:3.0.2:next</p>
       
 <p><b>Description</b>:</p>
       
@@ -264,13 +284,13 @@ the next release. Does not run the build nor tag the repo.</div>
 <td>
 <p>Additional arguments to pass to Maven during a release.</p>
 
-<p>To pass multiple system properties with spaces from the command
-line, use <tt>-Darguments=&quot;-Dprop.1='prop 1 value'
+<p>To pass multiple system properties from the command line, use
+<tt>-Darguments=&quot;-Dprop.1=prop1value
 -Dprop.2=prop2value&quot;</tt></p>
 
 <p>To configure arguments in your pom, in the
 <tt>&lt;configuration&gt;</tt> node add:
-<tt>&lt;arguments&gt;-Dprop.1='prop 1 value'
+<tt>&lt;arguments&gt;'-Dprop.1=prop 1 value'
 -Dprop.2=prop2value&lt;/arguments&gt;</tt></p><br /><b>User property is</b>: <tt>arguments</tt>.</td>
           </tr>
           
@@ -365,8 +385,13 @@ Possible values: <tt>ReleaseAll</tt>, <tt>ReleaseNone</tt>,
             
 <td><tt>1.4.0</tt></td>
             
-<td>Specifies the passphrase to be used with the identityFile
-specified.<br /><b>User property is</b>: <tt>passphrase</tt>.</td>
+<td>
+<p>Specifies the passphrase to be used with the identityFile
+specified for SSH where the private key requires a pass phrase.</p>
+
+<p>To avoid specifying a passphrase in your pom, you could instead
+specify a <tt>server</tt> in your maven settings file and then
+set the <tt>serverId</tt> property.</p><br /><b>User property is</b>: <tt>passphrase</tt>.</td>
           </tr>
           
 <tr class="b">
@@ -377,7 +402,8 @@ specified.<br /><b>User property is</b>: <tt>passphrase</tt>.</td>
             
 <td><tt>1.4.0</tt></td>
             
-<td>Specifies the private key to be used.<br /><b>User property is</b>: <tt>privateKey</tt>.</td>
+<td>Specifies the private key to be used for SSH URLs. By default it
+will use <tt>~/.ssh/id_rsa</tt><br /><b>User property is</b>: <tt>privateKey</tt>.</td>
           </tr>
           
 <tr class="a">
@@ -401,8 +427,12 @@ instead. Make sure they are up to date to avoid problems.<br /><b>Default value 
             
 <td><tt>1.4.0</tt></td>
             
-<td>If set, the identityFile and passphrase will be read from the Maven
-settings file.<br /><b>User property is</b>: <tt>serverId</tt>.</td>
+<td>
+<p>If set, the identityFile and passphrase will be read from the
+Maven settings file.</p>
+
+<p>See <a class="externalLink" href="https://maven.apache.org/guides/mini/guide-deployment-security-settings.html">https://maven.apache.org/guides/mini/guide-deployment-security-settings.html</a>
+for more information on configuring servers in Maven.</p><br /><b>User property is</b>: <tt>serverId</tt>.</td>
           </tr>
           
 <tr class="a">
@@ -427,13 +457,13 @@ settings file.<br /><b>User property is</b>: <tt>serverId</tt>.</td>
 <div>
 <p>Additional arguments to pass to Maven during a release.</p>
 
-<p>To pass multiple system properties with spaces from the command
-line, use <tt>-Darguments=&quot;-Dprop.1='prop 1 value'
+<p>To pass multiple system properties from the command line, use
+<tt>-Darguments=&quot;-Dprop.1=prop1value
 -Dprop.2=prop2value&quot;</tt></p>
 
 <p>To configure arguments in your pom, in the
 <tt>&lt;configuration&gt;</tt> node add:
-<tt>&lt;arguments&gt;-Dprop.1='prop 1 value'
+<tt>&lt;arguments&gt;'-Dprop.1=prop 1 value'
 -Dprop.2=prop2value&lt;/arguments&gt;</tt></p></div>
         
 <ul>
@@ -551,8 +581,13 @@ Possible values: <tt>ReleaseAll</tt>, <tt>ReleaseNone</tt>,
         </ul><hr />
 <p><b><a name="passphrase">passphrase</a>:</b></p>
         
-<div>Specifies the passphrase to be used with the identityFile
-specified.</div>
+<div>
+<p>Specifies the passphrase to be used with the identityFile
+specified for SSH where the private key requires a pass phrase.</p>
+
+<p>To avoid specifying a passphrase in your pom, you could instead
+specify a <tt>server</tt> in your maven settings file and then
+set the <tt>serverId</tt> property.</p></div>
         
 <ul>
           
@@ -566,7 +601,8 @@ specified.</div>
         </ul><hr />
 <p><b><a name="privateKey">privateKey</a>:</b></p>
         
-<div>Specifies the private key to be used.</div>
+<div>Specifies the private key to be used for SSH URLs. By default it
+will use <tt>~/.ssh/id_rsa</tt></div>
         
 <ul>
           
@@ -598,8 +634,12 @@ instead. Make sure they are up to date to avoid problems.</div>
         </ul><hr />
 <p><b><a name="serverId">serverId</a>:</b></p>
         
-<div>If set, the identityFile and passphrase will be read from the Maven
-settings file.</div>
+<div>
+<p>If set, the identityFile and passphrase will be read from the
+Maven settings file.</p>
+
+<p>See <a class="externalLink" href="https://maven.apache.org/guides/mini/guide-deployment-security-settings.html">https://maven.apache.org/guides/mini/guide-deployment-security-settings.html</a>
+for more information on configuring servers in Maven.</p></div>
         
 <ul>
           
