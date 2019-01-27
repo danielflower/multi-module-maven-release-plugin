@@ -190,12 +190,11 @@ public abstract class BaseMojo extends AbstractMojo {
 		disableSshAgent = true;
 	}
 
-	protected CredentialsProvider getCredentialsProvider() throws ValidationException {
+	protected CredentialsProvider getCredentialsProvider(final Log log) throws ValidationException {
         if (serverId != null) {
             Server server = settings.getServer(serverId);
             if (server == null) {
-                throw new ValidationException("Could not find git credentials", asList("The serverId specified was "
-                    + serverId + " however no server with that ID could be found in the maven settings."));
+                log.warn(format("No server configuration in Maven settings found with id %s", serverId));
             }
             if (server.getUsername() != null && server.getPassword() != null) {
                 return new UsernamePasswordCredentialsProvider(server.getUsername(), server.getPassword());

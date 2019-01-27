@@ -119,7 +119,7 @@ public class ReleaseMojo extends BaseMojo {
                 .remoteGitOperationsAllowed(gitOperations)
                 .remoteGitUrl(getRemoteUrlOrNullIfNoneSet(project.getOriginalModel().getScm(),
                                                           project.getModel().getScm()))
-                .credentialsProvider(getCredentialsProvider())
+                .credentialsProvider(getCredentialsProvider(log))
                 .buildFromCurrentDir();
             repo.errorIfNotClean();
 
