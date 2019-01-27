@@ -152,6 +152,8 @@ public class ReleaseMojo extends BaseMojo {
             	invoker.setModulesToRelease(modulesToRelease);
             	invoker.setReleaseProfiles(releaseProfiles);
             	invoker.setSkipTests(skipTests);
+            	invoker.setArguments(arguments);
+
                 invoker.runMavenBuild(reactor);
                 revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
             } finally {

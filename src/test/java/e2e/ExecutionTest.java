@@ -39,6 +39,25 @@ public class ExecutionTest {
     }
 
     @Test
+    public void argumentsCanBePassed() throws Exception {
+        List<String> consoleOutput = testProject.mvn("-Darguments=\"-Dprop.1='prop 1 value' -Dprop.2=prop2value\"", "releaser:release", "-P runTestsProfile");
+        assertThat(consoleOutput, oneOf(containsString("this is a system property: prop 1 value and prop2value")));
+    }
+
+    @Test
+    public void envVarsAreInherited() throws Exception {
+        List<String> consoleOutput = testProject.mvn("releaser:release", "-P runTestsProfile");
+        assertThat(consoleOutput, oneOf(containsString("this is an env var: whatever")));
+    }
+
+    @Test
+    public void mvn_optionsEnvVarIsPassedToExecution() throws Exception {
+        testProject.setMvnOpts("-Dmvnopt=a-maven-option");
+        List<String> consoleOutput = testProject.mvn("releaser:release", "-P runTestsProfile");
+        assertThat(consoleOutput, oneOf(containsString("this is a property set via MAVEN_OPTS: a-maven-option")));
+    }
+
+    @Test
     public void userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters() throws Exception {
         File globalSettings = new File("test-projects/module-with-profiles/custom-settings.xml");
         List<String> consoleOutput = testProject.mvn("-DbuildNumber=1",

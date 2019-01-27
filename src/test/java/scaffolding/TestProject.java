@@ -44,6 +44,10 @@ public class TestProject {
         return mvnRunner.runMaven(localDir, arguments);
     }
 
+    public void setMvnOpts(String mavenOpts) {
+        mvnRunner.mavenOpts = mavenOpts;
+    }
+
     public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
         return mvnRun("releaser:release", buildNumber, arguments);
     }

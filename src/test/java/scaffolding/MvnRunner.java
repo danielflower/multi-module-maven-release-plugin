@@ -21,6 +21,7 @@ public class MvnRunner {
     private static boolean haveInstalledPlugin = false;
     private final File mvnHome;
     public boolean logToStandardOut = false;
+    public String mavenOpts;
 
     public MvnRunner() {
         this(null);
@@ -43,7 +44,7 @@ public class MvnRunner {
         return new MvnRunner(mvnHome);
     }
 
-    public static void installReleasePluginToLocalRepo() throws MavenInvocationException {
+    public static void installReleasePluginToLocalRepo() {
         if (haveInstalledPlugin) {
             return;
         }
@@ -60,6 +61,8 @@ public class MvnRunner {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
+        request.setMavenOpts(mavenOpts);
+        request.addShellEnvironment("EXECUTION_TEST", "whatever");
 
         Invoker invoker = new DefaultInvoker();
 

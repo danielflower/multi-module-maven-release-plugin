@@ -73,7 +73,11 @@
                         <version>1.0.0</version>
                         <inherited>false</inherited>
                         <configuration>
-                            <message>echo-maven-plugin running because profileActivatedByReleasePlugin is activated - ${settings.file.is.activated}</message>
+                            <message>echo-maven-plugin running because profileActivatedByReleasePlugin is activated
+                                - ${settings.file.is.activated} and this is a system property: ${prop.1} and ${prop.2}
+                                - this is an env var: ${env.EXECUTION_TEST}
+                                - this is a property set via MAVEN_OPTS: ${mvnopt}
+                            </message>
                         </configuration>
                         <executions>
                             <execution>

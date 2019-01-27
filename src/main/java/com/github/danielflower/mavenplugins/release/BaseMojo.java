@@ -146,6 +146,16 @@ public abstract class BaseMojo extends AbstractMojo {
     @Parameter(alias = "pullTags", property = "pull", defaultValue = "true")
     protected boolean pullTags;
 
+    /**
+     * <p>Additional arguments to pass to Maven during a release.</p>
+     * <p>To pass multiple system properties with spaces from the command line,
+     * use <code>-Darguments="-Dprop.1='prop 1 value' -Dprop.2=prop2value"</code></p>
+     * <p>To configure arguments in your pom, in the <code>&lt;configuration&gt;</code> node add:
+     * <code>&lt;arguments&gt;-Dprop.1='prop 1 value' -Dprop.2=prop2value&lt;/arguments&gt;</code></p>
+     */
+    @Parameter(property = "arguments")
+    public String arguments;
+
     final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}

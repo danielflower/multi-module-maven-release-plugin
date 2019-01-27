@@ -32,6 +32,7 @@ class ReleaseInvoker {
 	private List<String> goals;
 	private List<String> modulesToRelease;
 	private List<String> releaseProfiles;
+	private String arguments;
 
 	public ReleaseInvoker(final Log log, final MavenProject project) {
 		this(log, project, new DefaultInvocationRequest(), new DefaultInvoker());
@@ -47,7 +48,7 @@ class ReleaseInvoker {
 
 	private List<String> getGoals() {
 		if (goals == null || goals.isEmpty()) {
-			goals = new ArrayList<String>();
+			goals = new ArrayList<>();
 			goals.add(DEPLOY);
 		}
 		return goals;
@@ -90,7 +91,11 @@ class ReleaseInvoker {
 		request.setShowErrors(true);
 		request.setDebug(log.isDebugEnabled());
 
+
 		final List<String> goals = getGoals();
+        if (arguments != null) {
+            goals.add(arguments);
+        }
 		if (skipTests) {
 			goals.add(SKIP_TESTS);
 		}
@@ -130,13 +135,19 @@ class ReleaseInvoker {
 	private List<String> profilesToActivate() {
 		final List<String> profiles = new ArrayList<String>();
 		if (getReleaseProfilesOrNull() != null) {
-			for (final String releaseProfile : getReleaseProfilesOrNull()) {
-				profiles.add(releaseProfile);
-			}
+            profiles.addAll(getReleaseProfilesOrNull());
 		}
 		for (final Object activatedProfile : project.getActiveProfiles()) {
 			profiles.add(((org.apache.maven.model.Profile) activatedProfile).getId());
 		}
 		return profiles;
 	}
+
+    public String getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(String arguments) {
+        this.arguments = arguments;
+    }
 }
