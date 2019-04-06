@@ -87,7 +87,7 @@ class ReleaseInvoker {
 	}
 
 	public final void runMavenBuild(final Reactor reactor) throws MojoExecutionException {
-		request.setInteractive(false);
+	    request.setBatchMode(true);
 		request.setShowErrors(true);
 		request.setDebug(log.isDebugEnabled());
 

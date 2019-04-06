@@ -4,9 +4,14 @@ import com.github.danielflower.mavenplugins.release.GitHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
+
+import java.util.List;
+
+import static org.eclipse.jgit.lib.Constants.R_TAGS;
 
 public class GitMatchers {
 
@@ -17,7 +22,7 @@ public class GitMatchers {
                 try {
                     mismatchDescription.appendValueList("a git repo with tags: ", ", ", "", repo.getRepository().getTags().keySet());
                     return GitHelper.hasLocalTag(repo, tag);
-                } catch (GitAPIException e) {
+                } catch (Exception e) {
                     throw new RuntimeException("Couldn't access repo", e);
                 }
             }

@@ -25,7 +25,7 @@ public class TreeWalkingDiffDetector implements DiffDetector {
         RevWalk walk = new RevWalk(repo);
         try {
             walk.setRetainBody(false);
-            walk.markStart(walk.parseCommit(repo.getRef("HEAD").getObjectId()));
+            walk.markStart(walk.parseCommit(repo.getRefDatabase().findRef("HEAD").getObjectId()));
             filterOutOtherModulesChanges(modulePath, childModules, walk);
             stopWalkingWhenTheTagsAreHit(tags, walk);
             return walk.iterator().hasNext();
@@ -45,7 +45,7 @@ public class TreeWalkingDiffDetector implements DiffDetector {
     private void filterOutOtherModulesChanges(String modulePath, List<String> childModules, RevWalk walk) {
         boolean isRootModule = ".".equals(modulePath);
         boolean isMultiModuleProject = !isRootModule || !childModules.isEmpty();
-        List<TreeFilter> treeFilters = new ArrayList<TreeFilter>();
+        List<TreeFilter> treeFilters = new ArrayList<>();
         treeFilters.add(TreeFilter.ANY_DIFF);
         if (isMultiModuleProject) {
             if (!isRootModule) {

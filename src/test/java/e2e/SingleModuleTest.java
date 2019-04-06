@@ -97,7 +97,7 @@ public class SingleModuleTest {
     }
 
     private ObjectId head(Git git) throws IOException {
-        return git.getRepository().getRef("HEAD").getObjectId();
+        return git.getRepository().getRefDatabase().findRef("HEAD").getObjectId();
     }
 
     @Test

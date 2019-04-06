@@ -70,7 +70,7 @@ public class ReleaseInvokerTest {
 	@Test
 	public void runMavenBuild_BaseTest() throws Exception {
 		releaseInvoker.runMavenBuild(reactor);
-		verify(request).setInteractive(false);
+		verify(request).setBatchMode(true);
 		verify(request).setShowErrors(true);
 		verify(request).setDebug(true);
 		verify(log).isDebugEnabled();

@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+### 3.1.0
+
+* Updated JGit to 5.3.0
+* If run with `-X` (debug mode) the release invocation will write debug logs too.
+
 ### 3.0.0
 
 * Update JGit to 4.7.0 to ensure changed files are detected for projects

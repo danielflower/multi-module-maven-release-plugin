@@ -59,6 +59,7 @@ public class MvnRunner {
 
     public List<String> runMaven(File workingDir, String... arguments) {
         InvocationRequest request = new DefaultInvocationRequest();
+        request.setBatchMode(true);
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
         request.setMavenOpts(mavenOpts);
@@ -93,6 +94,7 @@ public class MvnRunner {
         File temp = new File("target/downloads/" + UUID.randomUUID());
 
         InvocationRequest request = new DefaultInvocationRequest();
+        request.setBatchMode(true);
         request.setGoals(Collections.singletonList("org.apache.maven.plugins:maven-dependency-plugin:2.8:copy"));
 
         Properties props = new Properties();
