@@ -1,22 +1,18 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static java.lang.String.format;
-
-import org.apache.maven.plugin.logging.Log;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
-import org.eclipse.jgit.transport.OpenSshConfig;
-import org.eclipse.jgit.util.FS;
-
-import com.jcraft.jsch.IdentityRepository;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import com.jcraft.jsch.agentproxy.AgentProxyException;
 import com.jcraft.jsch.agentproxy.Connector;
 import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 import com.jcraft.jsch.agentproxy.USocketFactory;
 import com.jcraft.jsch.agentproxy.connector.SSHAgentConnector;
 import com.jcraft.jsch.agentproxy.usocket.NCUSocketFactory;
+import org.apache.maven.plugin.logging.Log;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.OpenSshConfig;
+import org.eclipse.jgit.util.FS;
+
+import static java.lang.String.format;
 
 /**
  * SSH-Agent enabler.
@@ -103,6 +99,41 @@ public class SshAgentSessionFactory extends JschConfigSessionFactory {
 			jsch.addIdentity(identityFile, passphraseOrNull);
 			log.debug(format("Jsch configured to use identity file %s", identityFile));
 		}
+		JSch.setLogger(new Logger() {
+            @Override
+            public boolean isEnabled(int level) {
+                switch (level) {
+                    case Logger.DEBUG:
+                        return log.isDebugEnabled();
+                    case Logger.INFO:
+                        return log.isInfoEnabled();
+                    case Logger.WARN:
+                        return log.isWarnEnabled();
+                    case Logger.FATAL:
+                    case Logger.ERROR:
+                        return log.isErrorEnabled();
+                }
+                return false;
+            }
+
+            @Override
+            public void log(int level, String message) {
+                switch (level) {
+                    case Logger.WARN:
+                        log.warn(message);
+                        break;
+                    case Logger.FATAL:
+                    case Logger.ERROR:
+                        log.error(message);
+                        break;
+                    case Logger.INFO: // send to debug as it is so verbose
+                    case Logger.DEBUG:
+                    default:
+                        log.debug(message);
+                        break;
+                }
+            }
+        });
 
 		return jsch;
 	}

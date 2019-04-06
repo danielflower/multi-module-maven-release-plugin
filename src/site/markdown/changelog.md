@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-### 3.1.0
+### 3.1.1
 
 * Updated JGit to 5.3.0
 * If run with `-X` (debug mode) the release invocation will write debug logs too.
