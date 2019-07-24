@@ -64,4 +64,7 @@ public class VersionNamer {
         return max + 1;
     }
 
+    String getDelimiter() {
+        return delimiter;
+    }
 }

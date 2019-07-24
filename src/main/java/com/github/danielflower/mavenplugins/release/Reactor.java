@@ -1,6 +1,5 @@
 package com.github.danielflower.mavenplugins.release;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -35,11 +34,12 @@ public class Reactor {
 
         resolveVersionsDefinedThroughProperties(projects);
 
+        AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(versionNamer);
         for (MavenProject project : projects) {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();
             String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-            List<AnnotatedTag> previousTagsForThisModule = AnnotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
+            List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
 
 
             Collection<Long> previousBuildNumbers = new ArrayList<Long>();
@@ -49,7 +49,7 @@ public class Reactor {
                 }
             }
 
-            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber);
+            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber, versionNamer);
             previousBuildNumbers.addAll(remoteBuildNumbers);
 
             VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
@@ -96,7 +96,7 @@ public class Reactor {
             } else {
                 AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-                    equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + "." + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+                    equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + versionNamer.getDelimiter() + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     // attempt to resolve
                     if (resolverWrapper.isResolvable(project.getGroupId(), project.getArtifactId(), equivalentVersion, project.getPackaging(), log)) {
                         log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
@@ -145,13 +145,14 @@ public class Reactor {
         return modelId[0].equals(module.getGroupId()) && modelId[1].equals(module.getArtifactId());
     }
 
-    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber) throws GitAPIException {
+    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber, VersionNamer versionNamer) throws GitAPIException {
         Collection<Ref> remoteTagRefs = gitRepo.allTags();
         Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
+        AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(versionNamer);
         for (Ref remoteTagRef : remoteTagRefs) {
             String remoteTagName = remoteTagRef.getName();
-            Long buildNumber = AnnotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
+            Long buildNumber = annotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
             if (buildNumber != null) {
                 remoteBuildNumbers.add(buildNumber);
             }

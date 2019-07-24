@@ -13,7 +13,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class VersionNamerTest {
 
-    final VersionNamer namer = new VersionNamer();
+    private final VersionNamer namer = new VersionNamer();
 
     @Test
     public void removesTheSnapshotAndSticksTheBuildNumberOnTheEnd() throws Exception {
@@ -43,6 +43,13 @@ public class VersionNamerTest {
     @Test
     public void addsTheBuildWithADash() throws Exception {
         assertThat(new VersionNamer("-").name("1.0.0-SNAPSHOT", 123L, null).releaseVersion(), is(equalTo("1.0.0-123")));
+    }
+
+    @Test
+    public void getterReturnsDefinedOrDefaultDelimiter() {
+        assertThat(new VersionNamer("-").getDelimiter(), is("-"));
+        assertThat(new VersionNamer("@").getDelimiter(), is("@"));
+        assertThat(new VersionNamer().getDelimiter(), is("."));
     }
 
     private List<String> errorMessageOf(String pomVersion, long buildNumber) {
