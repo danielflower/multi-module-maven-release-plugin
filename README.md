@@ -2,17 +2,18 @@ Documentation, download, and usage instructions
 ===============================================
 
 Full usage details, FAQs, background and more are available on the
-**[project documention website](http://danielflower.github.io/multi-module-maven-release-plugin/index.html)**.
+**[project documentation website](http://danielflower.github.io/multi-module-maven-release-plugin/index.html)**.
 
 Development
 ===========
 
-[![Build Status](https://travis-ci.org/danielflower/multi-module-maven-release-plugin.svg?branch=master)](https://travis-ci.org/danielflower/multi-module-maven-release-plugin)
+[![Build Status](https://travis-ci.org/danielflower/multi-module-maven-release-plugin.svg?branch=master)](https://travis-ci.org/danielflower/multi-module-maven-release-plugin) ![Maven Central](https://img.shields.io/maven-central/v/com.github.danielflower.mavenplugins/multi-module-maven-release-plugin.svg)
+
 
 Contributing
 ------------
 
-To build and run the tests, you need Java 6 or later and Maven 3 or later. Simply clone and run `mvn install`
+To build and run the tests, you need Java 8 or later and Maven 3 or later. Simply clone and run `mvn install`
 
 Note that the tests run the plugin against a number of sample test projects, located in the `test-projects` folder.
 If adding new functionality, or fixing a bug, it is recommended that a sample project be set up so that the scenario
