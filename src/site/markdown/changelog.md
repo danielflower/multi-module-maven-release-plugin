@@ -5,6 +5,7 @@ Changelog
 
 * Added support for processing version properties e.g. `<version>${foo.version}</version>`
 * Added support for processing dependencies in `<dependencyManagement>` sections e.g. for BOMs
+* Fix bugs with custom delimiters (joins build number to version)  
 
 ### 3.1.2
 

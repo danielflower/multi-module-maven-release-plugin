@@ -11,9 +11,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AnnotatedTagFinder {
+class AnnotatedTagFinder {
+    private VersionNamer versionNamer;
 
-    public static List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber) throws MojoExecutionException {
+    AnnotatedTagFinder(VersionNamer versionNamer) {
+        this.versionNamer = versionNamer;
+    }
+
+    List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber) throws MojoExecutionException {
         ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
         List<Ref> tags;
         try {
@@ -37,13 +42,13 @@ public class AnnotatedTagFinder {
         return results;
     }
 
-    public static boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
+    boolean isPotentiallySameVersionIgnoringBuildNumber(String versionWithoutBuildNumber, String refName) {
         return buildNumberOf(versionWithoutBuildNumber, refName) != null;
     }
 
-    public static Long buildNumberOf(String versionWithoutBuildNumber, String refName) {
+    Long buildNumberOf(String versionWithoutBuildNumber, String refName) {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
-        String prefix = versionWithoutBuildNumber + ".";
+        String prefix = versionWithoutBuildNumber + versionNamer.getDelimiter();
         if (tagName.startsWith(prefix)) {
             String end = tagName.substring(prefix.length());
             try {
