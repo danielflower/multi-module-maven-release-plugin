@@ -58,12 +58,19 @@ public class MvnRunner {
     }
 
     public List<String> runMaven(File workingDir, String... arguments) {
+        return runMavenInternal(workingDir, null, arguments);
+    }
+
+    private List<String> runMavenInternal(File workingDir, String profile, String[] arguments) {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setBatchMode(true);
         request.setGoals(asList(arguments));
         request.setBaseDirectory(workingDir);
         request.setMavenOpts(mavenOpts);
         request.addShellEnvironment("EXECUTION_TEST", "whatever");
+        if (profile != null) {
+            request.setProfiles(Collections.singletonList(profile));
+        }
 
         Invoker invoker = new DefaultInvoker();
 

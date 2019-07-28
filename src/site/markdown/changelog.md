@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+### 3.2.0
+
+* Added support for processing version properties e.g. `<version>${foo.version}</version>`
+* Added support for processing dependencies in `<dependencyManagement>` sections e.g. for BOMs
+
 ### 3.1.2
 
 * Updated JGit to 5.3.0

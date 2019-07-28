@@ -6,7 +6,7 @@
 
     <groupId>com.github.danielflower.mavenplugins</groupId>
     <artifactId>multi-module-maven-release-plugin</artifactId>
-    <version>3.1-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
+    <version>3.2.0-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
   
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
@@ -22,7 +22,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.global.server>github</github.global.server>
         <jsch.agentproxy.version>0.0.9</jsch.agentproxy.version>
-        <maven.model.version>2.2.1</maven.model.version>
+        <maven.artifact.version>2.2.1</maven.artifact.version>
+        <maven.plugin.api.version>2.2.1</maven.plugin.api.version>
+        <maven.project.version>2.2.1</maven.project.version>
+        <maven.model.version>3.3.9</maven.model.version>
+        <maven.settings.version>2.2.1</maven.settings.version>
     </properties>
 
     <ciManagement>
@@ -82,7 +86,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>${maven.model.version}</version>
+            <version>${maven.plugin.api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -92,17 +96,17 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
-            <version>${maven.model.version}</version>
+            <version>${maven.project.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.maven</groupId>
           <artifactId>maven-settings</artifactId>
-          <version>${maven.model.version}</version>
+          <version>${maven.settings.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>${maven.model.version}</version>
+            <version>${maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
