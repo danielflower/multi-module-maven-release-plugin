@@ -46,18 +46,12 @@ class AnnotatedTagFinder {
         return buildNumberOf(versionWithoutBuildNumber, refName) != null;
     }
 
-    Long buildNumberOf(String versionWithoutBuildNumber, String refName) {
+    String buildNumberOf(String versionWithoutBuildNumber, String refName) {
         String tagName = AnnotatedTag.stripRefPrefix(refName);
         String prefix = versionWithoutBuildNumber + versionNamer.getDelimiter();
         if (tagName.startsWith(prefix)) {
-            String end = tagName.substring(prefix.length());
-            try {
-                return Long.parseLong(end);
-            } catch (NumberFormatException e) {
-                return null;
-            }
+            return tagName.substring(prefix.length());
         }
         return null;
     }
-
 }

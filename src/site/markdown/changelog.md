@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+### 3.3.0
+
+* Allow build numbers to be arbitrary strings or null, #75
+
 ### 3.2.0
 
 * Added support for processing version properties e.g. `<version>${foo.version}</version>`

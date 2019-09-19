@@ -1,11 +1,13 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -43,16 +45,37 @@ public abstract class BaseMojo extends AbstractMojo {
 	 * </p>
 	 * <p>
 	 * By default, the plugin will automatically find a suitable build number.
-	 * It will start at version 0 and increment this with each release.
+	 * It will start at 0 and increment this with each release.
 	 * </p>
 	 * <p>
-	 * This can be specified using a command line parameter ("-DbuildNumber=2")
-	 * or in this plugin's configuration.
+	 * This can be specified using a command line parameter (e.g.
+     * <code>-DbuildNumber=2</code>) or in this plugin's configuration.
 	 * </p>
+     * <p>
+     * <strong>null vs. ""</strong>: if you do not define the build number it
+     * is treated as <code>null</code> and the plugin will start at 0. If you
+     * pass an empty string both the build number and the delimiter that
+     * precedes it will be omitted.<br>To define an empty string on the CLI use
+     * <code>-DbuildNumber=''</code>. For the same effect in the POM you can
+     * use <code>&lt;buildNumber&gt;""&lt;/buildNumber&gt;</code> as Maven does
+     * not support empty strings for configuration properties. The plugin will
+     * convert this accordingly.
+     * </p>
 	 */
+	// Maven has historically never supported empty strings in XML plugin configuration (see
+    // http://mail-archives.apache.org/mod_mbox/maven-users/200708.mbox/%3C5a2cf1f60708090246l216f156esf46cc1e968b37ccd@mail.gmail.com%3E
+    // from 2007). Hence, if a project defines <buildNumber></buildNumber> the property here will be null. However,
+    // Maven does support -DbuildNumber='' on the CLI.
 	@Parameter(property = "buildNumber")
-	protected Long buildNumber;
+	protected String buildNumber;
 
+    public void setBuildNumber(String buildNumber) {
+        if ("\"\"".equals(buildNumber)) {
+            this.buildNumber = StringUtils.EMPTY;
+        } else {
+            this.buildNumber = buildNumber;
+        }
+    }
 
     /**
      * <p>
@@ -252,5 +275,4 @@ public abstract class BaseMojo extends AbstractMojo {
         }
         return GitHelper.scmUrlToRemote(remote);
     }
-
 }
