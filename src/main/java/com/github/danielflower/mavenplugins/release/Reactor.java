@@ -28,7 +28,7 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, String buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
 
@@ -42,14 +42,14 @@ public class Reactor {
             List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
 
 
-            Collection<Long> previousBuildNumbers = new ArrayList<Long>();
+            Collection<String> previousBuildNumbers = new ArrayList<>();
             if (previousTagsForThisModule != null) {
                 for (AnnotatedTag previousTag : previousTagsForThisModule) {
                     previousBuildNumbers.add(previousTag.buildNumber());
                 }
             }
 
-            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber, versionNamer);
+            Collection<String> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber, versionNamer);
             previousBuildNumbers.addAll(remoteBuildNumbers);
 
             VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
@@ -145,14 +145,14 @@ public class Reactor {
         return modelId[0].equals(module.getGroupId()) && modelId[1].equals(module.getArtifactId());
     }
 
-    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber, VersionNamer versionNamer) throws GitAPIException {
+    private static Collection<String> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber, VersionNamer versionNamer) throws GitAPIException {
         Collection<Ref> remoteTagRefs = gitRepo.allTags();
-        Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
+        Collection<String> remoteBuildNumbers = new ArrayList<>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
         AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(versionNamer);
         for (Ref remoteTagRef : remoteTagRefs) {
             String remoteTagName = remoteTagRef.getName();
-            Long buildNumber = annotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
+            String buildNumber = annotatedTagFinder.buildNumberOf(tagWithoutBuildNumber, remoteTagName);
             if (buildNumber != null) {
                 remoteBuildNumbers.add(buildNumber);
             }
@@ -190,20 +190,27 @@ public class Reactor {
         try {
             if (previousTagsForThisModule.size() == 0) return null;
             boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(), previousTagsForThisModule);
-            return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
+            return hasChanged ? null : findTagWithHighestBuildNumber(previousTagsForThisModule);
         } catch (Exception e) {
             throw new MojoExecutionException("Error while detecting whether or not " + project.getArtifactId() + " has changed since the last release", e);
         }
     }
 
-    private static AnnotatedTag tagWithHighestBuildNumber(List<AnnotatedTag> tags) {
-        AnnotatedTag cur = null;
+    // Ignores any tags with non-numeric build numbers and finds the one with the largest build number among the others.
+    // The tags are guaranteed to be for the same /business version/ i.e. it's likely a small list.
+    private static AnnotatedTag findTagWithHighestBuildNumber(List<AnnotatedTag> tags) {
+        AnnotatedTag tagWithHighestBuildNumber = null;
         for (AnnotatedTag tag : tags) {
-            if (cur == null || tag.buildNumber() > cur.buildNumber()) {
-                cur = tag;
+            try {
+                if (tagWithHighestBuildNumber == null ||
+                    Long.parseLong(tag.buildNumber()) > Long.parseLong(tagWithHighestBuildNumber.buildNumber())) {
+                    tagWithHighestBuildNumber = tag;
+                }
+            } catch (NumberFormatException e) {
+                // non-numeric build numbers are not unexpected
             }
         }
-        return cur;
+        return tagWithHighestBuildNumber;
     }
 
     public ReleasableModule findByLabel(String label) {

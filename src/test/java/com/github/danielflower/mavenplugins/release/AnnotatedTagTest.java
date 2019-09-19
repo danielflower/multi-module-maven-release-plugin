@@ -12,25 +12,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AnnotatedTagTest {
     @Test
-    public void gettersReturnValuesPassedIn() throws Exception {
+    public void gettersReturnValuesPassedIn() {
         // yep, testing getters... but only because it isn't a simple POJO
-        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", 2134);
+        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", "2134");
         assertThat(tag.name(), equalTo("my-name"));
         assertThat(tag.version(), equalTo("the-version"));
-        assertThat(tag.buildNumber(), equalTo(2134L));
+        assertThat(tag.buildNumber(), equalTo("2134"));
     }
 
     @Test
     public void aTagCanBeCreatedFromAGitTag() throws GitAPIException, IOException {
         TestProject project = TestProject.singleModuleProject();
-        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", 2134);
+        AnnotatedTag tag = AnnotatedTag.create("my-name", "the-version", "2134");
         tag.saveAtHEAD(project.local);
 
         Ref ref = project.local.tagList().call().get(0);
         AnnotatedTag inflatedTag = AnnotatedTag.fromRef(project.local.getRepository(), ref);
         assertThat(inflatedTag.name(), equalTo("my-name"));
         assertThat(inflatedTag.version(), equalTo("the-version"));
-        assertThat(inflatedTag.buildNumber(), equalTo(2134L));
+        assertThat(inflatedTag.buildNumber(), equalTo("2134"));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class AnnotatedTagTest {
         AnnotatedTag inflatedTag = AnnotatedTag.fromRef(project.local.getRepository(), ref);
         assertThat(inflatedTag.name(), equalTo("my-name-1.0.2"));
         assertThat(inflatedTag.version(), equalTo("0"));
-        assertThat(inflatedTag.buildNumber(), equalTo(0L));
+        assertThat(inflatedTag.buildNumber(), equalTo("0"));
     }
 
 }

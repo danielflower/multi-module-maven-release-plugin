@@ -20,18 +20,18 @@ public class ReleasableModuleTest {
     }
 
     @Test
-    public void aReleaseableModuleCanBeCreatedFromAnUnreleasableOne() {
+    public void aReleasableModuleCanBeCreatedFromAnUnreleasableOne() {
         MavenProject project = new MavenProject();
         project.setArtifactId("some-arty");
         project.setGroupId("some-group");
         ReleasableModule first = new ReleasableModule(
-            project, new VersionName("1.2.3-SNAPSHOT", "1.2.3", 12), "1.2.3.11", "somewhere"
+            project, new VersionName("1.2.3-SNAPSHOT", "1.2.3", "12"), "1.2.3.11", "somewhere"
         );
         assertThat(first.willBeReleased(), is(false));
 
         ReleasableModule changed = first.createReleasableVersion();
         assertThat(changed.getArtifactId(), equalTo("some-arty"));
-        assertThat(changed.getBuildNumber(), equalTo(12L));
+        assertThat(changed.getBuildNumber(), equalTo("12"));
         assertThat(changed.getGroupId(), equalTo("some-group"));
         assertThat(changed.getNewVersion(), equalTo("1.2.3.12"));
         assertThat(changed.getProject(), is(project));

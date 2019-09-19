@@ -18,9 +18,9 @@ public class DiffDetectorTest {
     public void canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag() throws Exception {
         TestProject project = TestProject.independentVersionsProject();
 
-        AnnotatedTag tag1 = saveFileInModule(project, "console-app", "1.2", 3);
-        AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2", 0);
-        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
+        AnnotatedTag tag1 = saveFileInModule(project, "console-app", "1.2", "3");
+        AnnotatedTag tag2 = saveFileInModule(project, "core-utils", "2", "0");
+        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", "4");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
 
@@ -32,12 +32,12 @@ public class DiffDetectorTest {
     @Test
     public void canDetectThingsInTheRoot() throws IOException, GitAPIException {
         TestProject simple = TestProject.singleModuleProject();
-        AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0", 1);
+        AnnotatedTag tag1 = saveFileInModule(simple, ".", "1.0", "1");
         simple.commitRandomFile(".");
         DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
         assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(true));
 
-        AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0", 2);
+        AnnotatedTag tag2 = saveFileInModule(simple, ".", "1.0", "2");
         assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag2)), is(false));
     }
 
@@ -45,9 +45,9 @@ public class DiffDetectorTest {
     public void canDetectChangesAfterTheLastTag() throws IOException, GitAPIException {
         TestProject project = TestProject.independentVersionsProject();
 
-        saveFileInModule(project, "console-app", "1.2", 3);
-        saveFileInModule(project, "core-utils", "2", 0);
-        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", 4);
+        saveFileInModule(project, "console-app", "1.2", "3");
+        saveFileInModule(project, "core-utils", "2", "0");
+        AnnotatedTag tag3 = saveFileInModule(project, "console-app", "1.2", "4");
         project.commitRandomFile("console-app");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
@@ -58,7 +58,7 @@ public class DiffDetectorTest {
     public void canIgnoreChangesInModuleFolders() throws IOException, GitAPIException {
         TestProject project = TestProject.nestedProject();
 
-        AnnotatedTag tag1 = saveFileInModule(project, "server-modules", "1.0.2.4", 0);
+        AnnotatedTag tag1 = saveFileInModule(project, "server-modules", "1.0.2.4", "0");
         project.commitRandomFile("server-modules/server-module-a");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
@@ -70,7 +70,7 @@ public class DiffDetectorTest {
     public void canDetectLocalChangesWithModuleFolders() throws IOException, GitAPIException {
         TestProject project = TestProject.nestedProject();
 
-        AnnotatedTag tag1 = saveFileInModule(project, "server-modules", "1.0.2.4", 0);
+        AnnotatedTag tag1 = saveFileInModule(project, "server-modules", "1.0.2.4", "0");
         project.commitRandomFile("server-modules");
 
         DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
