@@ -4,7 +4,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
+import org.eclipse.jgit.api.errors.AbortedByHookException;
+import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.NoMessageException;
+import org.eclipse.jgit.api.errors.ServiceUnavailableException;
+import org.eclipse.jgit.api.errors.UnmergedPathsException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -19,7 +27,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "3.6-SNAPSHOT";
+    private static final String PLUGIN_VERSION_FOR_TESTS = "3.7-SNAPSHOT";
 
     public final File originDir;
     public final Git origin;
@@ -63,11 +71,18 @@ public class TestProject {
     }
 
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+        String filenameAndPostfix = UUID.randomUUID() + ".txt";
+        return commitFile(module, filenameAndPostfix);
+    }
+
+    public TestProject commitFile(String module, String filenameAndPostfix) throws IOException, GitAPIException,
+            NoFilepatternException, AbortedByHookException, ConcurrentRefUpdateException, NoHeadException,
+            NoMessageException, ServiceUnavailableException, UnmergedPathsException, WrongRepositoryStateException {
         File moduleDir = new File(localDir, module);
         if (!moduleDir.isDirectory()) {
             throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
         }
-        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
+        File random = new File(moduleDir, filenameAndPostfix);
         random.createNewFile();
         String modulePath = module.equals(".") ? "" : module + "/";
         local.add().addFilepattern(modulePath + random.getName()).call();
@@ -186,7 +201,7 @@ public class TestProject {
     }
 
     public static TestProject dependencyManagementUsingParentModuleVersionPropertyProject() {
-	    return project("dependencymanagement-using-parent-module-version-property");
+        return project("dependencymanagement-using-parent-module-version-property");
     }
 
     public static TestProject moduleWithTestFailure() {

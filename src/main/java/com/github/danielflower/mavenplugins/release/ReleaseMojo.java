@@ -69,27 +69,27 @@ public class ReleaseMojo extends BaseMojo {
      */
     @Parameter(alias = "skipTests", defaultValue = "false", property = "skipTests")
     private boolean skipTests;
-    
-	/**
-	 * Specifies a custom, user specific Maven settings file to be used during the release build.
+
+    /**
+     * Specifies a custom, user specific Maven settings file to be used during the release build.
      *
      * @deprecated In versions prior to 2.1, if the plugin was run with custom user settings the settings were ignored
      * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
      * Please use the '-s' command line parameter to set custom user settings.
-	 */
-	@Parameter(alias = "userSettings")
-	private File userSettings;
+     */
+    @Parameter(alias = "userSettings")
+    private File userSettings;
 
-	/**
-	 * Specifies a custom, global Maven settings file to be used during the release build.
+    /**
+     * Specifies a custom, global Maven settings file to be used during the release build.
      *
      * @deprecated In versions prior to 2.1, if the plugin was run with custom global settings the settings were ignored
      * during the release phase. Now that custom settings are inherited, setting this value is no longer needed.
      * Please use the '-gs' command line parameter to set custom global settings.
      */
-	@Parameter(alias = "globalSettings")
-	private File globalSettings;
-        
+    @Parameter(alias = "globalSettings")
+    private File globalSettings;
+
     /**
      * Push tags to remote repository as they are created.
      */
@@ -159,7 +159,7 @@ public class ReleaseMojo extends BaseMojo {
             repo.errorIfNotClean(ignoredUntrackedPaths);
 
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer);
+            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer, ignoredPaths);
             if (reactor == null) {
                 return;
             }
@@ -180,8 +180,8 @@ public class ReleaseMojo extends BaseMojo {
             tagAndPushRepo(log, repo, proposedTags);
 
             try {
-            	final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
-            	invoker.setGlobalSettings(globalSettings);
+                final ReleaseInvoker invoker = new ReleaseInvoker(getLog(), project);
+                invoker.setGlobalSettings(globalSettings);
                 if (userSettings != null) {
                     invoker.setUserSettings(userSettings);
                 } else if (getSettings() != null) {
@@ -190,11 +190,11 @@ public class ReleaseMojo extends BaseMojo {
                     new DefaultSettingsWriter().write(settingsFile, null, getSettings());
                     invoker.setUserSettings(settingsFile);
                 }
-            	invoker.setGoals(goals);
-            	invoker.setModulesToRelease(modulesToRelease);
-            	invoker.setReleaseProfiles(releaseProfiles);
-            	invoker.setSkipTests(skipTests);
-            	invoker.setArguments(arguments);
+                invoker.setGoals(goals);
+                invoker.setModulesToRelease(modulesToRelease);
+                invoker.setReleaseProfiles(releaseProfiles);
+                invoker.setSkipTests(skipTests);
+                invoker.setArguments(arguments);
 
                 invoker.runMavenBuild(reactor);
                 revertChanges(log, repo, changedFiles, true); // throw if you can't revert as that is the root problem
