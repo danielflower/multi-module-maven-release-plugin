@@ -29,15 +29,16 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, String buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
-        List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
+    static Reactor fromProjects(LocalGitRepo gitRepo, BaseMojo.PluginConfiguration pluginConfiguration, ResolverWrapper resolverWrapper, NoChangesAction noChangesAction, Log log) throws ValidationException, GitAPIException, MojoExecutionException {
+        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository(), pluginConfiguration.ignoredPaths);
+        List<ReleasableModule> modules = new ArrayList<>();
 
-        resolveVersionsDefinedThroughProperties(projects);
+        resolveVersionsDefinedThroughProperties(pluginConfiguration.projects);
 
+        VersionNamer versionNamer = pluginConfiguration.versionNamer;
         AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(versionNamer);
-        for (MavenProject project : projects) {
-            String relativePathToModule = calculateModulePath(rootProject, project);
+        for (MavenProject project : pluginConfiguration.projects) {
+            String relativePathToModule = calculateModulePath(pluginConfiguration.rootProject, project);
             String artifactId = project.getArtifactId();
             String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
             List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
@@ -53,7 +54,7 @@ public class Reactor {
             Collection<String> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber, versionNamer);
             previousBuildNumbers.addAll(remoteBuildNumbers);
 
-            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
+            VersionName newVersion = versionNamer.name(project.getVersion(), pluginConfiguration.buildNumber, previousBuildNumbers);
 
             boolean oneOfTheDependenciesHasChanged = false;
             String changedDependency = null;
@@ -90,7 +91,7 @@ public class Reactor {
 
             String equivalentVersion = null;
 
-            if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
+            if(pluginConfiguration.modulesToForceRelease != null && pluginConfiguration.modulesToForceRelease.contains(artifactId)) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we was asked to forced release.");
             } else if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
@@ -114,7 +115,7 @@ public class Reactor {
         }
 
         if (!atLeastOneBeingReleased(modules)) {
-            switch (actionWhenNoChangesDetected) {
+            switch (noChangesAction) {
                 case ReleaseNone:
                     log.warn("No changes have been detected in any modules so will not perform release");
                     return null;
@@ -122,7 +123,7 @@ public class Reactor {
                     throw new MojoExecutionException("No module changes have been detected");
                 default:
                     log.warn("No changes have been detected in any modules so will re-release them all");
-                    List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
+                    List<ReleasableModule> newList = new ArrayList<>();
                     for (ReleasableModule module : modules) {
                         newList.add(module.createReleasableVersion());
                     }

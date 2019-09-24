@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "3.3-SNAPSHOT";
+    private static final String PLUGIN_VERSION_FOR_TESTS = "3.4-SNAPSHOT";
     private static final String RELEASE_TARGET = "releaser:release";
     private static final String NEXT_TARGET = "releaser:next";
 
@@ -73,11 +73,15 @@ public class TestProject {
     }
 
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+        return commitFile(module, UUID.randomUUID() + ".txt");
+    }
+
+    public TestProject commitFile(String module, String fileNameAndSuffix) throws IOException, GitAPIException {
         File moduleDir = new File(localDir, module);
         if (!moduleDir.isDirectory()) {
             throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
         }
-        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
+        File random = new File(moduleDir, fileNameAndSuffix);
         random.createNewFile();
         String modulePath = module.equals(".") ? "" : module + "/";
         local.add().addFilepattern(modulePath + random.getName()).call();

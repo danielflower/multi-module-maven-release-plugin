@@ -7,7 +7,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -19,15 +18,17 @@ import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
  *
  */
 public abstract class BaseMojo extends AbstractMojo {
+    private PluginConfiguration pluginConfiguration;
+
 	/**
 	 * The Maven Project.
 	 */
@@ -185,6 +186,23 @@ public abstract class BaseMojo extends AbstractMojo {
     @Parameter(property = "arguments")
     public String arguments;
 
+    /**
+     * <p>List of relative file system paths to ignore when detecting changes in the project(s).</p>
+     * <p>The primary purpose is to skip creating new releases if only "infrastructure" files such as
+     * <code>.gitignore</code>, <code>.editorconfig</code> and the like changed. Very basic wild cards are supported as
+     * follows:
+     * <ul>
+     *     <li><code>foo.txt</code> - matches <code>foo.txt</code> in the root of the top-level project</li>
+     *     <li><code>bar/foo.txt</code> - matches <code>foo.txt</code> in the root of the <code>bar</code> directory</li>
+     *     <li><code>bar</code> - matches the <code>foo</code> directory and ignores everything below</li>
+     *     <li><code>**.txt</code> - matches all paths ending in <code>.txt</code> (suffix match)</li>
+     *     <li><code>**.editorconfig</code> - matches all <code>.editorconfig</code> files in all (sub)directories; a special case of suffix matching</li>
+     * <ul/>
+     * <p/>
+     */
+    @Parameter(property = "ignoredPaths")
+    Set<String> ignoredPaths;
+
     final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
@@ -274,5 +292,55 @@ public abstract class BaseMojo extends AbstractMojo {
             return null;
         }
         return GitHelper.scmUrlToRemote(remote);
+    }
+
+    PluginConfiguration getPluginConfiguration() {
+        if (pluginConfiguration == null) {
+            pluginConfiguration = new PluginConfiguration(project, projects, buildNumber, versionNamer,
+                modulesToRelease, modulesToForceRelease, noChangesAction, factory, artifactResolver, remoteRepositories,
+                localRepository, settings, pullTags, arguments, ignoredPaths);
+        }
+        return pluginConfiguration;
+    }
+
+    static class PluginConfiguration {
+        final MavenProject rootProject;
+        final List<MavenProject> projects;
+        final String buildNumber;
+        final VersionNamer versionNamer;
+        final List<String> modulesToRelease;
+        final List<String> modulesToForceRelease;
+        final NoChangesAction noChangesAction;
+        final ArtifactFactory factory;
+        final ArtifactResolver artifactResolver;
+        final List remoteRepositories;
+        final ArtifactRepository localRepository;
+        final Settings settings;
+        final boolean pullTags;
+        final String arguments;
+        final Set<String> ignoredPaths;
+
+        PluginConfiguration(MavenProject rootProject, List<MavenProject> projects, String buildNumber,
+                            VersionNamer versionNamer, List<String> modulesToRelease,
+                            List<String> modulesToForceRelease, NoChangesAction noChangesAction,
+                            ArtifactFactory factory, ArtifactResolver artifactResolver, List remoteRepositories,
+                            ArtifactRepository localRepository, Settings settings, boolean pullTags, String arguments,
+                            Set<String> ignoredPaths) {
+            this.rootProject = rootProject;
+            this.projects = projects;
+            this.buildNumber = buildNumber;
+            this.versionNamer = versionNamer;
+            this.modulesToRelease = modulesToRelease;
+            this.modulesToForceRelease = modulesToForceRelease;
+            this.noChangesAction = noChangesAction;
+            this.factory = factory;
+            this.artifactResolver = artifactResolver;
+            this.remoteRepositories = remoteRepositories;
+            this.localRepository = localRepository;
+            this.settings = settings;
+            this.pullTags = pullTags;
+            this.arguments = arguments;
+            this.ignoredPaths = ignoredPaths;
+        }
     }
 }

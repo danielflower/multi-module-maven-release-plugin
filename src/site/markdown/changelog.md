@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+### 3.4.0
+
+* Allow to define paths which should be ignored when detecting changes (`.gitignore` et.al.), #77
+
 ### 3.3.0
 
 * Allow build numbers to be arbitrary strings or null, #75
