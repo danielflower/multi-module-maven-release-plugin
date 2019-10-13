@@ -44,7 +44,7 @@ public class MvnRunner {
         return new MvnRunner(mvnHome);
     }
 
-    public static void installReleasePluginToLocalRepo() {
+    public static synchronized void installReleasePluginToLocalRepo() {
         if (haveInstalledPlugin) {
             return;
         }
