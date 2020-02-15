@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>services</artifactId>
+        <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
+        <version>${my.version}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>simple-project</artifactId>
+
+    <profiles>
+        <profile>
+            <id>project-version</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
+                        <artifactId>local-maven-plugin</artifactId>
+                        <version>${project.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshot-version</id>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache.snapshots</id>
+                    <url>https://repository.apache.org/snapshots/</url>
+                </pluginRepository>
+            </pluginRepositories>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                        <version>2.7-SNAPSHOT</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
