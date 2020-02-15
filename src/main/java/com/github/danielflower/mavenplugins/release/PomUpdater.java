@@ -103,12 +103,20 @@ public class PomUpdater {
         for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
             String version = plugin.getVersion();
             if (MavenVersionResolver.isSnapshot(MavenVersionResolver.resolveVersion(version, projectProperties))) {
-                if (!isMultiModuleReleasePlugin(plugin)) {
+                if (!isMultiModuleReleasePlugin(plugin) && !isReleasablePlugin(plugin)) {
                     errors.add(searchingFrom + " references plugin " + plugin.getArtifactId() + " " + version);
                 }
             }
         }
         return errors;
+    }
+    
+    private boolean isReleasablePlugin(Plugin plugin) {
+        try {
+            reactor.find(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion());
+            return true;
+        } catch (UnresolvedSnapshotDependencyException ignore) {}
+        return false;
     }
 
     private void alterSingleDependency(List<String> errors, String searchingFrom, Properties projectProperties, Dependency dependency) {
