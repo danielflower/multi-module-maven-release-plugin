@@ -127,6 +127,10 @@ public class TestProject {
         }
     }
 
+    public static TestProject localPluginProject() {
+        return project("local-plugin");
+    }
+
     public static String dirToGitScmReference(File sourceDir) {
         return "scm:git:file://localhost/" + pathOf(sourceDir).replace('\\', '/').toLowerCase();
     }

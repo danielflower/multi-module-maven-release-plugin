@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
+    <artifactId>local-plugin</artifactId>
+    <packaging>pom</packaging>
+    <version>${my.version}</version>
+
+    <properties>
+        <my.version>1.0-SNAPSHOT</my.version>
+    </properties>
+
+    <modules>
+        <module>common</module>
+        <module>services</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.danielflower.mavenplugins</groupId>
+                <artifactId>multi-module-maven-release-plugin</artifactId>
+                <version>${current.plugin.version}</version>
+                <configuration>
+                    <releaseGoals>
+                        <releaseGoal>install</releaseGoal>
+                    </releaseGoals>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
+                    <artifactId>local-maven-plguin</artifactId>
+                    <version>${project.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
