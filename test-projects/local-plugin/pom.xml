@@ -36,8 +36,8 @@
             <plugins>
                 <plugin>
                     <groupId>com.github.danielflower.mavenplugins.testprojects</groupId>
-                    <artifactId>local-maven-plguin</artifactId>
-                    <version>${project.version}</version>
+                    <artifactId>local-maven-plugin</artifactId>
+                    <version>${my.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

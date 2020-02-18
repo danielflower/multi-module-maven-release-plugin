@@ -11,11 +11,15 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
+import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasTag;
 
 public class LocalPluginTest {
 
     final TestProject testProject = TestProject.localPluginProject();
+
+    final String buildNumber = String.valueOf(System.currentTimeMillis());
+    final String expected = "1.0." + buildNumber;
 
     @BeforeClass
     public static void installPluginToLocalRepo() {
@@ -24,14 +28,20 @@ public class LocalPluginTest {
 
     @Test
     public void runWithLocalPluginSnapshotDependencyShouldSucceed() throws Exception {
-        List<String> outputLines = testProject.mvn("releaser:release", "-P project-version");
+        List<String> outputLines = testProject.mvn("releaser:release", "-DbuildNumber=" + buildNumber);
 
         for (String line : outputLines)
             System.out.println(line);
 
-        assertThat(testProject.local, hasTag("local-plugin-1.0.0"));
-        assertThat(testProject.local, hasTag("local-maven-plugin-1.0.0"));
-        assertThat(testProject.local, hasTag("simple-project-1.0.0"));
+        //Validate released artifacts
+        assertThat(testProject.local, hasTag("local-plugin-" + expected));
+        assertThat(testProject.local, hasTag("local-maven-plugin-" + expected));
+        assertThat(testProject.local, hasTag("simple-project-" + expected));
+
+        //Validate plugin dependencies updated (once for plugin itself, once for pluginManagement)
+        assertThat(
+            outputLines,
+            twoOf(containsString("Plugin dependency on local-maven-plugin rewritten to version " + expected)));
     }
 
     @Test
