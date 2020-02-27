@@ -100,6 +100,21 @@ public class PomUpdater {
             }
         }
 
+        //Support for plugin
+        if (originalModel.getBuild() != null && originalModel.getBuild().getPlugins() != null) {
+            for (Plugin plugin : originalModel.getBuild().getPlugins()) {
+                alterSinglePlugin(errors, searchingFrom, projectProperties, plugin);
+            }
+        }
+
+        //Support for pluginManagement
+        if (originalModel.getBuild() != null && originalModel.getBuild().getPluginManagement() != null
+        && originalModel.getBuild().getPluginManagement().getPlugins() != null) {
+            for (Plugin plugin : originalModel.getBuild().getPluginManagement().getPlugins()) {
+                alterSinglePlugin(errors, searchingFrom, projectProperties, plugin);
+            }
+        }
+
         for (Plugin plugin : project.getModel().getBuild().getPlugins()) {
             String version = plugin.getVersion();
             if (MavenVersionResolver.isSnapshot(MavenVersionResolver.resolveVersion(version, projectProperties))) {
@@ -117,6 +132,23 @@ public class PomUpdater {
             return true;
         } catch (UnresolvedSnapshotDependencyException ignore) {}
         return false;
+    }
+
+    private void alterSinglePlugin(List<String> errors, String searchingFrom, Properties projectProperties, Plugin plugin) {
+        String version = plugin.getVersion();
+        if (!isMultiModuleReleasePlugin(plugin) &&
+            MavenVersionResolver.isSnapshot(MavenVersionResolver.resolveVersion(version, projectProperties))) {
+            try {
+                ReleasableModule pluginBeingReleased = reactor.find(plugin.getGroupId(), plugin.getArtifactId(), version);
+                plugin.setVersion(pluginBeingReleased.getVersionToDependOn());
+                log.info("Plugin dependency on " + pluginBeingReleased.getArtifactId() + " rewritten to version " + pluginBeingReleased.getVersionToDependOn());
+            } catch (UnresolvedSnapshotDependencyException e) {
+                errors.add(searchingFrom + " references plugin dependency " + e.artifactId + " " + e.version);
+            }
+        }
+        else {
+            log.debug("Plugin dependency on " + plugin.getArtifactId() + " kept at version " + plugin.getVersion());
+        }
     }
 
     private void alterSingleDependency(List<String> errors, String searchingFrom, Properties projectProperties, Dependency dependency) {
