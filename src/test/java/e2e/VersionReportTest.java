@@ -12,35 +12,24 @@ import scaffolding.TestProject;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertTrue;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-public class IndependentVersionsTest {
+public class VersionReportTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());
     final String expectedParentVersion = "1.0." + buildNumber;
     final String expectedCoreVersion = "2.0." + buildNumber;
     final String expectedAppVersion = "3.2." + buildNumber;
-    final String releasedVersionsReportFlatFileName = "released-report.txt";
-    final String releasedVersionsReportJsonFileName = "released-report.json";
-    final String allVersionsReportJsonFileName = "version-report.json";
-    final List<String> reportedVersions = Arrays.asList(
-        "independent-versions:" + expectedParentVersion,
-        "core-utils:" + expectedCoreVersion,
-        "console-app:" + expectedAppVersion);
     final TestProject testProject = TestProject.independentVersionsProject();
 
     @BeforeClass
@@ -51,17 +40,11 @@ public class IndependentVersionsTest {
     @Test
     public void buildsAndInstallsAndTagsAllModules() throws Exception {
         buildsEachProjectOnceAndOnlyOnce(testProject.mvnRelease(buildNumber));
-        installsAllModulesIntoTheRepoWithTheBuildNumber();
-        theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
-        reportsFilesGeneratedWithCorrectVersionsAndFormat();
+//        installsAllModulesIntoTheRepoWithTheBuildNumber();
+//        theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion();
     }
 
-    private void reportsFilesGeneratedWithCorrectVersionsAndFormat() throws IOException {
-        List<String> fileLines =  Files.readAllLines(new File(testProject.localDir, releasedVersionsReportFlatFileName).toPath(), Charset.defaultCharset());
-        assertTrue(fileLines.size() == reportedVersions.size() && fileLines.containsAll(reportedVersions) && reportedVersions.containsAll(fileLines));
-    }
-
-    private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) {
+    private void buildsEachProjectOnceAndOnlyOnce(List<String> commandOutput) throws Exception {
         assertThat(
             commandOutput,
             allOf(
@@ -69,10 +52,7 @@ public class IndependentVersionsTest {
                 twoOf(containsString("Building independent-versions")), // once for initial build; once for release build
                 oneOf(containsString("Building core-utils")),
                 oneOf(containsString("Building console-app")),
-                oneOf(containsString("The Calculator Test has run")),
-                oneOf(containsString("Successfully written report file - " + releasedVersionsReportFlatFileName)),
-                oneOf(containsString("Successfully written report file - " + releasedVersionsReportJsonFileName)),
-                oneOf(containsString("Successfully written report file - " + allVersionsReportJsonFileName))
+                oneOf(containsString("The Calculator Test has run"))
             )
         );
     }

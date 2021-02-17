@@ -25,6 +25,23 @@
                 <artifactId>multi-module-maven-release-plugin</artifactId>
                 <version>${current.plugin.version}</version>
                 <configuration>
+                    <versionReports>
+                        <versionReport>
+                            <versionsReportFilePath>released-report.txt</versionsReportFilePath>
+                            <versionsReportFormat>FLAT</versionsReportFormat>
+                            <releasedModulesOnly>true</releasedModulesOnly>
+                        </versionReport>
+                        <versionReport>
+                            <versionsReportFilePath>released-report.json</versionsReportFilePath>
+                            <versionsReportFormat>JSON</versionsReportFormat>
+                            <releasedModulesOnly>true</releasedModulesOnly>
+                        </versionReport>
+                        <versionReport>
+                            <versionsReportFilePath>version-report.json</versionsReportFilePath>
+                            <versionsReportFormat>JSON</versionsReportFormat>
+                            <releasedModulesOnly>false</releasedModulesOnly>
+                        </versionReport>
+                    </versionReports>
                     <releaseGoals>
                         <releaseGoal>install</releaseGoal>
                     </releaseGoals>
