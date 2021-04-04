@@ -63,3 +63,13 @@ Authentication
 ------------------
 
 Please see [SSH Authentication](ssh-authentication.html) or [HTTPS Authentication](https-authentication.html).
+
+
+Determining which modules have changed
+--------------------------------------
+
+When determining which modules have changed since the previous release, the previously built artifacts must be available. Artifacts can be in a local or remote maven repository.
+If the previously built artifacts are not availabl, all modules will be considered changed.
+
+
+

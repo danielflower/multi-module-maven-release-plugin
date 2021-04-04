@@ -2,7 +2,7 @@ Documentation, download, and usage instructions
 ===============================================
 
 Full usage details, FAQs, background and more are available on the
-**[project documentation website](http://danielflower.github.io/multi-module-maven-release-plugin/index.html)**.
+**[project documentation website](https://danielflower.github.io/multi-module-maven-release-plugin/index.html)**.
 
 Development
 ===========
