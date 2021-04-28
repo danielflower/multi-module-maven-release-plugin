@@ -19,28 +19,36 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "3.2-SNAPSHOT";
+    private static final String PLUGIN_VERSION_FOR_TESTS = "3.4-SNAPSHOT";
+    private static final String RELEASE_TARGET = "releaser:release";
+    private static final String NEXT_TARGET = "releaser:next";
 
     public final File originDir;
     public final Git origin;
 
     public final File localDir;
     public final Git local;
+    private final String name;
 
     private final AtomicInteger commitCounter = new AtomicInteger(1);
     private MvnRunner mvnRunner = defaultRunner;
 
-    private TestProject(File originDir, Git origin, File localDir, Git local) {
+    private TestProject(File originDir, Git origin, File localDir, Git local, String name) {
         this.originDir = originDir;
         this.origin = origin;
         this.localDir = localDir;
         this.local = local;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     /**
      * Runs a mvn command against the local repo and returns the console output.
      */
-    public List<String> mvn(String... arguments) throws IOException {
+    public List<String> mvn(String... arguments) {
         return mvnRunner.runMaven(localDir, arguments);
     }
 
@@ -48,26 +56,32 @@ public class TestProject {
         mvnRunner.mavenOpts = mavenOpts;
     }
 
-    public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
-        return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "releaser:release");
+    public List<String> mvnRelease()  {
+        return mvnRunner.runMaven(localDir, RELEASE_TARGET);
     }
 
-    public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:release", buildNumber, arguments);
+    public List<String> mvnRelease(String buildNumber) {
+        return mvnRunner.runMaven(localDir, "-DbuildNumber=" + buildNumber, RELEASE_TARGET);
     }
 
-    public List<String> mvnReleaserNext(String buildNumber, String...arguments) throws IOException, InterruptedException {
-        return mvnRun("releaser:next", buildNumber, arguments);
+    public List<String> mvnRelease(String buildNumber, String...arguments) {
+        return mvnRun(RELEASE_TARGET, buildNumber, arguments);
+    }
+
+    public List<String> mvnReleaserNext(String buildNumber, String...arguments) {
+        return mvnRun(NEXT_TARGET, buildNumber, arguments);
     }
 
     public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+        return commitFile(module, UUID.randomUUID() + ".txt");
+    }
+
+    public TestProject commitFile(String module, String fileNameAndSuffix) throws IOException, GitAPIException {
         File moduleDir = new File(localDir, module);
         if (!moduleDir.isDirectory()) {
             throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
         }
-        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
+        File random = new File(moduleDir, fileNameAndSuffix);
         random.createNewFile();
         String modulePath = module.equals(".") ? "" : module + "/";
         local.add().addFilepattern(modulePath + random.getName()).call();
@@ -106,7 +120,7 @@ public class TestProject {
                 .setURI(originDir.toURI().toString())
                 .call();
 
-            return new TestProject(originDir, origin, localDir, local);
+            return new TestProject(originDir, origin, localDir, local, name);
         } catch (Exception e) {
             throw new RuntimeException("Error while creating copies of the test project", e);
         }
@@ -188,6 +202,10 @@ public class TestProject {
 
     public static TestProject differentDelimiterProject() {
         return project("different-delimiter");
+    }
+
+    public static TestProject emptyBuildNumberInPomProject() {
+        return project("empty-build-number-in-pom");
     }
 
     public void setMvnRunner(MvnRunner mvnRunner) {

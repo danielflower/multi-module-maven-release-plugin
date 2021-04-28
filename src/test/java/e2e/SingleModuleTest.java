@@ -54,12 +54,12 @@ public class SingleModuleTest {
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.1"));
 
-        AnnotatedTag.create("single-module-1.0.2", "1.0", 2).saveAtHEAD(testProject.local);
+        AnnotatedTag.create("single-module-1.0.2", "1.0", "2").saveAtHEAD(testProject.local);
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.3"));
 
-        AnnotatedTag.create("single-module-1.0.4", "1.0", 4).saveAtHEAD(testProject.origin);
-        AnnotatedTag.create("unrelated-module-1.0.5", "1.0", 5).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("single-module-1.0.4", "1.0", "4").saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("unrelated-module-1.0.5", "1.0", "5").saveAtHEAD(testProject.origin);
         testProject.mvn("releaser:release");
         assertThat(testProject.local, hasTag("single-module-1.0.5"));
 
@@ -104,8 +104,8 @@ public class SingleModuleTest {
     public void originTagsNotConsultedWithoutPull() throws Exception {
         testProject.mvn("releaser:release");
 
-        AnnotatedTag.create("single-module-1.0.2", "1.0", 2).saveAtHEAD(testProject.local);
-        AnnotatedTag.create("single-module-1.0.5", "1.0", 5).saveAtHEAD(testProject.origin);
+        AnnotatedTag.create("single-module-1.0.2", "1.0", "2").saveAtHEAD(testProject.local);
+        AnnotatedTag.create("single-module-1.0.5", "1.0", "5").saveAtHEAD(testProject.origin);
 
         testProject.mvn("-Dpush=false",
                         "-Dpull=false",

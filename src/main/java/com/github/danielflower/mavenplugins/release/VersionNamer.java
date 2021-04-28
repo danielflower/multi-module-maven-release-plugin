@@ -1,5 +1,6 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.lib.Repository;
 
@@ -33,35 +34,38 @@ public class VersionNamer {
         this(".");
     }
 
-    public VersionName name(String pomVersion, Long buildNumber, Collection<Long> previousBuildNumbers) throws ValidationException {
-
+    public VersionName name(String pomVersion, String buildNumber, Collection<String> previousBuildNumbers) throws ValidationException {
+        String effectiveBuildNumber = buildNumber;
         if (buildNumber == null) {
-            if (previousBuildNumbers.size() == 0) {
-                buildNumber = 0L;
+            if (previousBuildNumbers == null || previousBuildNumbers.isEmpty()) {
+                effectiveBuildNumber = "0";
             } else {
-                buildNumber = nextBuildNumber(previousBuildNumbers);
+                effectiveBuildNumber = nextBuildNumber(previousBuildNumbers);
             }
         }
 
-        VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), buildNumber, this.delimiter);
+        VersionName versionName = new VersionName(pomVersion, pomVersion.replace("-SNAPSHOT", ""), effectiveBuildNumber, this.delimiter);
 
         if (!Repository.isValidRefName("refs/tags/" + versionName.releaseVersion())) {
             String summary = "Sorry, '" + versionName.releaseVersion() + "' is not a valid version.";
             throw new ValidationException(summary, asList(
                 summary,
-                "Version numbers are used in the Git tag, and so can only contain characters that are valid in git tags.",
+                "Version numbers are used in the Git tag, and so can only contain characters that are valid in Git tags.",
                 "Please see https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html for tag naming rules."
             ));
         }
         return versionName;
     }
 
-    private static long nextBuildNumber(Collection<Long> previousBuildNumbers) {
+    // Increments the largest previous build number. Skips over any non-numeric previous build numbers.
+    private static String nextBuildNumber(Collection<String> previousBuildNumbers) {
         long max = 0;
-        for (Long buildNumber : previousBuildNumbers) {
-            max = Math.max(max, buildNumber);
+        for (String buildNumber : previousBuildNumbers) {
+            if (StringUtils.isNumeric(buildNumber)) {
+                max = Math.max(max, Long.parseLong(buildNumber));
+            }
         }
-        return max + 1;
+        return String.valueOf(max + 1);
     }
 
     String getDelimiter() {

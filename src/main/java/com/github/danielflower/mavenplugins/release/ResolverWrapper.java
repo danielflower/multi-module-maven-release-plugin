@@ -10,43 +10,21 @@ import org.apache.maven.plugin.logging.Log;
 
 import java.util.List;
 
-/**
- *
- */
-public class ResolverWrapper {
+class ResolverWrapper {
 
     private final ArtifactFactory factory;
-
     private final ArtifactResolver artifactResolver;
-
     private final List remoteRepositories;
-
     private final ArtifactRepository localRepository;
 
-    public ResolverWrapper(ArtifactFactory factory, ArtifactResolver artifactResolver, List remoteRepositories, ArtifactRepository localRepository) {
-        this.factory = factory;
-        this.artifactResolver = artifactResolver;
-        this.remoteRepositories = remoteRepositories;
-        this.localRepository = localRepository;
+    ResolverWrapper(BaseMojo.PluginConfiguration pluginConfiguration) {
+        this.factory = pluginConfiguration.factory;
+        this.artifactResolver = pluginConfiguration.artifactResolver;
+        this.remoteRepositories = pluginConfiguration.remoteRepositories;
+        this.localRepository = pluginConfiguration.localRepository;
     }
 
-    public ArtifactFactory getFactory() {
-        return factory;
-    }
-
-    public ArtifactResolver getArtifactResolver() {
-        return artifactResolver;
-    }
-
-    public List getRemoteRepositories() {
-        return remoteRepositories;
-    }
-
-    public ArtifactRepository getLocalRepository() {
-        return localRepository;
-    }
-
-    public boolean isResolvable(String groupId, String artifactId, String version, String type, Log log) {
+    boolean isResolvable(String groupId, String artifactId, String version, String type, Log log) {
         try {
             Artifact pomArtifact = this.factory.createArtifact(groupId, artifactId, version, "", type);
             artifactResolver.resolve(pomArtifact, remoteRepositories, localRepository);
