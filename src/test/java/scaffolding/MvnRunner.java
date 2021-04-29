@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -82,6 +83,8 @@ public class MvnRunner {
 
         int exitCode;
         try {
+            System.out.println(String.format("Running mvn in '%s' with profile(s) '%s' and arguments %s.",
+                workingDir, profile == null ? "" : profile, Arrays.toString(arguments)));
             InvocationResult result = invoker.execute(request);
             exitCode = result.getExitCode();
         } catch (Exception e) {
@@ -93,6 +96,8 @@ public class MvnRunner {
             throw new MavenExecutionException(exitCode, output);
         }
 
+        System.out.println("That produced the following output.\n");
+        output.forEach(System.out::println);
         return output;
     }
 

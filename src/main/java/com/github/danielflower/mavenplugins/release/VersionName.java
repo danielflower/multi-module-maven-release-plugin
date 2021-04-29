@@ -2,11 +2,12 @@ package com.github.danielflower.mavenplugins.release;
 
 public class VersionName {
     private final String version;
-    private final long buildNumber;
+    private final String buildNumber;
     private final String developmentVersion;
     private final String delimiter;
+    private final String releaseVersion;
 
-    public VersionName(String developmentVersion, String version, long buildNumber, String delimiter) {
+    public VersionName(String developmentVersion, String version, String buildNumber, String delimiter) {
         Guard.notBlank("developmentVersion", developmentVersion);
         Guard.notBlank("version", version);
         Guard.notNull("buildNumber", buildNumber);
@@ -14,20 +15,21 @@ public class VersionName {
         this.buildNumber = buildNumber;
         this.developmentVersion = developmentVersion;
         this.delimiter = delimiter;
+        this.releaseVersion = buildNumber.length() > 0 ? version + delimiter + buildNumber : version;
     }
 
-    public VersionName(String developmentVersion, String version, long buildNumber) {
+    public VersionName(String developmentVersion, String version, String buildNumber) {
         this(developmentVersion, version, buildNumber, ".");
     }
     
     /**
-     * For example, "1.0" if the development version is "1.0-SNAPSHOT"
+     * For example, "1.0" if the development version is "1.0-SNAPSHOT".
      */
     public String businessVersion() {
         return version;
     }
 
-    public long buildNumber() {
+    public String buildNumber() {
         return buildNumber;
     }
 
@@ -42,6 +44,6 @@ public class VersionName {
      * The business version with the build number appended, e.g. "1.0.1"
      */
     public String releaseVersion() {
-        return version + delimiter + buildNumber;
+        return releaseVersion;
     }
 }

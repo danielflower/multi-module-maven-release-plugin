@@ -28,10 +28,10 @@ public class AnnotatedTag {
         this.message = message;
     }
 
-    public static AnnotatedTag create(String name, String version, long buildNumber) {
+    public static AnnotatedTag create(String name, String version, String buildNumber) {
         JSONObject message = new JSONObject();
         message.put(VERSION, version);
-        message.put(BUILD_NUMBER, String.valueOf(buildNumber));
+        message.put(BUILD_NUMBER, buildNumber);
         return new AnnotatedTag(null, name, message);
     }
 
@@ -67,8 +67,8 @@ public class AnnotatedTag {
         return String.valueOf(message.get(VERSION));
     }
 
-    public long buildNumber() {
-        return Long.parseLong(String.valueOf(message.get(BUILD_NUMBER)));
+    public String buildNumber() {
+        return String.valueOf(message.get(BUILD_NUMBER));
     }
 
     public Ref saveAtHEAD(Git git) throws GitAPIException {
