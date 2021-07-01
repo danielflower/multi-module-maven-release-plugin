@@ -22,13 +22,13 @@ public class AnnotatedTagFinderTest {
     public void findsTheLatestCommitWhereThereHaveBeenNoBranches() throws Exception {
         TestProject project = TestProject.independentVersionsProject();
 
-        AnnotatedTag tag1 = saveFileInModuleAndTag(project, "console-app", "1.2", 3);
-        AnnotatedTag tag2 = saveFileInModuleAndTag(project, "core-utils", "2", 0);
-        AnnotatedTag tag3 = saveFileInModuleAndTag(project, "console-app", "1.2", 4);
+        saveFileInModuleAndTag(project, "console-app", "1.2", 3);
+        AnnotatedTag tag1 = saveFileInModuleAndTag(project, "core-utils", "2", 0);
+        AnnotatedTag tag2 = saveFileInModuleAndTag(project, "console-app", "1.2", 4);
 
         assertThat(annotatedTagFinder.tagsForVersion(project.local, "console-app", "1.3"), hasSize(0));
-        assertThat(annotatedTagFinder.tagsForVersion(project.local, "console-app", "1.2"), containsInAnyOrder(tag1, tag3));
-        assertThat(annotatedTagFinder.tagsForVersion(project.local, "core-utils", "2"), contains(tag2));
+        assertThat(annotatedTagFinder.tagsForVersion(project.local, "console-app", "1.2"), contains(tag2));
+        assertThat(annotatedTagFinder.tagsForVersion(project.local, "core-utils", "2"), contains(tag1));
     }
 
     static AnnotatedTag saveFileInModuleAndTag(TestProject project, String moduleName, String version, long buildNumber) throws IOException, GitAPIException {

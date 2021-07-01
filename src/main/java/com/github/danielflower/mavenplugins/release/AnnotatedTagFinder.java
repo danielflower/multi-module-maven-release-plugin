@@ -41,7 +41,8 @@ class AnnotatedTagFinder {
                                 throw new MojoExecutionException("Error while looking up tag " + tag, e);
                             }
                     }
-                    // break;
+                    // we want the version of the latest commit so we stop here
+                    break;
                 }
             }
         } catch (GitAPIException | IOException e) {
