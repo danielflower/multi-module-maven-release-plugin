@@ -75,6 +75,16 @@ public class TestProject {
         return this;
     }
 
+    public TestProject checkoutBranch(String branch) throws GitAPIException {
+        local.checkout().setName(branch).call();
+        return this;
+    }
+
+    public TestProject createBranch(String branch) throws GitAPIException {
+        local.branchCreate().setName(branch).call();
+        return this;
+    }
+
     public void pushIt() throws GitAPIException {
         local.push().call();
     }
