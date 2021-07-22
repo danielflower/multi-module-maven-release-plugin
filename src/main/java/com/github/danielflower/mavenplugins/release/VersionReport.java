@@ -2,6 +2,7 @@ package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
@@ -42,10 +43,17 @@ public class VersionReport {
                 break;
             default: //JSON as default
                 JSONObject jsonObject = new JSONObject();
+                JSONArray releasedModulesArray = new JSONArray();
+
                 for (ReleasableModule module : releasableModules) {
                     if (skipModuleInReport(module)) continue;
-                    jsonObject.put(module.getArtifactId(), module.getVersionToDependOn());
+                    JSONObject releasedModuleObject = new JSONObject();
+                    releasedModuleObject.put("name", module.getArtifactId());
+                    releasedModuleObject.put("version", module.getVersionToDependOn());
+                    releasedModulesArray.add(releasedModuleObject);
                 }
+
+                jsonObject.put("modules", releasedModulesArray);
                 res = jsonObject.toJSONString();
                 break;
         }
