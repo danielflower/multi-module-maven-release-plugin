@@ -359,6 +359,7 @@
                         <version>0.12</version>
                         <configuration>
                             <message>Creating site for ${project.version}</message>
+                            <server>github</server>
                         </configuration>
                         <executions>
                             <execution>
