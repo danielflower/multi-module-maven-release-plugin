@@ -1,7 +1,6 @@
 package scaffolding;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
@@ -39,27 +38,22 @@ public class ExactCountMatcher extends TypeSafeDiagnosingMatcher<List<String>> {
         description.appendDescriptionOf(stringMatcher).appendText(" " + expectedCount + " times");
     }
 
-    @Factory
     public static Matcher<? super List<String>> noneOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 0);
     }
 
-    @Factory
     public static Matcher<? super List<String>> oneOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 1);
     }
 
-    @Factory
     public static Matcher<? super List<String>> twoOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 2);
     }
 
-    @Factory
     public static Matcher<? super List<String>> threeOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 3);
     }
     
-    @Factory
     public static Matcher<? super List<String>> fourOf(Matcher<String> stringMatcher) {
         return new ExactCountMatcher(stringMatcher, 4);
     }

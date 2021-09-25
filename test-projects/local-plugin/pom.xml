@@ -11,6 +11,8 @@
 
     <properties>
         <my.version>1.0-SNAPSHOT</my.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <modules>
