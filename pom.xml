@@ -30,8 +30,8 @@
     </properties>
 
     <ciManagement>
-        <system>travis-ci</system>
-        <url>https://travis-ci.org/danielflower/multi-module-maven-release-plugin</url>
+        <system>GitHub Actions</system>
+        <url>https://github.com/danielflower/multi-module-maven-release-plugin/actions</url>
     </ciManagement>
 
     <scm>
@@ -359,7 +359,7 @@
                         <version>0.12</version>
                         <configuration>
                             <message>Creating site for ${project.version}</message>
-                            <server>github</server>
+                            <force>true</force>
                         </configuration>
                         <executions>
                             <execution>
