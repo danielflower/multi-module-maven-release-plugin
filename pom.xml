@@ -11,7 +11,7 @@
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
     </description>
-    <url>https://github.com/danielflower/maven-multi-module-releaser</url>
+    <url>https://github.com/danielflower/multi-module-maven-release-plugin</url>
     <packaging>maven-plugin</packaging>
     <prerequisites>
         <!-- if this changes, please update the MavenCompatibilityTest -->
@@ -359,8 +359,6 @@
                         <version>0.12</version>
                         <configuration>
                             <message>Creating site for ${project.version}</message>
-                            <repositoryName>multi-module-maven-release-plugin</repositoryName>
-                            <repositoryOwner>danielflower</repositoryOwner>
                         </configuration>
                         <executions>
                             <execution>
