@@ -359,6 +359,8 @@
                         <version>0.12</version>
                         <configuration>
                             <message>Creating site for ${project.version}</message>
+                            <repositoryName>multi-module-maven-release-plugin</repositoryName>
+                            <repositoryOwner>danielflower</repositoryOwner>
                         </configuration>
                         <executions>
                             <execution>
