@@ -49,8 +49,10 @@ public class MvnRunner {
             return;
         }
         long start = System.currentTimeMillis();
-        System.out.println("Installing the plugin into the local repo");
-        assertThat("Environment variable M2_HOME must be set", System.getenv("M2_HOME") != null);
+        String m2Home = System.getenv("M2_HOME");
+        System.out.println("Installing the plugin into the local repo with M2_HOME=" + m2Home);
+        assertThat("Environment variable M2_HOME must be set", m2Home != null);
+        assertThat("Environment variable M2_HOME must be a directory but was " + m2Home, new File(m2Home).isDirectory());
         MvnRunner mvnRunner = new MvnRunner();
         mvnRunner.runMaven(new File("."), "-DskipTests=true", "install");
         System.out.println("Finished installing the plugin into the local repo in " + (System.currentTimeMillis() - start) + "ms");

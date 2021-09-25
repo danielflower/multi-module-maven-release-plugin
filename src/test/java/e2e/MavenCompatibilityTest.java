@@ -1,6 +1,8 @@
 package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.hamcrest.Matchers;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import scaffolding.MvnRunner;
@@ -21,6 +23,7 @@ public class MavenCompatibilityTest {
 
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
+        Assume.assumeThat(System.getenv("CI"), Matchers.nullValue());
         MvnRunner.installReleasePluginToLocalRepo();
     }
 
@@ -45,7 +48,7 @@ public class MavenCompatibilityTest {
     }
 
     private void buildProjectWithMavenVersion(String mavenVersionToTest) throws IOException, InterruptedException, MavenInvocationException {
-        String buildNumber = mavenVersionToTest.replace(".", "") + String.valueOf(System.currentTimeMillis());
+        String buildNumber = mavenVersionToTest.replace(".", "") + System.currentTimeMillis();
         String expected = "1.0." + buildNumber;
         testProject.setMvnRunner(MvnRunner.mvn(mavenVersionToTest));
         testProject.mvnRelease(buildNumber);

@@ -2,6 +2,7 @@ package e2e;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -11,9 +12,8 @@ import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.hamcrest.Matchers;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JGitDiscoveryTest {
+    @BeforeClass
+    public static void installPluginToLocalRepo() throws MavenInvocationException {
+        Assume.assumeThat(System.getenv("CI"), Matchers.nullValue());
+    }
+
     Repository repo;
 
     @Before public void locateRepo() throws IOException {

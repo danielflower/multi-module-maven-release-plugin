@@ -16,13 +16,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
 
-      - name: Cache the Maven packages to speed up build
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-
+      - run: echo "M2_HOME=$(dirname $(dirname `which mvn`))" >> $GITHUB_ENV
       - run: git config --global user.email "test@example.com"
       - run: git config --global user.name "Test user"
 

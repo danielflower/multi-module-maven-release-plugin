@@ -1,16 +1,14 @@
 package com.github.danielflower.mavenplugins.release;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -49,7 +47,7 @@ public class BaseMojoTest {
 	public void configureJsch_SshAgentDisabled() {
 		mojo.disableSshAgent();
 		mojo.configureJsch(log);
-		assertEquals("org.eclipse.jgit.transport.DefaultSshSessionFactory",
+		assertEquals("org.eclipse.jgit.transport.JschConfigSessionFactory",
 				JschConfigSessionFactory.getInstance().getClass().getName());
 	}
 	
