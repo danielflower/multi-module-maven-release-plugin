@@ -98,6 +98,9 @@ public class ReleaseMojo extends BaseMojo {
      */
     @Parameter(alias = "pushTags", defaultValue="true", property="push")
     private boolean pushTags;
+
+    @Parameter(alias = "dryRun", defaultValue="false", property = "dryRun")
+    private boolean dryRun;
     
 
     @Override
@@ -187,7 +190,10 @@ public class ReleaseMojo extends BaseMojo {
         for (AnnotatedTag proposedTag : proposedTags) {
             log.info("About to tag the repository with " + proposedTag.name());
         }
-
+        if( dryRun ){
+            log.info("Not adding tags. Dry run enabled.");
+            return;
+        }
         repo.tagAndPushRepo(proposedTags);
     }
 
