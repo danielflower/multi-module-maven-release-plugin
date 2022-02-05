@@ -68,4 +68,22 @@
 
         </plugins>
     </build>
+
+    <!-- This project is used by MavenCompatibilityTest.java where old versions of maven
+     that default to http (rather than https) are used. Maven central now blocks non-https
+      requests so the following just forces all maven versions to use https. -->
+    <distributionManagement>
+        <repository>
+            <id>Central Maven repository</id>
+            <name>Central Maven repository https</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </distributionManagement>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Central Maven repository</id>
+            <name>Central Maven repository https</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

@@ -47,6 +47,11 @@ public class MavenCompatibilityTest {
         buildProjectWithMavenVersion("3.3.9");
     }
 
+    @Test
+    public void maven_3_8_4() throws Exception {
+        buildProjectWithMavenVersion("3.8.4");
+    }
+
     private void buildProjectWithMavenVersion(String mavenVersionToTest) throws IOException, InterruptedException, MavenInvocationException {
         String buildNumber = mavenVersionToTest.replace(".", "") + System.currentTimeMillis();
         String expected = "1.0." + buildNumber;
