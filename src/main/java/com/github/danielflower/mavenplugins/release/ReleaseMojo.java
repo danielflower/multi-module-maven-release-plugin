@@ -106,8 +106,7 @@ public class ReleaseMojo extends BaseMojo {
      * <p>
      * You can specify list of {@link com.github.danielflower.mavenplugins.release.VersionReport}
      * </p>
-     * <pre>
-     * {@code
+     * <pre>{@code
      *  <versionReports>
      *      <versionReport>
      *          <versionsReportFilePath>released-report.txt</versionsReportFilePath>
@@ -120,8 +119,7 @@ public class ReleaseMojo extends BaseMojo {
      *          <releasedModulesOnly>false</releasedModulesOnly>
      *      </versionReport>
      *  </versionReports>
-     * }
-     * </pre>
+     * }</pre>
      * @see com.github.danielflower.mavenplugins.release.VersionReport
      */
     @Parameter(alias = "versionReports")

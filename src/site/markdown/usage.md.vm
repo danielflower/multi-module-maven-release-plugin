@@ -6,20 +6,22 @@ Usage
 
 Add the plugin to your pom:
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>${project.artifactId}</artifactId>
-                <version>${project.version}</version>
-                <configuration>
-                    <releaseGoals>
-                        <releaseGoal>deploy</releaseGoal>
-                    </releaseGoals>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
+            <configuration>
+                <releaseGoals>
+                    <releaseGoal>deploy</releaseGoal>
+                </releaseGoals>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
 
 And then call the plugin:
 
@@ -76,19 +78,19 @@ Version reports
 
 Version report generation is supported for both the released modules (version incremented) and non-released modules (latest version).
 
-The supported report formats are FLAT(line separated) and JSON
+The supported report formats are FLAT(line separated) and JSON.
 
-    <versionReports>
-        <versionReport>
-            <versionsReportFilePath>released-report.txt</versionsReportFilePath>
-            <versionsReportFormat>FLAT</versionsReportFormat>
-            <releasedModulesOnly>true</releasedModulesOnly>
-        </versionReport>
-        <versionReport>
-            <versionsReportFilePath>version-report.json</versionsReportFilePath>
-            <versionsReportFormat>JSON</versionsReportFormat>
-            <releasedModulesOnly>false</releasedModulesOnly>
-        </versionReport>
-    </versionReports>
-
-
+```xml
+<versionReports>
+    <versionReport>
+        <versionsReportFilePath>released-report.txt</versionsReportFilePath>
+        <versionsReportFormat>FLAT</versionsReportFormat>
+        <releasedModulesOnly>true</releasedModulesOnly>
+    </versionReport>
+    <versionReport>
+        <versionsReportFilePath>version-report.json</versionsReportFilePath>
+        <versionsReportFormat>JSON</versionsReportFormat>
+        <releasedModulesOnly>false</releasedModulesOnly>
+    </versionReport>
+</versionReports>
+```
