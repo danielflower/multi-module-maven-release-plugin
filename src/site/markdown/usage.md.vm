@@ -71,5 +71,24 @@ Determining which modules have changed
 When determining which modules have changed since the previous release, the previously built artifacts must be available. Artifacts can be in a local or remote maven repository.
 If the previously built artifacts are not available, all modules will be considered changed.
 
+Version reports
+---------------
+
+Version report generation is supported for both the released modules (version incremented) and non-released modules (latest version).
+
+The supported report formats are FLAT(line separated) and JSON
+
+    <versionReports>
+        <versionReport>
+            <versionsReportFilePath>released-report.txt</versionsReportFilePath>
+            <versionsReportFormat>FLAT</versionsReportFormat>
+            <releasedModulesOnly>true</releasedModulesOnly>
+        </versionReport>
+        <versionReport>
+            <versionsReportFilePath>version-report.json</versionsReportFilePath>
+            <versionsReportFormat>JSON</versionsReportFormat>
+            <releasedModulesOnly>false</releasedModulesOnly>
+        </versionReport>
+    </versionReports>
 
 

@@ -101,8 +101,28 @@ public class ReleaseMojo extends BaseMojo {
 
     /**
      * <p>
-     *     Reports to generate with updated versions.
+     * Reports to generate with updated versions.
      * </p>
+     * <p>
+     * You can specify list of {@link com.github.danielflower.mavenplugins.release.VersionReport}
+     * </p>
+     * <pre>
+     * {@code
+     *  <versionReports>
+     *      <versionReport>
+     *          <versionsReportFilePath>released-report.txt</versionsReportFilePath>
+     *          <versionsReportFormat>FLAT</versionsReportFormat>
+     *          <releasedModulesOnly>true</releasedModulesOnly>
+     *      </versionReport>
+     *      <versionReport>
+     *          <versionsReportFilePath>version-report.json</versionsReportFilePath>
+     *          <versionsReportFormat>JSON</versionsReportFormat>
+     *          <releasedModulesOnly>false</releasedModulesOnly>
+     *      </versionReport>
+     *  </versionReports>
+     * }
+     * </pre>
+     * @see com.github.danielflower.mavenplugins.release.VersionReport
      */
     @Parameter(alias = "versionReports")
     private List<VersionReport> versionReports;
