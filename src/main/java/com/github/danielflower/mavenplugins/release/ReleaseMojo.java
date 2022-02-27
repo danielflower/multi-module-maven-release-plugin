@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -101,31 +102,19 @@ public class ReleaseMojo extends BaseMojo {
 
     /**
      * <p>
-     * Reports to generate with updated versions.
+     *     Reports to generate with updated versions.
      * </p>
-     * <p>
-     * You can specify list of {@link com.github.danielflower.mavenplugins.release.VersionReport}
-     * </p>
-     * <pre>
-     * {@code
-     *  <versionReports>
-     *      <versionReport>
-     *          <versionsReportFilePath>released-report.txt</versionsReportFilePath>
-     *          <versionsReportFormat>FLAT</versionsReportFormat>
-     *          <releasedModulesOnly>true</releasedModulesOnly>
-     *      </versionReport>
-     *      <versionReport>
-     *          <versionsReportFilePath>version-report.json</versionsReportFilePath>
-     *          <versionsReportFormat>JSON</versionsReportFormat>
-     *          <releasedModulesOnly>false</releasedModulesOnly>
-     *      </versionReport>
-     *  </versionReports>
-     * }
-     * </pre>
-     * @see com.github.danielflower.mavenplugins.release.VersionReport
      */
     @Parameter(alias = "versionReports")
     private List<VersionReport> versionReports;
+
+    /**
+     * <p>
+     *     Ignored untracked paths for git status
+     * </p>
+     */
+    @Parameter(alias = "ignoredUntrackedPaths", property = "ignoredUntrackedPaths")
+    private Set<String> ignoredUntrackedPaths = new HashSet<>();
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -148,7 +137,7 @@ public class ReleaseMojo extends BaseMojo {
                                                           project.getModel().getScm()))
                 .credentialsProvider(getCredentialsProvider(log))
                 .buildFromCurrentDir();
-            repo.errorIfNotClean();
+            repo.errorIfNotClean(ignoredUntrackedPaths);
 
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer);
