@@ -81,7 +81,7 @@
           <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2022-04-24<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 3.6.0</li>
+          <li id="projectVersion">Version: 3.6.1</li>
           </ul>
         </div>
       </header>
@@ -120,7 +120,7 @@
       
 <p><b>Full name</b>:</p>
       
-<p>com.github.danielflower.mavenplugins:multi-module-maven-release-plugin:3.6.0:release</p>
+<p>com.github.danielflower.mavenplugins:multi-module-maven-release-plugin:3.6.1:release</p>
       
 <p><b>Description</b>:</p>
       
@@ -253,6 +253,24 @@ use:</p>
           
 <tr class="a">
             
+<td align="left"><code><a href="#ignoredUntrackedPaths">&lt;ignoredUntrackedPaths&gt;</a></code></td>
+            
+<td><code>Set</code></td>
+            
+<td><code>-</code></td>
+            
+<td>
+<p>Specifies paths to ignore when checking for untracked files
+before releasing.</p>
+
+<p>By default, any untracked files in the git repo will prevent the
+release from starting. For cases when it is not possible to ignore
+these using a <code>.gitignore</code> file, this setting can be
+used to ignore specific paths during a release.</p><br /><b>User property is</b>: <code>ignoredUntrackedPaths</code>.<br /><b>Alias is</b>: <code>ignoredUntrackedPaths</code>.</td>
+          </tr>
+          
+<tr class="b">
+            
 <td align="left"><code><a href="#knownHosts">&lt;knownHosts&gt;</a></code></td>
             
 <td><code>String</code></td>
@@ -263,7 +281,7 @@ use:</p>
 will override any default value.<br /><b>User property is</b>: <code>knownHosts</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#modulesToForceRelease">&lt;modulesToForceRelease&gt;</a></code></td>
             
@@ -274,7 +292,7 @@ will override any default value.<br /><b>User property is</b>: <code>knownHosts<
 <td>A module to force release on, even if no changes has been detected.<br /><b>User property is</b>: <code>forceRelease</code>.<br /><b>Alias is</b>: <code>forceRelease</code>.</td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#modulesToRelease">&lt;modulesToRelease&gt;</a></code></td>
             
@@ -289,7 +307,7 @@ from the command line, this can be a comma-separated list of module
 names.<br /><b>User property is</b>: <code>modulesToRelease</code>.<br /><b>Alias is</b>: <code>modulesToRelease</code>.</td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#noChangesAction">&lt;noChangesAction&gt;</a></code></td>
             
@@ -302,7 +320,7 @@ Possible values: <code>ReleaseAll</code>, <code>ReleaseNone</code>,
 <code>FailBuild</code><br /><b>Default value is</b>: <code>ReleaseAll</code>.<br /><b>User property is</b>: <code>noChangesAction</code>.<br /><b>Alias is</b>: <code>noChangesAction</code>.</td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#passphrase">&lt;passphrase&gt;</a></code></td>
             
@@ -319,7 +337,7 @@ specify a <code>server</code> in your maven settings file and then
 set the <code>serverId</code> property.</p><br /><b>User property is</b>: <code>passphrase</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#privateKey">&lt;privateKey&gt;</a></code></td>
             
@@ -331,7 +349,7 @@ set the <code>serverId</code> property.</p><br /><b>User property is</b>: <code>
 will use <code>~/.ssh/id_rsa</code><br /><b>User property is</b>: <code>privateKey</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#pullTags">&lt;pullTags&gt;</a></code></td>
             
@@ -344,7 +362,7 @@ number. If false, then tags from the local repository will be used
 instead. Make sure they are up to date to avoid problems.<br /><b>Default value is</b>: <code>true</code>.<br /><b>User property is</b>: <code>pull</code>.<br /><b>Alias is</b>: <code>pullTags</code>.</td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#pushTags">&lt;pushTags&gt;</a></code></td>
             
@@ -355,7 +373,7 @@ instead. Make sure they are up to date to avoid problems.<br /><b>Default value 
 <td>Push tags to remote repository as they are created.<br /><b>Default value is</b>: <code>true</code>.<br /><b>User property is</b>: <code>push</code>.<br /><b>Alias is</b>: <code>pushTags</code>.</td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#releaseProfiles">&lt;releaseProfiles&gt;</a></code></td>
             
@@ -373,7 +391,7 @@ configure it in the plugin configuration, or activate profiles from
 the command line.</p><br /><b>Alias is</b>: <code>releaseProfiles</code>.</td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#serverId">&lt;serverId&gt;</a></code></td>
             
@@ -389,7 +407,7 @@ Maven settings file.</p>
 for more information on configuring servers in Maven.</p><br /><b>User property is</b>: <code>serverId</code>.<br /></td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#skipTests">&lt;skipTests&gt;</a></code></td>
             
@@ -401,7 +419,7 @@ for more information on configuring servers in Maven.</p><br /><b>User property 
 same as adding -DskipTests=true to the release goals.<br /><b>Default value is</b>: <code>false</code>.<br /><b>User property is</b>: <code>skipTests</code>.<br /><b>Alias is</b>: <code>skipTests</code>.</td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#userSettings">&lt;userSettings&gt;</a></code></td>
             
@@ -416,7 +434,7 @@ needed. Please use the '-s' command line parameter to set custom
 user settings.<br /><b>Alias is</b>: <code>userSettings</code>.</td>
           </tr>
           
-<tr class="a">
+<tr class="b">
             
 <td align="left"><code><a href="#versionNamer">&lt;versionNamer&gt;</a></code></td>
             
@@ -428,7 +446,7 @@ user settings.<br /><b>Alias is</b>: <code>userSettings</code>.</td>
 <p>Configures the version naming.</p><br /><b>User property is</b>: <code>versionNamer</code>.<br /></td>
           </tr>
           
-<tr class="b">
+<tr class="a">
             
 <td align="left"><code><a href="#versionReports">&lt;versionReports&gt;</a></code></td>
             
@@ -568,6 +586,27 @@ use:</p>
 <li><b>Required</b>: <code>No</code></li>
           
 <li><b>Alias</b>: <code>releaseGoals</code></li>
+        </ul><hr /></section><section>
+<h4><a name="a.3CignoredUntrackedPaths.3E"></a><b><a name="ignoredUntrackedPaths">&lt;ignoredUntrackedPaths&gt;</a></b></h4>
+        
+<div>
+<p>Specifies paths to ignore when checking for untracked files
+before releasing.</p>
+
+<p>By default, any untracked files in the git repo will prevent the
+release from starting. For cases when it is not possible to ignore
+these using a <code>.gitignore</code> file, this setting can be
+used to ignore specific paths during a release.</p></div>
+        
+<ul>
+          
+<li><b>Type</b>: <code>java.util.Set</code></li>
+          
+<li><b>Required</b>: <code>No</code></li>
+          
+<li><b>User Property</b>: <code>ignoredUntrackedPaths</code></li>
+          
+<li><b>Alias</b>: <code>ignoredUntrackedPaths</code></li>
         </ul><hr /></section><section>
 <h4><a name="a.3CknownHosts.3E"></a><b><a name="knownHosts">&lt;knownHosts&gt;</a></b></h4>
         
