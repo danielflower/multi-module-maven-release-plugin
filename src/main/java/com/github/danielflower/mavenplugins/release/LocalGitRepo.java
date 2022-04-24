@@ -114,22 +114,23 @@ public class LocalGitRepo {
         this.tagPusher = tagPusher;
     }
 
-    public void errorIfNotClean() throws ValidationException {
+    public void errorIfNotClean(Set<String> ignoredUntrackedPaths) throws ValidationException {
         Status status = currentStatus();
-        boolean isClean = status.isClean();
+        Set<String> untracked = new HashSet<>(status.getUntracked());
+        untracked.removeAll(ignoredUntrackedPaths);
+        boolean isClean = !status.hasUncommittedChanges() && untracked.isEmpty();
         if (!isClean) {
             String summary = "Cannot release with uncommitted changes. Please check the following files:";
             List<String> message = new ArrayList<String>();
             message.add(summary);
             Set<String> uncommittedChanges = status.getUncommittedChanges();
-            if (uncommittedChanges.size() > 0) {
+            if (!uncommittedChanges.isEmpty()) {
                 message.add("Uncommitted:");
                 for (String path : uncommittedChanges) {
                     message.add(" * " + path);
                 }
             }
-            Set<String> untracked = status.getUntracked();
-            if (untracked.size() > 0) {
+            if (!untracked.isEmpty()) {
                 message.add("Untracked:");
                 for (String path : untracked) {
                     message.add(" * " + path);

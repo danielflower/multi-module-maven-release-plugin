@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -125,6 +126,14 @@ public class ReleaseMojo extends BaseMojo {
     @Parameter(alias = "versionReports")
     private List<VersionReport> versionReports;
 
+    /**
+     * <p>
+     * Ignored untracked paths for git status
+     * </p>
+     */
+    @Parameter(alias = "ignoredUntrackedPaths", property = "ignoredUntrackedPaths")
+    private Set<String> ignoredUntrackedPaths = new HashSet<>();
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log log = getLog();
@@ -146,7 +155,7 @@ public class ReleaseMojo extends BaseMojo {
                                                           project.getModel().getScm()))
                 .credentialsProvider(getCredentialsProvider(log))
                 .buildFromCurrentDir();
-            repo.errorIfNotClean();
+            repo.errorIfNotClean(ignoredUntrackedPaths);
 
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
             Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer);

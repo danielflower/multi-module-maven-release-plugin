@@ -5,9 +5,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
+import static scaffolding.GitMatchers.hasTag;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -150,5 +152,19 @@ public class ValidationTest {
         }
 
         assertThat(badOne.local, hasCleanWorkingDirectory());
+    }
+
+    @Test
+    public void passIfThereAreUntrackedFilesWhichAreAddedToUntrackedConfiguration() throws Exception {
+        TestProject testProject = TestProject.singleModuleProject();
+        new File(testProject.localDir, "untracked1.txt").createNewFile();
+        new File(testProject.localDir, "someFolder").mkdir();
+        new File(testProject.localDir, "someFolder/untracked2.txt").createNewFile();
+
+        String buildNumber = "1";
+        String expected = "1.0." + buildNumber;
+        List<String> outputLines = testProject.mvnRelease(buildNumber, "-DignoredUntrackedPaths=\"someFolder/untracked2.txt,untracked1.txt\"");
+        assertThat(outputLines, oneOf(containsString("Going to release single-module " + expected)));
+        assertThat(testProject.local, hasTag("single-module-" + expected));
     }
 }
