@@ -12,11 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -128,7 +124,12 @@ public class ReleaseMojo extends BaseMojo {
 
     /**
      * <p>
-     * Ignored untracked paths for git status
+     * Specifies paths to ignore when checking for untracked files before releasing.
+     * </p>
+     * <p>
+     * By default, any untracked files in the git repo will prevent the release from starting. For cases when it
+     * is not possible to ignore these using a <code>.gitignore</code> file, this setting can be used to ignore
+     * specific paths during a release.
      * </p>
      */
     @Parameter(alias = "ignoredUntrackedPaths", property = "ignoredUntrackedPaths")
