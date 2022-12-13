@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+### 3.6.5
+
+* Updated JGit to [5.13.1](https://projects.eclipse.org/projects/technology.jgit/releases/5.13.1)
+
 ### 3.6.0
 
 * Latest tagged version from current branch is used for unchanged modules [issue #118 for details](https://github.com/danielflower/multi-module-maven-release-plugin/issues/118)
