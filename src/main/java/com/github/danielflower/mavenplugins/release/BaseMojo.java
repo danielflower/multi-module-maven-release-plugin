@@ -19,7 +19,6 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import java.util.List;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 /**
  * @author Roland Hauser sourcepond@gmail.com
@@ -195,9 +194,11 @@ public abstract class BaseMojo extends AbstractMojo {
             Server server = settings.getServer(serverId);
             if (server == null) {
                 log.warn(format("No server configuration in Maven settings found with id %s", serverId));
-            }
-            if (server.getUsername() != null && server.getPassword() != null) {
-                return new UsernamePasswordCredentialsProvider(server.getUsername(), server.getPassword());
+            } else {
+                String username = server.getUsername() == null ? "" : server.getUsername();
+                String password = server.getPassword() == null ? "" : server.getPassword();
+                log.debug("Using username-password credentials for server " + serverId + " and username " + username);
+                return new UsernamePasswordCredentialsProvider(username, password);
             }
         }
         return null;
