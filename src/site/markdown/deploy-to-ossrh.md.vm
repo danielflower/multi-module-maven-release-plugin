@@ -4,6 +4,80 @@
 Deploying to OSSRH from GitHub Actions
 --------------------------------------
 
+This page explains how to publish to <https://oss.sonatype.org> (a.k.a. OSSRH) from GitHub Actions, assuming you already
+can release to their manually. See their [Getting Started Guide](https://central.sonatype.org/publish/publish-guide/) if you do not
+have an account already.
+
+In order to publish directly to OSSRH from GitHub Actions, you will need OSSRH credentials, a PGP key for signing
+artifacts, and the correct plugins set up.
+
+$H$H$H Plugin setup
+
+There are some plugins that should only be executed during releases, like the Nexus staging plugin, so you may wish
+to enable a profile during a release which has those plugins. The following will enable the `release` profile during
+a release.
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>${project.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <releaseProfiles>
+                        <releaseProfile>release</releaseProfile>
+                    </releaseProfiles>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+The release profile can just have the `maven-gpg-plugin` (used to sign all the generated artifacts) and the
+`nexus-staging-maven-plugin`. Note that both plugins will use secrets that are saved in `~/.m2/settings.xml` which
+is created in the `release.yaml` file described below.
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+You'll also need to enable the `maven-javadoc-plugin` and `maven-sources-plugin` as per OSSRH requirements. You can
+put these in your `release` profile or normal `build` section.
+
 $H$H$H Secrets management
 
 Add the following secrets to your repository or organisation:
@@ -21,3 +95,53 @@ Make sure HTTPS is used in your `scm` section as SSH URLs will not work during t
         <url>https://github.com/3redronin/mu-acme</url>
         <connection>scm:git:https://github.com/3redronin/mu-acme.git</connection>
     </scm>
+
+$H$H$H Create a release workflow
+
+Create a file in your git repository at `.github/workflows/release.yaml` which has the following contents which will
+first test and verify your package using Java 11, and then release to OSSRH:
+
+```yaml
+name: Publish to Maven Central Repository
+on: workflow_dispatch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install gpg secret key
+        run: cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: Set up maven settings
+        uses: s4u/maven-settings-action@v2.8.0
+        with:
+          servers: |
+            [{
+              "id": "ossrh",
+              "username": "${{ secrets.OSSRH_USERNAME }}",
+              "password": "${{ secrets.OSSRH_TOKEN }}"
+            },
+            {
+              "id": "gpg.passphrase",
+              "passphrase": "${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}",
+              "configuration": {}
+            }]
+      - name: Verify package
+        run: mvn --batch-mode verify
+      - name: Release package
+        run: mvn --batch-mode -DskipTests=true releaser:release
+```
+
+Build triggers, java versions and build steps can be customised for your own requirements. The important bits to make sure remain
+are the `fetch-depth: 0` for checkout (so the plugin can look at the git tags in your repo), the GPG secret key
+installation and the maven-settings action.
+
+With these settings committed and pushed to GitHub, you should see a `Publish to Maven Central` job in the `Actions`
+section which lets you manually run the release.
