@@ -38,6 +38,7 @@
             <li><a href="FAQ.html" title="FAQ">FAQ</a></li>
             <li><a href="ssh-authentication.html" title="SSH Authentication">SSH Authentication</a></li>
             <li><a href="https-authentication.html" title="HTTPS Authentication">HTTPS Authentication</a></li>
+            <li><a href="deploy-to-ossrh.html" title="Deploy to OSSRH">Deploy to OSSRH</a></li>
             <li><a href="changelog.html" title="Changelog">Changelog</a></li>
         </ul>
       </li>
@@ -81,7 +82,7 @@
           <ul class="breadcrumb">
         <li id="publishDate">Last Published: 2023-02-18<span class="divider">|</span>
 </li>
-          <li id="projectVersion">Version: 3.6.2</li>
+          <li id="projectVersion">Version: 3.6-SNAPSHOT</li>
           </ul>
         </div>
       </header>
@@ -96,6 +97,7 @@
     <li><a href="FAQ.html" title="FAQ"><span class="none"></span>FAQ</a></li>
     <li><a href="ssh-authentication.html" title="SSH Authentication"><span class="none"></span>SSH Authentication</a></li>
     <li><a href="https-authentication.html" title="HTTPS Authentication"><span class="none"></span>HTTPS Authentication</a></li>
+    <li><a href="deploy-to-ossrh.html" title="Deploy to OSSRH"><span class="none"></span>Deploy to OSSRH</a></li>
     <li><a href="changelog.html" title="Changelog"><span class="none"></span>Changelog</a></li>
    <li class="nav-header">Project Documentation</li>
     <li><a href="project-info.html" title="Project Information"><span class="icon-chevron-down"></span>Project Information</a>
@@ -421,7 +423,7 @@ const OSI_LICENSE_DB = {"ajaxURL":"https:\/\/opensource.org\/wp-admin\/admin-aja
 		_stq.push([ 'view', {v:'ext',blog:'210318891',post:'395',tz:'0',srv:'opensource.org',hp:'atomic',ac:'3',amp:'0',j:'1:11.9-a.3'} ]);
 		_stq.push([ 'clickTrackerInit', '210318891', '395' ]);
 	</script>
-<script>(function(){var js = "window['__CF$cv$params']={r:'79b666a06d942ab5',m:'kTYi.uW8TepDQqVOhJXUpwhVSz0lM_j71d4Z2AF7CuY-1676719513-0-AXlSSUKKGpI0XR28EJSLIeHPulVHVq/Cj04eDwwDV28QLk2xBzqKEqlQJIoYLCLCQpp/Uju7VWLeAgMGeGnptS503743Sqr2lfqC8cfbenDnTxqvpfY4dSzjzf43siEVZw==',s:[0x94c443cb0f,0xfa802cad43],u:'/cdn-cgi/challenge-platform/h/g'};var now=Date.now()/1000,offset=14400,ts=''+(Math.floor(now)-Math.floor(now%offset)),_cpo=document.createElement('script');_cpo.nonce='',_cpo.src='/cdn-cgi/challenge-platform/h/g/scripts/alpha/invisible.js?ts='+ts,document.getElementsByTagName('head')[0].appendChild(_cpo);";var _0xh = document.createElement('iframe');_0xh.height = 1;_0xh.width = 1;_0xh.style.position = 'absolute';_0xh.style.top = 0;_0xh.style.left = 0;_0xh.style.border = 'none';_0xh.style.visibility = 'hidden';document.body.appendChild(_0xh);function handler() {var _0xi = _0xh.contentDocument || _0xh.contentWindow.document;if (_0xi) {var _0xj = _0xi.createElement('script');_0xj.nonce = '';_0xj.innerHTML = js;_0xi.getElementsByTagName('head')[0].appendChild(_0xj);}}if (document.readyState !== 'loading') {handler();} else if (window.addEventListener) {document.addEventListener('DOMContentLoaded', handler);} else {var prev = document.onreadystatechange || function () {};document.onreadystatechange = function (e) {prev(e);if (document.readyState !== 'loading') {document.onreadystatechange = prev;handler();}};}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/vaafb692b2aea4879b33c060e79fe94621666317369993" integrity="sha512-0ahDYl866UMhKuYcW078ScMalXqtFJggm7TmlUtp0UlD4eQk0Ixfnm5ykXKvGJNFjLMoortdseTfsRT8oCfgGA==" data-cf-beacon='{"rayId":"79b666a06d942ab5","version":"2023.2.0","r":1,"token":"36722192e396422c8012b09d7db81d9c","si":100}' crossorigin="anonymous"></script>
+<script>(function(){var js = "window['__CF$cv$params']={r:'79b7dca628760cdf',m:'q_T4Nk1zcYegiG6VMSCQwONqnQ4I4PV1pFHklanBUnk-1676734833-0-AV5XSFor/Tccdq1+/+oJhZt2XP7fDikmf0VtMtx7yYhIrVOdZbA7tJTI8+5+l4Fu3Yh1o4DwXDNAnNnqNiutNao//9sZyzoOa8ahgMEPG4p3xNl/0gfSmxOmzdYGB+0TGA==',s:[0x8b32e810e9,0x4dba4499e8],u:'/cdn-cgi/challenge-platform/h/g'};var now=Date.now()/1000,offset=14400,ts=''+(Math.floor(now)-Math.floor(now%offset)),_cpo=document.createElement('script');_cpo.nonce='',_cpo.src='/cdn-cgi/challenge-platform/h/g/scripts/alpha/invisible.js?ts='+ts,document.getElementsByTagName('head')[0].appendChild(_cpo);";var _0xh = document.createElement('iframe');_0xh.height = 1;_0xh.width = 1;_0xh.style.position = 'absolute';_0xh.style.top = 0;_0xh.style.left = 0;_0xh.style.border = 'none';_0xh.style.visibility = 'hidden';document.body.appendChild(_0xh);function handler() {var _0xi = _0xh.contentDocument || _0xh.contentWindow.document;if (_0xi) {var _0xj = _0xi.createElement('script');_0xj.nonce = '';_0xj.innerHTML = js;_0xi.getElementsByTagName('head')[0].appendChild(_0xj);}}if (document.readyState !== 'loading') {handler();} else if (window.addEventListener) {document.addEventListener('DOMContentLoaded', handler);} else {var prev = document.onreadystatechange || function () {};document.onreadystatechange = function (e) {prev(e);if (document.readyState !== 'loading') {document.onreadystatechange = prev;handler();}};}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/vaafb692b2aea4879b33c060e79fe94621666317369993" integrity="sha512-0ahDYl866UMhKuYcW078ScMalXqtFJggm7TmlUtp0UlD4eQk0Ixfnm5ykXKvGJNFjLMoortdseTfsRT8oCfgGA==" data-cf-beacon='{"rayId":"79b7dca628760cdf","version":"2023.2.0","r":1,"token":"36722192e396422c8012b09d7db81d9c","si":100}' crossorigin="anonymous"></script>
 </section></section>
         </main>
       </div>
