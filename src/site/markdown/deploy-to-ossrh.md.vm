@@ -1,0 +1,23 @@
+## Velocity treats double hashes as comments, which messes with markdown files. So $H can be used instead.
+#set( $H = '#' )
+
+Deploying to OSSRH from GitHub Actions
+--------------------------------------
+
+$H$H$H Secrets management
+
+Add the following secrets to your repository or organisation:
+
+* **OSSRH_USERNAME** - the username you use to log in to OSS Nexus
+* **OSSRH_TOKEN** - the password for your OSSRH user
+* **OSSRH_GPG_SECRET_KEY** - your GPG key as described [here](https://gist.github.com/sualeh/ae78dc16123899d7942bc38baba5203c).
+* **OSSRH_GPG_SECRET_KEY_PASSWORD** - the password for your GPG key
+
+$H$H$H Set your SCM plugin URLs to use HTTPS
+
+Make sure HTTPS is used in your `scm` section as SSH URLs will not work during the release from GitHub Actions. For example:
+
+    <scm>
+        <url>https://github.com/3redronin/mu-acme</url>
+        <connection>scm:git:https://github.com/3redronin/mu-acme.git</connection>
+    </scm>
