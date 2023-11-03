@@ -90,7 +90,7 @@ public class Reactor {
             String equivalentVersion = null;
 
             if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
-                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we was asked to forced release.");
+                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we were asked to force release.");
             } else if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
