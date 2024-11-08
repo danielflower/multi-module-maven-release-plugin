@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.github.danielflower.mavenplugins.testprojects.openapi-spec-as-plugin-dependency</groupId>
+    <artifactId>openapi-spec-as-plugin-dependency-aggregator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>the-service-impl</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.danielflower.mavenplugins.testprojects.openapi-spec-as-plugin-dependency</groupId>
+      <artifactId>the-openapi-spec</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <version>2.2.20</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+      <version>0.2.6</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.danielflower.mavenplugins</groupId>
+        <artifactId>multi-module-maven-release-plugin</artifactId>
+        <version>${current.plugin.version}</version>
+        <configuration>
+          <releaseGoals>
+            <releaseGoal>install</releaseGoal>
+          </releaseGoals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>7.8.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.github.danielflower.mavenplugins.testprojects.openapi-spec-as-plugin-dependency</groupId>
+            <artifactId>the-openapi-spec</artifactId>
+            <version>1.0-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>openapi-spec.yaml</inputSpec>
+              <generatorName>spring</generatorName>
+              <apiPackage>com.github.danielflower.mavenplugins.tesetprojects.openapispecasplugindependency.facade.openapi.api</apiPackage>
+              <modelPackage>com.github.danielflower.mavenplugins.tesetprojects.openapispecasplugindependency.facade.openapi.model</modelPackage>
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <verbose>false</verbose>
+              <configHelp>false</configHelp>
+              <configOptions>
+                <useSpringBoot3>true</useSpringBoot3>
+                <dateLibrary>java8</dateLibrary>
+                <interfaceOnly>true</interfaceOnly>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <generateBuilders>true</generateBuilders>
+                <useEnumCaseInsensitive>true</useEnumCaseInsensitive>
+                <implicitHeaders>true</implicitHeaders>
+                <useTags>true</useTags>
+                <idea>true</idea>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

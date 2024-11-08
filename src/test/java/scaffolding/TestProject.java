@@ -50,15 +50,15 @@ public class TestProject {
 
     public List<String> mvnRelease(String buildNumber) throws IOException, InterruptedException {
         return mvnRunner.runMaven(localDir,
-            "-DbuildNumber=" + buildNumber,
-            "releaser:release");
+                "-DbuildNumber=" + buildNumber,
+                "releaser:release");
     }
 
-    public List<String> mvnRelease(String buildNumber, String...arguments) throws IOException, InterruptedException {
+    public List<String> mvnRelease(String buildNumber, String... arguments) throws IOException, InterruptedException {
         return mvnRun("releaser:release", buildNumber, arguments);
     }
 
-    public List<String> mvnReleaserNext(String buildNumber, String...arguments) throws IOException, InterruptedException {
+    public List<String> mvnReleaserNext(String buildNumber, String... arguments) throws IOException, InterruptedException {
         return mvnRun("releaser:next", buildNumber, arguments);
     }
 
@@ -93,7 +93,7 @@ public class TestProject {
         String[] args = new String[arguments.length + 2];
         args[0] = "-DbuildNumber=" + buildNumber;
         System.arraycopy(arguments, 0, args, 1, arguments.length);
-        args[args.length-1] = goal;
+        args[args.length - 1] = goal;
         return mvnRunner.runMaven(localDir, args);
     }
 
@@ -111,10 +111,10 @@ public class TestProject {
 
             File localDir = Photocopier.folderForSampleProject(name);
             Git local = Git.cloneRepository()
-                .setBare(false)
-                .setDirectory(localDir)
-                .setURI(originDir.toURI().toString())
-                .call();
+                    .setBare(false)
+                    .setDirectory(localDir)
+                    .setURI(originDir.toURI().toString())
+                    .call();
 
             return new TestProject(originDir, origin, localDir, local);
         } catch (Exception e) {
@@ -186,7 +186,7 @@ public class TestProject {
     }
 
     public static TestProject dependencyManagementUsingParentModuleVersionPropertyProject() {
-	    return project("dependencymanagement-using-parent-module-version-property");
+        return project("dependencymanagement-using-parent-module-version-property");
     }
 
     public static TestProject moduleWithTestFailure() {
@@ -196,12 +196,17 @@ public class TestProject {
     public static TestProject moduleWithSnapshotDependencies() {
         return project("snapshot-dependencies");
     }
+
     public static TestProject moduleWithSnapshotDependenciesWithVersionProperties() {
         return project("snapshot-dependencies-with-version-properties");
     }
 
     public static TestProject differentDelimiterProject() {
         return project("different-delimiter");
+    }
+
+    public static TestProject openapiSpecAsPluginDependency() {
+        return project("openapi-spec-as-plugin-dependency");
     }
 
     public void setMvnRunner(MvnRunner mvnRunner) {

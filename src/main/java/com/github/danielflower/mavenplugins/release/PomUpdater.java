@@ -104,6 +104,9 @@ public class PomUpdater {
         if (originalModel.getBuild() != null && originalModel.getBuild().getPlugins() != null) {
             for (Plugin plugin : originalModel.getBuild().getPlugins()) {
                 alterSinglePlugin(errors, searchingFrom, projectProperties, plugin);
+                for (Dependency dependency : plugin.getDependencies()) {
+                    alterSingleDependency(errors, searchingFrom, projectProperties, dependency);
+                }
             }
         }
 
@@ -125,7 +128,7 @@ public class PomUpdater {
         }
         return errors;
     }
-    
+
     private boolean isReleasablePlugin(Plugin plugin) {
         try {
             reactor.find(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion());
