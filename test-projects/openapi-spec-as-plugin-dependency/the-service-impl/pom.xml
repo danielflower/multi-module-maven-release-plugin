@@ -27,13 +27,9 @@
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <version>2.2.20</version>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.3.2</version>
     </dependency>
     <dependency>
       <groupId>jakarta.validation</groupId>
@@ -44,6 +40,21 @@
       <groupId>org.openapitools</groupId>
       <artifactId>jackson-databind-nullable</artifactId>
       <version>0.2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.18.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.18.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
     </dependency>
   </dependencies>
 
@@ -77,23 +88,17 @@
             </goals>
             <configuration>
               <inputSpec>openapi-spec.yaml</inputSpec>
-              <generatorName>spring</generatorName>
+              <generatorName>java</generatorName>
+              <library>native</library>
               <apiPackage>com.github.danielflower.mavenplugins.tesetprojects.openapispecasplugindependency.facade.openapi.api</apiPackage>
               <modelPackage>com.github.danielflower.mavenplugins.tesetprojects.openapispecasplugindependency.facade.openapi.model</modelPackage>
-              <generateSupportingFiles>false</generateSupportingFiles>
               <verbose>false</verbose>
               <configHelp>false</configHelp>
               <configOptions>
-                <useSpringBoot3>true</useSpringBoot3>
+                <annotationLibrary>none</annotationLibrary>
                 <dateLibrary>java8</dateLibrary>
-                <interfaceOnly>true</interfaceOnly>
-                <skipDefaultInterface>true</skipDefaultInterface>
-                <useBeanValidation>true</useBeanValidation>
-                <generateBuilders>true</generateBuilders>
-                <useEnumCaseInsensitive>true</useEnumCaseInsensitive>
-                <implicitHeaders>true</implicitHeaders>
-                <useTags>true</useTags>
-                <idea>true</idea>
+                <useBeanValidation>false</useBeanValidation>
+                <generateBuilders>false</generateBuilders>
               </configOptions>
             </configuration>
           </execution>
