@@ -1,0 +1,25 @@
+openapi: 3.0.3
+info:
+  title: Fee Service errors
+  version: 1.0.0
+  license:
+    name: All rights reserved by multi-module-maven-release-plugin
+
+paths: { }
+
+components:
+
+  # Response-Error definitions
+  responses:
+    500_Response:
+      description: |
+        Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: 'openapi-common-error-types.yaml#/components/schemas/Fault'
+          example:
+            errors:
+              - id: '6629232743873699088'
+                status: 500
+                message: Internal server error

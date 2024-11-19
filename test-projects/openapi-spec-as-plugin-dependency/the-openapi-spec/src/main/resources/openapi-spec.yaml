@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: Openapi Spec As Plugin dependency test
+  description: |
+    Some dummy specification
+  version: 1.0.0
+  contact:
+    name: Michael Saladin
+    email: noreply@notexist.ch
+  license:
+    name: All rights reserved by multi-module-maven-release-plugin
+    url: https://github.com/danielflower/multi-module-maven-release-plugin
+servers:
+  - url: 'http://localhost:8080/api'
+tags:
+  - name: Dummy
+    description: Dummy operations
+components:
+  securitySchemes:
+    basicAuth:
+      description: |
+        No description
+      type: http
+      scheme: basic
+    bearerAuth:
+      description: |
+        No description
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - basicAuth: [ ]
+  - bearerAuth: [ ]
+
+paths:
+  /fee/ping:
+    get:
+      tags:
+        - Ping
+      summary: Unauthenticated ping service
+      description: Returns a ping result.
+      operationId: ping
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: 'schemas/openapi-common-types.yaml#/components/schemas/PingResult'
+        '400':
+          description: |
+            Client Error.
+          content:
+            application/json:
+              schema:
+                $ref: 'schemas/openapi-common-error-types.yaml#/components/schemas/Fault'
+        '500':
+          $ref: 'schemas/openapi-errors.yaml#/components/responses/500_Response'

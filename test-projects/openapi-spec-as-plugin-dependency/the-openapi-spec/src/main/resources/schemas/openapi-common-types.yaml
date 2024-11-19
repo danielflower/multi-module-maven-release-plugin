@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: Openapi common types
+  description: |
+    No description
+  version: 1.0.0
+  license:
+    name: All rights reserved by multi-module-maven-release-plugin
+paths: { }
+components:
+  schemas:
+    PingResult:
+      description: |
+        Service responds with a timestamp, not meant to be parsed or used in any way.
+      type: object
+      required:
+        - timestamp
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+
