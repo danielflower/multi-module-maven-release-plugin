@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.danielflower.mavenplugins.release.MavenVersionResolver.resolveVersionsDefinedThroughProperties;
 
@@ -28,8 +29,8 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer, Set<String> ignoredPaths) throws ValidationException, GitAPIException, MojoExecutionException {
+        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository(), ignoredPaths);
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
 
         resolveVersionsDefinedThroughProperties(projects);
@@ -121,7 +122,7 @@ public class Reactor {
                     throw new MojoExecutionException("No module changes have been detected");
                 default:
                     log.warn("No changes have been detected in any modules so will re-release them all");
-                    List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
+                    List<ReleasableModule> newList = new ArrayList<>();
                     for (ReleasableModule module : modules) {
                         newList.add(module.createReleasableVersion());
                     }

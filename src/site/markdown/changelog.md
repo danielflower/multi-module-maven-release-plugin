@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+### 3.7.0
+
+* Allow to define paths which should be ignored when detecting changes (`.gitignore` et.al.), #77
+
 ### 3.6.0
 
 * Latest tagged version from current branch is used for unchanged modules [issue #118 for details](https://github.com/danielflower/multi-module-maven-release-plugin/issues/118)
@@ -10,7 +14,7 @@ Changelog
 
 * Added support for processing version properties e.g. `<version>${foo.version}</version>`
 * Added support for processing dependencies in `<dependencyManagement>` sections e.g. for BOMs
-* Fix bugs with custom delimiters (joins build number to version)  
+* Fix bugs with custom delimiters (joins build number to version)
 
 ### 3.1.2
 
@@ -92,7 +96,7 @@ Warning: inadvertently requires java 8 (rather than java 7). Use 2.0.11 for java
 #### 1.3.4
 
 * Fixed bug where a partial build failure where a single commit has multiple tags could result in subsequent releases
-failing due to the plugin picking the older tag to use when it is detected that the module hadn't changed. 
+failing due to the plugin picking the older tag to use when it is detected that the module hadn't changed.
 
 ### 1.3.0
 
@@ -113,9 +117,9 @@ should force all children to be updated.
 
 ### 1.1.0
 
-* Bug fix: tags are now pushed before building so that in the event of failure, the next build will use an incremented build number. 
-This is needed for cases where part of the build succeeded and some module(s) were uploaded to Nexus - re-uploading would cause an 
-error if the build number is not incremented. 
+* Bug fix: tags are now pushed before building so that in the event of failure, the next build will use an incremented build number.
+This is needed for cases where part of the build succeeded and some module(s) were uploaded to Nexus - re-uploading would cause an
+error if the build number is not incremented.
 
 #### 1.0.2
 
