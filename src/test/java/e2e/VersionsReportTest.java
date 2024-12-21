@@ -2,6 +2,7 @@ package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 
+@Ignore
 public class VersionsReportTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

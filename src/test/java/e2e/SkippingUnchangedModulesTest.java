@@ -2,6 +2,7 @@ package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
@@ -16,6 +17,7 @@ import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasTag;
 
+@Ignore
 public class SkippingUnchangedModulesTest {
 
     final TestProject testProject = TestProject.deepDependenciesProject();

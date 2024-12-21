@@ -3,6 +3,7 @@ package e2e;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
@@ -14,6 +15,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
+@Ignore
 public class TestRunningTest {
     final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
 

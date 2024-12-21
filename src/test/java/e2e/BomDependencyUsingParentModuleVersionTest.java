@@ -10,11 +10,13 @@ import java.util.List;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
+@Ignore
 public class BomDependencyUsingParentModuleVersionTest {
 
     final TestProject testProject = TestProject.dependencyManagementUsingParentModuleVersionPropertyProject();

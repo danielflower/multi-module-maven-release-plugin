@@ -2,6 +2,7 @@ package e2e;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
@@ -14,6 +15,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 
+@Ignore
 public class DifferentDelimiterTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

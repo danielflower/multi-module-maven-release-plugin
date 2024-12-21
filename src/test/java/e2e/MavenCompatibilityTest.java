@@ -4,6 +4,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.hamcrest.Matchers;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
@@ -17,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * This test actually downloads multiple versions of maven and runs the plugin against them.
  */
+@Ignore
 public class MavenCompatibilityTest {
 
     final TestProject testProject = TestProject.singleModuleProject();

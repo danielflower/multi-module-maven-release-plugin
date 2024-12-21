@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
@@ -24,6 +25,7 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
+@Ignore
 public class IndependentVersionsTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

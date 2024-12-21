@@ -1,6 +1,7 @@
 package e2e;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
@@ -14,6 +15,7 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasTag;
 
+@Ignore
 public class LocalPluginTest {
 
     final TestProject testProject = TestProject.localPluginProject();

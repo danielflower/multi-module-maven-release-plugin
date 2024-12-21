@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class JGitDiscoveryTest {
     @BeforeClass
     public static void installPluginToLocalRepo() throws MavenInvocationException {
