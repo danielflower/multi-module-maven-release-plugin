@@ -81,7 +81,7 @@
           <ul class="breadcrumb">
         <li id="publishDate">$i18n.getString( "site-renderer", $locale, "template.lastpublished" ): $dateValue<span class="divider">|</span>
 </li>
-          <li id="projectVersion">$i18n.getString( "site-renderer", $locale, "template.version" ): 3.7-SNAPSHOT</li>
+          <li id="projectVersion">$i18n.getString( "site-renderer", $locale, "template.version" ): 3.7.6</li>
           </ul>
         </div>
       </header>
@@ -149,12 +149,12 @@ function toggleDisplay(elementId) {
 <th>Success Rate</th>
 <th>Time</th></tr>
 <tr class="b">
-<td>126</td>
+<td>75</td>
 <td>0</td>
-<td>1</td>
 <td>0</td>
-<td>99.2%</td>
-<td>567.1 s</td></tr></table><br />
+<td>19</td>
+<td>74.7%</td>
+<td>15.55 s</td></tr></table><br />
 <p>Note: failures are anticipated and checked for with assertions while errors are unanticipated.</p><br /></section><section><a id="Package_List"></a>
 <h2>Package List</h2>
 <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p><br />
@@ -169,12 +169,12 @@ function toggleDisplay(elementId) {
 <th>Time</th></tr>
 <tr class="b">
 <td><a href="#e2e">e2e</a></td>
-<td>72</td>
+<td>21</td>
 <td>0</td>
-<td>1</td>
 <td>0</td>
-<td>98.6%</td>
-<td>561.5 s</td></tr>
+<td>19</td>
+<td>9.5%</td>
+<td>13.45 s</td></tr>
 <tr class="a">
 <td><a href="#com.github.danielflower.mavenplugins.release">com.github.danielflower.mavenplugins.release</a></td>
 <td>54</td>
@@ -182,7 +182,7 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>5.684 s</td></tr></table><br />
+<td>2.100 s</td></tr></table><br />
 <p>Note: package statistics are not computed recursively, they only sum up all of its testsuites numbers.</p><section><a id="e2e"></a>
 <h3>e2e</h3>
 <table class="table table-striped">
@@ -196,51 +196,114 @@ function toggleDisplay(elementId) {
 <th>Success Rate</th>
 <th>Time</th></tr>
 <tr class="b">
-<td><a href="#e2e.BomDependencyTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.BomDependencyTest">BomDependencyTest</a></td>
-<td>4</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>48.54 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.BomDependencyUsingParentModuleVersionTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.BomDependencyUsingParentModuleVersionTest">BomDependencyUsingParentModuleVersionTest</a></td>
-<td>4</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>55.65 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.DifferentDelimiterTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.DifferentDelimiterTest">DifferentDelimiterTest</a></td>
+<td><a href="#e2e.GitRelatedTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.GitRelatedTest">GitRelatedTest</a></td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>11.37 s</td></tr>
+<td>1</td>
+<td>0%</td>
+<td>0.001 s</td></tr>
 <tr class="a">
-<td><a href="#e2e.ExecutionTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.ExecutionTest">ExecutionTest</a></td>
-<td>6</td>
+<td><a href="#e2e.ParentAsSiblingTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.ParentAsSiblingTest">ParentAsSiblingTest</a></td>
+<td>1</td>
 <td>0</td>
 <td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>28.68 s</td></tr>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><a href="#e2e.GitRelatedTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.GitRelatedTest">GitRelatedTest</a></td>
-<td>4</td>
+<td><a href="#e2e.JGitDiscoveryTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.JGitDiscoveryTest">JGitDiscoveryTest</a></td>
+<td>1</td>
 <td>0</td>
 <td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>8.984 s</td></tr>
+<td>1</td>
+<td>0%</td>
+<td>0.002 s</td></tr>
 <tr class="a">
+<td><a href="#e2e.VersionsReportTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.VersionsReportTest">VersionsReportTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.IndependentVersionsTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.IndependentVersionsTest">IndependentVersionsTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.BomDependencyUsingParentModuleVersionTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.BomDependencyUsingParentModuleVersionTest">BomDependencyUsingParentModuleVersionTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.MavenCompatibilityTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.MavenCompatibilityTest">MavenCompatibilityTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.041 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.PartialReleaseTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.PartialReleaseTest">PartialReleaseTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.002 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.InheritedVersionsTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.InheritedVersionsTest">InheritedVersionsTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.TestRunningTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.TestRunningTest">TestRunningTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.NestedModulesTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.NestedModulesTest">NestedModulesTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.ExecutionTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.ExecutionTest">ExecutionTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="b">
 <td><a href="#e2e.HelpTest"><img src="images/icon_success_sml.gif" /></a></td>
 <td><a href="#e2e.HelpTest">HelpTest</a></td>
 <td>2</td>
@@ -248,133 +311,70 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>3.040 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.IndependentVersionsTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.IndependentVersionsTest">IndependentVersionsTest</a></td>
-<td>3</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>19.00 s</td></tr>
+<td>13.40 s</td></tr>
 <tr class="a">
-<td><a href="#e2e.InheritedVersionsTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.InheritedVersionsTest">InheritedVersionsTest</a></td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>16.18 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.JGitDiscoveryTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.JGitDiscoveryTest">JGitDiscoveryTest</a></td>
-<td>3</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0.060 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.LocalPluginTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.LocalPluginTest">LocalPluginTest</a></td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>7.761 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.MavenCompatibilityTest"><img src="images/icon_warning_sml.gif" /></a></td>
-<td><a href="#e2e.MavenCompatibilityTest">MavenCompatibilityTest</a></td>
-<td>5</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>80.0%</td>
-<td>43.87 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.NestedModulesTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.NestedModulesTest">NestedModulesTest</a></td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>49.74 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.NextMojoTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#e2e.NextMojoTest"><img src="images/icon_warning_sml.gif" /></a></td>
 <td><a href="#e2e.NextMojoTest">NextMojoTest</a></td>
-<td>5</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>39.06 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.ParentAsSiblingTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.ParentAsSiblingTest">ParentAsSiblingTest</a></td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>19.57 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.PartialReleaseTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.PartialReleaseTest">PartialReleaseTest</a></td>
-<td>3</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>26.44 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.SingleModuleTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.SingleModuleTest">SingleModuleTest</a></td>
-<td>6</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>53.62 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.SkippingUnchangedModulesTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.SkippingUnchangedModulesTest">SkippingUnchangedModulesTest</a></td>
-<td>7</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>76.28 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.TestRunningTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.TestRunningTest">TestRunningTest</a></td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>9.734 s</td></tr>
-<tr class="b">
-<td><a href="#e2e.ValidationTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.ValidationTest">ValidationTest</a></td>
-<td>8</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>38.24 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.VersionsReportTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#e2e.VersionsReportTest">VersionsReportTest</a></td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.002 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.SkippingUnchangedModulesTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.SkippingUnchangedModulesTest">SkippingUnchangedModulesTest</a></td>
+<td>1</td>
 <td>0</td>
-<td>100%</td>
-<td>5.627 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release"></a>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.LocalPluginTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.LocalPluginTest">LocalPluginTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.001 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.BomDependencyTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.BomDependencyTest">BomDependencyTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.ValidationTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.ValidationTest">ValidationTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><a href="#e2e.SingleModuleTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.SingleModuleTest">SingleModuleTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><a href="#e2e.DifferentDelimiterTest"><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a href="#e2e.DifferentDelimiterTest">DifferentDelimiterTest</a></td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+<td>0 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release"></a>
 <h3>com.github.danielflower.mavenplugins.release</h3>
 <table class="table table-striped">
 <tr class="a">
@@ -387,33 +387,6 @@ function toggleDisplay(elementId) {
 <th>Success Rate</th>
 <th>Time</th></tr>
 <tr class="b">
-<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest">AnnotatedTagFinderTest</a></td>
-<td>6</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>1.376 s</td></tr>
-<tr class="a">
-<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagTest">AnnotatedTagTest</a></td>
-<td>3</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0.293 s</td></tr>
-<tr class="b">
-<td><a href="#com.github.danielflower.mavenplugins.release.BaseMojoTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#com.github.danielflower.mavenplugins.release.BaseMojoTest">BaseMojoTest</a></td>
-<td>7</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0.427 s</td></tr>
-<tr class="a">
 <td><a href="#com.github.danielflower.mavenplugins.release.DiffDetectorTest"><img src="images/icon_success_sml.gif" /></a></td>
 <td><a href="#com.github.danielflower.mavenplugins.release.DiffDetectorTest">DiffDetectorTest</a></td>
 <td>8</td>
@@ -421,8 +394,8 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>2.181 s</td></tr>
-<tr class="b">
+<td>0.504 s</td></tr>
+<tr class="a">
 <td><a href="#com.github.danielflower.mavenplugins.release.LocalGitRepoTest"><img src="images/icon_success_sml.gif" /></a></td>
 <td><a href="#com.github.danielflower.mavenplugins.release.LocalGitRepoTest">LocalGitRepoTest</a></td>
 <td>4</td>
@@ -430,34 +403,7 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>1.156 s</td></tr>
-<tr class="a">
-<td><a href="#com.github.danielflower.mavenplugins.release.ReactorTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#com.github.danielflower.mavenplugins.release.ReactorTest">ReactorTest</a></td>
-<td>4</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0.003 s</td></tr>
-<tr class="b">
-<td><a href="#com.github.danielflower.mavenplugins.release.ReleasableModuleTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#com.github.danielflower.mavenplugins.release.ReleasableModuleTest">ReleasableModuleTest</a></td>
-<td>2</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0 s</td></tr>
-<tr class="a">
-<td><a href="#com.github.danielflower.mavenplugins.release.ReleaseInvokerTest"><img src="images/icon_success_sml.gif" /></a></td>
-<td><a href="#com.github.danielflower.mavenplugins.release.ReleaseInvokerTest">ReleaseInvokerTest</a></td>
-<td>13</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>100%</td>
-<td>0.205 s</td></tr>
+<td>0.417 s</td></tr>
 <tr class="b">
 <td><a href="#com.github.danielflower.mavenplugins.release.SshAgentSessionFactoryTest"><img src="images/icon_success_sml.gif" /></a></td>
 <td><a href="#com.github.danielflower.mavenplugins.release.SshAgentSessionFactoryTest">SshAgentSessionFactoryTest</a></td>
@@ -466,8 +412,17 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0.043 s</td></tr>
+<td>0.042 s</td></tr>
 <tr class="a">
+<td><a href="#com.github.danielflower.mavenplugins.release.ReleasableModuleTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#com.github.danielflower.mavenplugins.release.ReleasableModuleTest">ReleasableModuleTest</a></td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+<td>0 s</td></tr>
+<tr class="b">
 <td><a href="#com.github.danielflower.mavenplugins.release.VersionNamerTest"><img src="images/icon_success_sml.gif" /></a></td>
 <td><a href="#com.github.danielflower.mavenplugins.release.VersionNamerTest">VersionNamerTest</a></td>
 <td>6</td>
@@ -475,149 +430,167 @@ function toggleDisplay(elementId) {
 <td>0</td>
 <td>0</td>
 <td>100%</td>
-<td>0 s</td></tr></table></section><br /></section><section><a id="Test_Cases"></a>
-<h2>Test Cases</h2>
-<p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p><section><a id="com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest"></a>
-<h3>AnnotatedTagFinderTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.respectDelimiterWhenExtractingBuildNumber"></a>respectDelimiterWhenExtractingBuildNumber</td>
-<td>0.005 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.returnsMultipleTagsOnASingleCommit"></a>returnsMultipleTagsOnASingleCommit</td>
-<td>0.725 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.returnsOnlyTagsOfCurrentBranch"></a>returnsOnlyTagsOfCurrentBranch</td>
-<td>0.230 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.canRecogniseTagsThatArePotentiallyOfTheSameVersion"></a>canRecogniseTagsThatArePotentiallyOfTheSameVersion</td>
-<td>0 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.versionNamerCaresNotForOrderOfTags"></a>versionNamerCaresNotForOrderOfTags</td>
 <td>0.001 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.findsTheLatestCommitWhereThereHaveBeenNoBranches"></a>findsTheLatestCommitWhereThereHaveBeenNoBranches</td>
-<td>0.373 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.AnnotatedTagTest"></a>
-<h3>AnnotatedTagTest</h3>
-<table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagTest.ifATagIsSavedWithoutJsonThenTheVersionIsSetTo0Dot0"></a>ifATagIsSavedWithoutJsonThenTheVersionIsSetTo0Dot0</td>
-<td>0.156 s</td></tr>
+<td><a href="#com.github.danielflower.mavenplugins.release.BaseMojoTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#com.github.danielflower.mavenplugins.release.BaseMojoTest">BaseMojoTest</a></td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+<td>0.090 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagTest.gettersReturnValuesPassedIn"></a>gettersReturnValuesPassedIn</td>
-<td>0 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagTest.aTagCanBeCreatedFromAGitTag"></a>aTagCanBeCreatedFromAGitTag</td>
-<td>0.135 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.BaseMojoTest"></a>
-<h3>BaseMojoTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_PomIdentityFile"></a>configureJsch_PomIdentityFile</td>
-<td>0.400 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_SshAgentDisabled"></a>configureJsch_SshAgentDisabled</td>
-<td>0.004 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_SettingsIdentityFile"></a>configureJsch_SettingsIdentityFile</td>
-<td>0.006 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_CustomKnownHosts"></a>configureJsch_CustomKnownHosts</td>
+<td><a href="#com.github.danielflower.mavenplugins.release.ReactorTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#com.github.danielflower.mavenplugins.release.ReactorTest">ReactorTest</a></td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
 <td>0.003 s</td></tr>
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_CustomIdentityOverridesPom"></a>configureJsch_CustomIdentityOverridesPom</td>
-<td>0.003 s</td></tr>
+<td><a href="#com.github.danielflower.mavenplugins.release.ReleaseInvokerTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#com.github.danielflower.mavenplugins.release.ReleaseInvokerTest">ReleaseInvokerTest</a></td>
+<td>13</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+<td>0.762 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_ServerIdDoesNotExist"></a>configureJsch_ServerIdDoesNotExist</td>
-<td>0.008 s</td></tr>
+<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest">AnnotatedTagFinderTest</a></td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+<td>0.212 s</td></tr>
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_CustomPassphraseOverridesPom"></a>configureJsch_CustomPassphraseOverridesPom</td>
-<td>0.002 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.DiffDetectorTest"></a>
+<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagTest"><img src="images/icon_success_sml.gif" /></a></td>
+<td><a href="#com.github.danielflower.mavenplugins.release.AnnotatedTagTest">AnnotatedTagTest</a></td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+<td>0.069 s</td></tr></table></section><br /></section><section><a id="Test_Cases"></a>
+<h2>Test Cases</h2>
+<p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p><section><a id="com.github.danielflower.mavenplugins.release.DiffDetectorTest"></a>
 <h3>DiffDetectorTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectLatestTagOnBranch"></a>canDetectLatestTagOnBranch</td>
-<td>0.219 s</td></tr>
+<td>0.051 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectLatestBuildNoMatterIfCreatedWrongWayRound"></a>canDetectLatestBuildNoMatterIfCreatedWrongWayRound</td>
-<td>0.158 s</td></tr>
+<td>0.038 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectLocalChangesWithModuleFolders"></a>canDetectLocalChangesWithModuleFolders</td>
-<td>0.422 s</td></tr>
+<td>0.112 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectThingsInTheRoot"></a>canDetectThingsInTheRoot</td>
-<td>0.178 s</td></tr>
+<td>0.048 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag"></a>canDetectIfFilesHaveBeenChangedForAModuleSinceSomeSpecificTag</td>
-<td>0.307 s</td></tr>
+<td>0.065 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectChangesAfterTheLastTag"></a>canDetectChangesAfterTheLastTag</td>
-<td>0.316 s</td></tr>
+<td>0.065 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canDetectLatestBuild"></a>canDetectLatestBuild</td>
-<td>0.163 s</td></tr>
+<td>0.039 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.DiffDetectorTest.canIgnoreChangesInModuleFolders"></a>canIgnoreChangesInModuleFolders</td>
-<td>0.417 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.LocalGitRepoTest"></a>
+<td>0.082 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.LocalGitRepoTest"></a>
 <h3>LocalGitRepoTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.LocalGitRepoTest.canHaveManyTags"></a>canHaveManyTags</td>
-<td>0.757 s</td></tr>
+<td>0.304 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.LocalGitRepoTest.canDetectRemoteTags"></a>canDetectRemoteTags</td>
-<td>0.128 s</td></tr>
+<td>0.039 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.LocalGitRepoTest.canDetectLocalTags"></a>canDetectLocalTags</td>
-<td>0.127 s</td></tr>
+<td>0.037 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.LocalGitRepoTest.usesThePassedInScmUrlToFindRemote"></a>usesThePassedInScmUrlToFindRemote</td>
-<td>0.143 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.ReactorTest"></a>
-<h3>ReactorTest</h3>
+<td>0.036 s</td></tr></table></section><section><a id="e2e.GitRelatedTest"></a>
+<h3>GitRelatedTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.GitRelatedTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.GitRelatedTest."></a><a href="#e2e.GitRelatedTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.GitRelatedTest.');"><span style="display:inline;" id="e2e.GitRelatedTest.-off"> + </span><span style="display:none;" id="e2e.GitRelatedTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.ParentAsSiblingTest"></a>
+<h3>ParentAsSiblingTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.ParentAsSiblingTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.ParentAsSiblingTest."></a><a href="#e2e.ParentAsSiblingTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.ParentAsSiblingTest.');"><span style="display:inline;" id="e2e.ParentAsSiblingTest.-off"> + </span><span style="display:none;" id="e2e.ParentAsSiblingTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.JGitDiscoveryTest"></a>
+<h3>JGitDiscoveryTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.JGitDiscoveryTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.JGitDiscoveryTest."></a><a href="#e2e.JGitDiscoveryTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.JGitDiscoveryTest.');"><span style="display:inline;" id="e2e.JGitDiscoveryTest.-off"> + </span><span style="display:none;" id="e2e.JGitDiscoveryTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.VersionsReportTest"></a>
+<h3>VersionsReportTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.VersionsReportTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.VersionsReportTest."></a><a href="#e2e.VersionsReportTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.VersionsReportTest.');"><span style="display:inline;" id="e2e.VersionsReportTest.-off"> + </span><span style="display:none;" id="e2e.VersionsReportTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.SshAgentSessionFactoryTest"></a>
+<h3>SshAgentSessionFactoryTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.ifNotFoundThenAUnresolvedSnapshotDependencyExceptionIsThrown"></a>ifNotFoundThenAUnresolvedSnapshotDependencyExceptionIsThrown</td>
-<td>0.001 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.returnsTheLatestTagIfThereAreChanges"></a>returnsTheLatestTagIfThereAreChanges</td>
-<td>0.001 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.SshAgentSessionFactoryTest.createDefaultJSch_WithKnownHosts"></a>createDefaultJSch_WithKnownHosts</td>
+<td>0.040 s</td></tr></table></section><section><a id="e2e.IndependentVersionsTest"></a>
+<h3>IndependentVersionsTest</h3>
+<table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.findOrReturnNullReturnsNullIfNotFound"></a>findOrReturnNullReturnsNullIfNotFound</td>
+<td><a href="#e2e.IndependentVersionsTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.IndependentVersionsTest."></a><a href="#e2e.IndependentVersionsTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.IndependentVersionsTest.');"><span style="display:inline;" id="e2e.IndependentVersionsTest.-off"> + </span><span style="display:none;" id="e2e.IndependentVersionsTest.-on"> - </span>[ Detail ]</a></div></td>
 <td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.canFindModulesByGroupAndArtifactName"></a>canFindModulesByGroupAndArtifactName</td>
-<td>0 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.ReleasableModuleTest"></a>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.ReleasableModuleTest"></a>
 <h3>ReleasableModuleTest</h3>
 <table class="table table-striped">
 <tr class="a">
@@ -627,67 +600,62 @@ function toggleDisplay(elementId) {
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.ReleasableModuleTest.getsTheTagFromTheArtifactAndVersion"></a>getsTheTagFromTheArtifactAndVersion</td>
-<td>0 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.ReleaseInvokerTest"></a>
-<h3>ReleaseInvokerTest</h3>
+<td>0 s</td></tr></table></section><section><a id="e2e.BomDependencyUsingParentModuleVersionTest"></a>
+<h3>BomDependencyUsingParentModuleVersionTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_BaseTest"></a>runMavenBuild_BaseTest</td>
-<td>0.185 s</td></tr>
+<td><a href="#e2e.BomDependencyUsingParentModuleVersionTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.BomDependencyUsingParentModuleVersionTest."></a><a href="#e2e.BomDependencyUsingParentModuleVersionTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.BomDependencyUsingParentModuleVersionTest.');"><span style="display:inline;" id="e2e.BomDependencyUsingParentModuleVersionTest.-off"> + </span><span style="display:none;" id="e2e.BomDependencyUsingParentModuleVersionTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithReleasableModule"></a>runMavenBuild_WithReleasableModule</td>
-<td>0.001 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithUserSettings"></a>runMavenBuild_WithUserSettings</td>
-<td>0.001 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_UserImplicitlyWantsThisToBeReleased"></a>runMavenBuild_UserImplicitlyWantsThisToBeReleased</td>
-<td>0.002 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithGoals"></a>runMavenBuild_WithGoals</td>
-<td>0.002 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithActiveProfiles"></a>runMavenBuild_WithActiveProfiles</td>
-<td>0.001 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithGlobalSettings"></a>runMavenBuild_WithGlobalSettings</td>
-<td>0.001 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_UserImplicitlyWantsThisToBeReleased_WillNotBeReleased"></a>runMavenBuild_UserImplicitlyWantsThisToBeReleased_WillNotBeReleased</td>
-<td>0.001 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_ErrorExitCode"></a>runMavenBuild_ErrorExitCode</td>
-<td>0.003 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.verifyDefaultConstructor"></a>verifyDefaultConstructor</td>
-<td>0.002 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_InvocationFailed"></a>runMavenBuild_InvocationFailed</td>
-<td>0.003 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_UserExplicitlyWantsThisToBeReleased"></a>runMavenBuild_UserExplicitlyWantsThisToBeReleased</td>
-<td>0.001 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.skipTests"></a>skipTests</td>
-<td>0.002 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.SshAgentSessionFactoryTest"></a>
-<h3>SshAgentSessionFactoryTest</h3>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.MavenCompatibilityTest"></a>
+<h3>MavenCompatibilityTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_com.github.danielflower.mavenplugins.release.SshAgentSessionFactoryTest.createDefaultJSch_WithKnownHosts"></a>createDefaultJSch_WithKnownHosts</td>
-<td>0.042 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.VersionNamerTest"></a>
+<td><a href="#e2e.MavenCompatibilityTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.MavenCompatibilityTest."></a><a href="#e2e.MavenCompatibilityTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.MavenCompatibilityTest.');"><span style="display:inline;" id="e2e.MavenCompatibilityTest.-off"> + </span><span style="display:none;" id="e2e.MavenCompatibilityTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.PartialReleaseTest"></a>
+<h3>PartialReleaseTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.PartialReleaseTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.PartialReleaseTest."></a><a href="#e2e.PartialReleaseTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.PartialReleaseTest.');"><span style="display:inline;" id="e2e.PartialReleaseTest.-off"> + </span><span style="display:none;" id="e2e.PartialReleaseTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.InheritedVersionsTest"></a>
+<h3>InheritedVersionsTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.InheritedVersionsTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.InheritedVersionsTest."></a><a href="#e2e.InheritedVersionsTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.InheritedVersionsTest.');"><span style="display:inline;" id="e2e.InheritedVersionsTest.-off"> + </span><span style="display:none;" id="e2e.InheritedVersionsTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.TestRunningTest"></a>
+<h3>TestRunningTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.TestRunningTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.TestRunningTest."></a><a href="#e2e.TestRunningTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.TestRunningTest.');"><span style="display:inline;" id="e2e.TestRunningTest.-off"> + </span><span style="display:none;" id="e2e.TestRunningTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.VersionNamerTest"></a>
 <h3>VersionNamerTest</h3>
 <table class="table table-striped">
 <tr class="a">
@@ -713,397 +681,375 @@ function toggleDisplay(elementId) {
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_com.github.danielflower.mavenplugins.release.VersionNamerTest.getterReturnsDefinedOrDefaultDelimiter"></a>getterReturnsDefinedOrDefaultDelimiter</td>
-<td>0 s</td></tr></table></section><section><a id="e2e.BomDependencyTest"></a>
-<h3>BomDependencyTest</h3>
+<td>0 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.BaseMojoTest"></a>
+<h3>BaseMojoTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyTest.willReleaseConsoleAppAndCoreUtilsWhenCoreUtilsIsChanged"></a>willReleaseConsoleAppAndCoreUtilsWhenCoreUtilsIsChanged</td>
-<td>10.77 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_PomIdentityFile"></a>configureJsch_PomIdentityFile</td>
+<td>0.082 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyTest.willReleaseOnlyConsoleAppWhenConsoleAppIsChanged"></a>willReleaseOnlyConsoleAppWhenConsoleAppIsChanged</td>
-<td>9.703 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_SshAgentDisabled"></a>configureJsch_SshAgentDisabled</td>
+<td>0.001 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyTest.willReleaseAllWhenBomIsChanged"></a>willReleaseAllWhenBomIsChanged</td>
-<td>10.79 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_SettingsIdentityFile"></a>configureJsch_SettingsIdentityFile</td>
+<td>0.001 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyTest.willReleaseAllButBomWhenParentIsChanged"></a>willReleaseAllButBomWhenParentIsChanged</td>
-<td>10.95 s</td></tr></table></section><section><a id="e2e.BomDependencyUsingParentModuleVersionTest"></a>
-<h3>BomDependencyUsingParentModuleVersionTest</h3>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_CustomKnownHosts"></a>configureJsch_CustomKnownHosts</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_CustomIdentityOverridesPom"></a>configureJsch_CustomIdentityOverridesPom</td>
+<td>0.001 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_ServerIdDoesNotExist"></a>configureJsch_ServerIdDoesNotExist</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.BaseMojoTest.configureJsch_CustomPassphraseOverridesPom"></a>configureJsch_CustomPassphraseOverridesPom</td>
+<td>0.001 s</td></tr></table></section><section><a id="e2e.NestedModulesTest"></a>
+<h3>NestedModulesTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyUsingParentModuleVersionTest.willReleaseConsoleAppAndCoreUtilsWhenCoreUtilsIsChanged"></a>willReleaseConsoleAppAndCoreUtilsWhenCoreUtilsIsChanged</td>
-<td>13.79 s</td></tr>
+<td><a href="#e2e.NestedModulesTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.NestedModulesTest."></a><a href="#e2e.NestedModulesTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.NestedModulesTest.');"><span style="display:inline;" id="e2e.NestedModulesTest.-off"> + </span><span style="display:none;" id="e2e.NestedModulesTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyUsingParentModuleVersionTest.willReleaseOnlyConsoleAppWhenConsoleAppIsChanged"></a>willReleaseOnlyConsoleAppWhenConsoleAppIsChanged</td>
-<td>12.90 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyUsingParentModuleVersionTest.willReleaseAllWhenBomIsChanged"></a>willReleaseAllWhenBomIsChanged</td>
-<td>14.05 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.BomDependencyUsingParentModuleVersionTest.willReleaseAllButBomWhenParentIsChanged"></a>willReleaseAllButBomWhenParentIsChanged</td>
-<td>14.91 s</td></tr></table></section><section><a id="e2e.DifferentDelimiterTest"></a>
-<h3>DifferentDelimiterTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.DifferentDelimiterTest.canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo"></a>canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo</td>
-<td>11.37 s</td></tr></table></section><section><a id="e2e.ExecutionTest"></a>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.ExecutionTest"></a>
 <h3>ExecutionTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ExecutionTest.profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment"></a>profilesPassedToTheReleaseExecutionArePassedOnToTheDeployment</td>
-<td>5.515 s</td></tr>
+<td><a href="#e2e.ExecutionTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.ExecutionTest."></a><a href="#e2e.ExecutionTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.ExecutionTest.');"><span style="display:inline;" id="e2e.ExecutionTest.-off"> + </span><span style="display:none;" id="e2e.ExecutionTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ExecutionTest.argumentsCanBePassed"></a>argumentsCanBePassed</td>
-<td>4.814 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ExecutionTest.mvn_optionsEnvVarIsPassedToExecution"></a>mvn_optionsEnvVarIsPassedToExecution</td>
-<td>4.646 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ExecutionTest.envVarsAreInherited"></a>envVarsAreInherited</td>
-<td>4.736 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ExecutionTest.userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters"></a>userAndGlobalSettingsCanBeOverwrittenWithStandardMavenCommandLineParameters</td>
-<td>4.355 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ExecutionTest.profilesNotPassedToTheReleaseExecutionAreNotPassedOnToTheDeploymentButConfiguredProfilesAre"></a>profilesNotPassedToTheReleaseExecutionAreNotPassedOnToTheDeploymentButConfiguredProfilesAre</td>
-<td>4.618 s</td></tr></table></section><section><a id="e2e.GitRelatedTest"></a>
-<h3>GitRelatedTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.GitRelatedTest.ifTheScmIsSpecifiedButIsNotGitThenThisIsThrown"></a>ifTheScmIsSpecifiedButIsNotGitThenThisIsThrown</td>
-<td>1.658 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.GitRelatedTest.ifThereIsNoRemoteButTheScmDetailsArePresentThenThisIsUsed"></a>ifThereIsNoRemoteButTheScmDetailsArePresentThenThisIsUsed</td>
-<td>3.483 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.GitRelatedTest.ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed"></a>ifTheReleaseIsRunFromANonGitRepoThenAnErrorIsClearlyDisplayed</td>
-<td>1.767 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.GitRelatedTest.ifThereIsNoScmInfoAndNoRemoteBranchThenAnErrorIsThrown"></a>ifThereIsNoScmInfoAndNoRemoteBranchThenAnErrorIsThrown</td>
-<td>2.076 s</td></tr></table></section><section><a id="e2e.HelpTest"></a>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.HelpTest"></a>
 <h3>HelpTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_e2e.HelpTest.runningTheHelpMojoTellsYouAboutThePlugin"></a>runningTheHelpMojoTellsYouAboutThePlugin</td>
-<td>1.438 s</td></tr>
+<td>1.209 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
 <td><a id="TC_e2e.HelpTest.canShowInformationAboutTheReleaseGoal"></a>canShowInformationAboutTheReleaseGoal</td>
-<td>1.467 s</td></tr></table></section><section><a id="e2e.IndependentVersionsTest"></a>
-<h3>IndependentVersionsTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.IndependentVersionsTest.buildsAndInstallsAndTagsAllModules"></a>buildsAndInstallsAndTagsAllModules</td>
-<td>11.33 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.IndependentVersionsTest.thePomChangesAreRevertedAfterTheRelease"></a>thePomChangesAreRevertedAfterTheRelease</td>
-<td>5.594 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.IndependentVersionsTest.whenRunFromASubFolderItShowsAnError"></a>whenRunFromASubFolderItShowsAnError</td>
-<td>2.076 s</td></tr></table></section><section><a id="e2e.InheritedVersionsTest"></a>
-<h3>InheritedVersionsTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.InheritedVersionsTest.buildsAndInstallsAndTagsAllModules"></a>buildsAndInstallsAndTagsAllModules</td>
-<td>11.12 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.InheritedVersionsTest.thePomChangesAreRevertedAfterTheRelease"></a>thePomChangesAreRevertedAfterTheRelease</td>
-<td>5.068 s</td></tr></table></section><section><a id="e2e.JGitDiscoveryTest"></a>
-<h3>JGitDiscoveryTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.JGitDiscoveryTest.blah"></a>blah</td>
-<td>0.004 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.JGitDiscoveryTest.name"></a>name</td>
-<td>0.030 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.JGitDiscoveryTest.showMeTheLog"></a>showMeTheLog</td>
-<td>0.025 s</td></tr></table></section><section><a id="e2e.LocalPluginTest"></a>
-<h3>LocalPluginTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.LocalPluginTest.runWithLocalPluginSnapshotDependencyShouldSucceed"></a>runWithLocalPluginSnapshotDependencyShouldSucceed</td>
-<td>5.599 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.LocalPluginTest.runWithSnapshotPluginDependencyShouldFail"></a>runWithSnapshotPluginDependencyShouldFail</td>
-<td>2.161 s</td></tr></table></section><section><a id="e2e.MavenCompatibilityTest"></a>
-<h3>MavenCompatibilityTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.MavenCompatibilityTest.maven_3_0_1"></a>maven_3_0_1</td>
-<td>9.925 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.MavenCompatibilityTest.maven_3_0_4"></a>maven_3_0_4</td>
-<td>8.675 s</td></tr>
-<tr class="a">
-<td><a href="#e2e.MavenCompatibilityTest.maven_3_2_1"><img src="images/icon_error_sml.gif" /></a></td>
-<td><a id="TC_e2e.MavenCompatibilityTest.maven_3_2_1"></a><a href="#e2e.MavenCompatibilityTest.maven_3_2_1">maven_3_2_1</a>
-<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.MavenCompatibilityTest.maven_3_2_1');"><span style="display:inline;" id="e2e.MavenCompatibilityTest.maven_3_2_1-off"> + </span><span style="display:none;" id="e2e.MavenCompatibilityTest.maven_3_2_1-on"> - </span>[ Detail ]</a></div></td>
-<td>7.788 s</td></tr>
-<tr class="b">
-<td>-</td>
-<td>Could not find artifact com.github.danielflower.mavenplugins.testprojects:single-module:1.0.3211734770877771:pom in repository
-Expected: is &lt;0&gt;
-     but: was &lt;1&gt;</td>
-<td>-</td></tr>
-<tr id="e2e.MavenCompatibilityTest.maven_3_2_1-failure" style="display:none;" class="a">
-<td>-</td>
-<td>
-<pre>java.lang.AssertionError: 
-Could not find artifact com.github.danielflower.mavenplugins.testprojects:single-module:1.0.3211734770877771:pom in repository
-Expected: is &lt;0&gt;
-     but: was &lt;1&gt;
-	at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
-	at scaffolding.MvnRunner.assertArtifactInLocalRepo(MvnRunner.java:128)
-	at e2e.MavenCompatibilityTest.buildProjectWithMavenVersion(MavenCompatibilityTest.java:60)
-	at e2e.MavenCompatibilityTest.maven_3_2_1(MavenCompatibilityTest.java:42)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
-	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
-	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
-	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
-	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
-	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
-	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
-	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:316)
-	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:240)
-	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:214)
-	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:155)
-	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
-	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
-	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
-	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
-</pre></td>
-<td>-</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.MavenCompatibilityTest.maven_3_3_9"></a>maven_3_3_9</td>
-<td>8.867 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.MavenCompatibilityTest.maven_3_8_4"></a>maven_3_8_4</td>
-<td>8.613 s</td></tr></table></section><section><a id="e2e.NestedModulesTest"></a>
-<h3>NestedModulesTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NestedModulesTest.buildsAndInstallsAndTagsAllModules"></a>buildsAndInstallsAndTagsAllModules</td>
-<td>42.57 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NestedModulesTest.thePomChangesAreRevertedAfterTheRelease"></a>thePomChangesAreRevertedAfterTheRelease</td>
-<td>7.173 s</td></tr></table></section><section><a id="e2e.NextMojoTest"></a>
+<td>1.267 s</td></tr></table></section><section><a id="e2e.NextMojoTest"></a>
 <h3>NextMojoTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NextMojoTest.changesInTheRootAreDetected"></a>changesInTheRootAreDetected</td>
-<td>7.263 s</td></tr>
+<td><a href="#e2e.NextMojoTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.NextMojoTest."></a><a href="#e2e.NextMojoTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.NextMojoTest.');"><span style="display:inline;" id="e2e.NextMojoTest.-off"> + </span><span style="display:none;" id="e2e.NextMojoTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NextMojoTest.doesNotReReleaseAModuleThatHasNotChanged"></a>doesNotReReleaseAModuleThatHasNotChanged</td>
-<td>7.797 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NextMojoTest.ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased"></a>ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased</td>
-<td>8.129 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NextMojoTest.ifThereHaveBeenNoChangesCanOptToReleaseNoModules"></a>ifThereHaveBeenNoChangesCanOptToReleaseNoModules</td>
-<td>7.962 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.NextMojoTest.ifThereHaveBeenNoChangesThenReReleaseAllModules"></a>ifThereHaveBeenNoChangesThenReReleaseAllModules</td>
-<td>7.904 s</td></tr></table></section><section><a id="e2e.ParentAsSiblingTest"></a>
-<h3>ParentAsSiblingTest</h3>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.ReactorTest"></a>
+<h3>ReactorTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ParentAsSiblingTest.buildsAndInstallsAndTagsAllModules"></a>buildsAndInstallsAndTagsAllModules</td>
-<td>13.85 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.ifNotFoundThenAUnresolvedSnapshotDependencyExceptionIsThrown"></a>ifNotFoundThenAUnresolvedSnapshotDependencyExceptionIsThrown</td>
+<td>0 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ParentAsSiblingTest.thePomChangesAreRevertedAfterTheRelease"></a>thePomChangesAreRevertedAfterTheRelease</td>
-<td>5.720 s</td></tr></table></section><section><a id="e2e.PartialReleaseTest"></a>
-<h3>PartialReleaseTest</h3>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.returnsTheLatestTagIfThereAreChanges"></a>returnsTheLatestTagIfThereAreChanges</td>
+<td>0 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.findOrReturnNullReturnsNullIfNotFound"></a>findOrReturnNullReturnsNullIfNotFound</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReactorTest.canFindModulesByGroupAndArtifactName"></a>canFindModulesByGroupAndArtifactName</td>
+<td>0 s</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.ReleaseInvokerTest"></a>
+<h3>ReleaseInvokerTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.PartialReleaseTest.buildsAndInstallsAndTagsAllModules"></a>buildsAndInstallsAndTagsAllModules</td>
-<td>9.740 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_BaseTest"></a>runMavenBuild_BaseTest</td>
+<td>0.734 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.PartialReleaseTest.thePomChangesAreRevertedAfterTheRelease"></a>thePomChangesAreRevertedAfterTheRelease</td>
-<td>6.253 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithReleasableModule"></a>runMavenBuild_WithReleasableModule</td>
+<td>0.001 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.PartialReleaseTest.whenNoChangesHaveBeenDetectedTheRequestedModuleIsBuiltAnyway"></a>whenNoChangesHaveBeenDetectedTheRequestedModuleIsBuiltAnyway</td>
-<td>10.45 s</td></tr></table></section><section><a id="e2e.SingleModuleTest"></a>
-<h3>SingleModuleTest</h3>
-<table class="table table-striped">
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SingleModuleTest.canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo"></a>canUpdateSnapshotVersionToReleaseVersionAndInstallToLocalRepo</td>
-<td>7.370 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithUserSettings"></a>runMavenBuild_WithUserSettings</td>
+<td>0.002 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SingleModuleTest.thePomChangesAreRevertedAfterTheRelease"></a>thePomChangesAreRevertedAfterTheRelease</td>
-<td>5.249 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_UserImplicitlyWantsThisToBeReleased"></a>runMavenBuild_UserImplicitlyWantsThisToBeReleased</td>
+<td>0.002 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SingleModuleTest.originTagsNotConsultedWithoutPull"></a>originTagsNotConsultedWithoutPull</td>
-<td>10.23 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithGoals"></a>runMavenBuild_WithGoals</td>
+<td>0.005 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SingleModuleTest.theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags"></a>theBuildNumberIsOptionalAndWillStartAt0AndThenIncrementTakingIntoAccountLocalAndRemoteTags</td>
-<td>20.25 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithActiveProfiles"></a>runMavenBuild_WithActiveProfiles</td>
+<td>0.002 s</td></tr>
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SingleModuleTest.theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion"></a>theLocalAndRemoteGitReposAreTaggedWithTheModuleNameAndVersion</td>
-<td>5.288 s</td></tr>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_WithGlobalSettings"></a>runMavenBuild_WithGlobalSettings</td>
+<td>0.002 s</td></tr>
 <tr class="b">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SingleModuleTest.onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush"></a>onlyLocalGitRepoIsTaggedWithTheModuleNameAndVersionWithoutPush</td>
-<td>5.231 s</td></tr></table></section><section><a id="e2e.SkippingUnchangedModulesTest"></a>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_UserImplicitlyWantsThisToBeReleased_WillNotBeReleased"></a>runMavenBuild_UserImplicitlyWantsThisToBeReleased_WillNotBeReleased</td>
+<td>0.002 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_ErrorExitCode"></a>runMavenBuild_ErrorExitCode</td>
+<td>0.002 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.verifyDefaultConstructor"></a>verifyDefaultConstructor</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_InvocationFailed"></a>runMavenBuild_InvocationFailed</td>
+<td>0.003 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.runMavenBuild_UserExplicitlyWantsThisToBeReleased"></a>runMavenBuild_UserExplicitlyWantsThisToBeReleased</td>
+<td>0.002 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.ReleaseInvokerTest.skipTests"></a>skipTests</td>
+<td>0.002 s</td></tr></table></section><section><a id="e2e.SkippingUnchangedModulesTest"></a>
 <h3>SkippingUnchangedModulesTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.changesInTheRootAreDetected"></a>changesInTheRootAreDetected</td>
-<td>10.45 s</td></tr>
+<td><a href="#e2e.SkippingUnchangedModulesTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.SkippingUnchangedModulesTest."></a><a href="#e2e.SkippingUnchangedModulesTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.SkippingUnchangedModulesTest.');"><span style="display:inline;" id="e2e.SkippingUnchangedModulesTest.-off"> + </span><span style="display:none;" id="e2e.SkippingUnchangedModulesTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.ifThereHaveBeenNoChangesThenCanOptToFailTheBuild"></a>ifThereHaveBeenNoChangesThenCanOptToFailTheBuild</td>
-<td>7.886 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.doesNotReReleaseAModuleThatHasNotChanged"></a>doesNotReReleaseAModuleThatHasNotChanged</td>
-<td>10.60 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased"></a>ifADependencyHasNotChangedButSomethingItDependsOnHasChangedThenTheDependencyIsReReleased</td>
-<td>11.95 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.ifThereHaveBeenNoChangesThenCanOptNotToReleaseAnything"></a>ifThereHaveBeenNoChangesThenCanOptNotToReleaseAnything</td>
-<td>8.028 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.ifThereHaveBeenNoChangesThenReReleaseAllModules"></a>ifThereHaveBeenNoChangesThenReReleaseAllModules</td>
-<td>12.03 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.SkippingUnchangedModulesTest.ifThereHaveBeenNoChangesButArtifactsCannotBeResolvedThenReleaseIsForcedForTheseArtifacts"></a>ifThereHaveBeenNoChangesButArtifactsCannotBeResolvedThenReleaseIsForcedForTheseArtifacts</td>
-<td>15.33 s</td></tr></table></section><section><a id="e2e.TestRunningTest"></a>
-<h3>TestRunningTest</h3>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.LocalPluginTest"></a>
+<h3>LocalPluginTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.TestRunningTest.ifTestsAreSkippedYouCanReleaseWithoutRunningThem"></a>ifTestsAreSkippedYouCanReleaseWithoutRunningThem</td>
-<td>4.815 s</td></tr>
+<td><a href="#e2e.LocalPluginTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.LocalPluginTest."></a><a href="#e2e.LocalPluginTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.LocalPluginTest.');"><span style="display:inline;" id="e2e.LocalPluginTest.-off"> + </span><span style="display:none;" id="e2e.LocalPluginTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.TestRunningTest.doesNotReleaseIfThereAreTestFailuresButTagsAreStillWritten"></a>doesNotReleaseIfThereAreTestFailuresButTagsAreStillWritten</td>
-<td>4.918 s</td></tr></table></section><section><a id="e2e.ValidationTest"></a>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.BomDependencyTest"></a>
+<h3>BomDependencyTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.BomDependencyTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.BomDependencyTest."></a><a href="#e2e.BomDependencyTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.BomDependencyTest.');"><span style="display:inline;" id="e2e.BomDependencyTest.-off"> + </span><span style="display:none;" id="e2e.BomDependencyTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.ValidationTest"></a>
 <h3>ValidationTest</h3>
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.ifAReleaseTagAlreadyExistsInTheRemoteRepoThenItErrorsEarly"></a>ifAReleaseTagAlreadyExistsInTheRemoteRepoThenItErrorsEarly</td>
-<td>1.999 s</td></tr>
+<td><a href="#e2e.ValidationTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.ValidationTest."></a><a href="#e2e.ValidationTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.ValidationTest.');"><span style="display:inline;" id="e2e.ValidationTest.-off"> + </span><span style="display:none;" id="e2e.ValidationTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
 <tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.failsIfThereAreDependenciesOnSnapshotVersionsThatAreNotPartOfTheReactor"></a>failsIfThereAreDependenciesOnSnapshotVersionsThatAreNotPartOfTheReactor</td>
-<td>8.874 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.failsIfThereAreDependenciesOnSnapshotVersionsWithVersionPropertiesThatAreNotPartOfTheReactor"></a>failsIfThereAreDependenciesOnSnapshotVersionsWithVersionPropertiesThatAreNotPartOfTheReactor</td>
-<td>8.730 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.failsIfThereAreUntrackedFiles"></a>failsIfThereAreUntrackedFiles</td>
-<td>1.906 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.passIfThereAreUntrackedFilesWhichAreAddedToUntrackedConfiguration"></a>passIfThereAreUntrackedFilesWhichAreAddedToUntrackedConfiguration</td>
-<td>5.370 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.ifIOErrorOccursWhileUpdatingPomsThenThisIsReported"></a>ifIOErrorOccursWhileUpdatingPomsThenThisIsReported</td>
-<td>2.188 s</td></tr>
-<tr class="a">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.ifTheSameVersionIsReleasedTwiceItErrorsLoudly"></a>ifTheSameVersionIsReleasedTwiceItErrorsLoudly</td>
-<td>7.192 s</td></tr>
-<tr class="b">
-<td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.ValidationTest.failsIfThereAreUncommittedFiles"></a>failsIfThereAreUncommittedFiles</td>
-<td>1.982 s</td></tr></table></section><section><a id="e2e.VersionsReportTest"></a>
-<h3>VersionsReportTest</h3>
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest"></a>
+<h3>AnnotatedTagFinderTest</h3>
 <table class="table table-striped">
 <tr class="a">
 <td><img src="images/icon_success_sml.gif" /></td>
-<td><a id="TC_e2e.VersionsReportTest.buildsAndInstallsAndTagsAllModules"></a>buildsAndInstallsAndTagsAllModules</td>
-<td>5.627 s</td></tr></table></section><br /></section><section><a id="Failure_Details"></a>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.respectDelimiterWhenExtractingBuildNumber"></a>respectDelimiterWhenExtractingBuildNumber</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.returnsMultipleTagsOnASingleCommit"></a>returnsMultipleTagsOnASingleCommit</td>
+<td>0.079 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.returnsOnlyTagsOfCurrentBranch"></a>returnsOnlyTagsOfCurrentBranch</td>
+<td>0.054 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.canRecogniseTagsThatArePotentiallyOfTheSameVersion"></a>canRecogniseTagsThatArePotentiallyOfTheSameVersion</td>
+<td>0.001 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.versionNamerCaresNotForOrderOfTags"></a>versionNamerCaresNotForOrderOfTags</td>
+<td>0 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTest.findsTheLatestCommitWhereThereHaveBeenNoBranches"></a>findsTheLatestCommitWhereThereHaveBeenNoBranches</td>
+<td>0.078 s</td></tr></table></section><section><a id="e2e.SingleModuleTest"></a>
+<h3>SingleModuleTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.SingleModuleTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.SingleModuleTest."></a><a href="#e2e.SingleModuleTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.SingleModuleTest.');"><span style="display:inline;" id="e2e.SingleModuleTest.-off"> + </span><span style="display:none;" id="e2e.SingleModuleTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="e2e.DifferentDelimiterTest"></a>
+<h3>DifferentDelimiterTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><a href="#e2e.DifferentDelimiterTest."><img src="images/icon_warning_sml.gif" /></a></td>
+<td><a id="TC_e2e.DifferentDelimiterTest."></a><a href="#e2e.DifferentDelimiterTest.">-</a>
+<div class="detailToggle" style="display:inline"><a href="javascript:toggleDisplay('e2e.DifferentDelimiterTest.');"><span style="display:inline;" id="e2e.DifferentDelimiterTest.-off"> + </span><span style="display:none;" id="e2e.DifferentDelimiterTest.-on"> - </span>[ Detail ]</a></div></td>
+<td>0 s</td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped</td>
+<td>-</td></tr></table></section><section><a id="com.github.danielflower.mavenplugins.release.AnnotatedTagTest"></a>
+<h3>AnnotatedTagTest</h3>
+<table class="table table-striped">
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagTest.ifATagIsSavedWithoutJsonThenTheVersionIsSetTo0Dot0"></a>ifATagIsSavedWithoutJsonThenTheVersionIsSetTo0Dot0</td>
+<td>0.037 s</td></tr>
+<tr class="b">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagTest.gettersReturnValuesPassedIn"></a>gettersReturnValuesPassedIn</td>
+<td>0 s</td></tr>
+<tr class="a">
+<td><img src="images/icon_success_sml.gif" /></td>
+<td><a id="TC_com.github.danielflower.mavenplugins.release.AnnotatedTagTest.aTagCanBeCreatedFromAGitTag"></a>aTagCanBeCreatedFromAGitTag</td>
+<td>0.031 s</td></tr></table></section><br /></section><section><a id="Failure_Details"></a>
 <h2>Failure Details</h2>
 <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p><br />
 <table class="table table-striped">
 <tr class="a">
-<td><img src="images/icon_error_sml.gif" /></td>
-<td><a id="e2e.MavenCompatibilityTest.maven_3_2_1"></a>maven_3_2_1</td></tr>
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.GitRelatedTest."></a></td></tr>
 <tr class="b">
 <td>-</td>
-<td>java.lang.AssertionError: Could not find artifact com.github.danielflower.mavenplugins.testprojects:single-module:1.0.3211734770877771:pom in repository
-Expected: is &lt;0&gt;
-     but: was &lt;1&gt;</td></tr>
+<td>skipped: skipped</td></tr>
 <tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.ParentAsSiblingTest."></a></td></tr>
+<tr class="b">
 <td>-</td>
-<td>
-<div id="maven_3_2_1-failure">e2e.MavenCompatibilityTest:42</div></td></tr></table><br /></section></section>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.JGitDiscoveryTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.VersionsReportTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.IndependentVersionsTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.BomDependencyUsingParentModuleVersionTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.MavenCompatibilityTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.PartialReleaseTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.InheritedVersionsTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.TestRunningTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.NestedModulesTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.ExecutionTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.NextMojoTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.SkippingUnchangedModulesTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.LocalPluginTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.BomDependencyTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.ValidationTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.SingleModuleTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr>
+<tr class="a">
+<td><img src="images/icon_warning_sml.gif" /></td>
+<td><a id="e2e.DifferentDelimiterTest."></a></td></tr>
+<tr class="b">
+<td>-</td>
+<td>skipped: skipped</td></tr></table><br /></section></section>
         </main>
       </div>
     </div>
