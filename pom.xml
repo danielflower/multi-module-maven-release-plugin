@@ -356,10 +356,7 @@
                                     <goal>sign</goal>
                                 </goals>
                                 <configuration>
-                                    <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
-                                    </gpgArguments>
+                                    <signer>bc</signer>
                                 </configuration>
                             </execution>
                         </executions>
@@ -380,7 +377,7 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <site>
-            <id>github</id>
+            <id>gh-pages</id>
             <url>scm:git:https://github.com/danielflower/multi-module-maven-release-plugin.git</url><!-- or scm:git:ssh://git@github.com/username/tomcat-foo-artifact.git -->
         </site>
     </distributionManagement>
