@@ -377,8 +377,8 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <site>
-            <id>gh-pages</id>
-            <url>scm:git:https://${GH_TOKEN}@github.com/danielflower/multi-module-maven-release-plugin.git</url><!-- or scm:git:ssh://git@github.com/username/tomcat-foo-artifact.git -->
+            <id>github</id>
+            <url>scm:git:https://github.com/danielflower/multi-module-maven-release-plugin.git</url>
         </site>
     </distributionManagement>
 
