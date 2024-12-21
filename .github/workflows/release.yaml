@@ -1,0 +1,37 @@
+name: Publish to Maven Central Repository
+on: workflow_dispatch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gpg secret key
+        run: cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Set up maven settings
+        uses: s4u/maven-settings-action@v3.1.0
+        with:
+          servers: |
+            [{
+              "id": "ossrh",
+              "username": "${{ secrets.OSSRH_USERNAME }}",
+              "password": "${{ secrets.OSSRH_TOKEN }}"
+            },
+            {
+              "id": "gpg.passphrase",
+              "passphrase": "${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}",
+              "configuration": {}
+            }]
+      - run: git config --global user.email "test@example.com"
+      - run: git config --global user.name "Github Action"
+      - run: echo "M2_HOME=$(dirname $(dirname `which mvn`))" >> $GITHUB_ENV
+      - name: Verify package
+        run: mvn --batch-mode verify
+      - name: Release package
+        run: mvn --batch-mode -DskipTests=true releaser:release
