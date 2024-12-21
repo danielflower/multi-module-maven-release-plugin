@@ -6,7 +6,7 @@
 
     <groupId>com.github.danielflower.mavenplugins</groupId>
     <artifactId>multi-module-maven-release-plugin</artifactId>
-    <version>3.6-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
+    <version>3.7-SNAPSHOT</version> <!-- When changing also update scaffolding.TestProject.PLUGIN_VERSION_FOR_TESTS and add to src/site/markdown/changelog.md -->
   
     <name>The Multi Module Maven Release Plugin</name>
     <description>A maven release plugin built for multi-maven-module git repositories allowing continuous deployment
@@ -293,16 +293,16 @@
                 </dependencies>
             </plugin>
             <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.12</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
-                    <message>Creating site for ${project.version}</message>
+                    <scmBranch>gh-pages</scmBranch>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>site</goal>
+                            <goal>publish-scm</goal>
                         </goals>
                         <phase>site</phase>
                     </execution>
@@ -388,6 +388,10 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <site>
+            <id>github</id>
+            <url>scm:git:https://github.com/danielflower/multi-module-maven-release-plugin.git</url><!-- or scm:git:ssh://git@github.com/username/tomcat-foo-artifact.git -->
+        </site>
     </distributionManagement>
 
     <reporting>

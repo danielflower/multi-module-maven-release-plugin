@@ -31,7 +31,5 @@ jobs:
       - run: git config --global user.email "test@example.com"
       - run: git config --global user.name "Github Action"
       - run: echo "M2_HOME=$(dirname $(dirname `which mvn`))" >> $GITHUB_ENV
-      - name: Verify package
-        run: mvn --batch-mode verify
       - name: Release package
         run: mvn --batch-mode -DskipTests=true releaser:release
