@@ -16,7 +16,6 @@ import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasTag;
 
-@Ignore
 public class NextMojoTest {
 
     final TestProject testProject = TestProject.deepDependenciesProject();

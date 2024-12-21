@@ -26,7 +26,6 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 
-@Ignore
 public class SingleModuleTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

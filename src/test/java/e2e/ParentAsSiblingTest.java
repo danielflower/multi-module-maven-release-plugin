@@ -22,7 +22,6 @@ import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 import static scaffolding.GitMatchers.hasTag;
 import static scaffolding.MvnRunner.assertArtifactInLocalRepo;
 
-@Ignore
 public class ParentAsSiblingTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

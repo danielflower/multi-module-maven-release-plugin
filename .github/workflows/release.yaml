@@ -33,6 +33,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Publish documentation
-        run: mvn scm-publish:publish-scm
+        run: mvn --batch-mode scm-publish:publish-scm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

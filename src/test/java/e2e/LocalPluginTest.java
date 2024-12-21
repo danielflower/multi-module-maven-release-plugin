@@ -15,7 +15,6 @@ import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 import static scaffolding.GitMatchers.hasTag;
 
-@Ignore
 public class LocalPluginTest {
 
     final TestProject testProject = TestProject.localPluginProject();

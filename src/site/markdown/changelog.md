@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+### 3.7.x
+
+* No functional changes. Upgraded dependencies.
+
 ### 3.6.0
 
 * Latest tagged version from current branch is used for unchanged modules [issue #118 for details](https://github.com/danielflower/multi-module-maven-release-plugin/issues/118)

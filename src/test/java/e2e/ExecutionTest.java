@@ -15,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 
-@Ignore
 public class ExecutionTest {
 
     final TestProject testProject = TestProject.moduleWithProfilesProject();

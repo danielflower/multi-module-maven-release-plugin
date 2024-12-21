@@ -15,7 +15,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.ExactCountMatcher.oneOf;
 
-@Ignore
 public class DifferentDelimiterTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

@@ -17,7 +17,6 @@ import static scaffolding.ExactCountMatcher.noneOf;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.GitMatchers.hasTag;
 
-@Ignore
 public class SkippingUnchangedModulesTest {
 
     final TestProject testProject = TestProject.deepDependenciesProject();

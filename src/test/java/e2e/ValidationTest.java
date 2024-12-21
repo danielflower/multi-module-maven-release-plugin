@@ -22,7 +22,6 @@ import scaffolding.MavenExecutionException;
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
 
-@Ignore
 public class ValidationTest {
 
     @BeforeClass

@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import scaffolding.MvnRunner;
 import scaffolding.TestProject;
-@Ignore
+
 public class BomDependencyTest {
 
     final TestProject testProject = TestProject.dependencyManagementProject();

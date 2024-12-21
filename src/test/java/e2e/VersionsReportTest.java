@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import static scaffolding.ExactCountMatcher.oneOf;
 import static scaffolding.ExactCountMatcher.twoOf;
 
-@Ignore
 public class VersionsReportTest {
 
     final String buildNumber = String.valueOf(System.currentTimeMillis());

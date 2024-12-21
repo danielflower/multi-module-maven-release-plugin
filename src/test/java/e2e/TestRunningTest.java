@@ -15,7 +15,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static scaffolding.GitMatchers.hasCleanWorkingDirectory;
 
-@Ignore
 public class TestRunningTest {
     final TestProject projectWithTestsThatFail = TestProject.moduleWithTestFailure();
 
