@@ -4,7 +4,6 @@ Changelog
 ### 3.6.0
 
 * Latest tagged version from current branch is used for unchanged modules [issue #118 for details](https://github.com/danielflower/multi-module-maven-release-plugin/issues/118)
-* Handle plugin dependencies the same way as "ordinary" dependencies (update version number) 
 
 ### 3.2.0
 
