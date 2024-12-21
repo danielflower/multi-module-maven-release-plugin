@@ -34,6 +34,6 @@ jobs:
       - name: Verify package
         run: mvn --batch-mode verify
       - name: Release package
-        run: mvn --batch-mode -DskipTests=true site site:stage releaser:release
+        run: mvn --batch-mode -DskipTests=true releaser:release
       - name: Publish documentation
         run: mvn scm-publish:publish-scm
