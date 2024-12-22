@@ -1,7 +1,12 @@
 Changelog
 ---------
 
-### 3.7.x
+### 3.7.8
+
+* Fixed null pointer exception when getting location of certain dependencies. 
+  See [pull request 147](https://github.com/danielflower/multi-module-maven-release-plugin/pull/147)
+
+### 3.7.7
 
 * No functional changes. Upgraded dependencies.
 
