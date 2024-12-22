@@ -1,6 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -89,7 +90,7 @@ public class Reactor {
 
             String equivalentVersion = null;
 
-            if(modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
+            if (modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we were asked to force release.");
             } else if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
@@ -141,7 +142,15 @@ public class Reactor {
     }
 
     private static boolean hasSameMavenGAByDependencyLocation(ReleasableModule module, Dependency dependency) {
-        String[] modelId = dependency.getLocation("").getSource().getModelId().split(":");
+        InputLocation depLocation = dependency.getLocation("");
+        String[] modelId;
+        if (depLocation == null) {
+            modelId = new String[2];
+            modelId[0] = dependency.getArtifactId();
+            modelId[1] = dependency.getGroupId();
+        } else {
+            modelId = depLocation.getSource().getModelId().split(":");
+        }
         return modelId[0].equals(module.getGroupId()) && modelId[1].equals(module.getArtifactId());
     }
 
@@ -188,7 +197,9 @@ public class Reactor {
 
     static AnnotatedTag hasChangedSinceLastRelease(List<AnnotatedTag> previousTagsForThisModule, DiffDetector detector, MavenProject project, String relativePathToModule) throws MojoExecutionException {
         try {
-            if (previousTagsForThisModule.size() == 0) return null;
+            if (previousTagsForThisModule.size() == 0) {
+                return null;
+            }
             boolean hasChanged = detector.hasChangedSince(relativePathToModule, project.getModel().getModules(), previousTagsForThisModule);
             return hasChanged ? null : tagWithHighestBuildNumber(previousTagsForThisModule);
         } catch (Exception e) {
