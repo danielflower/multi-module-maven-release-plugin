@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -23,10 +25,10 @@ class AnnotatedTagFinder {
         this.versionNamer = versionNamer;
     }
 
-    List<AnnotatedTag> tagsForVersion(Git git, String module, String versionWithoutBuildNumber) throws MojoExecutionException {
+    List<AnnotatedTag> tagsForVersion(Git git, String groupId, String artifactId, String versionWithoutBuildNumber, String tagNameFormat, Log log) throws MojoExecutionException {
         ArrayList<AnnotatedTag> results = new ArrayList<AnnotatedTag>();
         try {
-            ArrayList<RefWithCommitId> tagCommits = getAnnotatedTags(git, module, versionWithoutBuildNumber);
+            ArrayList<RefWithCommitId> tagCommits = getAnnotatedTags(git, groupId, artifactId, versionWithoutBuildNumber, tagNameFormat, log);
             Map<ObjectId, List<RefWithCommitId>> commitTags = tagCommits.stream().collect(groupingBy(
                 RefWithCommitId::getCommitObjectId));
             Iterable<RevCommit> commits = git.log().call();
@@ -51,25 +53,28 @@ class AnnotatedTagFinder {
         return results;
     }
 
-    private ArrayList<RefWithCommitId> getAnnotatedTags(Git git, String module, String versionWithoutBuildNumber)
+    private ArrayList<RefWithCommitId> getAnnotatedTags(Git git, String groupId, String artifactId, String versionWithoutBuildNumber, String tagNameFormat, Log log)
         throws GitAPIException, IOException
     {
-        String tagWithoutBuildNumber = module + "-" + versionWithoutBuildNumber;
+        String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
+        if (StringUtils.isNotEmpty(tagNameFormat)) {
+            tagWithoutBuildNumber = AnnotatedTag.formatTagName(tagWithoutBuildNumber, groupId, artifactId, versionWithoutBuildNumber, tagNameFormat, log);
+        }
         ArrayList<RefWithCommitId> allTags = new ArrayList<RefWithCommitId>();
         List<Ref> tags = git.tagList().call();
 
         for (Ref ref : tags) {
             if(!isPotentiallySameVersionIgnoringBuildNumber(tagWithoutBuildNumber, ref.getName())) continue;
 
-            LogCommand log = git.log();
+            LogCommand gitLog = git.log();
 
             Ref peeledRef = git.getRepository().getRefDatabase().peel(ref);
             if(peeledRef.getPeeledObjectId() != null) {
-                log.add(peeledRef.getPeeledObjectId());
+                gitLog.add(peeledRef.getPeeledObjectId());
             } else {
-                log.add(ref.getObjectId());
+                gitLog.add(ref.getObjectId());
             }
-            RevCommit commit = log.call().iterator().next();
+            RevCommit commit = gitLog.call().iterator().next();
             allTags.add(new RefWithCommitId(ref, commit.getId()));
         }
         return allTags;

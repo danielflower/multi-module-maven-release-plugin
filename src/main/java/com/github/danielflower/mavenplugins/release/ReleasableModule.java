@@ -1,6 +1,8 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.StringUtils;
 
 import java.util.List;
 
@@ -9,15 +11,24 @@ public class ReleasableModule {
     private final MavenProject project;
     private final VersionName version;
     private final String tagName;
+    private final String tagNameFormat;
     private final String equivalentVersion;
     private final String relativePathToModule;
 
-    public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule) {
+    public ReleasableModule(MavenProject project, VersionName version, String equivalentVersion, String relativePathToModule, String tagNameFormat, Log log) {
         this.project = project;
         this.version = version;
         this.equivalentVersion = equivalentVersion;
         this.relativePathToModule = relativePathToModule;
-        this.tagName = project.getArtifactId() + "-" + version.releaseVersion();
+
+        String defaultTagName = project.getArtifactId() + "-" + version.releaseVersion();
+        if (StringUtils.isNotEmpty(tagNameFormat)) {
+            this.tagName = AnnotatedTag.formatTagName(defaultTagName, project.getGroupId(), project.getArtifactId(), version.releaseVersion(), tagNameFormat, log);
+        } else {
+            this.tagName = defaultTagName;
+        }
+
+        this.tagNameFormat = tagNameFormat;
     }
 
     public String getTagName() {
@@ -70,7 +81,7 @@ public class ReleasableModule {
         return relativePathToModule;
     }
 
-    public ReleasableModule createReleasableVersion() {
-        return new ReleasableModule(project, version, null, relativePathToModule);
+    public ReleasableModule createReleasableVersion(Log log) {
+        return new ReleasableModule(project, version, null, relativePathToModule, tagNameFormat, log);
     }
 }

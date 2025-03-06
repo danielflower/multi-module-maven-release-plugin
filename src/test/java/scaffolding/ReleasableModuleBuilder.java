@@ -44,7 +44,7 @@ public class ReleasableModuleBuilder {
     }
 
     public ReleasableModule build() throws ValidationException {
-        return new ReleasableModule(project, versionNamer.name(project.getVersion(), buildNumber, null), equivalentVersion, relativePathToModule);
+        return new ReleasableModule(project, versionNamer.name(project.getVersion(), buildNumber, null), equivalentVersion, relativePathToModule, null,  null);
     }
 
     public static ReleasableModuleBuilder aModule() {

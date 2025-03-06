@@ -1,5 +1,7 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.interpolation.*;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -13,6 +15,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 public class AnnotatedTag {
     public static final String VERSION = "version";
@@ -134,5 +139,23 @@ public class AnnotatedTag {
 
     public Ref ref() {
         return ref;
+    }
+
+    public static String formatTagName(String tagName, String groupId, String artifactId, String version, String tagNameFormat, Log log) {
+        Interpolator interpolator = new StringSearchInterpolator("@{", "}");
+        List<String> possiblePrefixes = Arrays.asList("project");
+        Properties values = new Properties();
+        values.setProperty("groupId", groupId);
+        values.setProperty("artifactId", artifactId);
+        values.setProperty("version", version);
+        interpolator.addValueSource(new PrefixedPropertiesValueSource(possiblePrefixes, values, true));
+        RecursionInterceptor recursionInterceptor = new PrefixAwareRecursionInterceptor(possiblePrefixes);
+        try {
+            tagName = interpolator.interpolate(tagNameFormat, recursionInterceptor);
+        } catch (InterpolationException e) {
+            log.warn("Could not interpolate specified tag name format: " + tagNameFormat);
+        }
+
+        return tagName;
     }
 }
