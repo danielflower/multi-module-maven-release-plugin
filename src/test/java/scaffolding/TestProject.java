@@ -204,6 +204,10 @@ public class TestProject {
         return project("different-delimiter");
     }
 
+    public static TestProject versionOnlyTagProject() {
+        return project("version-only-tag");
+    }
+
     public void setMvnRunner(MvnRunner mvnRunner) {
         this.mvnRunner = mvnRunner;
     }
