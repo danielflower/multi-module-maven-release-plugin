@@ -5,6 +5,7 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -29,7 +30,7 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer) throws ValidationException, GitAPIException, MojoExecutionException {
+    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer, String tagNameFormat) throws ValidationException, GitAPIException, MojoExecutionException {
         DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
 
@@ -40,7 +41,7 @@ public class Reactor {
             String relativePathToModule = calculateModulePath(rootProject, project);
             String artifactId = project.getArtifactId();
             String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-            List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, artifactId, versionWithoutBuildNumber);
+            List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, project.getGroupId(), artifactId, versionWithoutBuildNumber, tagNameFormat, log);
 
 
             Collection<Long> previousBuildNumbers = new ArrayList<Long>();
@@ -50,7 +51,7 @@ public class Reactor {
                 }
             }
 
-            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, artifactId, versionWithoutBuildNumber, versionNamer);
+            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, project.getGroupId(), artifactId, versionWithoutBuildNumber, versionNamer, tagNameFormat, log);
             previousBuildNumbers.addAll(remoteBuildNumbers);
 
             VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
@@ -109,7 +110,7 @@ public class Reactor {
                     log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
                 }
             }
-            ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule);
+            ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule, tagNameFormat, log);
             modules.add(module);
         }
 
@@ -124,7 +125,7 @@ public class Reactor {
                     log.warn("No changes have been detected in any modules so will re-release them all");
                     List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
                     for (ReleasableModule module : modules) {
-                        newList.add(module.createReleasableVersion());
+                        newList.add(module.createReleasableVersion(log));
                     }
                     modules = newList;
             }
@@ -154,10 +155,14 @@ public class Reactor {
         return modelId[0].equals(module.getGroupId()) && modelId[1].equals(module.getArtifactId());
     }
 
-    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String artifactId, String versionWithoutBuildNumber, VersionNamer versionNamer) throws GitAPIException {
+    private static Collection<Long> getRemoteBuildNumbers(LocalGitRepo gitRepo, String groupId, String artifactId, String versionWithoutBuildNumber, VersionNamer versionNamer, String tagNameFormat, Log log) throws GitAPIException {
         Collection<Ref> remoteTagRefs = gitRepo.allTags();
         Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
+        if(StringUtils.isNotEmpty(tagNameFormat)) {
+            tagWithoutBuildNumber = AnnotatedTag.formatTagName(tagWithoutBuildNumber, groupId, artifactId, versionWithoutBuildNumber, tagNameFormat, log);
+        }
+
         AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(versionNamer);
         for (Ref remoteTagRef : remoteTagRefs) {
             String remoteTagName = remoteTagRef.getName();

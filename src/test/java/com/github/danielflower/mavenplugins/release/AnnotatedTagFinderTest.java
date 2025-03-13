@@ -26,9 +26,9 @@ public class AnnotatedTagFinderTest {
         AnnotatedTag tag1 = saveFileInModuleAndTag(project, "core-utils", "2", 0);
         AnnotatedTag tag2 = saveFileInModuleAndTag(project, "console-app", "1.2", 4);
 
-        assertThat(annotatedTagFinder.tagsForVersion(project.local, "console-app", "1.3"), hasSize(0));
-        assertThat(annotatedTagFinder.tagsForVersion(project.local, "console-app", "1.2"), contains(tag2));
-        assertThat(annotatedTagFinder.tagsForVersion(project.local, "core-utils", "2"), contains(tag1));
+        assertThat(annotatedTagFinder.tagsForVersion(project.local, "my-group", "console-app", "1.3", null, null), hasSize(0));
+        assertThat(annotatedTagFinder.tagsForVersion(project.local, "my-group", "console-app", "1.2", null, null), contains(tag2));
+        assertThat(annotatedTagFinder.tagsForVersion(project.local, "my-group", "core-utils", "2", null, null), contains(tag1));
     }
 
     static AnnotatedTag saveFileInModuleAndTag(TestProject project, String moduleName, String version, long buildNumber) throws IOException, GitAPIException {
@@ -62,7 +62,7 @@ public class AnnotatedTagFinderTest {
         AnnotatedTag tag1 = tagCurrentCommit(project, "console-app", "1.1.1", 1);
         AnnotatedTag tag3 = tagCurrentCommit(project, "console-app", "1.1.1", 3);
         AnnotatedTag tag2 = tagCurrentCommit(project, "console-app", "1.1.1", 2);
-        List<AnnotatedTag> annotatedTags = annotatedTagFinder.tagsForVersion(project.local, "console-app", "1.1.1");
+        List<AnnotatedTag> annotatedTags = annotatedTagFinder.tagsForVersion(project.local, "my-group", "console-app", "1.1.1", null, null);
         assertThat(annotatedTags, containsInAnyOrder(tag1, tag2, tag3));
     }
 
@@ -75,7 +75,7 @@ public class AnnotatedTagFinderTest {
         AnnotatedTag tag2 = saveFileInModuleAndTag(project, ".", "1.0", 1);
         project.checkoutBranch("feature");
 
-        List<AnnotatedTag> annotatedTags = annotatedTagFinder.tagsForVersion(project.local, "root", "1.0");
+        List<AnnotatedTag> annotatedTags = annotatedTagFinder.tagsForVersion(project.local, "my-group", "root", "1.0", null, null);
 
         assertThat(annotatedTags, both(contains(tag1)).and(not(contains(tag2))));
     }
@@ -94,16 +94,16 @@ public class AnnotatedTagFinderTest {
         // This should actually be implemented with a parameterized JUnit test but since this class isn't set up for
         // that yet we'll use our own data-driven harness.
         Arrays.asList(new Object[][]{
-            new Object[]{"libs-1.0.0", refPrefix + "foo-1.0.0-1", null},    // artifact ID does not match -> expect null
-            new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0-1", 1L},     // proper match with expected delimiter
-            new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0.1", null},   // no delimiter match
-            new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0@1", null},   // no delimiter match
-            new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0-A", null}    // format exception on build number
-        })
-        .forEach(dataSet -> {
-            final Object expectedBuildNumber = dataSet[2];
-            final Long buildNumber = tagFinder.buildNumberOf(dataSet[0].toString(), dataSet[1].toString());
-            assertThat(buildNumber, is(expectedBuildNumber));
-        });
+                new Object[]{"libs-1.0.0", refPrefix + "foo-1.0.0-1", null},    // artifact ID does not match -> expect null
+                new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0-1", 1L},     // proper match with expected delimiter
+                new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0.1", null},   // no delimiter match
+                new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0@1", null},   // no delimiter match
+                new Object[]{"libs-1.0.0", refPrefix + "libs-1.0.0-A", null}    // format exception on build number
+            })
+            .forEach(dataSet -> {
+                final Object expectedBuildNumber = dataSet[2];
+                final Long buildNumber = tagFinder.buildNumberOf(dataSet[0].toString(), dataSet[1].toString());
+                assertThat(buildNumber, is(expectedBuildNumber));
+            });
     }
 }

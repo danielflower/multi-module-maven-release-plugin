@@ -1,8 +1,11 @@
 package com.github.danielflower.mavenplugins.release;
 
+import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.mockito.Mockito;
 import scaffolding.TestProject;
 
 import java.io.IOException;
@@ -45,4 +48,68 @@ public class AnnotatedTagTest {
         assertThat(inflatedTag.buildNumber(), equalTo(0L));
     }
 
+    @Test
+    public void tagIsFormattedAsExpectedWithProjectPrefixTemplate() {
+        Log log = Mockito.mock(Log.class);
+        String name = "release";
+        String groupId = "my-group";
+        String artifactId = "my-app";
+        String version = "1.0.0";
+        String tagNameFormat = "@{project.groupId}-@{project.artifactId}-@{project.version}";
+        String expected = "my-group-my-app-1.0.0";
+        String result1 = AnnotatedTag.formatTagName(name, groupId, artifactId, version, tagNameFormat, log);
+        assertThat(result1, Matchers.equalTo(expected));
+    }
+
+    @Test
+    public void tagIsFormattedAsExpectedWithEmptyTemplate() {
+        Log log = Mockito.mock(Log.class);
+        String name = "release";
+        String groupId = "my-group";
+        String artifactId = "my-app";
+        String version = "1.0.0";
+        String tagNameFormat = "";
+        String expected = "";
+        String result = AnnotatedTag.formatTagName(name, groupId, artifactId, version, tagNameFormat, log);
+        assertThat(result, Matchers.equalTo(expected));
+    }
+
+    @Test
+    public void tagIsFormattedAsExpectedWith0nlyVersionTemplate() {
+        Log log = Mockito.mock(Log.class);
+        String name = "release";
+        String groupId = "my-group";
+        String artifactId = "my-app";
+        String version = "1.0.0";
+        String tagNameFormat = "@{version}";
+        String expected = "1.0.0";
+        String result = AnnotatedTag.formatTagName(name, groupId, artifactId, version, tagNameFormat, log);
+        assertThat(result, Matchers.equalTo(expected));
+    }
+
+    @Test
+    public void testWithNullTemplate() {
+        Log log = Mockito.mock(Log.class);
+        String name = "release";
+        String groupId = "my-group";
+        String artifactId = "my-app";
+        String version = "1.0.0";
+        String tagNameFormat = null;
+        String expected = "";
+        String result = AnnotatedTag.formatTagName(name, groupId, artifactId, version, tagNameFormat, log);
+        assertThat(result, Matchers.equalTo(expected));
+    }
+
+    @Test
+    public void testWithInvalidTemplate() {
+        Log log = Mockito.mock(Log.class);
+        String name = " release ";
+        String groupId = "my-group";
+        String artifactId = "my-app";
+        String version = "1.0.0";
+        String tagNameFormat = "@{$";
+        String expected = "@{$";
+        String result = AnnotatedTag.formatTagName(name, groupId, artifactId, version, tagNameFormat, log);
+        assertThat(result, Matchers.equalTo(expected));
+    }
 }
