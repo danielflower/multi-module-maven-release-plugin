@@ -5,20 +5,29 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
+import org.eclipse.jgit.treewalk.filter.OrTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.treewalk.filter.PathSuffixFilter;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TreeWalkingDiffDetector implements DiffDetector {
 
     private final Repository repo;
+    private final Set<String> ignoredPaths;
+    private final Set<String> requiredPaths;
 
-    public TreeWalkingDiffDetector(Repository repo) {
+    public TreeWalkingDiffDetector(Repository repo, Set<String> ignoredPaths, Set<String> requiredPaths) {
         this.repo = repo;
+        this.ignoredPaths = ignoredPaths != null ? ignoredPaths : new HashSet<>();
+        this.requiredPaths = requiredPaths;
     }
 
     public boolean hasChangedSince(String modulePath, java.util.List<String> childModules, Collection<AnnotatedTag> tags) throws IOException {
@@ -26,7 +35,14 @@ public class TreeWalkingDiffDetector implements DiffDetector {
         try {
             walk.setRetainBody(false);
             walk.markStart(walk.parseCommit(repo.getRefDatabase().findRef("HEAD").getObjectId()));
-            filterOutOtherModulesChanges(modulePath, childModules, walk);
+            List<TreeFilter> treeFilters = new ArrayList<>();
+            filterOutOtherModulesChanges(modulePath, childModules, treeFilters);
+            if (requiredPaths == null || requiredPaths.isEmpty()) {
+                filterOutIgnoredPathsChanges(treeFilters);
+            } else {
+                filterRequiredPathsChanges(treeFilters);
+            }
+            walk.setTreeFilter(treeFilters.size() == 1 ? treeFilters.get(0) : AndTreeFilter.create(treeFilters));
             stopWalkingWhenTheTagsAreHit(tags, walk);
             return walk.iterator().hasNext();
         } finally {
@@ -42,10 +58,9 @@ public class TreeWalkingDiffDetector implements DiffDetector {
         }
     }
 
-    private void filterOutOtherModulesChanges(String modulePath, List<String> childModules, RevWalk walk) {
+    private void filterOutOtherModulesChanges(String modulePath, List<String> childModules, List<TreeFilter> treeFilters) {
         boolean isRootModule = ".".equals(modulePath);
         boolean isMultiModuleProject = !isRootModule || !childModules.isEmpty();
-        List<TreeFilter> treeFilters = new ArrayList<>();
         treeFilters.add(TreeFilter.ANY_DIFF);
         if (isMultiModuleProject) {
             if (!isRootModule) {
@@ -60,7 +75,34 @@ public class TreeWalkingDiffDetector implements DiffDetector {
             }
 
         }
-        TreeFilter treeFilter = treeFilters.size() == 1 ? treeFilters.get(0) : AndTreeFilter.create(treeFilters);
-        walk.setTreeFilter(treeFilter);
+    }
+
+    private void filterOutIgnoredPathsChanges(List<TreeFilter> treeFilters) {
+        for (String ignoredPath : ignoredPaths) {
+            TreeFilter filter;
+            if (ignoredPath.startsWith("/")) {
+                filter = PathFilter.create(ignoredPath.substring(1));
+            } else {
+                filter = PathSuffixFilter.create(ignoredPath);
+            }
+            treeFilters.add(filter.negate());
+        }
+    }
+
+    private void filterRequiredPathsChanges(List<TreeFilter> treeFilters) {
+        List<TreeFilter> filters = requiredPaths.stream()
+            .filter(requiredPath -> !requiredPath.isEmpty())
+            .map(requiredPath -> {
+                if (requiredPath.startsWith("/")) {
+                    return PathFilter.create(requiredPath.substring(1));
+                } else {
+                    return PathSuffixFilter.create(requiredPath);
+                }
+            })
+            .collect(Collectors.toList());
+        if (filters.isEmpty()) {
+            return;
+        }
+        treeFilters.add(filters.size() == 1 ? filters.get(0) : OrTreeFilter.create(filters));
     }
 }

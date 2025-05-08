@@ -30,18 +30,18 @@ public class Reactor {
         return modulesInBuildOrder;
     }
 
-    public static Reactor fromProjects(Log log, LocalGitRepo gitRepo, MavenProject rootProject, List<MavenProject> projects, Long buildNumber, List<String> modulesToForceRelease, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper, VersionNamer versionNamer, String tagNameFormat) throws ValidationException, GitAPIException, MojoExecutionException {
-        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository());
+    public static Reactor fromProjects(BaseMojo mojo, Log log, LocalGitRepo gitRepo, NoChangesAction actionWhenNoChangesDetected, ResolverWrapper resolverWrapper) throws ValidationException, GitAPIException, MojoExecutionException {
+        DiffDetector detector = new TreeWalkingDiffDetector(gitRepo.git.getRepository(), mojo.getIgnoredPaths(), mojo.getRequiredPaths());
         List<ReleasableModule> modules = new ArrayList<ReleasableModule>();
 
-        resolveVersionsDefinedThroughProperties(projects);
+        resolveVersionsDefinedThroughProperties(mojo.getProjects());
 
-        AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(versionNamer);
-        for (MavenProject project : projects) {
-            String relativePathToModule = calculateModulePath(rootProject, project);
+        AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(mojo.getVersionNamer());
+        for (MavenProject project : mojo.getProjects()) {
+            String relativePathToModule = calculateModulePath(mojo.getProject(), project);
             String artifactId = project.getArtifactId();
             String versionWithoutBuildNumber = project.getVersion().replace("-SNAPSHOT", "");
-            List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, project.getGroupId(), artifactId, versionWithoutBuildNumber, tagNameFormat, log);
+            List<AnnotatedTag> previousTagsForThisModule = annotatedTagFinder.tagsForVersion(gitRepo.git, project.getGroupId(), artifactId, versionWithoutBuildNumber, mojo.getTagNameFormat(), log);
 
 
             Collection<Long> previousBuildNumbers = new ArrayList<Long>();
@@ -51,10 +51,10 @@ public class Reactor {
                 }
             }
 
-            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, project.getGroupId(), artifactId, versionWithoutBuildNumber, versionNamer, tagNameFormat, log);
+            Collection<Long> remoteBuildNumbers = getRemoteBuildNumbers(gitRepo, project.getGroupId(), artifactId, versionWithoutBuildNumber, mojo.getVersionNamer(), mojo.getTagNameFormat(), log);
             previousBuildNumbers.addAll(remoteBuildNumbers);
 
-            VersionName newVersion = versionNamer.name(project.getVersion(), buildNumber, previousBuildNumbers);
+            VersionName newVersion = mojo.getVersionNamer().name(project.getVersion(), mojo.getBuildNumber(), previousBuildNumbers);
 
             boolean oneOfTheDependenciesHasChanged = false;
             String changedDependency = null;
@@ -91,14 +91,14 @@ public class Reactor {
 
             String equivalentVersion = null;
 
-            if (modulesToForceRelease != null && modulesToForceRelease.contains(artifactId)) {
+            if (mojo.getModulesToForceRelease() != null && mojo.getModulesToForceRelease().contains(artifactId)) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we were asked to force release.");
             } else if (oneOfTheDependenciesHasChanged) {
                 log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
                 AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
-                    equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + versionNamer.getDelimiter() + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
+                    equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + mojo.getVersionNamer().getDelimiter() + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     // attempt to resolve
                     if (resolverWrapper.isResolvable(project.getGroupId(), project.getArtifactId(), equivalentVersion, project.getPackaging(), log)) {
                         log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
@@ -110,7 +110,7 @@ public class Reactor {
                     log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
                 }
             }
-            ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule, tagNameFormat, log);
+            ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule, mojo.getTagNameFormat(), log);
             modules.add(module);
         }
 
@@ -159,7 +159,7 @@ public class Reactor {
         Collection<Ref> remoteTagRefs = gitRepo.allTags();
         Collection<Long> remoteBuildNumbers = new ArrayList<Long>();
         String tagWithoutBuildNumber = artifactId + "-" + versionWithoutBuildNumber;
-        if(StringUtils.isNotEmpty(tagNameFormat)) {
+        if (StringUtils.isNotEmpty(tagNameFormat)) {
             tagWithoutBuildNumber = AnnotatedTag.formatTagName(tagWithoutBuildNumber, groupId, artifactId, versionWithoutBuildNumber, tagNameFormat, log);
         }
 

@@ -12,7 +12,6 @@ import static com.github.danielflower.mavenplugins.release.AnnotatedTagFinderTes
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 public class DiffDetectorTest {
 
@@ -24,7 +23,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag2 = saveFileInModuleAndTag(project, "core-utils", "2", 0);
         AnnotatedTag tag3 = saveFileInModuleAndTag(project, "console-app", "1.2", 4);
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
 
         assertThat(detector.hasChangedSince("core-utils", noChildModules(), asList(tag2)), is(false));
         assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag2)), is(true));
@@ -36,7 +35,7 @@ public class DiffDetectorTest {
         TestProject simple = TestProject.singleModuleProject();
         AnnotatedTag tag1 = saveFileInModuleAndTag(simple, ".", "1.0", 1);
         simple.commitRandomFile(".");
-        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(simple.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince(".", noChildModules(), asList(tag1)), is(true));
 
         AnnotatedTag tag2 = saveFileInModuleAndTag(simple, ".", "1.0", 2);
@@ -53,7 +52,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag3 = saveFileInModuleAndTag(project, "console-app", "1.2", 4);
         project.commitRandomFile("console-app");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince("console-app", noChildModules(), asList(tag3)), is(true));
     }
 
@@ -64,7 +63,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag1 = saveFileInModuleAndTag(project, "server-modules", "1.0.2.4", 0);
         project.commitRandomFile("server-modules/server-module-a");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince("server-modules", asList("server-module-a", "server-module-b"),
             asList(tag1)), is(false));
     }
@@ -76,7 +75,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag1 = saveFileInModuleAndTag(project, "server-modules", "1.0.2.4", 0);
         project.commitRandomFile("server-modules");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince("server-modules", asList("server-module-a", "server-module-b"),
             asList(tag1)), is(true));
     }
@@ -90,7 +89,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag2 = saveFileInModuleAndTag(project, ".", "1.0", 1);
         project.checkoutBranch("feature");
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince(".", noChildModules(),
             asList(tag1, tag2)), is(false));
     }
@@ -99,9 +98,9 @@ public class DiffDetectorTest {
     public void canDetectLatestBuild() throws Exception {
         TestProject project = TestProject.singleModuleProject();
         AnnotatedTag tag1 = saveFileInModuleAndTag(project, ".", "1.0", 0);
-        AnnotatedTag tag2 =  tagCurrentCommit(project, ".", "1.0", 1);
+        AnnotatedTag tag2 = tagCurrentCommit(project, ".", "1.0", 1);
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince(".", noChildModules(),
             asList(tag1, tag2)), is(false));
         assertThat(detector.hasChangedSince(".", noChildModules(),
@@ -114,7 +113,7 @@ public class DiffDetectorTest {
         AnnotatedTag tag2 = saveFileInModuleAndTag(project, ".", "1.0", 1);
         AnnotatedTag tag1 = tagCurrentCommit(project, ".", "1.0", 0);
 
-        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository());
+        DiffDetector detector = new TreeWalkingDiffDetector(project.local.getRepository(), null, null);
         assertThat(detector.hasChangedSince(".", noChildModules(),
             asList(tag2, tag1)), is(false));
         assertThat(detector.hasChangedSince(".", noChildModules(),

@@ -17,6 +17,7 @@ import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -173,6 +174,41 @@ public abstract class BaseMojo extends AbstractMojo {
     @Parameter(property = "arguments")
     public String arguments;
 
+    /**
+     * <p>List of file system paths to ignore when detecting changes in the project(s).</p>
+     * <p>The primary purpose is to skip creating new releases if only "infrastructure" files such as
+     * <code>.gitignore</code>, <code>.editorconfig</code> and the like changed. Very basic wild cards are supported as
+     * follows:
+     * <ul>
+     *     <li><code>/foo.txt</code> - matches <code>foo.txt</code> in the root of the top-level project</li>
+     *     <li><code>/bar/foo.txt</code> - matches <code>foo.txt</code> in the root of the <code>bar</code> directory that resides in the root of the top-level project</li>
+     *     <li><code>/bar/</code> - matches the <code>bar</code> directory and it's contents in the root of the top-level project</li>
+     *     <li><code>foo.txt</code> - matches <code>foo.txt</code> anywhere in the project</li>
+     *     <li><code>bar/foo.txt</code> - matches <code>foo.txt</code> in the <code>bar</code> directory anywhere in the project</li>
+     *     <li><code>bar</code> - matches the <code>bar</code> directory anywhere in the project and ignores everything below</li>
+     * <ul/></p>
+     */
+    @Parameter(property = "ignoredPaths")
+    Set<String> ignoredPaths;
+
+    /**
+     * <p>List of file system paths that are required to be changed when detecting changes in the project(s).</p>
+     * <p>The primary purpose is to trigger creating new releases only f certain changes occur in the repository.
+     * For example, a library repository with ProtoBuf messages would trigger release only if any of the *.proto files has been modified. Very basic wild cards are supported as
+     * follows:
+     * <ul>
+     *     <li><code>/foo.txt</code> - matches <code>foo.txt</code> in the root of the top-level project</li>
+     *     <li><code>/bar/foo.txt</code> - matches <code>foo.txt</code> in the root of the <code>bar</code> directory that resides in the root of the top-level project</li>
+     *     <li><code>/bar/</code> - matches the <code>bar</code> directory and it's contents in the root of the top-level project</li>
+     *     <li><code>foo.txt</code> - matches <code>foo.txt</code> anywhere in the project</li>
+     *     <li><code>bar/foo.txt</code> - matches <code>foo.txt</code> in the <code>bar</code> directory anywhere in the project</li>
+     *     <li><code>bar</code> - matches the <code>bar</code> directory anywhere in the project and ignores everything below</li>
+     * <ul/></p>
+     * <p><b>Excludes the <code>ignoredPaths</code> logic</b></p>
+     */
+    @Parameter(property = "requiredPaths")
+    Set<String> requiredPaths;
+
     final void setSettings(final Settings settings) {
 		this.settings = settings;
 	}
@@ -266,4 +302,35 @@ public abstract class BaseMojo extends AbstractMojo {
         return GitHelper.scmUrlToRemote(remote);
     }
 
+    public MavenProject getProject() {
+        return project;
+    }
+
+    public List<MavenProject> getProjects() {
+        return projects;
+    }
+
+    public Long getBuildNumber() {
+        return buildNumber;
+    }
+
+    public String getTagNameFormat() {
+        return tagNameFormat;
+    }
+
+    public VersionNamer getVersionNamer() {
+        return versionNamer;
+    }
+
+    public List<String> getModulesToForceRelease() {
+        return modulesToForceRelease;
+    }
+
+    public Set<String> getIgnoredPaths() {
+        return ignoredPaths;
+    }
+
+    public Set<String> getRequiredPaths() {
+        return requiredPaths;
+    }
 }
