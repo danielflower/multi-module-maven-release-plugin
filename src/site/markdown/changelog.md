@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+### 3.8.0
+
+* Added `ignorePaths` and `requiredPaths` settings
+
 ### 3.7.8
 
 * Fixed null pointer exception when getting location of certain dependencies. 
