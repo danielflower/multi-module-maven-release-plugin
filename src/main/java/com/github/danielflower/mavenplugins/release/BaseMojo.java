@@ -193,7 +193,8 @@ public abstract class BaseMojo extends AbstractMojo {
 
     /**
      * <p>List of file system paths that are required to be changed when detecting changes in the project(s).</p>
-     * <p>The primary purpose is to trigger creating new releases only f certain changes occur in the repository.
+     * <p>If not set, any change triggers the release logic.</p>
+     * <p>The primary purpose is to trigger creating new releases only if certain changes occur in the repository.
      * For example, a library repository with ProtoBuf messages would trigger release only if any of the *.proto files has been modified. Very basic wild cards are supported as
      * follows:
      * <ul>
