@@ -46,7 +46,7 @@ public class NextMojo extends BaseMojo {
                 .credentialsProvider(getCredentialsProvider(log))
                 .buildFromCurrentDir();
             ResolverWrapper resolverWrapper = new ResolverWrapper(factory, artifactResolver, remoteRepositories, localRepository);
-            Reactor reactor = Reactor.fromProjects(log, repo, project, projects, buildNumber, modulesToForceRelease, noChangesAction, resolverWrapper, versionNamer, tagNameFormat);
+            Reactor reactor = Reactor.fromProjects(this, log, repo, noChangesAction, resolverWrapper);
             if (reactor == null) {
                 return;
             }

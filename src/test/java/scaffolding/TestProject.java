@@ -19,7 +19,7 @@ import static scaffolding.Photocopier.copyTestProjectToTemporaryLocation;
 public class TestProject {
 
     private static final MvnRunner defaultRunner = new MvnRunner(null);
-    private static final String PLUGIN_VERSION_FOR_TESTS = "3.7-SNAPSHOT";
+    private static final String PLUGIN_VERSION_FOR_TESTS = "3.8-SNAPSHOT";
 
     public final File originDir;
     public final Git origin;
@@ -62,17 +62,21 @@ public class TestProject {
         return mvnRun("releaser:next", buildNumber, arguments);
     }
 
-    public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+    public TestProject commitFile(String module, String fileName) throws IOException, GitAPIException {
         File moduleDir = new File(localDir, module);
         if (!moduleDir.isDirectory()) {
             throw new RuntimeException("Could not find " + moduleDir.getCanonicalPath());
         }
-        File random = new File(moduleDir, UUID.randomUUID() + ".txt");
-        random.createNewFile();
+        File file = new File(moduleDir, fileName);
+        file.createNewFile();
         String modulePath = module.equals(".") ? "" : module + "/";
-        local.add().addFilepattern(modulePath + random.getName()).call();
-        local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + random.getName()).call();
+        local.add().addFilepattern(modulePath + file.getName()).call();
+        local.commit().setMessage("Commit " + commitCounter.getAndIncrement() + ": adding " + file.getName()).call();
         return this;
+    }
+
+    public TestProject commitRandomFile(String module) throws IOException, GitAPIException {
+        return commitFile(module, UUID.randomUUID() + ".txt");
     }
 
     public TestProject checkoutBranch(String branch) throws GitAPIException {
