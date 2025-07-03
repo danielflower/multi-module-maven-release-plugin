@@ -37,6 +37,8 @@ public class Reactor {
         resolveVersionsDefinedThroughProperties(mojo.getProjects());
 
         AnnotatedTagFinder annotatedTagFinder = new AnnotatedTagFinder(mojo.getVersionNamer());
+        List<String> moduleReleaseLogMessages = new ArrayList<>();
+
         for (MavenProject project : mojo.getProjects()) {
             String relativePathToModule = calculateModulePath(mojo.getProject(), project);
             String artifactId = project.getArtifactId();
@@ -92,29 +94,34 @@ public class Reactor {
             String equivalentVersion = null;
 
             if (mojo.getModulesToForceRelease() != null && mojo.getModulesToForceRelease().contains(artifactId)) {
-                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we were asked to force release.");
+                moduleReleaseLogMessages.add("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as we were asked to force release.");
             } else if (oneOfTheDependenciesHasChanged) {
-                log.info("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
+                moduleReleaseLogMessages.add("Releasing " + artifactId + " " + newVersion.releaseVersion() + " as " + changedDependency + " has changed.");
             } else {
                 AnnotatedTag previousTagThatIsTheSameAsHEADForThisModule = hasChangedSinceLastRelease(previousTagsForThisModule, detector, project, relativePathToModule);
                 if (previousTagThatIsTheSameAsHEADForThisModule != null) {
                     equivalentVersion = previousTagThatIsTheSameAsHEADForThisModule.version() + mojo.getVersionNamer().getDelimiter() + previousTagThatIsTheSameAsHEADForThisModule.buildNumber();
                     // attempt to resolve
                     if (resolverWrapper.isResolvable(project.getGroupId(), project.getArtifactId(), equivalentVersion, project.getPackaging(), log)) {
-                        log.info("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
+                        moduleReleaseLogMessages.add("Will use version " + equivalentVersion + " for " + artifactId + " as it has not been changed since that release.");
                     } else {
-                        log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as although no change was detected, the artifact cannot be resolved!");
+                        moduleReleaseLogMessages.add("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as although no change was detected, the artifact cannot be resolved!");
                         equivalentVersion = null;
                     }
                 } else {
-                    log.info("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
+                    moduleReleaseLogMessages.add("Will use version " + newVersion.releaseVersion() + " for " + artifactId + " as it has changed since the last release.");
                 }
             }
             ReleasableModule module = new ReleasableModule(project, newVersion, equivalentVersion, relativePathToModule, mojo.getTagNameFormat(), log);
             modules.add(module);
         }
 
-        if (!atLeastOneBeingReleased(modules)) {
+        if (atLeastOneBeingReleased(modules)) {
+            for (String moduleReleaseLogMessage : moduleReleaseLogMessages) {
+                log.info(moduleReleaseLogMessage);
+            }
+        }
+        else {
             switch (actionWhenNoChangesDetected) {
                 case ReleaseNone:
                     log.warn("No changes have been detected in any modules so will not perform release");
@@ -125,6 +132,7 @@ public class Reactor {
                     log.warn("No changes have been detected in any modules so will re-release them all");
                     List<ReleasableModule> newList = new ArrayList<ReleasableModule>();
                     for (ReleasableModule module : modules) {
+                        log.info("Will use version " + module.getNewVersion() + " for " + module.getArtifactId() + " as it has not been changed since that release.");
                         newList.add(module.createReleasableVersion(log));
                     }
                     modules = newList;
