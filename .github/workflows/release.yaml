@@ -6,6 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v4
         with:
@@ -27,3 +29,12 @@ jobs:
           CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
           MAVEN_GPG_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+      - name: Set up Java for publishing to GitHub Packages
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: Publish documentation
+        run: mvn --batch-mode scm-publish:publish-scm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

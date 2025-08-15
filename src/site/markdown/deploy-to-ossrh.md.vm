@@ -1,21 +1,22 @@
 ## Velocity treats double hashes as comments, which messes with markdown files. So $H can be used instead.
 #set( $H = '#' )
 
-Deploying to OSSRH from GitHub Actions
---------------------------------------
+Deploying to Maven Central from GitHub Actions
+----------------------------------------------
 
-This page explains how to publish to <https://oss.sonatype.org> (a.k.a. OSSRH) from GitHub Actions, assuming you already
-can release to there manually. See their [Getting Started Guide](https://central.sonatype.org/publish/publish-guide/) if
+This page explains how to publish to [Maven Central](https://central.sonatype.org) via the Maven Central Portal from
+GitHub Actions, assuming you already can release there manually. See their
+[Getting Started Guide](https://central.sonatype.org/register/central-portal/) if
 you do not have an account already.
 
-In order to publish directly to OSSRH from GitHub Actions, you will need OSSRH credentials, a PGP key for signing
-artifacts, and the correct plugins configured.
+In order to publish directly to Maven Central from GitHub Actions, you will need a Maven Central user token, a PGP key
+for signing artifacts, and the correct plugins configured.
 
 $H$H$H Plugin setup
 
-There are some plugins that should only be executed during releases, like the Nexus staging plugin, so you may wish
-to enable a profile during a release which has those plugins. The following will enable the `release` profile during
-a release.
+There are some plugins that should only be executed during releases, like the `central-publishing-maven-plugin`, so you
+may wish to enable a profile during a release which has those plugins. The following will enable the `release` profile
+during a release:
 
     <build>
         <plugins>
@@ -33,7 +34,7 @@ a release.
     </build>
 
 The release profile can just have the `maven-gpg-plugin` (used to sign all the generated artifacts) and the
-`nexus-staging-maven-plugin`. Note that both plugins will use secrets that will be managed by GitHub Actions.
+`central-publishing-maven-plugin`. Note that both plugins will use secrets that will be managed by GitHub Actions.
 
     <profiles>
         <profile>
@@ -57,13 +58,13 @@ The release profile can just have the `maven-gpg-plugin` (used to sign all the g
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -71,17 +72,15 @@ The release profile can just have the `maven-gpg-plugin` (used to sign all the g
         </profile>
     </profiles>
 
-*Note:* check the `nexusUrl` configuration value is correct for your project.
-
-You'll also need to enable the `maven-javadoc-plugin` and `maven-sources-plugin` as per OSSRH requirements. You can
-put these in your `release` profile or normal `build` section.
+You'll also need to enable the `maven-javadoc-plugin` and `maven-sources-plugin` as per Maven Central requirements. You
+can put these in your `release` profile or normal `build` section.
 
 $H$H$H Secrets management
 
 Add the following secrets to your repository or organisation:
 
-* **OSSRH_USERNAME** - the username you use to log in to OSS Nexus
-* **OSSRH_TOKEN** - the password for your OSSRH user
+* **CENTRAL_USERNAME** - the user token name generated at <https://central.sonatype.org/publish/generate-portal-token/>
+* **CENTRAL_TOKEN** - the password for your generated token
 * **GPG_SECRET_KEY** - your GPG key as described [here](https://gist.github.com/sualeh/ae78dc16123899d7942bc38baba5203c).
 * **GPG_SECRET_KEY_PASSPHRASE** - the password for your GPG key
 
@@ -97,7 +96,7 @@ Make sure HTTPS is used in your `scm` section as SSH URLs will not work during t
 $H$H$H Create a release workflow
 
 Create a file in your git repository at `.github/workflows/release.yaml` which has the following contents which will
-first test and verify your package using Java 21, and then release to OSSRH:
+first test and verify your package using Java 21, and then release to Maven Central:
 
 ```yaml
 name: Publish to Maven Central Repository
@@ -116,18 +115,18 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-          server-id: ossrh
-          server-username: OSSRH_USERNAME
-          server-password: OSSRH_TOKEN
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_TOKEN
       - name: Verify package
         run: mvn --batch-mode verify
       - name: Release package
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_GPG_KEY: ${{ secrets.GPG_SECRET_KEY }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
         run: mvn --batch-mode -DskipTests=true releaser:release
+        env:
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSWORD }}
+          MAVEN_GPG_KEY: ${{ secrets.GPG_SECRET_KEY }}
 ```
 
 Build triggers, java versions and build steps can be customised for your own requirements. The important bits to make sure remain
