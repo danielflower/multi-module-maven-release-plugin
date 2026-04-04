@@ -27,7 +27,7 @@
         <maven.project.version>2.2.1</maven.project.version>
         <maven.model.version>3.9.9</maven.model.version>
         <maven.settings.version>3.9.9</maven.settings.version>
-        <jgit.version>7.2.0.202503040940-r</jgit.version>
+        <jgit.version>5.13.3.202401111512-r</jgit.version>
     </properties>
 
     <ciManagement>
@@ -123,7 +123,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-settings-builder</artifactId>
-            <version>3.8.5</version>
+            <version>${maven.settings.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -134,17 +134,17 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-invoker</artifactId>
-            <version>3.1.0</version>
+            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>5.13.3.202401111512-r</version>
+            <version>${jgit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit.ssh.jsch</artifactId>
-            <version>5.13.3.202401111512-r</version>
+            <version>${jgit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -155,7 +155,7 @@
             <!-- Only because jgit uses slf4j - without a binding, it logs an error -->
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.36</version>
+            <version>2.0.17</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -166,18 +166,24 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.6.0</version>
+            <version>4.0.3</version>
+        </dependency>
+        <dependency>
+            <!-- plexus-utils 4.x moved XML classes (e.g. XmlStreamWriter) to plexus-xml, which is declared optional there -->
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-xml</artifactId>
+            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-interpolation</artifactId>
-            <version>1.27</version >
+            <version>1.29</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.18.0</version>
+            <version>2.21.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -189,7 +195,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-            <version>1.4.0</version>
+            <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -256,12 +262,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.15.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -270,7 +276,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.10.0</version>
                 <executions>
                     <execution>
                         <id>analyze</id>
@@ -293,7 +299,7 @@
                     <dependency>
                         <groupId>org.apache.maven.doxia</groupId>
                         <artifactId>doxia-module-markdown</artifactId>
-                        <version>2.0.0</version>
+                        <version>2.1.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -308,7 +314,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.12.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -321,7 +327,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -342,7 +348,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.8.0</version>
+                        <version>0.10.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
@@ -397,12 +403,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.9.0</version>
                 <reportSets>
                     <reportSet>
                         <reports>
