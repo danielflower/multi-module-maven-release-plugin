@@ -27,7 +27,7 @@
         <maven.project.version>2.2.1</maven.project.version>
         <maven.model.version>3.9.9</maven.model.version>
         <maven.settings.version>3.9.9</maven.settings.version>
-        <jgit.version>5.13.3.202401111512-r</jgit.version>
+        <jgit.version>5.13.4.202507202350-r</jgit.version>
     </properties>
 
     <ciManagement>
