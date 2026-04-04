@@ -169,9 +169,15 @@
             <version>4.0.3</version>
         </dependency>
         <dependency>
+            <!-- plexus-utils 4.x moved XML classes (e.g. XmlStreamWriter) to plexus-xml, which is declared optional there -->
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-xml</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-interpolation</artifactId>
-            <version>1.29</version >
+            <version>1.29</version>
         </dependency>
 
         <dependency>
