@@ -68,13 +68,19 @@ public class SkippingUnchangedModulesTest {
         List<String> firstBuildOutput = testProject.mvnRelease("1");
         assertThat(firstBuildOutput, noneOf(containsString("No changes have been detected in any modules so will re-release them all")));
         List<String> secondBuildOutput = testProject.mvnRelease("2");
-        assertThat(secondBuildOutput, oneOf(containsString("No changes have been detected in any modules so will re-release them all")));
 
         assertTagExists("console-app-3.2.2");
         assertTagExists("parent-module-1.2.3.2");
         assertTagExists("core-utils-2.0.2");
         assertTagExists("more-utils-10.0.2");
         assertTagExists("deep-dependencies-aggregator-1.0.2");
+
+        assertThat(secondBuildOutput, oneOf(containsString("[WARNING] No changes have been detected in any modules so will re-release them all")));
+        assertThat(secondBuildOutput, oneOf(containsString("[INFO] Will use version 1.2.3.2 for parent-module as it has not been changed since that release.")));
+        assertThat(secondBuildOutput, oneOf(containsString("[INFO] Will use version 10.0.2 for more-utils as it has not been changed since that release.")));
+        assertThat(secondBuildOutput, oneOf(containsString("[INFO] Will use version 2.0.2 for core-utils as it has not been changed since that release.")));
+        assertThat(secondBuildOutput, oneOf(containsString("[INFO] Will use version 3.2.2 for console-app as it has not been changed since that release.")));
+        assertThat(secondBuildOutput, oneOf(containsString("[INFO] Will use version 1.0.2 for deep-dependencies-aggregator as it has not been changed since that release.")));
     }
 
     @Test

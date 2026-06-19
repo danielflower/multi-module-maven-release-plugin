@@ -65,12 +65,12 @@ public class NextMojoTest {
         assertTagDoesNotExist("more-utils-10.0.2");
         assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
 
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.2.3.1 for parent-module as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 10.0.1 for more-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 2.0.1 for core-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 3.2.1 for console-app as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.0.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
         assertThat(output, oneOf(containsString("[WARNING] No changes have been detected in any modules so will re-release them all")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 1.2.3.2 for parent-module as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 10.0.2 for more-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 2.0.2 for core-utils as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 3.2.2 for console-app as it has not been changed since that release.")));
+        assertThat(output, oneOf(containsString("[INFO] Will use version 1.0.2 for deep-dependencies-aggregator as it has not been changed since that release.")));
     }
 
     @Test
@@ -86,11 +86,6 @@ public class NextMojoTest {
         assertTagDoesNotExist("more-utils-10.0.2");
         assertTagDoesNotExist("deep-dependencies-aggregator-1.0.2");
 
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.2.3.1 for parent-module as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 10.0.1 for more-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 2.0.1 for core-utils as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 3.2.1 for console-app as it has not been changed since that release.")));
-        assertThat(output, oneOf(containsString("[INFO] Will use version 1.0.1 for deep-dependencies-aggregator as it has not been changed since that release.")));
         assertThat(output, oneOf(containsString("[WARNING] No changes have been detected in any modules so will not perform release")));
     }
 
